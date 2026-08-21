@@ -930,7 +930,7 @@ export async function breakdownFile(
     return finish({
       kind: 'unknown',
       title: name,
-      tempoBpm: 90,
+      tempoBpm: 100,
       isPlaceholder: true,
       key: { root: 'C', scaleId: 'major', scaleName: 'Major (Ionian)' },
       pitchClasses: [],
