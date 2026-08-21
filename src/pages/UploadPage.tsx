@@ -85,8 +85,8 @@ export function UploadPage() {
   const [tempoOverride, setTempoOverride] = useState(0)
   /** 0 = full file; else first N seconds */
   const [trimSec, setTrimSec] = useState(90)
-  /** HPSS stem for full-band mixes */
-  const [stem, setStem] = useState<'lead' | 'harmonic' | 'mix'>('lead')
+  /** HPSS stem for full-band mixes — auto races lead/harmonic/mix */
+  const [stem, setStem] = useState<'auto' | 'lead' | 'harmonic' | 'mix'>('auto')
   const [sourceAudioUrl, setSourceAudioUrl] = useState<string | null>(null)
   /** 0–100 while audio convert runs (from pcmToMidi onProgress). */
   const [progressPct, setProgressPct] = useState(0)
@@ -365,9 +365,9 @@ export function UploadPage() {
         </ol>
         <p className="text-xs text-[var(--text-muted)] mt-3 leading-relaxed">
           <AudioLines className="w-3.5 h-3.5 inline mr-1 text-mint" />
-          Best results: dry single-note melody (no heavy drums/chords). Full-band mixes use the{' '}
-          <strong className="text-[var(--text)]">Lead</strong> stem by default (HPSS) for a monophonic
-          draft — always edit by ear. Prefer MIDI/MusicXML when you have them.
+          Best results: dry single-note melody (no heavy drums/chords). Full-band mixes default to{' '}
+          <strong className="text-[var(--text)]">Auto stem</strong> (races lead / harmonic / mix via
+          HPSS) for a monophonic draft — always edit by ear. Prefer MIDI/MusicXML when you have them.
         </p>
         <div className="mt-4 grid sm:grid-cols-3 gap-3">
           <label className="block text-xs text-[var(--text-muted)]">
@@ -403,14 +403,17 @@ export function UploadPage() {
               className="input mt-1"
               value={stem}
               disabled={busy}
-              onChange={(e) => setStem(e.target.value as 'lead' | 'harmonic' | 'mix')}
+              onChange={(e) =>
+                setStem(e.target.value as 'auto' | 'lead' | 'harmonic' | 'mix')
+              }
             >
-              <option value="lead">Lead (default · best for bands)</option>
+              <option value="auto">Auto (default · race stems)</option>
+              <option value="lead">Lead only</option>
               <option value="harmonic">Harmonic only</option>
               <option value="mix">Full mix (no HPSS · harder)</option>
             </select>
             <span className="text-[10px] opacity-80">
-              Lead is on by default — softens drums/bass before pitch track
+              Auto picks the cleanest monophonic track from lead / harmonic / mix
             </span>
           </label>
         </div>

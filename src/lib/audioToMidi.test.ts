@@ -189,4 +189,55 @@ describe('audioToMidi', () => {
     expect(mid.warnings.some((w) => /HPSS/i.test(w))).toBe(true)
     expect(mid.midiBytes.byteLength).toBeGreaterThan(20)
   })
+
+  it('scorePitchFrames rewards stable high-confidence runs', async () => {
+    const { scorePitchFrames } = await import('./audioToMidi')
+    expect(scorePitchFrames([])).toBe(0)
+    expect(
+      scorePitchFrames([
+        { timeSec: 0, hz: 440, midi: 69, confidence: 0.8 },
+        { timeSec: 0.05, hz: 440, midi: 69, confidence: 0.8 },
+      ]),
+    ).toBe(0) // need ≥3 frames
+    const stable: PitchFrame[] = Array.from({ length: 12 }, (_, i) => ({
+      timeSec: i * 0.05,
+      hz: 440,
+      midi: 69,
+      confidence: 0.85,
+    }))
+    const jumpy: PitchFrame[] = Array.from({ length: 12 }, (_, i) => ({
+      timeSec: i * 0.05,
+      hz: 200 + i * 80,
+      midi: 50 + i * 4,
+      confidence: 0.4,
+    }))
+    expect(scorePitchFrames(stable)).toBeGreaterThan(scorePitchFrames(jumpy))
+  })
+
+  it('pickBestMelodyStem + auto stem race a mixed tone+click track', async () => {
+    const { pickBestMelodyStem, selectStem, pcmToMidi } = await import('./audioToMidi')
+    const sr = 16000
+    const n = sr * 2
+    const pcm = new Float32Array(n)
+    for (let i = 0; i < n; i++) {
+      const t = i / sr
+      pcm[i] =
+        0.4 * Math.sin(2 * Math.PI * 440 * t) + (i % Math.floor(sr * 0.2) < 30 ? 0.7 : 0)
+    }
+    const best = pickBestMelodyStem(pcm, sr)
+    expect(['lead', 'harmonic', 'mix']).toContain(best.stem)
+    expect(best.pcm.length).toBe(n)
+    expect(Number.isFinite(best.score)).toBe(true)
+
+    const autoPcm = selectStem(pcm, sr, 'auto')
+    expect(autoPcm.length).toBe(n)
+
+    const mid = pcmToMidi(pcm, sr, {
+      tempoBpm: 120,
+      maxSec: 1.5,
+      stem: 'auto',
+    })
+    expect(mid.midiBytes.byteLength).toBeGreaterThan(20)
+    expect(mid.warnings.some((w) => /auto-stem|picked/i.test(w))).toBe(true)
+  })
 })

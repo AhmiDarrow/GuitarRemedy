@@ -976,8 +976,8 @@ export async function convertAudioToGuitarTabs(
     tempoBpm?: number
     /** Analyze only first N seconds (0/omit = full). */
     maxSec?: number
-    /** HPSS stem: lead (default) | harmonic | mix | percussive */
-    stem?: 'lead' | 'harmonic' | 'mix' | 'percussive'
+    /** HPSS stem: auto (default · races lead/harmonic/mix) | lead | harmonic | mix | percussive */
+    stem?: 'auto' | 'lead' | 'harmonic' | 'mix' | 'percussive'
     skipHpss?: boolean
     onProgress?: ConvertProgress
   },
@@ -992,7 +992,7 @@ export async function convertAudioToGuitarTabs(
     const converted = await convertArrayBufferToMidi(buf, {
       tempoBpm: opts?.tempoBpm,
       maxSec: opts?.maxSec,
-      stem: opts?.stem ?? 'lead',
+      stem: opts?.stem ?? 'auto',
       skipHpss: opts?.skipHpss,
       onProgress: (pct, message) => {
         onProgress?.('audio_to_midi', `2/3 ${message} (${pct}%)`)
@@ -1025,7 +1025,7 @@ export async function breakdownFile(
     onProgress?: ConvertProgress
     tempoBpm?: number
     maxSec?: number
-    stem?: 'lead' | 'harmonic' | 'mix' | 'percussive'
+    stem?: 'auto' | 'lead' | 'harmonic' | 'mix' | 'percussive'
     skipHpss?: boolean
     /** Theory-order opens (0 = low E). Overrides session when set. */
     tuning?: number[]
@@ -1072,7 +1072,7 @@ export async function breakdownFile(
       onProgress: opts?.onProgress,
       tempoBpm: opts?.tempoBpm,
       maxSec: opts?.maxSec,
-      stem: opts?.stem ?? 'lead',
+      stem: opts?.stem ?? 'auto',
       skipHpss: opts?.skipHpss,
     })
   }

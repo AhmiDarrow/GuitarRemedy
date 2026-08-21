@@ -3,8 +3,10 @@
  * Browser Web Audio decode + autocorrelation pitch track → SMF MIDI.
  * Monophonic / dominant-pitch only — not multi-voice transcription.
  *
- * Quality pipeline: melody-band → pitch track → octave repair →
- * confidence filter → note group → beat quantize → MIDI.
+ * Quality pipeline (full-band): auto stem race (lead/harmonic/mix via HPSS) →
+ * melody-band → pitch track → octave repair → confidence filter →
+ * note group → beat quantize → ghost drop → MIDI.
+ * Still monophonic assist — not multi-voice transcription.
  */
 
 import { buildSimpleMidi, parseMidi, type MidiNote, type MidiParseResult } from './midi'
@@ -446,13 +448,68 @@ export function harmonicEmphasis(
   return harm
 }
 
-export type StemKind = 'mix' | 'harmonic' | 'percussive' | 'lead'
+export type StemKind = 'mix' | 'harmonic' | 'percussive' | 'lead' | 'auto'
 
 export interface HpssResult {
   harmonic: Float32Array
   percussive: Float32Array
   /** Lead-oriented blend: harmonic + mild residual for attack. */
   lead: Float32Array
+}
+
+/** Quality score for a pitch-frame stream (higher = cleaner monophonic melody). */
+export function scorePitchFrames(frames: PitchFrame[]): number {
+  if (frames.length < 3) return 0
+  let confSum = 0
+  let jumps = 0
+  for (let i = 0; i < frames.length; i++) {
+    confSum += frames[i].confidence
+    if (i > 0) {
+      const d = Math.abs(frames[i].midi - frames[i - 1].midi)
+      // Penalize wild leaps more than stepwise motion
+      jumps += d > 7 ? d * 1.5 : d * 0.25
+    }
+  }
+  const avgConf = confSum / frames.length
+  const density = Math.min(1, frames.length / 40)
+  return avgConf * 100 + density * 25 - jumps * 0.35
+}
+
+/**
+ * Full-band assist: try lead / harmonic / mix stems and keep the cleanest pitch track.
+ * Returns the chosen stem PCM + label for warnings/UI.
+ */
+export function pickBestMelodyStem(
+  samples: Float32Array,
+  sampleRate: number,
+  opts?: { candidates?: Array<Exclude<StemKind, 'auto' | 'percussive'>> },
+): { stem: Exclude<StemKind, 'auto'>; pcm: Float32Array; score: number } {
+  const candidates = opts?.candidates ?? (['lead', 'harmonic', 'mix'] as const)
+  const sep = separateHpss(samples, sampleRate)
+  let best: { stem: Exclude<StemKind, 'auto'>; pcm: Float32Array; score: number } = {
+    stem: 'lead',
+    pcm: sep.lead,
+    score: -Infinity,
+  }
+  for (const kind of candidates) {
+    const pcm =
+      kind === 'mix' ? samples : kind === 'harmonic' ? sep.harmonic : kind === 'lead' ? sep.lead : sep.percussive
+    const prepared = emphasizeMelodyBand(pcm, sampleRate, { leadMode: true })
+    const frames = trackPitchFrames(prepared, sampleRate, {
+      minConfidence: 0.34,
+      hopSec: 0.042,
+      windowSec: 0.09,
+    })
+    const repaired = filterLowConfidenceFrames(repairOctaveFrames(frames), {
+      minConfidence: 0.32,
+      minRun: 2,
+    })
+    const score = scorePitchFrames(repaired)
+    if (score > best.score) {
+      best = { stem: kind as Exclude<StemKind, 'auto'>, pcm, score }
+    }
+  }
+  return best
 }
 
 /**
@@ -553,6 +610,7 @@ export function selectStem(
   stem: StemKind = 'lead',
 ): Float32Array {
   if (stem === 'mix') return samples
+  if (stem === 'auto') return pickBestMelodyStem(samples, sampleRate).pcm
   const sep = separateHpss(samples, sampleRate)
   if (stem === 'harmonic') return sep.harmonic
   if (stem === 'percussive') return sep.percussive
@@ -730,26 +788,41 @@ export function pcmToMidi(
   }
   onProgress?.(6, 'Separating lead stem (HPSS)…')
 
-  const stemKind: StemKind = opts?.stem ?? 'lead'
+  const stemKind: StemKind = opts?.stem ?? 'auto'
   let stemPcm = work
-  if (!opts?.skipHpss && stemKind !== 'mix') {
+  let chosenStemLabel = stemKind
+
+  if (!opts?.skipHpss && stemKind === 'auto') {
+    onProgress?.(10, 'Comparing lead / harmonic / mix stems…')
+    // Compete stems on a short window so full-band mixes stay interactive
+    const probe = trimSamples(work, sampleRate, Math.min(12, analyzedSec || 12)).samples
+    const best = pickBestMelodyStem(probe, sampleRate)
+    chosenStemLabel = best.stem
+    stemPcm = selectStem(work, sampleRate, best.stem === 'mix' ? 'mix' : best.stem)
+    warnings.push(
+      `Full-band auto-stem picked “${best.stem}” (score ${best.score.toFixed(1)}) — HPSS lead vs harmonic vs mix.`,
+    )
+  } else if (!opts?.skipHpss && stemKind !== 'mix') {
     stemPcm = selectStem(work, sampleRate, stemKind)
+    chosenStemLabel = stemKind
     warnings.push(
       `Applied median HPSS → ${stemKind} stem to reduce drums/bass before pitch track.`,
     )
+  } else {
+    chosenStemLabel = 'mix'
   }
 
-  onProgress?.(14, 'Preparing melody band…')
+  onProgress?.(18, 'Preparing melody band…')
 
   const prepared = opts?.skipMelodyBand
     ? stemPcm
     : emphasizeMelodyBand(stemPcm, sampleRate, { leadMode: true })
   if (!opts?.skipMelodyBand) {
     warnings.push(
-      'Applied lead emphasis (harmonic envelope + melody-band filter) on the chosen stem.',
+      `Applied lead emphasis (harmonic envelope + melody-band filter) on “${chosenStemLabel}” stem.`,
     )
   }
-  onProgress?.(22, 'Detecting tempo…')
+  onProgress?.(26, 'Detecting tempo…')
 
   const detectedTempo = detectTempoBpm(prepared, sampleRate, {
     defaultBpm: 100,
@@ -762,9 +835,10 @@ export function pcmToMidi(
   }
   onProgress?.(40, 'Tracking pitch…')
 
+  // Full-band: slightly stricter confidence; pure mono melodies still pass
+  const minConf = stemKind === 'mix' && opts?.skipHpss ? 0.3 : 0.36
   const frames = trackPitchFrames(prepared, sampleRate, {
-    // Tighter for full-band after HPF — fewer false pitches
-    minConfidence: 0.36,
+    minConfidence: minConf,
     hopSec: 0.038,
     windowSec: 0.09,
   })
@@ -778,6 +852,20 @@ export function pcmToMidi(
   })
   notes = dropGhostNotes(notes, { minDurationSec: 0.09, minVelocity: 45 })
   notes = mergeAdjacentNotes(notes, { ticksPerQuarter: DEFAULT_TPQ })
+
+  // Prefer fewer stable notes over a spray of ghosts on dense mixes
+  if (notes.length > 8) {
+    const confSorted = [...notes].sort((a, b) => (b.confidence ?? 0) - (a.confidence ?? 0))
+    const floor = confSorted[Math.min(confSorted.length - 1, Math.floor(confSorted.length * 0.65))]
+      ?.confidence
+    if (typeof floor === 'number' && floor > 0.3) {
+      const filtered = notes.filter((n) => (n.confidence ?? 0) >= floor * 0.92)
+      if (filtered.length >= Math.max(3, Math.floor(notes.length * 0.35))) {
+        notes = filtered.sort((a, b) => a.start - b.start)
+        warnings.push('Dropped lower-confidence ghost notes after full-band ranking.')
+      }
+    }
+  }
 
   if (notes.length === 0) {
     warnings.push('No stable pitches found — check that the clip has a clear single-note melody.')
