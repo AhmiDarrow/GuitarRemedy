@@ -155,4 +155,38 @@ describe('audioToMidi', () => {
     expect(samples.length).toBe(Math.floor(0.5 * sr))
     expect(trimSec).toBeCloseTo(0.5, 1)
   })
+
+  it('separateHpss splits harmonic vs percussive energy', async () => {
+    const { separateHpss, selectStem, pcmToMidi } = await import('./audioToMidi')
+    const sr = 16000
+    const n = sr * 2
+    const pcm = new Float32Array(n)
+    for (let i = 0; i < n; i++) {
+      const t = i / sr
+      // sustained A4 + click train (kick-ish)
+      pcm[i] =
+        0.35 * Math.sin(2 * Math.PI * 440 * t) + (i % Math.floor(sr * 0.25) < 40 ? 0.8 : 0)
+    }
+    const sep = separateHpss(pcm, sr)
+    expect(sep.harmonic.length).toBe(n)
+    expect(sep.percussive.length).toBe(n)
+    expect(sep.lead.length).toBe(n)
+    let hE = 0
+    let pE = 0
+    for (let i = 0; i < n; i++) {
+      hE += sep.harmonic[i] * sep.harmonic[i]
+      pE += sep.percussive[i] * sep.percussive[i]
+    }
+    expect(hE).toBeGreaterThan(0)
+    expect(pE).toBeGreaterThan(0)
+    const lead = selectStem(pcm, sr, 'lead')
+    expect(lead.length).toBe(n)
+    const mid = pcmToMidi(pcm, sr, {
+      tempoBpm: 120,
+      maxSec: 1.5,
+      stem: 'lead',
+    })
+    expect(mid.warnings.some((w) => /HPSS/i.test(w))).toBe(true)
+    expect(mid.midiBytes.byteLength).toBeGreaterThan(20)
+  })
 })

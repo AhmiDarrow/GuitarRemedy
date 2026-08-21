@@ -26,17 +26,32 @@ npm run tauri:build    # MSI/NSIS under src-tauri/target/release/bundle/
 - **Auto-update:** Tauri updater + process plugins; endpoint `…/releases/latest/download/latest.json`; minisign pubkey in `tauri.conf.json`
 - **CI:** `.github/workflows/ci.yml` (frontend + rust on push/PR)
 - **Release:** `.github/workflows/release.yml` on `v*` tags (draft GH release + updater JSON)
+- **Installer polish:** NSIS current-user, DigiCert timestamp URL, WebView2 bootstrapper, publisher metadata — see [`docs/WINDOWS_INSTALLER.md`](docs/WINDOWS_INSTALLER.md)
 - **Before first live update:** create `AhmiDarrow/GuitarRemedy` on GitHub, then  
   `gh secret set TAURI_SIGNING_PRIVATE_KEY < %USERPROFILE%\.tauri\guitarremedy.key`  
   and tag `v0.1.0` (do **not** commit the private key). See `docs/AUTOUPDATE.md`.
 
-## Android
+### Optional Authenticode (SmartScreen)
 
-Capacitor is **not** wired yet. Use the responsive PWA, or add Capacitor later:
+Set `bundle.windows.certificateThumbprint` in `tauri.conf.json` when you have a code-signing cert. Until then, minisign updater signatures still protect in-app updates; first-run SmartScreen may warn on unsigned NSIS.
 
-1. `npm run build`
-2. `npx cap add android` (when you choose to)
-3. Point `webDir` at `dist/`
+## Android (Capacitor)
+
+Scaffold is ready: `capacitor.config.ts`, `docs/ANDROID.md`, npm scripts.
+
+```bash
+npm i -D @capacitor/cli @capacitor/core
+npm i @capacitor/android
+npm run mobile:add          # once — creates ./android (gitignored)
+npm run mobile:sync         # build web → cap sync
+npm run mobile:android      # Android Studio
+```
+
+PWA install remains the zero-native path for phones.
+
+## Song → tabs (quality path)
+
+Full-band audio uses **median HPSS lead stem** → melody band → pitch → tempo → MIDI → fretting → auto-clean. Upload UI: stem picker (Lead / Harmonic / Mix), tempo override, trim seconds.
 
 ## Ship checklist
 
@@ -45,3 +60,4 @@ Capacitor is **not** wired yet. Use the responsive PWA, or add Capacitor later:
 3. Desktop: `cargo check` in `src-tauri` (or full `tauri build`)
 4. Smoke Upload: MP3 → tabs → Your tabs → export `.grtab.json`
 5. Smoke Learn day 1 + Library play/stop
+6. (Optional) `npm run mobile:sync` after Capacitor install

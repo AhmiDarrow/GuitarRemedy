@@ -24,7 +24,11 @@
     "test:all": "npm test && npm run test:rust",
     "tauri": "tauri",
     "tauri:dev": "tauri dev",
-    "tauri:build": "tauri build"
+    "tauri:build": "tauri build",
+    "mobile:sync": "npm run build && npx cap sync android",
+    "mobile:android": "npx cap open android",
+    "mobile:add": "npx cap add android",
+    "cap": "cap"
   },
   "dependencies": {
     "@tauri-apps/api": "^2.2.0",

@@ -53,13 +53,28 @@
     "windows": {
       "certificateThumbprint": null,
       "digestAlgorithm": "sha256",
-      "timestampUrl": "",
+      "timestampUrl": "http://timestamp.digicert.com",
+      "webviewInstallMode": {
+        "type": "downloadBootstrapper"
+      },
       "nsis": {
         "installMode": "currentUser",
-        "installerIcon": "icons/icon.ico"
+        "installerIcon": "icons/icon.ico",
+        "headerImage": null,
+        "sidebarImage": null,
+        "displayLanguageSelector": false,
+        "startMenuFolder": "GuitarRemedy",
+        "template": null
+      },
+      "wix": {
+        "language": "en-US"
       }
     },
+    "publisher": "Ahmi Darrow",
+    "copyright": "Copyright © Ahmi Darrow",
+    "category": "Education",
     "shortDescription": "Learn guitar — scales, tabs, 365-day path",
-    "longDescription": "GuitarRemedy: interactive scales, tabs, built-in library, song upload breakdown, and Day 1–365 lessons."
+    "longDescription": "GuitarRemedy: interactive scales, tabs, built-in library, song upload breakdown, and Day 1–365 lessons. Dark Forest theme. Local-first. Hi I'm Ahmi, hope this helps!",
+    "homepage": "https://github.com/AhmiDarrow/GuitarRemedy"
   }
 }

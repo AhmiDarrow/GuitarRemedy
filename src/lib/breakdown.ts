@@ -724,6 +724,9 @@ export async function convertAudioToGuitarTabs(
     tempoBpm?: number
     /** Analyze only first N seconds (0/omit = full). */
     maxSec?: number
+    /** HPSS stem: lead (default) | harmonic | mix | percussive */
+    stem?: 'lead' | 'harmonic' | 'mix' | 'percussive'
+    skipHpss?: boolean
     onProgress?: ConvertProgress
   },
 ): Promise<RemedyBreakdown> {
@@ -737,6 +740,8 @@ export async function convertAudioToGuitarTabs(
     const converted = await convertArrayBufferToMidi(buf, {
       tempoBpm: opts?.tempoBpm,
       maxSec: opts?.maxSec,
+      stem: opts?.stem ?? 'lead',
+      skipHpss: opts?.skipHpss,
       onProgress: (pct, message) => {
         onProgress?.('audio_to_midi', `2/3 ${message} (${pct}%)`)
       },
@@ -768,6 +773,8 @@ export async function breakdownFile(
     onProgress?: ConvertProgress
     tempoBpm?: number
     maxSec?: number
+    stem?: 'lead' | 'harmonic' | 'mix' | 'percussive'
+    skipHpss?: boolean
   },
 ): Promise<RemedyBreakdown> {
   const name = file.name
@@ -806,7 +813,13 @@ export async function breakdownFile(
   // Primary user path: audio (mp3/wav/m4a/…) → MIDI → guitar tabs
   const mime = 'type' in file ? (file as File).type : undefined
   if (isAudioUpload({ name: lower, type: mime })) {
-    return convertAudioToGuitarTabs(file, { onProgress: opts?.onProgress })
+    return convertAudioToGuitarTabs(file, {
+      onProgress: opts?.onProgress,
+      tempoBpm: opts?.tempoBpm,
+      maxSec: opts?.maxSec,
+      stem: opts?.stem ?? 'lead',
+      skipHpss: opts?.skipHpss,
+    })
   }
 
   // try midi parse anyway

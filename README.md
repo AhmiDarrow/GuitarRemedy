@@ -29,7 +29,7 @@ GuitarRemedy is a local-first guitar school you can actually practice in — not
 
 | | |
 |---|---|
-| **Platforms** | Windows (Tauri 2) · Web / PWA · mobile-responsive |
+| **Platforms** | Windows (Tauri 2) · Web / PWA · Android (Capacitor scaffold) |
 | **Theme** | Dark Forest (mint · lime · void green) |
 | **Data** | On-device progress, favorites, **Your tabs** |
 | **Content** | Public-domain / traditional / original study only |
@@ -50,10 +50,10 @@ GuitarRemedy is a local-first guitar school you can actually practice in — not
 ### Song → tabs (honest path)
 
 1. **Solid:** `.mid` / MusicXML (Guitar Pro when GPIF parses) → tabs + scale map  
-2. **Audio:** decode → lead emphasis → pitch → tempo → MIDI → fretting → auto-clean  
+2. **Audio:** decode → **HPSS lead stem** → melody band → pitch → tempo → MIDI → fretting → auto-clean  
 3. **Human loop:** Edit (pitch ±1, keep first N bars, Clean up) → save to **Your tabs** → `.grtab.json` / MIDI / ASCII  
 
-Full-band mixes are **monophonic drafts**. Clean single-note leads convert best. Always confirm by ear.
+Full-band mixes use a **lead stem** (median HPSS) before pitch track — still monophonic drafts. Clean single-note leads convert best. Always confirm by ear. Stem picker on Upload: Lead / Harmonic / Mix.
 
 ---
 
@@ -132,6 +132,7 @@ git tag v0.1.0 && git push origin v0.1.0
 | `npm run build` | Production web build |
 | `npm run test:rust` | Tauri crate tests |
 | `npm run tauri:dev` / `tauri:build` | Desktop shell |
+| `npm run mobile:sync` / `mobile:android` | Capacitor Android (after `cap add`) |
 
 ---
 

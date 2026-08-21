@@ -47,3 +47,7 @@ gh repo create AhmiDarrow/GuitarRemedy --private --source=. --remote=origin
 git push -u origin main
 git tag v0.1.0 && git push origin v0.1.0
 ```
+
+## Installer polish
+
+See [`WINDOWS_INSTALLER.md`](WINDOWS_INSTALLER.md) for NSIS/MSI, WebView2 bootstrapper, timestamp URL, and optional Authenticode. Updater minisign is separate from OS code-signing.

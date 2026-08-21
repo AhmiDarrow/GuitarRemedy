@@ -38,3 +38,10 @@ dev-smoke*.log
 # Large user/full-band samples (keep small synthetic fixtures tracked for CI)
 public/samples/*fullband*
 public/samples/Born*
+
+# Capacitor / Android (generated native project — re-sync from webDir)
+android/
+.capacitor/
+*.jks
+*.keystore
+local.properties

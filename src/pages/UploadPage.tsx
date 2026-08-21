@@ -83,6 +83,8 @@ export function UploadPage() {
   const [tempoOverride, setTempoOverride] = useState(0)
   /** 0 = full file; else first N seconds */
   const [trimSec, setTrimSec] = useState(90)
+  /** HPSS stem for full-band mixes */
+  const [stem, setStem] = useState<'lead' | 'harmonic' | 'mix'>('lead')
   const [sourceAudioUrl, setSourceAudioUrl] = useState<string | null>(null)
   /** 0–100 while audio convert runs (from pcmToMidi onProgress). */
   const [progressPct, setProgressPct] = useState(0)
@@ -139,6 +141,7 @@ export function UploadPage() {
           },
           tempoBpm: audio && tempoOverride > 0 ? tempoOverride : undefined,
           maxSec: audio && trimSec > 0 ? trimSec : undefined,
+          stem: audio ? stem : undefined,
         })
         setBreakdown(b)
         setStage(b.kind === 'unknown' ? 'error' : 'done')
@@ -160,7 +163,7 @@ export function UploadPage() {
         setBusy(false)
       }
     },
-    [persistBreakdown, sourceAudioUrl, tempoOverride, trimSec],
+    [persistBreakdown, sourceAudioUrl, tempoOverride, trimSec, stem],
   )
 
   const onInput = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -374,7 +377,7 @@ export function UploadPage() {
           Best results: dry single-note melody (no heavy drums/chords). Full-band mixes get a monophonic
           lead draft — always edit by ear.
         </p>
-        <div className="mt-4 grid sm:grid-cols-2 gap-3">
+        <div className="mt-4 grid sm:grid-cols-3 gap-3">
           <label className="block text-xs text-[var(--text-muted)]">
             Tempo override (BPM)
             <input
@@ -401,6 +404,20 @@ export function UploadPage() {
               onChange={(e) => setTrimSec(Math.max(0, Number(e.target.value) || 0))}
             />
             <span className="text-[10px] opacity-80">0 = full file · default 90s for long mixes</span>
+          </label>
+          <label className="block text-xs text-[var(--text-muted)]">
+            Full-band stem (HPSS)
+            <select
+              className="input mt-1"
+              value={stem}
+              disabled={busy}
+              onChange={(e) => setStem(e.target.value as 'lead' | 'harmonic' | 'mix')}
+            >
+              <option value="lead">Lead (recommended)</option>
+              <option value="harmonic">Harmonic only</option>
+              <option value="mix">Full mix (no HPSS)</option>
+            </select>
+            <span className="text-[10px] opacity-80">Softens drums before pitch track</span>
           </label>
         </div>
       </div>

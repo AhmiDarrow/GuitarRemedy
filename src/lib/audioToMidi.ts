@@ -446,6 +446,119 @@ export function harmonicEmphasis(
   return harm
 }
 
+export type StemKind = 'mix' | 'harmonic' | 'percussive' | 'lead'
+
+export interface HpssResult {
+  harmonic: Float32Array
+  percussive: Float32Array
+  /** Lead-oriented blend: harmonic + mild residual for attack. */
+  lead: Float32Array
+}
+
+/**
+ * Median-filter HPSS (harmonic–percussive source separation), O(n · win).
+ * Softens drums/transients so pitch track locks onto sustained melody.
+ * winFrames≈17 @ hop 512 is a good default for full-band mixes.
+ */
+export function separateHpss(
+  samples: Float32Array,
+  sampleRate: number,
+  opts?: { hop?: number; winFrames?: number; leadMix?: number },
+): HpssResult {
+  const hop = opts?.hop ?? Math.max(256, Math.floor(sampleRate * 0.012))
+  const winFrames = Math.max(5, opts?.winFrames ?? 17) | 1 // odd
+  const leadMix = opts?.leadMix ?? 0.82
+  const n = samples.length
+  if (n < hop * 4 || sampleRate <= 0) {
+    const copy = samples.slice()
+    return { harmonic: copy, percussive: new Float32Array(n), lead: copy.slice() }
+  }
+
+  // Frame RMS magnitudes (cheap spectrogram proxy)
+  const nFrames = Math.max(1, Math.floor((n - hop) / hop))
+  const mag = new Float32Array(nFrames)
+  for (let f = 0; f < nFrames; f++) {
+    const start = f * hop
+    let e = 0
+    const end = Math.min(n, start + hop)
+    for (let i = start; i < end; i++) e += samples[i] * samples[i]
+    mag[f] = Math.sqrt(e / Math.max(1, end - start))
+  }
+
+  // Horizontal median → harmonic mask; residual → percussive
+  const half = (winFrames - 1) >> 1
+  const harmMag = new Float32Array(nFrames)
+  const scratch = new Float32Array(winFrames)
+  for (let f = 0; f < nFrames; f++) {
+    let k = 0
+    for (let d = -half; d <= half; d++) {
+      const j = Math.min(nFrames - 1, Math.max(0, f + d))
+      scratch[k++] = mag[j]
+    }
+    // partial sort for median
+    for (let a = 0; a <= half; a++) {
+      let minI = a
+      for (let b = a + 1; b < winFrames; b++) if (scratch[b] < scratch[minI]) minI = b
+      const tmp = scratch[a]
+      scratch[a] = scratch[minI]
+      scratch[minI] = tmp
+    }
+    harmMag[f] = scratch[half]
+  }
+
+  const harmonic = new Float32Array(n)
+  const percussive = new Float32Array(n)
+  for (let f = 0; f < nFrames; f++) {
+    const m = mag[f]
+    const hRatio = m > 1e-9 ? Math.min(1, harmMag[f] / m) : 1
+    const pRatio = 1 - hRatio
+    const start = f * hop
+    const end = f === nFrames - 1 ? n : Math.min(n, start + hop)
+    for (let i = start; i < end; i++) {
+      const x = samples[i]
+      harmonic[i] = x * hRatio
+      percussive[i] = x * pRatio
+    }
+  }
+  // Tail after last full hop
+  const tail = nFrames * hop
+  for (let i = tail; i < n; i++) {
+    harmonic[i] = samples[i]
+    percussive[i] = 0
+  }
+
+  const lead = new Float32Array(n)
+  for (let i = 0; i < n; i++) {
+    // Keep a little percussive for note attacks; mostly harmonic body
+    lead[i] = harmonic[i] * leadMix + samples[i] * (1 - leadMix) * 0.35
+  }
+  // Peak normalize lead so RMS gate still fires
+  let peak = 1e-6
+  for (let i = 0; i < n; i++) {
+    const a = Math.abs(lead[i])
+    if (a > peak) peak = a
+  }
+  if (peak > 1) {
+    const inv = 1 / peak
+    for (let i = 0; i < n; i++) lead[i] *= inv
+  }
+
+  return { harmonic, percussive, lead }
+}
+
+/** Pick a stem for pitch tracking (default lead = HPSS harmonic blend). */
+export function selectStem(
+  samples: Float32Array,
+  sampleRate: number,
+  stem: StemKind = 'lead',
+): Float32Array {
+  if (stem === 'mix') return samples
+  const sep = separateHpss(samples, sampleRate)
+  if (stem === 'harmonic') return sep.harmonic
+  if (stem === 'percussive') return sep.percussive
+  return sep.lead
+}
+
 /**
  * Emphasize mid/high melody band and soften low-end thump (kick/bass)
  * before pitch tracking — light HPSS-style assist, not stem separation.
@@ -590,6 +703,10 @@ export function pcmToMidi(
     title?: string
     /** Skip melody-band emphasis (tests / already-filtered PCM) */
     skipMelodyBand?: boolean
+    /** Skip median HPSS stem split (tests / already separated). */
+    skipHpss?: boolean
+    /** Which stem to pitch-track after HPSS (default lead). */
+    stem?: StemKind
     noteCap?: number
     /** Analyze only the first N seconds (0 = full). */
     maxSec?: number
@@ -598,7 +715,7 @@ export function pcmToMidi(
 ): AudioToMidiResult {
   const warnings: string[] = [
     'Audio→MIDI is monophonic pitch-track assist — not multi-voice transcription.',
-    'Lead emphasis (HPSS-lite + melody band), octave repair, confidence gate, and beat quantize run automatically.',
+    'Full-band path: HPSS lead stem → melody band → octave repair → confidence gate → beat quantize.',
     'Edit or Clean up the candidate tab before practicing or saving.',
   ]
   const onProgress = opts?.onProgress
@@ -611,14 +728,25 @@ export function pcmToMidi(
   if (opts?.maxSec && opts.maxSec > 0 && analyzedSec + 0.05 < fullDuration) {
     warnings.push(`Analyzed first ${analyzedSec.toFixed(0)}s of ${fullDuration.toFixed(0)}s (trim).`)
   }
-  onProgress?.(8, 'Preparing lead band…')
+  onProgress?.(6, 'Separating lead stem (HPSS)…')
+
+  const stemKind: StemKind = opts?.stem ?? 'lead'
+  let stemPcm = work
+  if (!opts?.skipHpss && stemKind !== 'mix') {
+    stemPcm = selectStem(work, sampleRate, stemKind)
+    warnings.push(
+      `Applied median HPSS → ${stemKind} stem to reduce drums/bass before pitch track.`,
+    )
+  }
+
+  onProgress?.(14, 'Preparing melody band…')
 
   const prepared = opts?.skipMelodyBand
-    ? work
-    : emphasizeMelodyBand(work, sampleRate, { leadMode: true })
+    ? stemPcm
+    : emphasizeMelodyBand(stemPcm, sampleRate, { leadMode: true })
   if (!opts?.skipMelodyBand) {
     warnings.push(
-      'Applied lead emphasis (harmonic median + melody-band filter) to reduce drums/bass pull.',
+      'Applied lead emphasis (harmonic envelope + melody-band filter) on the chosen stem.',
     )
   }
   onProgress?.(22, 'Detecting tempo…')
@@ -704,6 +832,8 @@ function getDecodeContext(): { ctx: AudioContext; close: boolean } {
 export type AudioConvertOpts = {
   tempoBpm?: number
   skipMelodyBand?: boolean
+  skipHpss?: boolean
+  stem?: StemKind
   /** Analyze only first N seconds (0/omit = full track). */
   maxSec?: number
   onProgress?: (pct: number, message: string) => void
@@ -731,6 +861,8 @@ export async function convertArrayBufferToMidi(
     return pcmToMidi(mono, audio.sampleRate, {
       tempoBpm: opts?.tempoBpm,
       skipMelodyBand: opts?.skipMelodyBand,
+      skipHpss: opts?.skipHpss,
+      stem: opts?.stem,
       maxSec: opts?.maxSec,
       onProgress: opts?.onProgress,
     })

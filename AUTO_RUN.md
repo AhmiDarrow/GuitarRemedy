@@ -24,21 +24,22 @@ Vigil does **not** call cloud providers at night. Daytime chat still drives prod
 - [ ] **Create GitHub remote + push** when Ahmi says go (private/public choice)
 - [ ] **Set GH secret** `TAURI_SIGNING_PRIVATE_KEY` from `~/.tauri/guitarremedy.key`
 - [ ] **Tag `v0.1.0`** after first green CI for draft Windows installer
-- [ ] **Stronger full-band audio** — optional stems / ML pitch when ready
-- [ ] **Capacitor Android** packaging (optional)
-- [ ] **Windows installer polish** — code-signing cert / SmartScreen (optional)
+- [ ] **Authenticode cert** for SmartScreen (optional — needs purchased cert)
+- [ ] **ML pitch model** (Basic Pitch / similar) if HPSS lead still weak on some mixes
 
 ## Done (do not re-open without a bug)
 
 - Dark Forest theme + ComfyUI assets
 - Day 1–365 private-lesson expansion + Learn UI
-- Audio → MIDI → tabs (lead emphasis, tempo, trim, multi-format, Clean up)
+- Audio → MIDI → tabs (HPSS lead stem, melody band, tempo, trim, multi-format, Clean up)
 - Tab editor ear-loop + eternal user tabs + `.grtab` import/export
 - Free-license full-length tabs + Play/Stop
 - GP best-effort path + MusicXML/MIDI solid path + unit coverage
 - README + offline wiki + About (Ahmi family) + GH updater pipeline (local, no push yet)
 - Mobile bottom nav trimmed (Wiki/About via rail + Profile)
 - Upload pipeline labels ASCII-safe
+- Capacitor Android scaffold (`capacitor.config.ts`, docs, scripts)
+- Windows installer polish (NSIS metadata, timestamp URL, WebView2 bootstrapper, docs)
 - `npm test` / `cargo test` / `npm run build` green
 
 ## Rule for Remedy
