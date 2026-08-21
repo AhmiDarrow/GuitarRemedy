@@ -1,4 +1,4 @@
-/** Minimal MusicXML note extractor for Option A */
+/** Minimal MusicXML note extractor for song import */
 
 export interface MusicXmlNote {
   pitch: number | null // MIDI, null = rest

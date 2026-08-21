@@ -1,4 +1,4 @@
-/** Lightweight SMF (Standard MIDI File) parser for Option A imports */
+/** Lightweight SMF (Standard MIDI File) parser for song import */
 
 export interface MidiNote {
   pitch: number

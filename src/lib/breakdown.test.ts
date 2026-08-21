@@ -32,7 +32,7 @@ describe('breakdown', () => {
     expect(r.kind).toBe('audio')
     expect(r.editable).toBe(true)
     expect(r.confidence).toBeLessThan(0.6)
-    expect(r.warnings.some((w) => /assist|Option A/i.test(w))).toBe(true)
+    expect(r.warnings.some((w) => /assist|monophonic|editable/i.test(w))).toBe(true)
   })
 
   it('renders ascii tab', () => {
