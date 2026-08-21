@@ -1,0 +1,34 @@
+import { Navigate, Route, Routes } from 'react-router-dom'
+import { AppShell } from './components/AppShell'
+import { HomePage } from './pages/HomePage'
+import { LearnPage } from './pages/LearnPage'
+import { LibraryPage } from './pages/LibraryPage'
+import { PracticePage } from './pages/PracticePage'
+import { UploadPage } from './pages/UploadPage'
+import { ProfilePage } from './pages/ProfilePage'
+import { AboutPage } from './pages/AboutPage'
+import { Onboarding } from './components/Onboarding'
+import { useAppStore } from './store/appStore'
+
+export default function App() {
+  const onboarded = useAppStore((s) => s.onboarded)
+
+  return (
+    <>
+      {!onboarded && <Onboarding />}
+      <Routes>
+        <Route element={<AppShell />}>
+          <Route index element={<HomePage />} />
+          <Route path="learn" element={<LearnPage />} />
+          <Route path="learn/:day" element={<LearnPage />} />
+          <Route path="library" element={<LibraryPage />} />
+          <Route path="practice" element={<PracticePage />} />
+          <Route path="upload" element={<UploadPage />} />
+          <Route path="profile" element={<ProfilePage />} />
+          <Route path="about" element={<AboutPage />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Route>
+      </Routes>
+    </>
+  )
+}

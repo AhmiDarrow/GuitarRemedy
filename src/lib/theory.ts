@@ -1,0 +1,585 @@
+/** Guitar theory engine — notes, scales, chords, fretting helpers */
+
+export const NOTE_NAMES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'] as const
+export type NoteName = (typeof NOTE_NAMES)[number]
+
+export const FLAT_TO_SHARP: Record<string, NoteName> = {
+  Db: 'C#',
+  Eb: 'D#',
+  Gb: 'F#',
+  Ab: 'G#',
+  Bb: 'A#',
+}
+
+/** Canonical scale ids (snake_case). CamelCase aliases resolve via `resolveScaleId`. */
+export type ScaleId =
+  | 'major'
+  | 'natural_minor'
+  | 'harmonic_minor'
+  | 'melodic_minor'
+  | 'dorian'
+  | 'phrygian'
+  | 'lydian'
+  | 'mixolydian'
+  | 'locrian'
+  | 'major_pentatonic'
+  | 'minor_pentatonic'
+  | 'blues'
+  | 'whole_tone'
+  | 'chromatic'
+
+/** @deprecated Prefer snake_case ScaleId — kept for call-site compatibility */
+export type ScaleIdAlias =
+  | ScaleId
+  | 'naturalMinor'
+  | 'harmonicMinor'
+  | 'melodicMinor'
+  | 'majorPentatonic'
+  | 'minorPentatonic'
+
+export interface ScaleDef {
+  id: ScaleId
+  name: string
+  intervals: number[]
+  degrees: string[]
+  category: 'scale' | 'mode' | 'pentatonic' | 'other'
+}
+
+export type ScaleDefinition = ScaleDef
+
+function def(
+  id: ScaleId,
+  name: string,
+  intervals: number[],
+  degrees: string[],
+  category: ScaleDef['category'],
+): ScaleDef {
+  return { id, name, intervals, degrees, category }
+}
+
+const major = def('major', 'Major (Ionian)', [0, 2, 4, 5, 7, 9, 11], ['1', '2', '3', '4', '5', '6', '7'], 'scale')
+const natural_minor = def('natural_minor', 'Natural Minor (Aeolian)', [0, 2, 3, 5, 7, 8, 10], ['1', '2', 'b3', '4', '5', 'b6', 'b7'], 'scale')
+const harmonic_minor = def('harmonic_minor', 'Harmonic Minor', [0, 2, 3, 5, 7, 8, 11], ['1', '2', 'b3', '4', '5', 'b6', '7'], 'scale')
+const melodic_minor = def('melodic_minor', 'Melodic Minor', [0, 2, 3, 5, 7, 9, 11], ['1', '2', 'b3', '4', '5', '6', '7'], 'scale')
+const dorian = def('dorian', 'Dorian', [0, 2, 3, 5, 7, 9, 10], ['1', '2', 'b3', '4', '5', '6', 'b7'], 'mode')
+const phrygian = def('phrygian', 'Phrygian', [0, 1, 3, 5, 7, 8, 10], ['1', 'b2', 'b3', '4', '5', 'b6', 'b7'], 'mode')
+const lydian = def('lydian', 'Lydian', [0, 2, 4, 6, 7, 9, 11], ['1', '2', '3', '#4', '5', '6', '7'], 'mode')
+const mixolydian = def('mixolydian', 'Mixolydian', [0, 2, 4, 5, 7, 9, 10], ['1', '2', '3', '4', '5', '6', 'b7'], 'mode')
+const locrian = def('locrian', 'Locrian', [0, 1, 3, 5, 6, 8, 10], ['1', 'b2', 'b3', '4', 'b5', 'b6', 'b7'], 'mode')
+const major_pentatonic = def('major_pentatonic', 'Major Pentatonic', [0, 2, 4, 7, 9], ['1', '2', '3', '5', '6'], 'pentatonic')
+const minor_pentatonic = def('minor_pentatonic', 'Minor Pentatonic', [0, 3, 5, 7, 10], ['1', 'b3', '4', '5', 'b7'], 'pentatonic')
+const blues = def('blues', 'Blues', [0, 3, 5, 6, 7, 10], ['1', 'b3', '4', 'b5', '5', 'b7'], 'other')
+const whole_tone = def('whole_tone', 'Whole Tone', [0, 2, 4, 6, 8, 10], ['1', '2', '3', '#4', '#5', 'b7'], 'other')
+const chromatic = def('chromatic', 'Chromatic', [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11], ['1', 'b2', '2', 'b3', '3', '4', 'b5', '5', 'b6', '6', 'b7', '7'], 'other')
+
+export const SCALES: Record<string, ScaleDef> = {
+  major,
+  natural_minor,
+  harmonic_minor,
+  melodic_minor,
+  dorian,
+  phrygian,
+  lydian,
+  mixolydian,
+  locrian,
+  major_pentatonic,
+  minor_pentatonic,
+  blues,
+  whole_tone,
+  chromatic,
+  naturalMinor: { ...natural_minor, id: 'natural_minor' },
+  harmonicMinor: { ...harmonic_minor, id: 'harmonic_minor' },
+  melodicMinor: { ...melodic_minor, id: 'melodic_minor' },
+  majorPentatonic: { ...major_pentatonic, id: 'major_pentatonic' },
+  minorPentatonic: { ...minor_pentatonic, id: 'minor_pentatonic' },
+}
+
+export const SCALE_CATALOG = SCALES
+
+export const SCALE_LIST: ScaleDef[] = [
+  major,
+  natural_minor,
+  harmonic_minor,
+  melodic_minor,
+  dorian,
+  phrygian,
+  lydian,
+  mixolydian,
+  locrian,
+  major_pentatonic,
+  minor_pentatonic,
+  blues,
+  whole_tone,
+  chromatic,
+]
+
+export type ChordId =
+  | 'maj'
+  | 'min'
+  | 'dim'
+  | 'aug'
+  | 'sus2'
+  | 'sus4'
+  | '7'
+  | 'maj7'
+  | 'min7'
+  | 'dim7'
+  | 'm7b5'
+  | '9'
+  | 'add9'
+  | '6'
+  | 'min6'
+  | '5'
+
+export interface ChordDef {
+  id: ChordId
+  name: string
+  intervals: number[]
+  symbol: string
+}
+
+export const CHORDS: Record<ChordId, ChordDef> = {
+  maj: { id: 'maj', name: 'Major', intervals: [0, 4, 7], symbol: '' },
+  min: { id: 'min', name: 'Minor', intervals: [0, 3, 7], symbol: 'm' },
+  dim: { id: 'dim', name: 'Diminished', intervals: [0, 3, 6], symbol: 'dim' },
+  aug: { id: 'aug', name: 'Augmented', intervals: [0, 4, 8], symbol: 'aug' },
+  sus2: { id: 'sus2', name: 'Sus2', intervals: [0, 2, 7], symbol: 'sus2' },
+  sus4: { id: 'sus4', name: 'Sus4', intervals: [0, 5, 7], symbol: 'sus4' },
+  '7': { id: '7', name: 'Dominant 7', intervals: [0, 4, 7, 10], symbol: '7' },
+  maj7: { id: 'maj7', name: 'Major 7', intervals: [0, 4, 7, 11], symbol: 'maj7' },
+  min7: { id: 'min7', name: 'Minor 7', intervals: [0, 3, 7, 10], symbol: 'm7' },
+  dim7: { id: 'dim7', name: 'Dim 7', intervals: [0, 3, 6, 9], symbol: 'dim7' },
+  m7b5: { id: 'm7b5', name: 'Half-dim', intervals: [0, 3, 6, 10], symbol: 'm7b5' },
+  '9': { id: '9', name: 'Dominant 9', intervals: [0, 4, 7, 10, 14], symbol: '9' },
+  add9: { id: 'add9', name: 'Add9', intervals: [0, 4, 7, 14], symbol: 'add9' },
+  '6': { id: '6', name: 'Major 6', intervals: [0, 4, 7, 9], symbol: '6' },
+  min6: { id: 'min6', name: 'Minor 6', intervals: [0, 3, 7, 9], symbol: 'm6' },
+  '5': { id: '5', name: 'Power chord', intervals: [0, 7], symbol: '5' },
+}
+
+export const STANDARD_TUNING = [40, 45, 50, 55, 59, 64] as const
+
+export type TuningName =
+  | 'standard'
+  | 'drop_d'
+  | 'half_down'
+  | 'open_g'
+  | 'open_d'
+  | 'dadgad'
+  | 'custom'
+
+export const TUNINGS: Record<string, { name: string; midi: number[] }> = {
+  standard: { name: 'Standard (EADGBE)', midi: [...STANDARD_TUNING] },
+  drop_d: { name: 'Drop D', midi: [38, 45, 50, 55, 59, 64] },
+  half_down: { name: 'Half Step Down', midi: [39, 44, 49, 54, 58, 63] },
+  open_g: { name: 'Open G', midi: [38, 43, 50, 55, 59, 62] },
+  open_d: { name: 'Open D', midi: [38, 45, 50, 54, 57, 62] },
+  dadgad: { name: 'DADGAD', midi: [38, 45, 50, 55, 57, 62] },
+}
+
+export function resolveScaleId(id: string): string {
+  if (SCALES[id]) return id
+  const map: Record<string, string> = {
+    naturalMinor: 'natural_minor',
+    harmonicMinor: 'harmonic_minor',
+    melodicMinor: 'melodic_minor',
+    majorPentatonic: 'major_pentatonic',
+    minorPentatonic: 'minor_pentatonic',
+    natural_minor: 'natural_minor',
+    harmonic_minor: 'harmonic_minor',
+    melodic_minor: 'melodic_minor',
+    major_pentatonic: 'major_pentatonic',
+    minor_pentatonic: 'minor_pentatonic',
+  }
+  return map[id] ?? 'major'
+}
+
+export function getScale(id: string): ScaleDef {
+  const key = resolveScaleId(id)
+  return SCALES[key] ?? SCALES.major
+}
+
+export function normalizeNoteName(name: string): NoteName {
+  const cleaned = name.trim().replace('♯', '#').replace('♭', 'b')
+  if ((NOTE_NAMES as readonly string[]).includes(cleaned)) return cleaned as NoteName
+  if (FLAT_TO_SHARP[cleaned]) return FLAT_TO_SHARP[cleaned]
+  const upper = cleaned.charAt(0).toUpperCase() + cleaned.slice(1)
+  if ((NOTE_NAMES as readonly string[]).includes(upper)) return upper as NoteName
+  if (FLAT_TO_SHARP[upper]) return FLAT_TO_SHARP[upper]
+  throw new Error(`Unknown note: ${name}`)
+}
+
+export function noteToPc(note: string | number): number {
+  if (typeof note === 'number') return ((note % 12) + 12) % 12
+  return NOTE_NAMES.indexOf(normalizeNoteName(note))
+}
+
+export const pitchClass = noteToPc
+
+export function pcToName(pc: number): NoteName {
+  return NOTE_NAMES[((pc % 12) + 12) % 12]
+}
+
+export function midiToName(midi: number): string {
+  const pc = ((midi % 12) + 12) % 12
+  const octave = Math.floor(midi / 12) - 1
+  return `${NOTE_NAMES[pc]}${octave}`
+}
+
+export const midiToNoteName = midiToName
+
+export function nameToMidi(note: string, defaultOctave = 4): number {
+  const m = note.trim().match(/^([A-Ga-g])([#b♯♭]?)(-?\d+)?$/)
+  if (!m) throw new Error(`Bad note name: ${note}`)
+  const acc = (m[2] || '').replace('♯', '#').replace('♭', 'b')
+  const base = normalizeNoteName(m[1].toUpperCase() + acc)
+  const oct = m[3] !== undefined ? parseInt(m[3], 10) : defaultOctave
+  return (oct + 1) * 12 + NOTE_NAMES.indexOf(base)
+}
+
+export function noteToMidi(note: string, octave = 4): number {
+  if (/[0-9]/.test(note)) return nameToMidi(note)
+  return nameToMidi(note, octave)
+}
+
+export function scalePitchClasses(root: string | number, scaleId: string): number[] {
+  const rootPc = noteToPc(root)
+  const scale = getScale(scaleId)
+  return scale.intervals.map((i) => (rootPc + i) % 12)
+}
+
+export function scaleNoteNames(root: string, scaleId: string): NoteName[] {
+  return scalePitchClasses(root, scaleId).map(pcToName)
+}
+
+export function chordPitchClasses(root: string | number, chordId: ChordId | string): number[] {
+  const rootPc = noteToPc(root)
+  const chord = CHORDS[chordId as ChordId] ?? CHORDS.maj
+  return chord.intervals.map((i) => (rootPc + (i % 12)) % 12)
+}
+
+export function chordNotes(root: string, quality: string): number[] {
+  const q = quality === 'm' || quality === 'min' ? 'min' : quality === 'maj' || quality === '' ? 'maj' : quality
+  const map: Record<string, ChordId> = {
+    maj: 'maj',
+    min: 'min',
+    m: 'min',
+    '7': '7',
+    maj7: 'maj7',
+    m7: 'min7',
+    min7: 'min7',
+    dim: 'dim',
+    aug: 'aug',
+    sus2: 'sus2',
+    sus4: 'sus4',
+    '5': '5',
+  }
+  const id = map[q] ?? 'maj'
+  const base = 60 + noteToPc(root)
+  return CHORDS[id].intervals.map((i) => base + i)
+}
+
+export function degreeLabel(root: string | number, note: string | number, scaleId: string): string | null {
+  const rootPc = noteToPc(root)
+  const notePc = noteToPc(note)
+  const interval = (notePc - rootPc + 12) % 12
+  const defn = getScale(scaleId)
+  const idx = defn.intervals.indexOf(interval)
+  return idx >= 0 ? defn.degrees[idx] : null
+}
+
+export function degreeOf(pc: number, rootPc: number, scale: ScaleDef | string): string | null {
+  const scaleDef = typeof scale === 'string' ? getScale(scale) : scale
+  const interval = (pc - rootPc + 12) % 12
+  const idx = scaleDef.intervals.indexOf(interval)
+  return idx >= 0 ? scaleDef.degrees[idx] : null
+}
+
+export interface FretCell {
+  string: number
+  fret: number
+  midi: number
+  pc: number
+  note: NoteName
+  inScale: boolean
+  isRoot: boolean
+  degree: string | null
+}
+
+export function buildFretboard(options: {
+  tuning?: number[]
+  frets?: number
+  root: string | number
+  scaleId: string
+  lefty?: boolean
+}): FretCell[][] {
+  const tuning = options.tuning ?? [...STANDARD_TUNING]
+  const frets = options.frets ?? 15
+  const rootPc = noteToPc(options.root)
+  const pcs = new Set(scalePitchClasses(options.root, options.scaleId))
+  const strings = options.lefty ? [...tuning].reverse() : tuning
+
+  return strings.map((openMidi, stringIndex) => {
+    const row: FretCell[] = []
+    for (let fret = 0; fret <= frets; fret++) {
+      const midi = openMidi + fret
+      const pc = ((midi % 12) + 12) % 12
+      row.push({
+        string: stringIndex,
+        fret,
+        midi,
+        pc,
+        note: pcToName(pc),
+        inScale: pcs.has(pc),
+        isRoot: pc === rootPc,
+        degree: degreeLabel(options.root, pc, options.scaleId),
+      })
+    }
+    return row
+  })
+}
+
+export function fretboardNotes(
+  tuning: number[],
+  frets: number,
+  scale: ScaleDef | string,
+  rootPc: number,
+): FretCell[][] {
+  const scaleDef = typeof scale === 'string' ? getScale(scale) : scale
+  return buildFretboard({
+    tuning,
+    frets,
+    root: rootPc,
+    scaleId: scaleDef.id,
+  })
+}
+
+/** Best fretting for a single MIDI pitch on the given tuning (string 0 = low E). */
+export function frettingForMidi(
+  midi: number,
+  tuning: number[] = [...STANDARD_TUNING],
+  preferFret = 0,
+  opts?: { preferString?: number; maxFret?: number; positionCenter?: number },
+): { string: number; fret: number; midi: number } | null {
+  const maxFret = opts?.maxFret ?? 17
+  const positionCenter = opts?.positionCenter ?? preferFret
+  let best: { string: number; fret: number; midi: number; score: number } | null = null
+  for (let s = 0; s < tuning.length; s++) {
+    const fret = midi - tuning[s]
+    if (fret < 0 || fret > maxFret) continue
+    const dist = Math.abs(fret - preferFret)
+    const stringJump =
+      opts?.preferString != null ? Math.abs(s - opts.preferString) * 1.15 : 0
+    // Prefer staying in a hand position (4-fret window) and mid-neck comfort
+    const outOfPosition = Math.abs(fret - positionCenter) > 4 ? Math.abs(fret - positionCenter) * 0.55 : 0
+    const openBias = fret === 0 && preferFret > 3 ? 0.4 : 0
+    const highFretPenalty = fret > 12 ? (fret - 12) * 0.08 : 0
+    const score =
+      dist * 1.1 +
+      stringJump +
+      outOfPosition +
+      openBias +
+      highFretPenalty +
+      fret * 0.015 +
+      (tuning.length - 1 - s) * 0.02
+    if (!best || score < best.score) best = { string: s, fret, midi, score }
+  }
+  return best ? { string: best.string, fret: best.fret, midi: best.midi } : null
+}
+
+/**
+ * Map a melody line to playable frets with hand continuity
+ * (prefer previous position / nearby string, smooth position shifts).
+ */
+export function frettingSequence(
+  midis: number[],
+  tuning: number[] = [...STANDARD_TUNING],
+): Array<{ string: number; fret: number; midi: number }> {
+  const out: Array<{ string: number; fret: number; midi: number }> = []
+  let preferFret = 5
+  let preferString: number | undefined
+  let positionCenter = 5
+  for (const midi of midis) {
+    const f =
+      frettingForMidi(midi, tuning, preferFret, {
+        preferString,
+        positionCenter,
+        maxFret: 17,
+      }) || {
+        string: 0,
+        fret: Math.max(0, Math.min(17, midi - tuning[0])),
+        midi,
+      }
+    out.push(f)
+    // Slow hand drift — don't teleport the position every note
+    preferFret = Math.round(preferFret * 0.35 + f.fret * 0.65)
+    preferString = f.string
+    if (f.fret > 0) {
+      positionCenter = Math.round(positionCenter * 0.55 + f.fret * 0.45)
+    }
+  }
+  return out
+}
+
+/**
+ * Second pass: reduce large string jumps when a same-pitch neighbor fretting exists.
+ */
+export function smoothFrettingRun(
+  run: Array<{ string: number; fret: number; midi: number }>,
+  tuning: number[] = [...STANDARD_TUNING],
+): Array<{ string: number; fret: number; midi: number }> {
+  if (run.length < 2) return run.map((r) => ({ ...r }))
+  const out = run.map((r) => ({ ...r }))
+  for (let i = 1; i < out.length; i++) {
+    const prev = out[i - 1]
+    const cur = out[i]
+    if (Math.abs(cur.string - prev.string) <= 1 && Math.abs(cur.fret - prev.fret) <= 5) continue
+    let best = cur
+    let bestCost =
+      Math.abs(cur.string - prev.string) * 2 + Math.abs(cur.fret - prev.fret) * 0.5
+    for (let s = 0; s < tuning.length; s++) {
+      const fret = cur.midi - tuning[s]
+      if (fret < 0 || fret > 17) continue
+      const cost =
+        Math.abs(s - prev.string) * 2 +
+        Math.abs(fret - prev.fret) * 0.5 +
+        (fret > 12 ? (fret - 12) * 0.2 : 0)
+      if (cost < bestCost) {
+        bestCost = cost
+        best = { string: s, fret, midi: cur.midi }
+      }
+    }
+    out[i] = best
+  }
+  return out
+}
+
+export function frettingForPcs(
+  pcs: number[],
+  tuning: number[] = [...STANDARD_TUNING],
+  preferFret = 0,
+  window = 4,
+): Array<{ string: number; fret: number; midi: number } | null> {
+  return pcs.map((pc) => {
+    let best: { string: number; fret: number; midi: number; score: number } | null = null
+    for (let s = 0; s < tuning.length; s++) {
+      for (let f = 0; f <= 15; f++) {
+        const midi = tuning[s] + f
+        if (((midi % 12) + 12) % 12 !== ((pc % 12) + 12) % 12) continue
+        const dist = Math.abs(f - preferFret)
+        const inWindow = f >= preferFret && f <= preferFret + window ? 0 : 3
+        const score = dist + inWindow + (15 - s) * 0.05
+        if (!best || score < best.score) best = { string: s, fret: f, midi, score }
+      }
+    }
+    return best ? { string: best.string, fret: best.fret, midi: best.midi } : null
+  })
+}
+
+export function scalePositions(
+  pcs: number[],
+  tuning: number[] = [...STANDARD_TUNING],
+  minFret = 0,
+  maxFret = 12,
+): Array<{ string: number; fret: number; midi: number }> {
+  const out: Array<{ string: number; fret: number; midi: number }> = []
+  const set = new Set(pcs.map((p) => ((p % 12) + 12) % 12))
+  for (let s = 0; s < tuning.length; s++) {
+    for (let f = minFret; f <= maxFret; f++) {
+      const midi = tuning[s] + f
+      if (set.has(((midi % 12) + 12) % 12)) out.push({ string: s, fret: f, midi })
+    }
+  }
+  return out
+}
+
+export function detectKeyFromPcs(pcs: number[]): { root: NoteName; scaleId: ScaleId; score: number } {
+  const unique = [...new Set(pcs.map((p) => ((p % 12) + 12) % 12))]
+  const candidates = [
+    'major',
+    'natural_minor',
+    'dorian',
+    'mixolydian',
+    'minor_pentatonic',
+    'major_pentatonic',
+    'blues',
+  ]
+  let best = { root: 'C' as NoteName, scaleId: 'major' as ScaleId, score: -1 }
+  for (const scaleId of candidates) {
+    for (let root = 0; root < 12; root++) {
+      const set = new Set(scalePitchClasses(root, scaleId))
+      let hit = 0
+      let miss = 0
+      for (const p of unique) {
+        if (set.has(p)) hit++
+        else miss++
+      }
+      const coverage = hit / Math.max(set.size, 1)
+      const score = hit * 2 - miss * 3 + coverage
+      if (score > best.score) best = { root: pcToName(root), scaleId: scaleId as ScaleId, score }
+    }
+  }
+  return best
+}
+
+export function detectKeyAndScale(notes: number[]): {
+  rootPc: number
+  scaleId: string
+  root: NoteName
+  score: number
+} {
+  const pcs = notes.map((n) => ((n % 12) + 12) % 12)
+  const d = detectKeyFromPcs(pcs)
+  return { rootPc: noteToPc(d.root), scaleId: d.scaleId, root: d.root, score: d.score }
+}
+
+export function transposePc(pc: number, semitones: number): number {
+  return (((pc + semitones) % 12) + 12) % 12
+}
+
+export function parseChordSymbol(symbol: string): { root: string; quality: string } | null {
+  const m = symbol.trim().match(/^([A-Ga-g][#b]?)(.*)$/)
+  if (!m) return null
+  const root = normalizeNoteName(m[1])
+  let quality = (m[2] || 'maj').trim()
+  if (quality === '') quality = 'maj'
+  if (quality === 'm') quality = 'm'
+  if (quality.startsWith('maj7')) quality = 'maj7'
+  else if (quality.startsWith('m7')) quality = 'm7'
+  else if (quality === '7') quality = '7'
+  return { root, quality }
+}
+
+export function cagedShapes(root: string, quality: 'major' | 'minor' = 'major') {
+  const rootPc = noteToPc(root)
+  const majorForms = [
+    { name: 'C form', openRoot: noteToPc('C'), barreHint: false },
+    { name: 'A form', openRoot: noteToPc('A'), barreHint: true },
+    { name: 'G form', openRoot: noteToPc('G'), barreHint: false },
+    { name: 'E form', openRoot: noteToPc('E'), barreHint: true },
+    { name: 'D form', openRoot: noteToPc('D'), barreHint: false },
+  ]
+  return majorForms.map((f) => {
+    const fret = (rootPc - f.openRoot + 12) % 12
+    return { ...f, fret, quality, root: pcToName(rootPc) }
+  })
+}
+
+export function intervalName(semitones: number): string {
+  const names = [
+    'Unison',
+    'Minor 2nd',
+    'Major 2nd',
+    'Minor 3rd',
+    'Major 3rd',
+    'Perfect 4th',
+    'Tritone',
+    'Perfect 5th',
+    'Minor 6th',
+    'Major 6th',
+    'Minor 7th',
+    'Major 7th',
+    'Octave',
+  ]
+  return names[((semitones % 12) + 12) % 12] ?? `${semitones} st`
+}

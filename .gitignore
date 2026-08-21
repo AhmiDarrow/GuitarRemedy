@@ -1,0 +1,40 @@
+# Dependencies / build
+node_modules/
+dist/
+dist-ssr/
+coverage/
+.vitest/
+*.local
+
+# Tauri / Rust
+src-tauri/target/
+src-tauri/WixTools/
+src-tauri/gen/schemas/
+*.pdb
+
+# OS / editor
+.DS_Store
+Thumbs.db
+desktop.ini
+.idea/
+.vscode/*
+!.vscode/extensions.json
+*.swp
+*~
+
+# Logs / local tooling
+*.log
+dev-smoke*.log
+.remedy-build/
+
+# Env / secrets — never commit signing keys
+.env
+.env.*
+!.env.example
+*.key
+!*.key.pub
+.tauri/
+
+# Large user/full-band samples (keep small synthetic fixtures tracked for CI)
+public/samples/*fullband*
+public/samples/Born*

@@ -1,0 +1,97 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Release tag to build (e.g. v0.1.0). Leave empty to use package version."
+        required: false
+        default: ""
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build-windows:
+    name: Build Windows installer
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache cargo
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri -> target
+
+      - name: Install frontend deps
+        run: npm ci
+
+      - name: Run tests (gate)
+        run: |
+          npm test
+          cargo test --manifest-path src-tauri/Cargo.toml
+
+      - name: Require updater signing key
+        shell: bash
+        run: |
+          if [ -z "${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}" ]; then
+            echo "::error::Missing repo secret TAURI_SIGNING_PRIVATE_KEY (minisign private key for updater artifacts)."
+            echo "Generate with: npx tauri signer generate -w ~/.tauri/guitarremedy.key"
+            echo "Then: gh secret set TAURI_SIGNING_PRIVATE_KEY < ~/.tauri/guitarremedy.key"
+            exit 1
+          fi
+
+      - name: Build Tauri (NSIS + MSI + updater)
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+        with:
+          tagName: ${{ github.event.inputs.tag != '' && github.event.inputs.tag || github.ref_name }}
+          releaseName: "GuitarRemedy ${{ github.event.inputs.tag != '' && github.event.inputs.tag || github.ref_name }}"
+          releaseBody: |
+            ## GuitarRemedy ${{ github.event.inputs.tag != '' && github.event.inputs.tag || github.ref_name }}
+
+            Learn guitar — scales, tabs, free library, song upload → tabs, Day 1–365 path.
+
+            Hi I'm Ahmi, hope this helps!
+            - Profile: https://github.com/AhmiDarrow
+            - Repo: https://github.com/AhmiDarrow/GuitarRemedy
+
+            ### Install
+            - Prefer the **NSIS setup** (`.exe`) for a normal Windows install.
+            - MSI is also attached when available.
+            - Installed builds check **GitHub Releases** for signed updates (About → Check for updates).
+
+            ### Notes
+            - Local-first progress and Your tabs under this device
+            - Audio → MIDI → tabs is monophonic assist (editable)
+            - Solid path: MIDI / MusicXML / Guitar Pro (best-effort)
+
+            See README and docs/AUTOUPDATE.md.
+          releaseDraft: true
+          prerelease: false
+          includeUpdaterJson: true
+          updaterJsonPreferNsis: true
+          args: --bundles nsis,msi

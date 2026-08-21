@@ -1,0 +1,35 @@
+[package]
+name = "guitar-remedy"
+version = "0.1.0"
+description = "GuitarRemedy — desktop shell"
+authors = ["Ahmi Darrow"]
+edition = "2021"
+license = "MIT"
+repository = "https://github.com/AhmiDarrow/GuitarRemedy"
+
+[lib]
+name = "guitar_remedy_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+# Default on for Cargo/tauri. Bare `rustc` file probes do not enable Cargo
+# features, so main/lib/build stay free of unresolved external crates there.
+[features]
+default = ["desktop"]
+desktop = []
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = [] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+tauri-plugin-dialog = "2"
+tauri-plugin-fs = "2"
+tauri-plugin-process = "2"
+tauri-plugin-updater = "2"
+
+[profile.release]
+panic = "abort"
+codegen-units = 1
+lto = true

@@ -1,0 +1,71 @@
+import { describe, expect, it } from 'vitest'
+import {
+  NOTE_NAMES,
+  SCALES,
+  buildFretboard,
+  chordNotes,
+  degreeLabel,
+  frettingSequence,
+  nameToMidi,
+  noteToPc,
+  scaleNoteNames,
+  scalePitchClasses,
+  smoothFrettingRun,
+} from './theory'
+
+describe('theory', () => {
+  it('maps note names to pitch classes', () => {
+    expect(noteToPc('C')).toBe(0)
+    expect(noteToPc('C#')).toBe(1)
+    expect(noteToPc('Db')).toBe(1)
+    expect(noteToPc(60)).toBe(0)
+    expect(NOTE_NAMES).toHaveLength(12)
+  })
+
+  it('builds major scale pitch classes', () => {
+    expect(scalePitchClasses('C', 'major')).toEqual([0, 2, 4, 5, 7, 9, 11])
+    expect(scaleNoteNames('A', 'natural_minor')).toEqual(['A', 'B', 'C', 'D', 'E', 'F', 'G'])
+  })
+
+  it('supports camelCase scale aliases', () => {
+    expect(SCALES.minorPentatonic.intervals).toEqual([0, 3, 5, 7, 10])
+    expect(scalePitchClasses('A', 'minorPentatonic')).toEqual([9, 0, 2, 4, 7])
+  })
+
+  it('builds a fretboard with roots highlighted', () => {
+    const board = buildFretboard({ root: 'E', scaleId: 'minor_pentatonic', frets: 12 })
+    expect(board).toHaveLength(6)
+    expect(board[0]).toHaveLength(13)
+    const roots = board.flat().filter((c) => c.isRoot)
+    expect(roots.length).toBeGreaterThan(0)
+    expect(roots.every((r) => r.pc === 4)).toBe(true)
+  })
+
+  it('labels scale degrees', () => {
+    expect(degreeLabel('C', 'E', 'major')).toBe('3')
+    expect(degreeLabel('C', 'F', 'major')).toBe('4')
+    expect(degreeLabel('C', 'C#', 'major')).toBeNull()
+  })
+
+  it('builds chord note midis', () => {
+    const cmaj = chordNotes('C', 'maj')
+    expect(cmaj.map((m) => m % 12)).toEqual([0, 4, 7])
+    expect(nameToMidi('A4')).toBe(69)
+  })
+
+  it('frettingSequence keeps hand continuity on a rising line', () => {
+    // C4 D4 E4 F4 G4 A4
+    const midis = [60, 62, 64, 65, 67, 69]
+    const run = frettingSequence(midis)
+    expect(run).toHaveLength(6)
+    expect(run.every((f) => f.fret >= 0 && f.fret <= 17)).toBe(true)
+    // average string jump should be small
+    let jumps = 0
+    for (let i = 1; i < run.length; i++) jumps += Math.abs(run[i].string - run[i - 1].string)
+    expect(jumps / (run.length - 1)).toBeLessThanOrEqual(1.5)
+
+    const smoothed = smoothFrettingRun(run)
+    expect(smoothed).toHaveLength(run.length)
+    expect(smoothed.map((f) => f.midi)).toEqual(midis)
+  })
+})
