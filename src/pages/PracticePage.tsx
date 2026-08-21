@@ -117,8 +117,8 @@ export function PracticePage() {
                   type="number"
                   className="input !py-2 !text-sm w-24"
                   value={bpm}
-                  min={40}
-                  max={200}
+                  min={30}
+                  max={300}
                   onChange={(e) => setBpm(Number(e.target.value))}
                 />
               </label>

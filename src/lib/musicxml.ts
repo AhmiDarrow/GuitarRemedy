@@ -2,11 +2,19 @@
 
 export interface MusicXmlNote {
   pitch: number | null // MIDI, null = rest
+  /** Duration in divisions (MusicXML duration units). */
   duration: number
   measure: number
   voice: number
   /** True when <chord/> — shares onset with previous note in the voice. */
   chord?: boolean
+  /**
+   * Onset in quarter-note beats from the start of the score (voice-local timeline).
+   * Computed in the parser so consumers need not rebuild cursors.
+   */
+  startBeat?: number
+  /** Duration in quarter-note beats (duration / divisions). */
+  durationBeats?: number
   string?: number
   fret?: number
   lyric?: string
@@ -74,6 +82,10 @@ export function parseMusicXml(xml: string): MusicXmlParseResult {
   }
 
   const notes: MusicXmlNote[] = []
+  const divSafe = Math.max(1, divisions)
+  /** Per-voice cursor in quarter-note beats (score-absolute). */
+  const voiceCursor = new Map<number, number>()
+  const voiceLastOnset = new Map<number, number>()
   const measures = Array.from(doc.getElementsByTagName('measure'))
   measures.forEach((measure, mi) => {
     const measureNum = parseInt(measure.getAttribute('number') || String(mi + 1), 10)
@@ -97,6 +109,10 @@ export function parseMusicXml(xml: string): MusicXmlParseResult {
       const duration = parseInt(textContent(noteEl, 'duration') || '0', 10) || 0
       const voice = parseInt(textContent(noteEl, 'voice') || '1', 10)
       const isChord = noteEl.getElementsByTagName('chord').length > 0
+      const durationBeats = duration / divSafe
+      const onset = isChord
+        ? (voiceLastOnset.get(voice) ?? voiceCursor.get(voice) ?? 0)
+        : (voiceCursor.get(voice) ?? 0)
       let pitch: number | null = null
       let string: number | undefined
       let fret: number | undefined
@@ -124,10 +140,15 @@ export function parseMusicXml(xml: string): MusicXmlParseResult {
         measure: measureNum,
         voice,
         chord: isChord || undefined,
+        startBeat: onset,
+        durationBeats,
         string,
         fret,
         lyric: textContent(noteEl, 'text') || undefined,
       })
+
+      voiceLastOnset.set(voice, onset)
+      if (!isChord) voiceCursor.set(voice, onset + durationBeats)
     }
   })
 

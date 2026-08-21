@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import clsx from 'clsx'
 import type { TabScore } from '../lib/breakdown'
 import { beatDurationSec } from '../lib/tabScore'
-import { audioNow, playNote, stopAllNotes } from '../lib/audio'
+import { audioNow, claimAudioSession, playNote, releaseAudioSession, stopAllNotes } from '../lib/audio'
 import { Pause, Play, RotateCcw, Gauge, Square } from 'lucide-react'
 
 type Props = {
@@ -46,6 +46,7 @@ export function TabView({ score, className, title }: Props) {
     runIdRef.current += 1
     clearCursorTimers()
     stopAllNotes()
+    releaseAudioSession('tabs')
     setPlaying(false)
     setCursor(-1)
   }
@@ -65,6 +66,9 @@ export function TabView({ score, className, title }: Props) {
     clearCursorTimers()
     setPlaying(true)
     setCursor(0)
+
+    await claimAudioSession('tabs')
+    if (stopRef.current || runId !== runIdRef.current) return
 
     const secPerBeat = beatDurationSec(tempo, speed)
     const base = columns[0]?.[0]?.time ?? 0
@@ -102,6 +106,8 @@ export function TabView({ score, className, title }: Props) {
     const endDelay = Math.max(0, (0.05 + lastOffset + secPerBeat) * 1000)
     const endId = window.setTimeout(() => {
       if (runId !== runIdRef.current || stopRef.current) return
+      stopAllNotes()
+      releaseAudioSession('tabs')
       setPlaying(false)
       setCursor(-1)
     }, endDelay)

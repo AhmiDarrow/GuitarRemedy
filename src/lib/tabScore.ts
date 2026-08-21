@@ -3,8 +3,20 @@
 import type { TabSong } from '../data/library'
 import type { TabNote, TabScore } from './breakdown'
 
+/** Practice / metronome / UI BPM range — single policy everywhere. */
+export const BPM_MIN = 30
+export const BPM_MAX = 300
+export const BPM_DEFAULT = 80
+
+/** Clamp BPM to the shared practice range (30–300). */
+export function clampPracticeBpm(n: number, fallback = BPM_DEFAULT): number {
+  if (!Number.isFinite(n)) return fallback
+  return Math.max(BPM_MIN, Math.min(BPM_MAX, Math.round(n)))
+}
+
 /** Seconds per beat at tempo (BPM), scaled by playback speed. */
 export function beatDurationSec(tempoBpm: number, speed = 1): number {
+  // Allow slightly wider range for imported scores; UI still clamps to 30–300.
   const bpm = Math.max(20, Math.min(400, tempoBpm || 100))
   const sp = Math.max(0.25, Math.min(4, speed || 1))
   return (60 / bpm) / sp

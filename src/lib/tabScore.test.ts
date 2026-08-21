@@ -1,8 +1,23 @@
 import { describe, expect, it } from 'vitest'
-import { beatDurationSec, beatsToSeconds, tabSongToScore } from './tabScore'
+import {
+  beatDurationSec,
+  beatsToSeconds,
+  clampPracticeBpm,
+  BPM_MAX,
+  BPM_MIN,
+  tabSongToScore,
+} from './tabScore'
 import type { TabSong } from '../data/library'
 
 describe('tabScore', () => {
+  it('clampPracticeBpm enforces shared 30–300 policy', () => {
+    expect(BPM_MIN).toBe(30)
+    expect(BPM_MAX).toBe(300)
+    expect(clampPracticeBpm(10)).toBe(30)
+    expect(clampPracticeBpm(400)).toBe(300)
+    expect(clampPracticeBpm(120.4)).toBe(120)
+  })
+
   it('beatDurationSec at 60 BPM is 1 second', () => {
     expect(beatDurationSec(60, 1)).toBeCloseTo(1, 5)
   })

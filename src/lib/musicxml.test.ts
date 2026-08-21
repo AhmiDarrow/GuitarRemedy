@@ -4,7 +4,7 @@ import { buildSimpleMusicXml, parseMusicXml } from './musicxml'
 import { breakdownFile } from './breakdown'
 
 describe('musicxml', () => {
-  it('parses a simple melody with pitches and frets', () => {
+  it('parses a simple melody with pitches, frets, and beat onsets', () => {
     const xml = buildSimpleMusicXml({
       title: 'Open E sketch',
       notes: [
@@ -20,6 +20,12 @@ describe('musicxml', () => {
     expect(parsed.notes[0].pitch).toBe(64) // E4
     expect(parsed.notes[0].string).toBe(1)
     expect(parsed.notes[0].fret).toBe(0)
+    expect(parsed.notes[0].startBeat).toBeCloseTo(0, 5)
+    expect(parsed.notes[1].startBeat).toBeCloseTo(1, 5)
+    expect(parsed.notes[2].startBeat).toBeCloseTo(2, 5)
+    expect(parsed.notes[3].startBeat).toBeCloseTo(3, 5)
+    expect(parsed.notes[0].durationBeats).toBeCloseTo(1, 5)
+    expect(parsed.notes[3].durationBeats).toBeCloseTo(2, 5)
     expect(parsed.pitchClasses.length).toBeGreaterThan(0)
   })
 

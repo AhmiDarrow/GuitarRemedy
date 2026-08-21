@@ -61,3 +61,16 @@ Full-band audio uses **median HPSS lead stem** → melody band → pitch → tem
 4. Smoke Upload: MP3 → tabs → Your tabs → export `.grtab.json`
 5. Smoke Learn day 1 + Library play/stop
 6. (Optional) `npm run mobile:sync` after Capacitor install
+
+## Pre-push readiness (local → GitHub)
+
+Code can ship without a remote. When you are ready:
+
+| Step | Command / note |
+|------|----------------|
+| Create repo | `gh repo create AhmiDarrow/GuitarRemedy --private --source=. --remote=origin` |
+| First push | `git push -u origin main` — watch **CI** go green |
+| Updater secret | `gh secret set TAURI_SIGNING_PRIVATE_KEY < %USERPROFILE%\.tauri\guitarremedy.key` |
+| First release | Tag `v0.1.0` after CI green (draft Windows installer + `latest.json`) |
+
+**Do not** commit `.tauri/*.key` or large full-band sample audio. Authenticode cert is optional (SmartScreen); minisign still protects in-app updates.

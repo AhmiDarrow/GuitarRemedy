@@ -51,8 +51,8 @@ export function TabEditor({ score: initial, title, onSave, onCancel, className }
             Tempo
             <input
               type="number"
-              min={40}
-              max={240}
+              min={30}
+              max={300}
               value={draft.tempo ?? 100}
               onChange={(e) => setDraft((s) => setScoreTempo(s, Number(e.target.value)))}
               className="w-16 rounded-lg bg-[var(--bg-elevated)] border border-[var(--border)] px-2 py-1 text-[var(--text)]"

@@ -7,7 +7,11 @@
  */
 
 import { ensureAudio } from './audio'
-import { beatDurationSec as sharedBeatDurationSec } from './tabScore'
+import {
+  beatDurationSec as sharedBeatDurationSec,
+  clampPracticeBpm,
+  BPM_DEFAULT,
+} from './tabScore'
 
 export type Subdivision = 1 | 2 | 3 | 4
 /** Beats per bar (numerator). Denominator is always quarter = 1 beat. */
@@ -32,8 +36,7 @@ export const DEFAULT_METRONOME: MetronomeConfig = {
 }
 
 export function clampBpm(n: number): number {
-  if (!Number.isFinite(n)) return 80
-  return Math.max(30, Math.min(300, Math.round(n)))
+  return clampPracticeBpm(n, BPM_DEFAULT)
 }
 
 /** Seconds per beat — shared with tab playback (speed scale = 1). */
@@ -156,7 +159,9 @@ export async function startMetronome(
     }) => void
   },
 ): Promise<void> {
-  await stopMetronome()
+  await stopMetronome({ skipSession: true })
+  const { claimAudioSession } = await import('./audio')
+  await claimAudioSession('metronome')
   await ensureAudio()
   const Tone = await tone()
   await getClickSynth()
@@ -188,7 +193,7 @@ export async function startMetronome(
   transportRunning = true
 }
 
-export async function stopMetronome(): Promise<void> {
+export async function stopMetronome(opts?: { skipSession?: boolean }): Promise<void> {
   transportRunning = false
   clickIndex = 0
   countInRemaining = 0
@@ -208,6 +213,14 @@ export async function stopMetronome(): Promise<void> {
     Tone.Transport.position = 0
   } catch {
     /* tone not loaded */
+  }
+  if (!opts?.skipSession) {
+    try {
+      const { releaseAudioSession } = await import('./audio')
+      releaseAudioSession('metronome')
+    } catch {
+      /* ignore */
+    }
   }
 }
 

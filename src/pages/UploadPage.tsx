@@ -357,8 +357,9 @@ export function UploadPage() {
         </ol>
         <p className="text-xs text-[var(--text-muted)] mt-3 leading-relaxed">
           <AudioLines className="w-3.5 h-3.5 inline mr-1 text-mint" />
-          Best results: dry single-note melody (no heavy drums/chords). Full-band mixes get a monophonic
-          lead draft — always edit by ear.
+          Best results: dry single-note melody (no heavy drums/chords). Full-band mixes use the{' '}
+          <strong className="text-[var(--text)]">Lead</strong> stem by default (HPSS) for a monophonic
+          draft — always edit by ear. Prefer MIDI/MusicXML when you have them.
         </p>
         <div className="mt-4 grid sm:grid-cols-3 gap-3">
           <label className="block text-xs text-[var(--text-muted)]">
@@ -366,7 +367,7 @@ export function UploadPage() {
             <input
               type="number"
               min={0}
-              max={240}
+              max={300}
               className="input mt-1"
               value={tempoOverride || ''}
               placeholder="Auto-detect"
@@ -396,11 +397,13 @@ export function UploadPage() {
               disabled={busy}
               onChange={(e) => setStem(e.target.value as 'lead' | 'harmonic' | 'mix')}
             >
-              <option value="lead">Lead (recommended)</option>
+              <option value="lead">Lead (default · best for bands)</option>
               <option value="harmonic">Harmonic only</option>
-              <option value="mix">Full mix (no HPSS)</option>
+              <option value="mix">Full mix (no HPSS · harder)</option>
             </select>
-            <span className="text-[10px] opacity-80">Softens drums before pitch track</span>
+            <span className="text-[10px] opacity-80">
+              Lead is on by default — softens drums/bass before pitch track
+            </span>
           </label>
         </div>
       </div>
@@ -425,7 +428,7 @@ export function UploadPage() {
         <p className="font-medium">Drop audio here to convert</p>
         <p className="text-sm text-[var(--text-muted)] mt-1 mb-4">
           Audio: <span className="text-mint">{AUDIO_FORMATS_LABEL}</span> → MIDI → tabs · Also:
-          .mid · .musicxml · .gp / .gpx / .gpif (best-effort)
+          .mid · .musicxml · .gp / .gpx / .gpif (GP binary often needs MIDI/MusicXML export)
         </p>
         <label
           className={`btn-primary inline-flex cursor-pointer ${busy ? 'opacity-70 pointer-events-none' : ''}`}

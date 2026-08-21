@@ -23,8 +23,8 @@ interface AppState {
   metronomeAccent: boolean
   /** Soft count-in bars before main loop (0–4). */
   metronomeCountInBars: number
+  /** True after first-run onboarding completes (single source of truth). */
   onboarded: boolean
-  onboardingDone: boolean
   favorites: string[]
   completedLessons: number[]
   currentDay: number
@@ -78,7 +78,6 @@ export const useAppStore = create<AppState>()(
       metronomeAccent: true,
       metronomeCountInBars: 1,
       onboarded: false,
-      onboardingDone: false,
       favorites: [],
       completedLessons: [],
       currentDay: 1,
@@ -89,7 +88,11 @@ export const useAppStore = create<AppState>()(
       setLefty: (v) => set({ lefty: v, handedness: v ? 'left' : 'right' }),
       setHandedness: (h) => set({ handedness: h, lefty: h === 'left' }),
       setTuningName: (t) => set({ tuningName: t }),
-      setCustomTuning: (notes) => set({ customTuning: notes, tuningName: 'standard' }),
+      setCustomTuning: (notes) => {
+        if (!Array.isArray(notes) || notes.length !== 6) return
+        const midi = notes.map((n) => Math.max(0, Math.min(127, Math.round(Number(n) || 0))))
+        set({ customTuning: midi, tuningName: 'custom' })
+      },
       setA4: (hz) => set({ a4: hz }),
       setShowDegrees: (v) => set({ showDegrees: v }),
       setMetronomeOn: (v) => set({ metronomeOn: v }),
@@ -105,7 +108,6 @@ export const useAppStore = create<AppState>()(
       completeOnboarding: (name, leftyFlag) =>
         set((s) => ({
           onboarded: true,
-          onboardingDone: true,
           displayName: name?.trim() || s.displayName || 'Player',
           lefty: leftyFlag ?? s.lefty,
           handedness: (leftyFlag ?? s.lefty) ? 'left' : 'right',
@@ -139,6 +141,10 @@ export const useAppStore = create<AppState>()(
 
       getTuning: () => {
         const s = get()
+        // Custom tuning wins when selected (or when name is custom).
+        if (s.tuningName === 'custom' && s.customTuning?.length === 6) {
+          return [...s.customTuning]
+        }
         const def = TUNINGS[s.tuningName]
         if (def?.midi?.length === 6) return [...def.midi]
         if (s.customTuning?.length === 6) return [...s.customTuning]
@@ -161,13 +167,25 @@ export const useAppStore = create<AppState>()(
         metronomeAccent: s.metronomeAccent,
         metronomeCountInBars: s.metronomeCountInBars,
         onboarded: s.onboarded,
-        onboardingDone: s.onboardingDone,
         favorites: s.favorites,
         completedLessons: s.completedLessons,
         currentDay: s.currentDay,
         streak: s.streak,
         lastPracticeDate: s.lastPracticeDate,
       }),
+      // Migrate older persists that used dual onboarding flags.
+      merge: (persisted, current) => {
+        const p = (persisted ?? {}) as Record<string, unknown>
+        const legacyDone = Boolean(p.onboardingDone)
+        const onboarded = Boolean(p.onboarded || legacyDone || current.onboarded)
+        const rest = { ...p }
+        delete rest.onboardingDone
+        return {
+          ...current,
+          ...rest,
+          onboarded,
+        } as AppState
+      },
     },
   ),
 )

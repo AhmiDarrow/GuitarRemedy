@@ -170,9 +170,9 @@ export function MetronomePanel() {
           </div>
           <input
             type="range"
-            min={40}
-            max={220}
-            value={Math.min(220, Math.max(40, bpm))}
+            min={30}
+            max={300}
+            value={Math.min(300, Math.max(30, bpm))}
             onChange={(e) => setBpm(Number(e.target.value))}
             className="w-48 accent-mint mt-1"
           />

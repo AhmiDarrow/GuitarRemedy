@@ -10,6 +10,9 @@ export function ProfilePage() {
   const setLefty = useAppStore((s) => s.setLefty)
   const tuningName = useAppStore((s) => s.tuningName)
   const setTuningName = useAppStore((s) => s.setTuningName)
+  const customTuning = useAppStore((s) => s.customTuning)
+  const setCustomTuning = useAppStore((s) => s.setCustomTuning)
+  const getTuning = useAppStore((s) => s.getTuning)
   const a4 = useAppStore((s) => s.a4)
   const setA4 = useAppStore((s) => s.setA4)
   const showDegrees = useAppStore((s) => s.showDegrees)
@@ -90,6 +93,32 @@ export function ProfilePage() {
             ))}
           </select>
         </label>
+        {tuningName === 'custom' ? (
+          <div className="space-y-2">
+            <p className="text-[11px] text-[var(--text-muted)]">
+              Custom open-string MIDI (low E → high e). Applied to fretboard &amp; play-along.
+            </p>
+            <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
+              {['E', 'A', 'D', 'G', 'B', 'e'].map((label, i) => (
+                <label key={label} className="block text-[10px] text-[var(--text-muted)]">
+                  {label}
+                  <input
+                    type="number"
+                    className="input mt-0.5 !py-1.5 !text-sm"
+                    min={28}
+                    max={88}
+                    value={customTuning[i] ?? getTuning()[i] ?? 40}
+                    onChange={(e) => {
+                      const next = [...(customTuning.length === 6 ? customTuning : getTuning())]
+                      next[i] = Number(e.target.value) || next[i]
+                      setCustomTuning(next)
+                    }}
+                  />
+                </label>
+              ))}
+            </div>
+          </div>
+        ) : null}
         <label className="block text-xs text-[var(--text-muted)]">
           A4 reference (Hz)
           <input
@@ -115,8 +144,8 @@ export function ProfilePage() {
           <input
             type="number"
             className="input mt-1"
-            min={40}
-            max={240}
+            min={30}
+            max={300}
             value={bpm}
             onChange={(e) => setBpm(Number(e.target.value) || 80)}
           />

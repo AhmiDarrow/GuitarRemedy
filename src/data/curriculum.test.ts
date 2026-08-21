@@ -83,6 +83,16 @@ describe('curriculum', () => {
     expect(new Set(drills).size).toBeGreaterThan(300)
   })
 
+  it('keeps theory bites unique enough (no mass clone pedagogy)', () => {
+    const bites = CURRICULUM.map((l) => l.theoryBite.trim())
+    expect(new Set(bites).size).toBeGreaterThan(280)
+    // No empty / tiny theory
+    expect(bites.every((b) => b.length >= 24)).toBe(true)
+    // Private-lesson hooks should not collapse to one template
+    const hooks = CURRICULUM.map((l) => l.privateLesson.hook.trim())
+    expect(new Set(hooks).size).toBeGreaterThan(250)
+  })
+
   it('covers all phases', () => {
     const phases = new Set(CURRICULUM.map((l) => l.phase))
     expect(phases.has('basics')).toBe(true)

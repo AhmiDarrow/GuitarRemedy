@@ -121,3 +121,57 @@ export function stopAllNotes() {
     // ignore if Tone not loaded
   }
 }
+
+/**
+ * Single audio-session owner so metronome Transport and tab poly synth
+ * don't fight. Call before starting tab playback or metronome.
+ */
+export type AudioSessionOwner = 'idle' | 'metronome' | 'tabs' | 'scale'
+
+let sessionOwner: AudioSessionOwner = 'idle'
+const sessionListeners = new Set<(owner: AudioSessionOwner) => void>()
+
+export function getAudioSessionOwner(): AudioSessionOwner {
+  return sessionOwner
+}
+
+export function onAudioSessionChange(cb: (owner: AudioSessionOwner) => void): () => void {
+  sessionListeners.add(cb)
+  return () => {
+    sessionListeners.delete(cb)
+  }
+}
+
+function setSessionOwner(owner: AudioSessionOwner) {
+  if (sessionOwner === owner) return
+  sessionOwner = owner
+  for (const cb of sessionListeners) {
+    try {
+      cb(owner)
+    } catch {
+      /* ignore */
+    }
+  }
+}
+
+/** Claim the audio session; stops the previous owner when switching. */
+export async function claimAudioSession(owner: Exclude<AudioSessionOwner, 'idle'>): Promise<void> {
+  if (sessionOwner === owner) return
+  const prev = sessionOwner
+  if (prev === 'metronome' && owner !== 'metronome') {
+    try {
+      const { stopMetronome } = await import('./metronome')
+      await stopMetronome({ skipSession: true })
+    } catch {
+      /* ignore */
+    }
+  }
+  if ((prev === 'tabs' || prev === 'scale') && owner === 'metronome') {
+    stopAllNotes()
+  }
+  setSessionOwner(owner)
+}
+
+export function releaseAudioSession(owner: AudioSessionOwner): void {
+  if (sessionOwner === owner) setSessionOwner('idle')
+}

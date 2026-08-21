@@ -212,10 +212,33 @@ export function analyzeNotes(
       'Mark any stretch frets and isolate them for 2 minutes.',
       'Play full phrase, then improvise using only scale tones.',
     ],
-    confidence: Math.min(0.95, 0.5 + midis.length * 0.03),
+    confidence: estimateNoteConfidence(midis),
     editable: true,
     warnings: [],
   })
+}
+
+/** Confidence from pitch span + uniqueness — not raw note count vanity. */
+export function estimateNoteConfidence(
+  midis: number[],
+  opts?: { avgFrameConf?: number; source?: 'midi' | 'audio' | 'musicxml' | 'gp' },
+): number {
+  if (!midis.length) return 0.15
+  const pcs = new Set(midis.map((m) => ((m % 12) + 12) % 12))
+  const sorted = [...midis].sort((a, b) => a - b)
+  const span = sorted[sorted.length - 1]! - sorted[0]!
+  // Prefer moderate register spans (melody-like) over noise sprays.
+  const spanScore = span <= 0 ? 0.2 : span <= 24 ? 0.35 : span <= 36 ? 0.28 : 0.18
+  const pcScore = Math.min(0.35, pcs.size * 0.04)
+  const lengthScore = Math.min(0.2, Math.log10(midis.length + 1) * 0.12)
+  let base = 0.25 + spanScore + pcScore + lengthScore
+  if (opts?.avgFrameConf != null && Number.isFinite(opts.avgFrameConf)) {
+    base = base * 0.45 + Math.max(0, Math.min(1, opts.avgFrameConf)) * 0.55
+  }
+  if (opts?.source === 'musicxml' || opts?.source === 'midi') base = Math.max(base, 0.72)
+  if (opts?.source === 'audio') base = Math.min(base, 0.82)
+  if (opts?.source === 'gp') base = Math.min(base, 0.9)
+  return Math.max(0.12, Math.min(0.95, base))
 }
 
 export function remedyExplanation(result: RemedyBreakdown): string {
@@ -324,7 +347,10 @@ export function midiToBreakdown(
       'Highlight chord tones (1–3–5) in the tab.',
       'Slow full run, then mark sticky frets.',
     ],
-    confidence: Math.min(0.95, 0.55 + pcs.length * 0.04),
+    confidence: estimateNoteConfidence(
+      notes.map((n) => n.midi),
+      { source: 'midi' },
+    ),
     editable: true,
     warnings,
   })
@@ -359,20 +385,34 @@ function musicXmlToBreakdown(parsed: MusicXmlParseResult): RemedyBreakdown {
       scaleId = d.scaleId
     }
   }
-  // Per-voice cursors so multi-voice scores don't serialize into one line.
-  // <chord/> shares the previous onset in that voice and does not advance time.
+  // Prefer parser-computed startBeat/durationBeats; fall back to voice cursors
+  // for older MusicXmlNote payloads that omit onsets.
   const voiceCursor = new Map<number, number>()
   const voiceLastOnset = new Map<number, number>()
   const tab: TabEvent[] = []
+  let usedParserOnsets = 0
   for (const n of parsed.notes) {
     const voice = n.voice || 1
-    const dur = (n.duration || 1) / Math.max(parsed.divisions || 1, 1)
-    const onset = n.chord ? (voiceLastOnset.get(voice) ?? voiceCursor.get(voice) ?? 0) : (voiceCursor.get(voice) ?? 0)
+    const durFallback = (n.duration || 1) / Math.max(parsed.divisions || 1, 1)
+    const dur =
+      typeof n.durationBeats === 'number' && n.durationBeats > 0
+        ? n.durationBeats
+        : durFallback
+    const hasParserOnset = typeof n.startBeat === 'number' && Number.isFinite(n.startBeat)
+    const onset = hasParserOnset
+      ? (n.startBeat as number)
+      : n.chord
+        ? (voiceLastOnset.get(voice) ?? voiceCursor.get(voice) ?? 0)
+        : (voiceCursor.get(voice) ?? 0)
+    if (hasParserOnset) usedParserOnsets += 1
 
     if (n.pitch == null) {
-      if (!n.chord) {
+      if (!n.chord && !hasParserOnset) {
         voiceCursor.set(voice, onset + dur)
         voiceLastOnset.set(voice, onset)
+      } else if (!n.chord) {
+        voiceLastOnset.set(voice, onset)
+        voiceCursor.set(voice, onset + dur)
       }
       continue
     }
@@ -404,6 +444,7 @@ function musicXmlToBreakdown(parsed: MusicXmlParseResult): RemedyBreakdown {
     voiceLastOnset.set(voice, onset)
     if (!n.chord) voiceCursor.set(voice, onset + dur)
   }
+  void usedParserOnsets
   const scaleNotes = scaleNoteNames(root, scaleId)
   const xmlTempo =
     typeof parsed.tempoBpm === 'number' && parsed.tempoBpm > 0 ? parsed.tempoBpm : 100
@@ -431,7 +472,10 @@ function musicXmlToBreakdown(parsed: MusicXmlParseResult): RemedyBreakdown {
       'Loop any two-bar cell at slow tempo.',
       'Name scale degrees while playing the melody.',
     ],
-    confidence: 0.85,
+    confidence: estimateNoteConfidence(
+      tab.map((t) => t.midi),
+      { source: 'musicxml' },
+    ),
     editable: true,
     warnings: [],
   })
@@ -520,7 +564,12 @@ export function guitarProToBreakdown(
   const detected = detectKeyFromPcs(pcs)
   const scaleNotes = scaleNoteNames(detected.root, detected.scaleId)
   const isStub = parsed.source === 'stub' || parsed.source === 'binary-header'
-  const conf = isStub ? 0.2 : Math.min(0.92, 0.55 + tab.length * 0.02)
+  const conf = isStub
+    ? 0.2
+    : estimateNoteConfidence(
+        tab.map((t) => t.midi),
+        { source: 'gp' },
+      )
 
   return finish({
     kind: 'guitarpro',
@@ -754,11 +803,21 @@ export function audioMidiToBreakdown(
     return result
   }
 
+  const confidences = converted.notes.map((n) => n.confidence ?? n.velocity / 127)
+  const avgFrameConf =
+    confidences.length > 0
+      ? confidences.reduce((a, b) => a + b, 0) / confidences.length
+      : undefined
+  const audioConf = estimateNoteConfidence(
+    converted.notes.map((n) => n.pitch),
+    { avgFrameConf, source: 'audio' },
+  )
+
   // Step 3: MIDI → guitar tabs with playable fretting + auto cleanup
   const tabs = midiBytesToGuitarTabs(converted.midiBytes, title, {
     kind: 'audio',
     cleanUp: true,
-    confidence: Math.min(0.62, 0.32 + converted.notes.length * 0.01),
+    confidence: audioConf,
     warnings: [
       ...converted.warnings,
       'Converted via monophonic pitch-track — use Clean up / Edit tab if anything is off.',
@@ -767,7 +826,6 @@ export function audioMidiToBreakdown(
   })
 
   const cleaned = cleanUpAfterConvert(tabs.score)
-  const confidences = converted.notes.map((n) => n.confidence ?? n.velocity / 127)
   const polished = applyScoreToBreakdown(
     {
       ...tabs,
@@ -777,7 +835,10 @@ export function audioMidiToBreakdown(
       detectedTempoBpm: converted.detectedTempoBpm ?? converted.tempoBpm,
       analyzedSec: converted.analyzedSec ?? converted.durationSec,
       noteConfidences: confidences,
-      confidence: Math.min(0.62, 0.32 + cleaned.notes.length * 0.01),
+      confidence: estimateNoteConfidence(
+        cleaned.notes.map((n) => n.midi).filter((m): m is number => typeof m === 'number'),
+        { avgFrameConf, source: 'audio' },
+      ),
       editable: true,
       warnings: [
         ...converted.warnings,

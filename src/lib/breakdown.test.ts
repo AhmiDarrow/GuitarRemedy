@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import {
   breakdownAudioAssist,
   breakdownGuitarPro,
+  estimateNoteConfidence,
   midiToBreakdown,
   tabToAscii,
 } from './breakdown'
@@ -54,6 +55,19 @@ describe('breakdown', () => {
     expect(r.editable).toBe(true)
     expect(r.confidence).toBeLessThan(0.6)
     expect(r.warnings.some((w) => /assist|monophonic|editable/i.test(w))).toBe(true)
+  })
+
+  it('estimateNoteConfidence prefers quality over raw length', () => {
+    expect(estimateNoteConfidence([])).toBeLessThan(0.2)
+    const melody = [60, 62, 64, 65, 67, 69, 71, 72]
+    const longNoise = Array.from({ length: 200 }, (_, i) => 40 + (i % 48))
+    const m = estimateNoteConfidence(melody, { source: 'midi' })
+    const n = estimateNoteConfidence(longNoise, { source: 'audio', avgFrameConf: 0.2 })
+    expect(m).toBeGreaterThan(0.7)
+    expect(n).toBeLessThan(m)
+    expect(estimateNoteConfidence(melody, { source: 'audio', avgFrameConf: 0.9 })).toBeLessThanOrEqual(
+      0.82,
+    )
   })
 
   it('renders ascii tab', () => {
