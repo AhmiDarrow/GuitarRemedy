@@ -2,7 +2,6 @@ import { describe, expect, it } from 'vitest'
 import {
   breakdownAudioAssist,
   breakdownGuitarPro,
-  breakdownGuitarProStub,
   midiToBreakdown,
   tabToAscii,
 } from './breakdown'
@@ -42,5 +41,18 @@ describe('breakdown', () => {
     ])
     expect(ascii).toContain('e|')
     expect(ascii).toContain('E|')
+  })
+
+  it('Guitar Pro empty buffer stays editable with honest fallback', async () => {
+    const r = await breakdownGuitarPro(new ArrayBuffer(0), 'empty.gp')
+    expect(r.kind).toBe('guitarpro')
+    expect(r.editable).toBe(true)
+    expect(r.tab.length).toBeGreaterThan(0)
+    expect(r.warnings.length + r.explanation.length).toBeGreaterThan(0)
+    expect(
+      [...r.warnings, ...r.explanation, r.statusMessage || ''].some((t) =>
+        /MIDI|MusicXML|best-effort|fallback|binary/i.test(t),
+      ),
+    ).toBe(true)
   })
 })

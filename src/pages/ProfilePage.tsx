@@ -141,14 +141,19 @@ export function ProfilePage() {
 
       <div className="card p-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
-          <h2 className="font-display font-semibold">About & updates</h2>
+          <h2 className="font-display font-semibold">About, wiki & updates</h2>
           <p className="text-xs text-[var(--text-muted)] mt-1">
-            Hi I&apos;m Ahmi — links, version, and Check for updates (desktop).
+            Hi I&apos;m Ahmi — theory wiki, links, version, and Check for updates (desktop).
           </p>
         </div>
-        <Link to="/about" className="btn-primary text-center text-sm px-4 py-2 rounded-xl">
-          Open About
-        </Link>
+        <div className="flex flex-wrap gap-2">
+          <Link to="/wiki" className="btn-secondary text-center text-sm px-4 py-2 rounded-xl">
+            Open wiki
+          </Link>
+          <Link to="/about" className="btn-primary text-center text-sm px-4 py-2 rounded-xl">
+            Open About
+          </Link>
+        </div>
       </div>
     </div>
   )

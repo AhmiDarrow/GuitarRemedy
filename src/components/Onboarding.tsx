@@ -24,8 +24,8 @@ export function Onboarding() {
               Welcome to GuitarRemedy
             </h1>
             <p className="text-[var(--text-muted)] mt-2 text-sm leading-relaxed">
-              Scales, tabs, a 365-day path, and song breakdown — polished for desktop and phone.
-              Built for real practice, not gimmicks.
+              Scales, tabs, a 365-day path, song upload to tabs, and a full guitar wiki — polished for
+              desktop and phone. Built for real practice, not gimmicks.
             </p>
             <ul className="mt-5 space-y-3 text-sm">
               <li className="flex gap-3 items-start">
@@ -34,11 +34,11 @@ export function Onboarding() {
               </li>
               <li className="flex gap-3 items-start">
                 <Sparkles className="w-4 h-4 text-mint mt-0.5 shrink-0" />
-                Upload MIDI / MusicXML — Remedy explains scales
+                Drop MP3/WAV/MIDI/MusicXML — get editable tabs + scale map
               </li>
               <li className="flex gap-3 items-start">
                 <Hand className="w-4 h-4 text-mint mt-0.5 shrink-0" />
-                Day 1 → 365 progressive lessons with streaks
+                Day 1–365 private lessons with streaks
               </li>
             </ul>
             <button type="button" className="btn-primary w-full mt-6" onClick={() => setStep(1)}>
@@ -64,7 +64,7 @@ export function Onboarding() {
                 type="checkbox"
                 checked={lefty}
                 onChange={(e) => setLefty(e.target.checked)}
-                className="accent-amber-500 w-4 h-4"
+                className="accent-[var(--mint)] w-4 h-4"
               />
               <span className="text-sm">
                 Left-handed fretboard

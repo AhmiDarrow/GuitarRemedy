@@ -1,6 +1,7 @@
 /**
  * Real-file conversion smoke: public/samples/*.wav → PCM → MIDI → guitar tabs.
  * (Browser Web Audio decodes MP3/M4A the same way after decodeAudioData.)
+ * Full-band user mixes stay local/gitignored — not required for CI.
  */
 import { readFileSync, existsSync, mkdirSync, writeFileSync, readdirSync } from 'node:fs'
 import { join } from 'node:path'

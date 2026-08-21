@@ -55,9 +55,9 @@ function toScore(b: RemedyBreakdown): TabScore {
 }
 
 const PIPELINE_STEPS: { id: ConvertStage; label: string }[] = [
-  { id: 'decode', label: '1 · Decode audio' },
-  { id: 'audio_to_midi', label: '2 · MP3 → MIDI' },
-  { id: 'midi_to_tabs', label: '3 · MIDI → tabs' },
+  { id: 'decode', label: '1. Decode audio' },
+  { id: 'audio_to_midi', label: '2. Audio to MIDI' },
+  { id: 'midi_to_tabs', label: '3. MIDI to tabs' },
 ]
 
 function stageIndex(stage: ConvertStage | null): number {

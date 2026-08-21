@@ -8,7 +8,7 @@ Ahmi asked for a timer or subagent to proc the next run so work does not stall o
 |-----------|------|--------|
 | **Soul vigil** | Between-visit wakes (local-only, budgeted) | **ON** — 8 wakes/day, 30 min gap |
 | **Mission** | Durable checklist + `npm test` verify | Active goal tracks remaining ship work |
-| **Checkpoint** | Resume block for next agent/muscle | Latest: fixes 1–10 closeout |
+| **Checkpoint** | Resume block for next agent/muscle | Latest: pre-push issue fix pass |
 | **This file** | Human-readable queue of next hops | Update after each green hop |
 
 Vigil does **not** call cloud providers at night. Daytime chat still drives product code.
@@ -21,24 +21,25 @@ Vigil does **not** call cloud providers at night. Daytime chat still drives prod
 
 ## Hop queue (top = next)
 
-- [ ] **Stronger full-band audio** — optional stems / ML pitch (Basic Pitch-class) when ready
+- [ ] **Create GitHub remote + push** when Ahmi says go (private/public choice)
+- [ ] **Set GH secret** `TAURI_SIGNING_PRIVATE_KEY` from `~/.tauri/guitarremedy.key`
+- [ ] **Tag `v0.1.0`** after first green CI for draft Windows installer
+- [ ] **Stronger full-band audio** — optional stems / ML pitch when ready
 - [ ] **Capacitor Android** packaging (optional)
-- [ ] **Windows installer polish** — signed `tauri build` artifacts + update channel notes
+- [ ] **Windows installer polish** — code-signing cert / SmartScreen (optional)
 
 ## Done (do not re-open without a bug)
 
 - Dark Forest theme + ComfyUI assets
-- Day 1–365 private-lesson expansion + Learn UI + late-day mastery variety
-- Audio → MIDI → tabs (lead emphasis / HPSS-lite, tempo detect, trim, multi-format)
-- Convert UX: tempo override, trim seconds, progress %, confidence, Clean up
-- Tab editor ear-loop (source scrub, ±1 nudge, bulk keep)
-- Eternal user tabs + `.grtab.json` export/import
+- Day 1–365 private-lesson expansion + Learn UI
+- Audio → MIDI → tabs (lead emphasis, tempo, trim, multi-format, Clean up)
+- Tab editor ear-loop + eternal user tabs + `.grtab` import/export
 - Free-license full-length tabs + Play/Stop
-- GP best-effort path (GPIF/zip + honest MIDI/MusicXML fallback) — no “Option A” codename
-- README + PWA manifest + Tauri scripts
-- Theory scale id aliases consolidated via `resolveScaleId` / `getScale`
-- Full-band sample smoke (`Born Between the Smoke and the Sky`)
-- `npm test` green
+- GP best-effort path + MusicXML/MIDI solid path + unit coverage
+- README + offline wiki + About (Ahmi family) + GH updater pipeline (local, no push yet)
+- Mobile bottom nav trimmed (Wiki/About via rail + Profile)
+- Upload pipeline labels ASCII-safe
+- `npm test` / `cargo test` / `npm run build` green
 
 ## Rule for Remedy
 

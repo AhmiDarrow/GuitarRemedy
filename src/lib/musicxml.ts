@@ -28,8 +28,11 @@ function textContent(el: Element | null, tag: string): string | null {
 }
 
 export function parseMusicXml(xml: string): MusicXmlParseResult {
-  const doc = new DOMParser().parseFromString(xml, 'application/xml')
-  if (doc.querySelector('parsererror')) {
+  // Strip DOCTYPE — external DTDs trip DOMParser/jsdom even when the body is fine.
+  const cleaned = xml.replace(/<!DOCTYPE[\s\S]*?>/i, '')
+  const doc = new DOMParser().parseFromString(cleaned, 'application/xml')
+  const err = doc.querySelector('parsererror')
+  if (err) {
     throw new Error('Invalid MusicXML')
   }
 
@@ -103,16 +106,13 @@ export function buildSimpleMusicXml(opts: {
       const alter = n.alter ? `<alter>${n.alter}</alter>` : ''
       const tech =
         n.string != null && n.fret != null
-          ? `<technical><string>${n.string}</technical>`.replace(
-              '</technical>',
-              `<fret>${n.fret}</fret></technical>`,
-            )
+          ? `<technical><string>${n.string}</string><fret>${n.fret}</fret></technical>`
           : ''
       return `<note><pitch><step>${n.step}</step>${alter}<octave>${n.octave}</octave></pitch><duration>${n.duration}</duration><voice>1</voice>${tech}</note>`
     })
     .join('')
+  // No external DOCTYPE — keeps browser + jsdom parsers happy without network DTD fetch.
   return `<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 3.1 Partwise//EN" "http://www.musicxml.org/dtds/partwise.dtd">
 <score-partwise version="3.1">
   <work><work-title>${opts.title}</work-title></work>
   <part-list><score-part id="P1"><part-name>Guitar</part-name></score-part></part-list>

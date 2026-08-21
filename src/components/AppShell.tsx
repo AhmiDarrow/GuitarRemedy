@@ -13,6 +13,7 @@ import {
 import { useAppStore } from '../store/appStore'
 import clsx from 'clsx'
 
+/** Full rail on desktop. */
 const nav = [
   { to: '/', label: 'Home', icon: Home, end: true },
   { to: '/learn', label: 'Learn', icon: BookOpen },
@@ -22,6 +23,16 @@ const nav = [
   { to: '/wiki', label: 'Wiki', icon: ScrollText },
   { to: '/profile', label: 'You', icon: User },
   { to: '/about', label: 'About', icon: Info },
+]
+
+/** Phone bottom bar — keep primary practice surfaces; Wiki/About live in rail + Profile. */
+const mobileNav = [
+  { to: '/', label: 'Home', icon: Home, end: true },
+  { to: '/learn', label: 'Learn', icon: BookOpen },
+  { to: '/library', label: 'Library', icon: Library },
+  { to: '/practice', label: 'Practice', icon: Guitar },
+  { to: '/upload', label: 'Upload', icon: Upload },
+  { to: '/profile', label: 'You', icon: User },
 ]
 
 export function AppShell() {
@@ -101,14 +112,14 @@ export function AppShell() {
 
       <nav className="md:hidden fixed bottom-0 inset-x-0 z-40 glass border-t border-[var(--border)] safe-bottom">
         <div className="flex justify-around items-stretch px-1 py-1">
-          {nav.map(({ to, label, icon: Icon, end }) => (
+          {mobileNav.map(({ to, label, icon: Icon, end }) => (
             <NavLink
               key={to}
               to={to}
               end={end}
               className={({ isActive }) =>
                 clsx(
-                  'flex flex-col items-center justify-center gap-0.5 py-2 px-2 min-w-[3.25rem] rounded-xl text-[10px] font-medium transition-colors',
+                  'flex flex-col items-center justify-center gap-0.5 py-2 px-1.5 min-w-0 flex-1 rounded-xl text-[10px] font-medium transition-colors',
                   isActive
                     ? 'text-mint'
                     : 'text-[var(--text-muted)]',
