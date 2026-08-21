@@ -56,7 +56,16 @@ export function Fretboard({
   const markers = [3, 5, 7, 9, 12]
 
   return (
-    <div className={clsx('overflow-x-auto rounded-2xl border border-[var(--border)] bg-[#0a0d12]', className)}>
+    <div
+      className={clsx(
+        'overflow-x-auto rounded-2xl border border-[var(--border)]',
+        className,
+      )}
+      style={{
+        background:
+          'linear-gradient(180deg, #0c1a14 0%, #07110c 55%, #030705 100%)',
+      }}
+    >
       <div className="min-w-[720px] p-3 md:p-4">
         <div className="flex mb-1 pl-10">
           {fretOrder.map((f) => (
@@ -70,9 +79,9 @@ export function Fretboard({
           <div className="absolute inset-0 pointer-events-none flex pl-10">
             {fretOrder.map((f) => (
               <div key={f} className="flex-1 relative">
-                {f > 0 && <div className="absolute left-0 top-0 bottom-0 w-px bg-mint/15" />}
+                {f > 0 && <div className="absolute left-0 top-0 bottom-0 w-px bg-mint/20" />}
                 {markers.includes(f) && (
-                  <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-mint/25" />
+                  <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-lime/30 ring-1 ring-mint/20" />
                 )}
               </div>
             ))}
@@ -87,7 +96,7 @@ export function Fretboard({
                   {openName}
                 </div>
                 <div className="flex-1 flex relative h-full items-center">
-                  <div className="absolute left-0 right-0 h-[2px] bg-gradient-to-r from-mint/35 via-soft/25 to-moss/40" />
+                  <div className="absolute left-0 right-0 h-[2px] bg-gradient-to-r from-mint/40 via-soft/20 to-moss/50" />
                   {fretOrder.map((fret) => {
                     const cell = row[fret]
                     const deg = cell.inScale ? degreeOf(cell.pc, root, scale) : null
@@ -110,11 +119,11 @@ export function Fretboard({
                         {cell.inScale && (
                           <span
                             className={clsx(
-                              'w-6 h-6 md:w-7 md:h-7 rounded-full flex items-center justify-center text-[10px] md:text-[11px] font-semibold transition-transform',
+                              'min-w-[1.75rem] h-7 md:min-w-[2rem] md:h-8 px-1 rounded-full flex items-center justify-center text-[11px] md:text-xs font-bold tracking-tight transition-transform border',
                               isRoot
-                                ? 'bg-amber-400 text-black shadow-md shadow-amber-500/40'
-                                : 'bg-sky-500/90 text-white shadow-md shadow-sky-500/20',
-                              dim && 'opacity-25',
+                                ? 'bg-lime text-[var(--color-ink)] border-lime shadow-[0_0_14px_rgba(200,245,96,0.55)] ring-2 ring-mint/70'
+                                : 'bg-mint text-[var(--color-ink)] border-mint/80 shadow-[0_0_12px_rgba(93,255,176,0.4)] ring-1 ring-white/25',
+                              dim && 'opacity-40',
                               interactive && 'hover:scale-110 active:scale-95',
                             )}
                           >

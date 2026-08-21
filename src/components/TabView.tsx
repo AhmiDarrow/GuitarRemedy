@@ -187,7 +187,7 @@ export function TabView({ score, className, title }: Props) {
                     </span>
                   )
                 })}
-                <span className="text-slate-600">|</span>
+                <span className="text-mint/25">|</span>
               </div>
             ))}
           </div>

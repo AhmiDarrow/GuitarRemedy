@@ -22,39 +22,39 @@ const PHASE_TONE: Record<
   { bar: string; chip: string; soft: string; label: string }
 > = {
   basics: {
-    bar: 'bg-sky-400',
-    chip: 'border-sky-400/40 bg-sky-400/15 text-sky-300',
-    soft: 'text-sky-300/90',
+    bar: 'bg-mint',
+    chip: 'border-mint/45 bg-mint/15 text-mint',
+    soft: 'text-mint',
     label: 'Foundations',
   },
   chords: {
-    bar: 'bg-mint',
-    chip: 'border-mint/40 bg-mint/15 text-mint',
-    soft: 'text-mint/90',
+    bar: 'bg-lime',
+    chip: 'border-lime/45 bg-lime/15 text-lime',
+    soft: 'text-lime',
     label: 'Harmony',
   },
   scales: {
-    bar: 'bg-teal-400',
-    chip: 'border-teal-400/40 bg-teal-400/15 text-teal-300',
-    soft: 'text-teal-300/90',
+    bar: 'bg-teal',
+    chip: 'border-teal/45 bg-teal/20 text-soft',
+    soft: 'text-soft',
     label: 'Melody map',
   },
   rhythm: {
-    bar: 'bg-violet-400',
-    chip: 'border-violet-400/40 bg-violet-400/15 text-violet-300',
-    soft: 'text-violet-300/90',
+    bar: 'bg-moss',
+    chip: 'border-moss/50 bg-moss/25 text-soft',
+    soft: 'text-soft',
     label: 'Groove',
   },
   lead: {
-    bar: 'bg-rose-400',
-    chip: 'border-rose-400/40 bg-rose-400/15 text-rose-300',
-    soft: 'text-rose-300/90',
+    bar: 'bg-lime',
+    chip: 'border-lime/50 bg-lime/20 text-lime',
+    soft: 'text-lime',
     label: 'Lead voice',
   },
   repertoire: {
-    bar: 'bg-emerald-400',
-    chip: 'border-emerald-400/40 bg-emerald-400/15 text-emerald-300',
-    soft: 'text-emerald-300/90',
+    bar: 'bg-mint',
+    chip: 'border-mint/50 bg-mint/20 text-mint',
+    soft: 'text-mint',
     label: 'Songs',
   },
 }
@@ -169,7 +169,7 @@ export function LearnPage() {
             </div>
           </div>
         </div>
-        <div className="h-2 rounded-full bg-black/30 overflow-hidden border border-[var(--border)]">
+        <div className="h-2 rounded-full bg-ink/60 overflow-hidden border border-[var(--border)]">
           <div
             className={clsx('h-full rounded-full transition-all duration-300', tone.bar)}
             style={{ width: `${phasePct}%` }}
@@ -368,12 +368,12 @@ export function LearnPage() {
         </div>
 
         {pl?.commonMistakes?.length ? (
-          <div className="rounded-2xl border border-amber-400/25 bg-amber-400/5 p-4">
-            <h3 className="text-sm font-semibold text-amber-200/90">Watch for these</h3>
+          <div className="rounded-2xl border border-lime/25 bg-lime/5 p-4">
+            <h3 className="text-sm font-semibold text-lime/90">Watch for these</h3>
             <ul className="mt-2 space-y-1.5 text-sm text-[var(--text-secondary)]">
               {pl.commonMistakes.map((m) => (
                 <li key={m} className="flex gap-2">
-                  <span className="text-amber-300/80">·</span>
+                  <span className="text-lime/80">·</span>
                   <span>{m}</span>
                 </li>
               ))}

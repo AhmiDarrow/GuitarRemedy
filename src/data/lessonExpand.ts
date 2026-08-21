@@ -390,6 +390,46 @@ const GOLD: Partial<Record<number, Partial<PrivateLessonFields> & { teachExtra?:
     teacherIntro:
       'Minor pentatonic is the “can’t mess it up too bad” scale. We’ll find A at fret 5, walk the box like stepping stones, and leave space so it sounds like music, not an elevator.',
   },
+
+  // Weekly-ish anchors get richer teacher voice (research: spaced retrieval + celebration)
+  30: {
+    hook: 'Basics capstone — prove the campfire core with kindness.',
+    teacherIntro:
+      'Thirty days in: you are not “behind.” You are collecting clean reps. Today we perform a tiny set, not a exam.',
+    encouragement: 'Foundations compound. Showing up for a month is already rare — and it shows in your hands.',
+    funBonus: 'Text a friend a 15s clip of your favorite 8 bars. Witnesses make wins real.',
+  },
+  75: {
+    hook: 'Chord phase crest — fluency over fancy.',
+    teacherIntro:
+      'If changes are getting smoother, that is the whole plot. We polish the sticky door today and play music through it.',
+    encouragement: 'Chord comfort arrives in jumps after plateaus. Trust the slow days.',
+  },
+  120: {
+    hook: 'Scales become stories today — not exams.',
+    teacherIntro:
+      'A 16-bar pent story beats a perfect box run. Shape a beginning, a little peak, and a landing on the root.',
+    encouragement: 'If you left space in your solo, you are already thinking like a musician.',
+  },
+  180: {
+    hook: 'Rhythm checkpoint — pocket is a superpower.',
+    teacherIntro:
+      'We bridge toward lead by locking time. If the groove is honest, notes you add later will sit like furniture on a good floor.',
+    encouragement: 'People feel your time before they admire your fretting. You are training what listeners love first.',
+  },
+  260: {
+    hook: 'Lead checkpoint — speech, not sport.',
+    teacherIntro:
+      'Bring a motif, a bend with a target, and silence. That trio outperforms a hundred rushed scale runs on stage.',
+    encouragement: 'Your voice on the instrument is forming. Protect it with rests.',
+  },
+  365: {
+    hook: 'Day 365 — finish art on a long horizon.',
+    teacherIntro:
+      'This is a celebration performance, not a jury. Play a mini-set that sounds like you. Then write the next arc with kindness.',
+    encouragement: 'You finished a year-shaped path. That identity shift matters as much as any lick.',
+    funBonus: 'Schedule the first practice of the next 30 days on your calendar before you put the guitar down.',
+  },
 }
 
 /**

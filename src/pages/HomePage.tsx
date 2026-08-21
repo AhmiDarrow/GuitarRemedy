@@ -47,9 +47,9 @@ export function HomePage() {
       <section className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {[
           { label: 'Streak', value: `${streak}d`, icon: Flame, tone: 'text-mint' },
-          { label: 'Path day', value: String(currentDay), icon: BookOpen, tone: 'text-sky-400' },
-          { label: 'Completed', value: String(completed.length), icon: Library, tone: 'text-emerald-400' },
-          { label: 'Progress', value: `${progress}%`, icon: Upload, tone: 'text-violet-400' },
+          { label: 'Path day', value: String(currentDay), icon: BookOpen, tone: 'text-lime' },
+          { label: 'Completed', value: String(completed.length), icon: Library, tone: 'text-teal' },
+          { label: 'Progress', value: `${progress}%`, icon: Upload, tone: 'text-soft' },
         ].map(({ label, value, icon: Icon, tone }) => (
           <div key={label} className="card p-4">
             <div className="flex items-center justify-between">

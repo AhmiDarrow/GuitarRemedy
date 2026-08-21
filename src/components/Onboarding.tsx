@@ -13,12 +13,12 @@ export function Onboarding() {
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-md">
-      <div className="card max-w-md w-full p-6 md:p-8 animate-fade-up shadow-2xl shadow-black/50">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink/80 backdrop-blur-md">
+      <div className="card max-w-md w-full p-6 md:p-8 animate-fade-up shadow-2xl shadow-ink/60 ring-1 ring-mint/15">
         {step === 0 && (
           <>
             <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-mint to-teal flex items-center justify-center mb-5 shadow-lg shadow-mint/30">
-              <Guitar className="w-7 h-7 text-black" />
+              <Guitar className="w-7 h-7 text-ink" />
             </div>
             <h1 className="font-display text-2xl font-bold tracking-tight">
               Welcome to GuitarRemedy
