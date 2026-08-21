@@ -7,6 +7,8 @@ import {
   Upload,
   User,
   Flame,
+  ScrollText,
+  Info,
 } from 'lucide-react'
 import { useAppStore } from '../store/appStore'
 import clsx from 'clsx'
@@ -17,8 +19,9 @@ const nav = [
   { to: '/library', label: 'Library', icon: Library },
   { to: '/practice', label: 'Practice', icon: Guitar },
   { to: '/upload', label: 'Upload', icon: Upload },
+  { to: '/wiki', label: 'Wiki', icon: ScrollText },
   { to: '/profile', label: 'You', icon: User },
-  { to: '/about', label: 'About', icon: BookOpen },
+  { to: '/about', label: 'About', icon: Info },
 ]
 
 export function AppShell() {

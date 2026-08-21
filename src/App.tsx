@@ -7,6 +7,7 @@ import { PracticePage } from './pages/PracticePage'
 import { UploadPage } from './pages/UploadPage'
 import { ProfilePage } from './pages/ProfilePage'
 import { AboutPage } from './pages/AboutPage'
+import { WikiPage } from './pages/WikiPage'
 import { Onboarding } from './components/Onboarding'
 import { useAppStore } from './store/appStore'
 
@@ -24,6 +25,8 @@ export default function App() {
           <Route path="library" element={<LibraryPage />} />
           <Route path="practice" element={<PracticePage />} />
           <Route path="upload" element={<UploadPage />} />
+          <Route path="wiki" element={<WikiPage />} />
+          <Route path="wiki/:slug" element={<WikiPage />} />
           <Route path="profile" element={<ProfilePage />} />
           <Route path="about" element={<AboutPage />} />
           <Route path="*" element={<Navigate to="/" replace />} />

@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { ArrowRight, BookOpen, Flame, Guitar, Library, Upload } from 'lucide-react'
+import { ArrowRight, BookOpen, Flame, Guitar, Library, ScrollText, Upload } from 'lucide-react'
 import { useAppStore } from '../store/appStore'
 import { getLesson } from '../data/curriculum'
 import { LIBRARY } from '../data/library'
@@ -30,7 +30,7 @@ export function HomePage() {
             Keep the streak alive
           </h1>
           <p className="text-[var(--text-muted)] mt-2 max-w-xl text-sm md:text-base">
-            Scales, tabs, a 365-day path, and Option A song breakdown — MIDI, MusicXML, and light audio assist.
+            Scales, tabs, a 365-day path, song upload → tabs, and a full guitar wiki — music theory to fretboard craft.
           </p>
           <div className="flex flex-wrap gap-3 mt-6">
             <Link to={`/learn/${currentDay}`} className="btn-primary">
@@ -101,6 +101,9 @@ export function HomePage() {
           <div className="mt-5 flex flex-wrap gap-2">
             <Link to="/upload" className="btn-secondary text-sm">
               <Upload className="w-4 h-4" /> Break down a song
+            </Link>
+            <Link to="/wiki" className="btn-secondary text-sm">
+              <ScrollText className="w-4 h-4" /> Open wiki
             </Link>
           </div>
         </div>
