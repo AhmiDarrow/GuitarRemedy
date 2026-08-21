@@ -78,14 +78,32 @@ export interface RemedyBreakdown {
   analyzedSec?: number
   /** Per-note confidences 0..1 aligned with score.notes when available. */
   noteConfidences?: number[]
+  /**
+   * True when notes are a placeholder (e.g. GP binary stub), not a real parse.
+   * Callers must not auto-save these into Your tabs.
+   */
+  isPlaceholder?: boolean
+}
+
+/**
+ * TabEvent.string is fretting/theory index: 0 = low E … 5 = high e.
+ * TabNote / TabView / library use display index: 0 = high e … 5 = low E.
+ * Score time/duration are always in **beats** (TabView multiplies by 60/tempo).
+ */
+export function theoryStringToDisplay(stringLowE0: number): number {
+  return Math.max(0, Math.min(5, 5 - stringLowE0))
+}
+
+export function displayStringToTheory(stringHighE0: number): number {
+  return Math.max(0, Math.min(5, 5 - stringHighE0))
 }
 
 function eventsToNotes(tab: TabEvent[]): TabNote[] {
   return tab.map((t) => ({
-    string: Math.max(0, Math.min(5, 5 - t.string)), // display high-e = 0
+    string: theoryStringToDisplay(t.string),
     fret: t.fret,
-    time: t.startBeat * 0.5,
-    duration: Math.max(0.15, t.durationBeats * 0.5),
+    time: t.startBeat,
+    duration: Math.max(0.125, t.durationBeats || 1),
     midi: t.midi,
   }))
 }
@@ -151,7 +169,7 @@ export function analyzeNotes(midis: number[], title = 'Untitled'): RemedyBreakdo
   return finish({
     kind: 'midi',
     title,
-    tempoBpm: 100,
+    tempoBpm: 90,
     key: {
       root: detected.root,
       scaleId: detected.scaleId,
@@ -319,10 +337,15 @@ function musicXmlToBreakdown(parsed: MusicXmlParseResult): RemedyBreakdown {
     beat += dur
   }
   const scaleNotes = scaleNoteNames(root, scaleId)
+  const xmlTempo =
+    typeof (parsed as { tempoBpm?: number }).tempoBpm === 'number' &&
+    (parsed as { tempoBpm?: number }).tempoBpm! > 0
+      ? (parsed as { tempoBpm?: number }).tempoBpm!
+      : 100
   return finish({
     kind: 'musicxml',
     title: parsed.title || 'MusicXML',
-    tempoBpm: 100,
+    tempoBpm: xmlTempo,
     key: {
       root,
       scaleId,
@@ -405,8 +428,11 @@ export function guitarProToBreakdown(
     let s = 0
     let f = 0
     if (n.string != null && n.fret != null) {
-      // GP strings are 1=high-e … 6=low-E in many exports; our TabEvent uses 0=high-e
-      s = Math.max(0, Math.min(5, (n.string >= 1 && n.string <= 6 ? 6 - n.string : n.string)))
+      // GP strings are often 1=high-e … 6=low-E. TabEvent uses 0=low E … 5=high e.
+      s = Math.max(
+        0,
+        Math.min(5, n.string >= 1 && n.string <= 6 ? 6 - n.string : displayStringToTheory(n.string)),
+      )
       f = Math.max(0, n.fret)
     } else if (frets[i]) {
       s = frets[i].string
@@ -432,9 +458,7 @@ export function guitarProToBreakdown(
   const detected = detectKeyFromPcs(pcs)
   const scaleNotes = scaleNoteNames(detected.root, detected.scaleId)
   const isStub = parsed.source === 'stub' || parsed.source === 'binary-header'
-  const conf = isStub
-    ? 0.35
-    : Math.min(0.92, 0.55 + tab.length * 0.02)
+  const conf = isStub ? 0.2 : Math.min(0.92, 0.55 + tab.length * 0.02)
 
   return finish({
     kind: 'guitarpro',
@@ -455,23 +479,35 @@ export function guitarProToBreakdown(
       `Key context ≈ ${detected.root} ${SCALES[detected.scaleId as ScaleId]?.name || detected.scaleId}.`,
       scaleNotes.length ? `Scale tones: ${scaleNotes.join(', ')}.` : '',
       isStub
-        ? 'Binary GP3–5 full decode is best-effort — export MIDI or MusicXML from Guitar Pro / TuxGuitar for accurate tabs.'
+        ? 'PLACEHOLDER only — binary GP was not decoded. Export MIDI or MusicXML for real tabs. Not saved to Your tabs.'
         : 'GPIF/zip best-effort parse. Complex multi-voice scores may still need MIDI/MusicXML export.',
     ].filter(Boolean),
-    practicePlan: [
-      'Check fretting against the original GP score if you have it open.',
-      `Loop the first four bars at ${Math.round((parsed.tempoBpm || 120) * 0.7)} BPM.`,
-      'Mark any stretch frets and isolate them for 2 minutes.',
-      'Save to Your tabs once the candidate looks right.',
-    ],
+    practicePlan: isStub
+      ? [
+          'Re-export this score as MIDI (.mid) or MusicXML from Guitar Pro / TuxGuitar.',
+          'Upload the export here for accurate fretting and timing.',
+          'Do not practice the placeholder melody as if it were the song.',
+        ]
+      : [
+          'Check fretting against the original GP score if you have it open.',
+          `Loop the first four bars at ${Math.round((parsed.tempoBpm || 120) * 0.7)} BPM.`,
+          'Mark any stretch frets and isolate them for 2 minutes.',
+          'Save to Your tabs once the candidate looks right.',
+        ],
     confidence: conf,
     editable: true,
+    isPlaceholder: isStub,
     warnings: [
       ...(parsed.warnings || []),
-      ...(isStub ? [GP_EXPORT_HINT] : []),
+      ...(isStub
+        ? [
+            GP_EXPORT_HINT,
+            'Placeholder melody — not auto-saved. Export MIDI/MusicXML for a real tab.',
+          ]
+        : []),
     ],
     statusMessage: isStub
-      ? 'Guitar Pro · binary fallback (export MIDI/MusicXML for accuracy)'
+      ? 'Guitar Pro · placeholder (not saved) — export MIDI/MusicXML'
       : `Guitar Pro → tabs · ${tab.length} notes · ready`,
   })
 }
@@ -832,7 +868,8 @@ export async function breakdownFile(
     return finish({
       kind: 'unknown',
       title: name,
-      tempoBpm: 100,
+      tempoBpm: 90,
+      isPlaceholder: true,
       key: { root: 'C', scaleId: 'major', scaleName: 'Major (Ionian)' },
       pitchClasses: [],
       scaleNotes: scaleNoteNames('C', 'major'),

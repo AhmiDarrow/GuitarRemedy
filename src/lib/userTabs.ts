@@ -97,9 +97,9 @@ export function breakdownToTabSong(b: RemedyBreakdown): TabSong {
         flush()
         measureStart += beatsPer
       }
-      const displayString = Math.max(0, Math.min(5, 5 - ev.string))
+      // TabEvent.string is low-E=0; library TabSong uses high-e=0
       measureNotes.push({
-        string: displayString,
+        string: Math.max(0, Math.min(5, 5 - ev.string)),
         fret: ev.fret,
         duration: Math.max(0.125, ev.durationBeats || 1),
       })
@@ -133,6 +133,8 @@ export function breakdownToUserTab(
   b: RemedyBreakdown,
   opts?: { sourceName?: string; id?: string },
 ): UserTab | null {
+  // Never persist GP/binary placeholders as if they were real songs
+  if (b.isPlaceholder) return null
   const notes = b.score?.notes?.length ? b.score.notes : b.tabNotes
   if (!notes?.length && !b.tab?.length) return null
 

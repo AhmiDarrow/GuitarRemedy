@@ -158,6 +158,52 @@ textarea {
   animation: fade-up 0.4s ease both;
 }
 
+/* Tuner — live gauge motion */
+@keyframes tuner-ring-pulse {
+  0%,
+  100% {
+    opacity: 0.35;
+    transform: scale(0.92);
+  }
+  50% {
+    opacity: 0.95;
+    transform: scale(1.08);
+  }
+}
+
+.tuner-ring-pulse {
+  transform-origin: 120px 70px;
+  animation: tuner-ring-pulse 1.1s ease-in-out infinite;
+}
+
+@keyframes tuner-note-breathe {
+  0%,
+  100% {
+    filter: brightness(1);
+  }
+  50% {
+    filter: brightness(1.12);
+  }
+}
+
+.tuner-note-breathe {
+  animation: tuner-note-breathe 2.4s ease-in-out infinite;
+}
+
+@keyframes tuner-meter-shimmer {
+  0% {
+    background-position: 0% 50%;
+  }
+  100% {
+    background-position: 100% 50%;
+  }
+}
+
+.tuner-meter-fill {
+  background-size: 200% 100%;
+  animation: tuner-meter-shimmer 2.2s linear infinite;
+}
+
 .font-display {
   font-family: var(--font-display);
   letter-spacing: -0.02em;

@@ -26,6 +26,28 @@ describe('breakdown', () => {
     expect(result.key.root).toBeTruthy()
   })
 
+  it('stores score time in beats (not seconds-at-120bpm)', () => {
+    const buf = buildSimpleMidi([
+      { pitch: 60, start: 0, duration: 480 },
+      { pitch: 64, start: 480, duration: 480 },
+      { pitch: 67, start: 960, duration: 480 },
+    ])
+    const parsed = parseMidi(buf)
+    const result = midiToBreakdown(parsed, 'beat grid')
+    expect(result.score.tempo).toBeGreaterThan(0)
+    // ticksPerQuarter 480 → start beats 0, 1, 2
+    const times = result.score.notes.map((n) => n.time).sort((a, b) => a - b)
+    expect(times[0]).toBeCloseTo(0, 5)
+    expect(times[1]).toBeCloseTo(1, 5)
+    expect(times[2]).toBeCloseTo(2, 5)
+    // display string is high-e=0; theory low-E=0 is flipped once
+    for (const n of result.score.notes) {
+      expect(n.string).toBeGreaterThanOrEqual(0)
+      expect(n.string).toBeLessThanOrEqual(5)
+      expect(n.duration).toBeGreaterThan(0)
+    }
+  })
+
   it('marks audio assist as editable and low confidence', () => {
     const r = breakdownAudioAssist('jam.wav', [57, 60, 62, 64])
     expect(r.kind).toBe('audio')
@@ -48,10 +70,11 @@ describe('breakdown', () => {
     expect(r.kind).toBe('guitarpro')
     expect(r.editable).toBe(true)
     expect(r.tab.length).toBeGreaterThan(0)
+    expect(r.isPlaceholder).toBe(true)
     expect(r.warnings.length + r.explanation.length).toBeGreaterThan(0)
     expect(
       [...r.warnings, ...r.explanation, r.statusMessage || ''].some((t) =>
-        /MIDI|MusicXML|best-effort|fallback|binary/i.test(t),
+        /MIDI|MusicXML|best-effort|fallback|binary|placeholder/i.test(t),
       ),
     ).toBe(true)
   })

@@ -11,6 +11,7 @@ import {
   Info,
 } from 'lucide-react'
 import { useAppStore } from '../store/appStore'
+import { AppMenu } from './AppMenu'
 import clsx from 'clsx'
 
 /** Full rail on desktop. */
@@ -25,7 +26,7 @@ const nav = [
   { to: '/about', label: 'About', icon: Info },
 ]
 
-/** Phone bottom bar — keep primary practice surfaces; Wiki/About live in rail + Profile. */
+/** Phone bottom bar — keep primary practice surfaces; Wiki/About via menu + rail. */
 const mobileNav = [
   { to: '/', label: 'Home', icon: Home, end: true },
   { to: '/learn', label: 'Learn', icon: BookOpen },
@@ -42,22 +43,8 @@ export function AppShell() {
   return (
     <div className="min-h-dvh flex flex-col md:flex-row">
       <aside className="hidden md:flex md:w-60 lg:w-64 shrink-0 flex-col border-r border-[var(--border)] bg-[var(--bg-elevated)]/80 backdrop-blur-xl sticky top-0 h-dvh">
-        <div className="px-5 pt-6 pb-4">
-          <div className="flex items-center gap-3">
-            <img
-              src="/assets/brand-mark.png"
-              alt=""
-              className="w-10 h-10 rounded-xl object-cover shadow-lg shadow-mint/20 ring-1 ring-mint/30"
-            />
-            <div>
-              <div className="font-display font-bold text-lg tracking-tight leading-none">
-                Guitar<span className="text-mint">Remedy</span>
-              </div>
-              <div className="text-[11px] text-[var(--text-muted)] mt-0.5">
-                Day path · scales · tabs
-              </div>
-            </div>
-          </div>
+        <div className="px-4 pt-5 pb-4">
+          <AppMenu size="md" showTitle />
         </div>
 
         <nav className="flex-1 px-3 space-y-0.5">
@@ -66,9 +53,7 @@ export function AppShell() {
               key={to}
               to={to}
               end={end}
-              className={({ isActive }) =>
-                clsx('nav-link', isActive && 'active')
-              }
+              className={({ isActive }) => clsx('nav-link', isActive && 'active')}
             >
               <Icon className="w-4.5 h-4.5 opacity-80" />
               {label}
@@ -88,18 +73,9 @@ export function AppShell() {
       </aside>
 
       <div className="flex-1 flex flex-col min-w-0 pb-20 md:pb-0">
-        <header className="md:hidden sticky top-0 z-30 glass border-b border-[var(--border)] px-4 py-3 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <img
-              src="/assets/brand-mark.png"
-              alt=""
-              className="w-8 h-8 rounded-lg object-cover ring-1 ring-mint/30"
-            />
-            <span className="font-display font-bold">
-              Guitar<span className="text-mint">Remedy</span>
-            </span>
-          </div>
-          <div className="flex items-center gap-1.5 text-mint text-sm font-medium">
+        <header className="md:hidden sticky top-0 z-30 glass border-b border-[var(--border)] px-3 py-2.5 flex items-center justify-between gap-2">
+          <AppMenu size="sm" showTitle />
+          <div className="flex items-center gap-1.5 text-mint text-sm font-medium shrink-0">
             <Flame className="w-3.5 h-3.5" />
             {streak}
           </div>
@@ -120,9 +96,7 @@ export function AppShell() {
               className={({ isActive }) =>
                 clsx(
                   'flex flex-col items-center justify-center gap-0.5 py-2 px-1.5 min-w-0 flex-1 rounded-xl text-[10px] font-medium transition-colors',
-                  isActive
-                    ? 'text-mint'
-                    : 'text-[var(--text-muted)]',
+                  isActive ? 'text-mint' : 'text-[var(--text-muted)]',
                 )
               }
             >

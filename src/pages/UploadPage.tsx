@@ -18,7 +18,6 @@ import {
 import {
   analyzeNotes,
   AUDIO_FORMATS_LABEL,
-  frettingForMidi,
   isAudioUpload,
   parseUploadedFile,
   UPLOAD_ACCEPT,
@@ -94,6 +93,10 @@ export function UploadPage() {
       b: RemedyBreakdown,
       opts?: string | { sourceName?: string; replaceId?: string },
     ) => {
+      if (b.isPlaceholder) {
+        setSavedTab(null)
+        return null
+      }
       const noteCount = b.score?.notes?.length || b.tabNotes?.length || b.tab?.length || 0
       if (noteCount === 0) {
         setSavedTab(null)
@@ -195,17 +198,7 @@ export function UploadPage() {
     const midiBytes = buildSimpleMidi(events)
     const midis = events.map((e) => e.pitch)
     const b = analyzeNotes(midis, 'Demo C major arpeggio')
-    b.tabNotes = midis.map((m, i) => {
-      const f = frettingForMidi(m) || { string: 0, fret: 0, midi: m }
-      return {
-        string: Math.max(0, Math.min(5, 5 - f.string)),
-        fret: f.fret,
-        time: i * 0.5,
-        duration: 0.45,
-        midi: m,
-      }
-    })
-    b.score = toScore(b)
+    // score/tabNotes already in beats via analyzeNotes → eventsToNotes
     b.midiBytes = midiBytes
     b.statusMessage = 'Demo · MIDI → tabs'
     b.kind = 'midi'
@@ -229,17 +222,7 @@ export function UploadPage() {
     const b = analyzeNotes(pitches, 'demo-melody.mp3')
     b.kind = 'audio'
     b.midiBytes = midiBytes
-    b.tabNotes = pitches.map((m, i) => {
-      const f = frettingForMidi(m) || { string: 0, fret: 0, midi: m }
-      return {
-        string: Math.max(0, Math.min(5, 5 - f.string)),
-        fret: f.fret,
-        time: i * 0.5,
-        duration: 0.45,
-        midi: m,
-      }
-    })
-    b.score = toScore(b)
+    // keep beat-based score from analyzeNotes (no *0.5 seconds hack)
     b.confidence = 0.48
     b.editable = true
     b.warnings = [

@@ -77,6 +77,15 @@ describe('userTabs', () => {
     expect(loaded[0].title).toBe('Test Melody')
   })
 
+  it('refuses placeholder GP stubs', () => {
+    const b = {
+      ...sampleBreakdown(),
+      kind: 'guitarpro' as const,
+      isPlaceholder: true,
+    }
+    expect(breakdownToUserTab(b)).toBeNull()
+  })
+
   it('parseGrTabFile accepts export payload', () => {
     const tab = breakdownToUserTab(sampleBreakdown())!
     const payload = userTabToExportPayload(tab)

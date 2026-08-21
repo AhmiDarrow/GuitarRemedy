@@ -15,6 +15,14 @@ interface AppState {
   showDegrees: boolean
   metronomeOn: boolean
   bpm: number
+  /** Beats per bar for metronome (2–8). */
+  timeSignatureBeats: number
+  /** Subdivision: 1=quarter, 2=eighth, 3=triplet, 4=sixteenth. */
+  metronomeSubdivision: number
+  /** Accent beat 1. */
+  metronomeAccent: boolean
+  /** Soft count-in bars before main loop (0–4). */
+  metronomeCountInBars: number
   onboarded: boolean
   onboardingDone: boolean
   favorites: string[]
@@ -31,6 +39,10 @@ interface AppState {
   setShowDegrees: (v: boolean) => void
   setMetronomeOn: (v: boolean) => void
   setBpm: (n: number) => void
+  setTimeSignatureBeats: (n: number) => void
+  setMetronomeSubdivision: (n: number) => void
+  setMetronomeAccent: (v: boolean) => void
+  setMetronomeCountInBars: (n: number) => void
   completeOnboarding: (name?: string, lefty?: boolean) => void
   toggleFavorite: (id: string) => void
   completeLesson: (day: number) => void
@@ -61,6 +73,10 @@ export const useAppStore = create<AppState>()(
       showDegrees: true,
       metronomeOn: false,
       bpm: 80,
+      timeSignatureBeats: 4,
+      metronomeSubdivision: 1,
+      metronomeAccent: true,
+      metronomeCountInBars: 1,
       onboarded: false,
       onboardingDone: false,
       favorites: [],
@@ -77,7 +93,14 @@ export const useAppStore = create<AppState>()(
       setA4: (hz) => set({ a4: hz }),
       setShowDegrees: (v) => set({ showDegrees: v }),
       setMetronomeOn: (v) => set({ metronomeOn: v }),
-      setBpm: (n) => set({ bpm: Math.max(40, Math.min(240, n)) }),
+      setBpm: (n) => set({ bpm: Math.max(40, Math.min(240, Math.round(n) || 80)) }),
+      setTimeSignatureBeats: (n) =>
+        set({ timeSignatureBeats: Math.max(2, Math.min(8, Math.round(n) || 4)) }),
+      setMetronomeSubdivision: (n) =>
+        set({ metronomeSubdivision: [1, 2, 3, 4].includes(n) ? n : 1 }),
+      setMetronomeAccent: (v) => set({ metronomeAccent: v }),
+      setMetronomeCountInBars: (n) =>
+        set({ metronomeCountInBars: Math.max(0, Math.min(4, Math.round(n) || 0)) }),
       completeOnboarding: (name, leftyFlag) =>
         set((s) => ({
           onboarded: true,
@@ -132,6 +155,10 @@ export const useAppStore = create<AppState>()(
         a4: s.a4,
         showDegrees: s.showDegrees,
         bpm: s.bpm,
+        timeSignatureBeats: s.timeSignatureBeats,
+        metronomeSubdivision: s.metronomeSubdivision,
+        metronomeAccent: s.metronomeAccent,
+        metronomeCountInBars: s.metronomeCountInBars,
         onboarded: s.onboarded,
         onboardingDone: s.onboardingDone,
         favorites: s.favorites,
