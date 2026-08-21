@@ -39,6 +39,7 @@ export function LibraryPage() {
   const hydrate = useUserTabsStore((s) => s.hydrate)
   const userTabs = useUserTabsStore((s) => s.tabs)
   const removeTab = useUserTabsStore((s) => s.removeTab)
+  const getTuning = useAppStore((s) => s.getTuning)
   const upsertTab = useUserTabsStore((s) => s.upsertTab)
   const activeTabId = useUserTabsStore((s) => s.activeTabId)
   const setActiveTabId = useUserTabsStore((s) => s.setActiveTabId)
@@ -367,7 +368,10 @@ export function LibraryPage() {
               ) : selectedUser?.score?.notes?.length ? (
                 <TabView title={selectedUser.title} score={selectedUser.score} />
               ) : selected.tab ? (
-                <TabView title={selected.tab.title} score={tabSongToScore(selected.tab)} />
+                <TabView
+                  title={selected.tab.title}
+                  score={tabSongToScore(selected.tab, { tuning: getTuning() })}
+                />
               ) : null}
             </>
           ) : (

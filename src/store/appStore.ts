@@ -2,6 +2,7 @@ import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import type { TuningName } from '../lib/theory'
 import { STANDARD_TUNING, TUNINGS } from '../lib/theory'
+import { BPM_DEFAULT, clampPracticeBpm } from '../lib/tabScore'
 
 export type Handedness = 'right' | 'left'
 
@@ -96,8 +97,8 @@ export const useAppStore = create<AppState>()(
       setA4: (hz) => set({ a4: hz }),
       setShowDegrees: (v) => set({ showDegrees: v }),
       setMetronomeOn: (v) => set({ metronomeOn: v }),
-      // Keep in sync with metronome.clampBpm (30–300) so scale play and click share one tempo.
-      setBpm: (n) => set({ bpm: Math.max(30, Math.min(300, Math.round(n) || 80)) }),
+      // Keep in sync with clampPracticeBpm (30–300) so scale play, tabs, and click share one tempo.
+      setBpm: (n) => set({ bpm: clampPracticeBpm(n, BPM_DEFAULT) }),
       setTimeSignatureBeats: (n) =>
         set({ timeSignatureBeats: Math.max(2, Math.min(8, Math.round(n) || 4)) }),
       setMetronomeSubdivision: (n) =>

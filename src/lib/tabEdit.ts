@@ -2,10 +2,31 @@
 
 import type { TabNote, TabScore, RemedyBreakdown } from './breakdown'
 import { frettingSequence, smoothFrettingRun, STANDARD_TUNING } from './theory'
+import {
+  clampPracticeBpm,
+  midiFromDisplayStringFret,
+  openMidiHighToLow,
+  STANDARD_OPEN_MIDI_HIGH_TO_LOW,
+} from './tabScore'
 import { scoreToTabSong, type UserTab } from './userTabs'
 
-/** Display string index 0 = high e … 5 = low E (matches TabView). */
-export const OPEN_MIDI_HIGH_TO_LOW = [64, 59, 55, 50, 45, 40] as const
+/** Display string index 0 = high e … 5 = low E (matches TabView). Standard only. */
+export const OPEN_MIDI_HIGH_TO_LOW = STANDARD_OPEN_MIDI_HIGH_TO_LOW
+
+/** Active editor tuning (theory low-E=0). Defaults to standard. */
+let editorTuning: number[] = [...STANDARD_TUNING]
+
+export function setEditorTuning(tuning: number[] | null | undefined): void {
+  if (Array.isArray(tuning) && tuning.length === 6) {
+    editorTuning = tuning.map((n) => Math.max(0, Math.min(127, Math.round(Number(n) || 0))))
+  } else {
+    editorTuning = [...STANDARD_TUNING]
+  }
+}
+
+export function getEditorTuning(): number[] {
+  return [...editorTuning]
+}
 
 export function clampString(s: number): number {
   return Math.max(0, Math.min(5, Math.round(s)))
@@ -15,10 +36,12 @@ export function clampFret(f: number): number {
   return Math.max(0, Math.min(24, Math.round(f)))
 }
 
-export function midiFromStringFret(string: number, fret: number): number {
-  const s = clampString(string)
-  const fr = clampFret(fret)
-  return OPEN_MIDI_HIGH_TO_LOW[s] + fr
+export function midiFromStringFret(
+  string: number,
+  fret: number,
+  tuning: number[] = editorTuning,
+): number {
+  return midiFromDisplayStringFret(string, fret, tuning)
 }
 
 export function normalizeNote(n: TabNote): TabNote {
@@ -50,13 +73,14 @@ export function applyNotePatch(note: TabNote, patch: NotePatch): TabNote {
       patch.fret !== undefined ? patch.fret : note.fret,
     )
   } else if (patch.midi !== undefined && patch.string === undefined && patch.fret === undefined) {
-    // Snap fretting to nearest open-string position for this midi
+    // Snap fretting to nearest open-string position for this midi (session tuning)
     const m = Math.round(patch.midi)
+    const open = openMidiHighToLow(editorTuning)
     let bestS = 0
     let bestF = 0
     let bestDist = Infinity
     for (let s = 0; s < 6; s++) {
-      const f = m - OPEN_MIDI_HIGH_TO_LOW[s]
+      const f = m - open[s]
       if (f < 0 || f > 24) continue
       const dist = Math.abs(f - (note.string === s ? note.fret : 5))
       if (dist < bestDist) {
@@ -100,8 +124,7 @@ export function insertScoreNote(score: TabScore, note?: Partial<TabNote>): TabSc
 }
 
 export function setScoreTempo(score: TabScore, tempo: number): TabScore {
-  const t = Math.max(40, Math.min(240, Math.round(tempo) || 100))
-  return { ...score, tempo: t }
+  return { ...score, tempo: clampPracticeBpm(tempo, 100) }
 }
 
 /** Rebuild UserTab measure tab + score after edits. */
@@ -113,9 +136,11 @@ export function applyScoreToUserTab(tab: UserTab, score: TabScore): UserTab {
     tempo,
     key: score.key || tab.keyLabel,
   }
+  const timeSig = tab.tab?.timeSig ?? [4, 4]
   const measures = scoreToTabSong(titled, {
     title: tab.title,
     tempo,
+    timeSig: timeSig as [number, number],
   })
   return {
     ...tab,
@@ -187,8 +212,9 @@ export function cleanUpScore(score: TabScore, opts?: CleanUpOptions): TabScore {
   notes = merged
 
   if (reFret && notes.length > 0) {
-    const midis = notes.map((n) => n.midi ?? midiFromStringFret(n.string, n.fret))
-    const run = smoothFrettingRun(frettingSequence(midis, [...STANDARD_TUNING]))
+    const tuning = editorTuning.length === 6 ? editorTuning : [...STANDARD_TUNING]
+    const midis = notes.map((n) => n.midi ?? midiFromStringFret(n.string, n.fret, tuning))
+    const run = smoothFrettingRun(frettingSequence(midis, tuning), tuning)
     notes = notes.map((n, i) => {
       const f = run[i]
       // theory string 0 = low E → display string 5

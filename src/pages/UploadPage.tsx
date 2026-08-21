@@ -20,11 +20,13 @@ import {
   AUDIO_FORMATS_LABEL,
   isAudioUpload,
   parseUploadedFile,
+  setSessionTuning,
   UPLOAD_ACCEPT,
   type ConvertStage,
   type RemedyBreakdown,
   type TabScore,
 } from '../lib/breakdown'
+import { setEditorTuning } from '../lib/tabEdit'
 import { buildSimpleMidi } from '../lib/midi'
 import { downloadMidiBytes } from '../lib/audioToMidi'
 import {
@@ -68,6 +70,7 @@ function stageIndex(stage: ConvertStage | null): number {
 
 export function UploadPage() {
   const recordPractice = useAppStore((s) => s.recordPractice)
+  const getTuning = useAppStore((s) => s.getTuning)
   const saveFromBreakdown = useUserTabsStore((s) => s.saveFromBreakdown)
   const userTabCount = useUserTabsStore((s) => s.tabs.length)
   const [breakdown, setBreakdown] = useState<RemedyBreakdown | null>(null)
@@ -131,6 +134,10 @@ export function UploadPage() {
       setStage(audio ? 'decode' : 'midi_to_tabs')
       setStatus(audio ? '1/3 Decoding audio…' : `Parsing ${file.name}…`)
       try {
+        // Fretting + editor cleanup follow Profile tuning (Drop D, custom, …).
+        const tuning = getTuning()
+        setSessionTuning(tuning)
+        setEditorTuning(tuning)
         const b = await parseUploadedFile(file, {
           onProgress: (s, message) => {
             setStage(s)
@@ -166,7 +173,7 @@ export function UploadPage() {
         setBusy(false)
       }
     },
-    [persistBreakdown, sourceAudioUrl, tempoOverride, trimSec, stem],
+    [persistBreakdown, sourceAudioUrl, tempoOverride, trimSec, stem, getTuning],
   )
 
   const onInput = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -312,11 +319,12 @@ export function UploadPage() {
           <p className="section-title">Upload</p>
           <h1 className="font-display text-3xl font-bold tracking-tight mt-1">Song → tabs</h1>
           <p className="text-[var(--text-muted)] mt-2 text-sm max-w-2xl leading-relaxed">
-            Drop an <strong className="text-mint font-medium">MP3</strong> and Remedy runs a clean
-            three-step converter: <span className="text-[var(--text)]">decode audio</span> →{' '}
-            <span className="text-[var(--text)]">MP3 to MIDI</span> →{' '}
-            <span className="text-[var(--text)]">MIDI to guitar tabs</span>. You can also upload MIDI
-            or MusicXML directly (skips straight to tabs). Monophonic assist — always editable.
+            Drop an <strong className="text-mint font-medium">MP3 / WAV</strong> and Remedy runs a
+            clean three-step converter: <span className="text-[var(--text)]">decode audio</span> →{' '}
+            <span className="text-[var(--text)]">audio to MIDI</span> →{' '}
+            <span className="text-[var(--text)]">MIDI to guitar tabs</span>. MIDI / MusicXML / GP are
+            the solid path when you have them. Audio is a monophonic draft — always editable, never a
+            perfect full-band auto-tab.
           </p>
         </div>
       </div>
@@ -490,8 +498,16 @@ export function UploadPage() {
                   <div className="min-w-0">
                     <h2 className="font-display font-bold text-lg">{breakdown.title}</h2>
                     <p className="text-sm text-[var(--text-muted)] mt-0.5">
-                      {breakdown.keyLabel} · confidence {Math.round(breakdown.confidence * 100)}% ·{' '}
-                      {breakdown.kind === 'audio' ? 'audio→MIDI→tabs' : breakdown.kind}
+                      {breakdown.keyLabel}
+                      {breakdown.timeSig
+                        ? ` · ${breakdown.timeSig[0]}/${breakdown.timeSig[1]}`
+                        : ''}{' '}
+                      · ranking {Math.round(breakdown.confidence * 100)}%
+                      <span className="text-[var(--text-muted)]/80">
+                        {' '}
+                        (sort only — not fret/rhythm accuracy)
+                      </span>{' '}
+                      · {breakdown.kind === 'audio' ? 'audio→MIDI→tabs (draft)' : breakdown.kind}
                       {breakdown.editable ? ' · editable' : ''}
                       {breakdown.tempoBpm ? ` · ♩=${breakdown.tempoBpm}` : ''}
                       {breakdown.detectedTempoBpm &&

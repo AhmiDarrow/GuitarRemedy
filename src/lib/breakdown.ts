@@ -9,8 +9,10 @@ import {
   SCALES,
   scaleNoteNames,
   smoothFrettingRun,
+  STANDARD_TUNING,
   type ScaleId,
 } from './theory'
+import { clampImportBpm } from './tabScore'
 import { parseMidi, ticksToBeatsWarped, type MidiParseResult } from './midi'
 import { parseMusicXml, type MusicXmlParseResult } from './musicxml'
 import { convertArrayBufferToMidi, type AudioToMidiResult } from './audioToMidi'
@@ -19,6 +21,7 @@ import {
   GP_EXPORT_HINT,
   isGuitarProName,
   parseGuitarPro,
+  setGuitarProOpenTuning,
   type GuitarProParseResult,
 } from './guitarpro'
 
@@ -49,6 +52,8 @@ export type TabScore = {
   tempo?: number
   key?: string
   strings?: number
+  /** Meter [numerator, denominator] when known (e.g. [3, 4]). */
+  timeSig?: [number, number]
   notes: TabNote[]
 }
 
@@ -58,6 +63,8 @@ export interface RemedyBreakdown {
   tempoBpm: number
   /** Onset-estimated tempo before user override (audio path). */
   detectedTempoBpm?: number
+  /** Meter from MIDI/MusicXML when present; default 4/4. */
+  timeSig?: [number, number]
   key: { root: string; scaleId: ScaleId | string; scaleName: string }
   keyLabel: string
   scaleId: string
@@ -67,6 +74,10 @@ export interface RemedyBreakdown {
   tabNotes: TabNote[]
   explanation: string[]
   practicePlan: string[]
+  /**
+   * Heuristic 0–1 for ranking / UI only — not a guarantee of fret or rhythm accuracy.
+   * Structured imports get a floor; audio is capped lower.
+   */
   confidence: number
   editable: boolean
   warnings: string[]
@@ -124,12 +135,19 @@ function eventsToNotes(tab: TabEvent[]): TabNote[] {
   }))
 }
 
-function toScore(title: string, tempo: number, keyLabel: string, tab: TabEvent[]): TabScore {
+function toScore(
+  title: string,
+  tempo: number,
+  keyLabel: string,
+  tab: TabEvent[],
+  timeSig?: [number, number],
+): TabScore {
   return {
     title,
     tempo,
     key: keyLabel,
     strings: 6,
+    timeSig: timeSig ?? [4, 4],
     notes: eventsToNotes(tab),
   }
 }
@@ -153,29 +171,57 @@ function finish(
 ): RemedyBreakdown {
   const keyLabel = `${partial.key.root} ${partial.key.scaleName}`
   const tabNotes = eventsToNotes(partial.tab)
+  const timeSig: [number, number] = partial.timeSig ?? [4, 4]
   return {
     ...partial,
+    timeSig,
     keyLabel,
     scaleId: String(partial.key.scaleId),
     tabNotes,
-    score: toScore(partial.title, partial.tempoBpm, keyLabel, partial.tab),
+    score: toScore(partial.title, partial.tempoBpm, keyLabel, partial.tab, timeSig),
   }
 }
 
-function fretMelody(midis: number[]): Array<{ string: number; fret: number; midi: number }> {
-  return smoothFrettingRun(frettingSequence(midis))
+/** Active fretting tuning (theory low-E=0). Set from session before convert when possible. */
+let sessionTuning: number[] = [...STANDARD_TUNING]
+
+/** Use Profile / appStore tuning for fretting on the next convert. */
+export function setSessionTuning(tuning: number[] | null | undefined): void {
+  if (Array.isArray(tuning) && tuning.length === 6) {
+    sessionTuning = tuning.map((n) => Math.max(0, Math.min(127, Math.round(Number(n) || 0))))
+  } else {
+    sessionTuning = [...STANDARD_TUNING]
+  }
+}
+
+export function getSessionTuning(): number[] {
+  return [...sessionTuning]
+}
+
+function activeTuning(override?: number[]): number[] {
+  if (Array.isArray(override) && override.length === 6) return override
+  return sessionTuning.length === 6 ? sessionTuning : [...STANDARD_TUNING]
+}
+
+function fretMelody(
+  midis: number[],
+  tuning?: number[],
+): Array<{ string: number; fret: number; midi: number }> {
+  const t = activeTuning(tuning)
+  return smoothFrettingRun(frettingSequence(midis, t), t)
 }
 
 export function analyzeNotes(
   midis: number[],
   title = 'Untitled',
-  opts?: { tempoBpm?: number },
+  opts?: { tempoBpm?: number; tuning?: number[] },
 ): RemedyBreakdown {
   const pcs = midis.map((m) => ((m % 12) + 12) % 12)
   const detected = detectKeyFromPcs(pcs)
-  const frets = fretMelody(midis)
+  const tuning = activeTuning(opts?.tuning)
+  const frets = fretMelody(midis, tuning)
   const tab: TabEvent[] = midis.map((midi, i) => {
-    const f = frets[i] || frettingForMidi(midi) || { string: 0, fret: 0, midi }
+    const f = frets[i] || frettingForMidi(midi, tuning) || { string: 0, fret: 0, midi }
     return {
       string: f.string,
       fret: f.fret,
@@ -186,12 +232,14 @@ export function analyzeNotes(
     }
   })
   const scaleNotes = scaleNoteNames(detected.root, detected.scaleId)
-  const tempoBpm =
-    typeof opts?.tempoBpm === 'number' && opts.tempoBpm > 0 ? opts.tempoBpm : 100
+  const tempoBpm = clampImportBpm(
+    typeof opts?.tempoBpm === 'number' && opts.tempoBpm > 0 ? opts.tempoBpm : 100,
+  )
   return finish({
     kind: 'midi',
     title,
     tempoBpm,
+    timeSig: [4, 4],
     key: {
       root: detected.root,
       scaleId: detected.scaleId,
@@ -204,7 +252,7 @@ export function analyzeNotes(
       `Analyzed ${midis.length} notes.`,
       `Detected tonal center ≈ ${detected.root} ${SCALES[detected.scaleId as ScaleId]?.name || detected.scaleId}.`,
       `Scale tones: ${scaleNotes.join(', ')}.`,
-      'Fretting mapped to standard tuning (always editable).',
+      'Fretting uses your session tuning (always editable).',
     ],
     practicePlan: [
       `Drone the root ${detected.root}, then ascend the scale slowly.`,
@@ -218,7 +266,10 @@ export function analyzeNotes(
   })
 }
 
-/** Confidence from pitch span + uniqueness — not raw note count vanity. */
+/**
+ * Heuristic ranking score only — NOT rhythmic/fret accuracy.
+ * MIDI/MusicXML get a floor; audio is capped. Always treat tabs as editable.
+ */
 export function estimateNoteConfidence(
   midis: number[],
   opts?: { avgFrameConf?: number; source?: 'midi' | 'audio' | 'musicxml' | 'gp' },
@@ -252,14 +303,19 @@ export { frettingForMidi }
 export function midiToBreakdown(
   parsed: MidiParseResult,
   title: string,
-  opts?: { midiBytes?: ArrayBuffer; cleanUp?: boolean },
+  opts?: { midiBytes?: ArrayBuffer; cleanUp?: boolean; tuning?: number[] },
 ): RemedyBreakdown {
   const tpq = parsed.ticksPerQuarter || 480
-  const tempoBpm = parsed.tempoBpm || 120
+  const tempoBpm = clampImportBpm(parsed.tempoBpm || 120)
   const tempoMap = parsed.tempoMap?.length
     ? parsed.tempoMap
     : [{ tick: 0, bpm: tempoBpm }]
   const warp = Boolean(parsed.hasTempoChanges)
+  const tuning = activeTuning(opts?.tuning)
+  const timeSig: [number, number] = [
+    Math.max(1, Math.min(16, parsed.timeSignature?.numerator || 4)),
+    parsed.timeSignature?.denominator || 4,
+  ]
 
   const raw = parsed.notes.map(
     (n: {
@@ -292,9 +348,9 @@ export function midiToBreakdown(
       return { midi, startBeat, durationBeats }
     },
   )
-  const frets = fretMelody(raw.map((n) => n.midi))
+  const frets = fretMelody(raw.map((n) => n.midi), tuning)
   const notes = raw.map((n, i) => {
-    const f = frets[i] || frettingForMidi(n.midi) || { string: 0, fret: 0, midi: n.midi }
+    const f = frets[i] || frettingForMidi(n.midi, tuning) || { string: 0, fret: 0, midi: n.midi }
     return {
       string: f.string,
       fret: f.fret,
@@ -320,10 +376,14 @@ export function midiToBreakdown(
       'MIDI used SMPTE time division; tick grid was normalized to 480 PPQ (timing may be approximate).',
     )
   }
+  if (timeSig[0] !== 4 || timeSig[1] !== 4) {
+    warnings.push(`Time signature ${timeSig[0]}/${timeSig[1]} preserved from MIDI.`)
+  }
   let result = finish({
     kind: 'midi',
     title,
     tempoBpm,
+    timeSig,
     key: {
       root: detected.root,
       scaleId: detected.scaleId,
@@ -366,10 +426,15 @@ export function midiToBreakdown(
   return result
 }
 
-function musicXmlToBreakdown(parsed: MusicXmlParseResult): RemedyBreakdown {
+function musicXmlToBreakdown(
+  parsed: MusicXmlParseResult,
+  opts?: { tuning?: number[] },
+): RemedyBreakdown {
+  const warnings: string[] = []
   let root: string
   let scaleId: ScaleId | string
-  if (parsed.keyFifths !== undefined) {
+  const hasWrittenKey = parsed.keyFifths !== undefined && parsed.keyFifths !== null
+  if (hasWrittenKey) {
     const k = fifthsToRoot(parsed.keyFifths || 0, parsed.mode || 'major')
     root = k.root
     scaleId = k.scaleId
@@ -378,19 +443,24 @@ function musicXmlToBreakdown(parsed: MusicXmlParseResult): RemedyBreakdown {
     root = d.root
     scaleId = d.scaleId
   }
-  if ((parsed.pitchClasses || []).length >= 3) {
+  // Prefer written key; only surface detect when it disagrees (do not override chart).
+  if (hasWrittenKey && (parsed.pitchClasses || []).length >= 3) {
     const d = detectKeyFromPcs(parsed.pitchClasses)
-    if (d.score > 2) {
-      root = d.root
-      scaleId = d.scaleId
+    const writtenLabel = `${root} ${SCALES[scaleId as ScaleId]?.name || scaleId}`
+    const detectedLabel = `${d.root} ${SCALES[d.scaleId as ScaleId]?.name || d.scaleId}`
+    if (d.score > 2 && (d.root !== root || d.scaleId !== scaleId)) {
+      warnings.push(
+        `Written key is ${writtenLabel}; pitch content leans ${detectedLabel}. Keeping the written key for practice labels.`,
+      )
     }
   }
+  const tuning = activeTuning(opts?.tuning)
   // Prefer parser-computed startBeat/durationBeats; fall back to voice cursors
   // for older MusicXmlNote payloads that omit onsets.
   const voiceCursor = new Map<number, number>()
   const voiceLastOnset = new Map<number, number>()
   const tab: TabEvent[] = []
-  let usedParserOnsets = 0
+  let parserOnsetCount = 0
   for (const n of parsed.notes) {
     const voice = n.voice || 1
     const durFallback = (n.duration || 1) / Math.max(parsed.divisions || 1, 1)
@@ -404,7 +474,7 @@ function musicXmlToBreakdown(parsed: MusicXmlParseResult): RemedyBreakdown {
       : n.chord
         ? (voiceLastOnset.get(voice) ?? voiceCursor.get(voice) ?? 0)
         : (voiceCursor.get(voice) ?? 0)
-    if (hasParserOnset) usedParserOnsets += 1
+    if (hasParserOnset) parserOnsetCount += 1
 
     if (n.pitch == null) {
       if (!n.chord && !hasParserOnset) {
@@ -421,12 +491,12 @@ function musicXmlToBreakdown(parsed: MusicXmlParseResult): RemedyBreakdown {
     let s = n.string != null ? musicXmlStringToTheory(n.string) : 0
     let f = n.fret ?? 0
     if (n.string == null || n.fret == null) {
-      const fr = frettingForMidi(midi)
+      const fr = frettingForMidi(midi, tuning)
       if (fr) {
         s = fr.string
         f = fr.fret
       } else {
-        const frets = frettingForPcs([midi % 12])
+        const frets = frettingForPcs([midi % 12], tuning, 5)
         if (frets[0]) {
           s = frets[0].string
           f = frets[0].fret
@@ -444,14 +514,25 @@ function musicXmlToBreakdown(parsed: MusicXmlParseResult): RemedyBreakdown {
     voiceLastOnset.set(voice, onset)
     if (!n.chord) voiceCursor.set(voice, onset + dur)
   }
-  void usedParserOnsets
+  if (parserOnsetCount === 0 && tab.length > 0) {
+    warnings.push('MusicXML notes lacked parser onsets — rebuilt voice cursors.')
+  }
   const scaleNotes = scaleNoteNames(root, scaleId)
-  const xmlTempo =
-    typeof parsed.tempoBpm === 'number' && parsed.tempoBpm > 0 ? parsed.tempoBpm : 100
+  const xmlTempo = clampImportBpm(
+    typeof parsed.tempoBpm === 'number' && parsed.tempoBpm > 0 ? parsed.tempoBpm : 100,
+  )
+  const timeSig: [number, number] = [
+    Math.max(1, Math.min(16, parsed.timeSignature?.numerator || 4)),
+    parsed.timeSignature?.denominator || 4,
+  ]
+  if (timeSig[0] !== 4 || timeSig[1] !== 4) {
+    warnings.push(`Time signature ${timeSig[0]}/${timeSig[1]} preserved from MusicXML.`)
+  }
   return finish({
     kind: 'musicxml',
     title: parsed.title || 'MusicXML',
     tempoBpm: xmlTempo,
+    timeSig,
     key: {
       root,
       scaleId,
@@ -462,9 +543,9 @@ function musicXmlToBreakdown(parsed: MusicXmlParseResult): RemedyBreakdown {
     tab,
     explanation: [
       `Parsed MusicXML “${parsed.title || 'score'}” with ${tab.length} pitched notes.`,
-      `Key context: ${root} ${SCALES[scaleId as ScaleId]?.name || scaleId}.`,
+      `Key context: ${root} ${SCALES[scaleId as ScaleId]?.name || scaleId} (written key preferred).`,
       `Scale tones: ${scaleNotes.join(', ')}.`,
-      'Tab from MusicXML string/fret when present; otherwise fretted automatically.',
+      'Tab from MusicXML string/fret when present; otherwise fretted with your session tuning.',
     ],
     practicePlan: [
       'Clap the rhythm away from the guitar once.',
@@ -477,7 +558,7 @@ function musicXmlToBreakdown(parsed: MusicXmlParseResult): RemedyBreakdown {
       { source: 'musicxml' },
     ),
     editable: true,
-    warnings: [],
+    warnings,
   })
 }
 
@@ -511,13 +592,15 @@ export function breakdownGuitarProStub(fileName: string): RemedyBreakdown {
 export function guitarProToBreakdown(
   parsed: GuitarProParseResult,
   fileName: string,
+  opts?: { tuning?: number[] },
 ): RemedyBreakdown {
   if (parsed.musicXml && (parsed.musicXml.notes?.length || 0) > 0) {
-    const mx = musicXmlToBreakdown(parsed.musicXml)
+    const mx = musicXmlToBreakdown(parsed.musicXml, opts)
     return finish({
       ...mx,
       kind: 'guitarpro',
       title: parsed.title || mx.title || fileName.replace(/\.\w+$/, '') || 'GP import',
+      timeSig: mx.timeSig ?? [4, 4],
       warnings: [...(parsed.warnings || []), ...(mx.warnings || [])],
       explanation: [
         `Guitar Pro package “${fileName}” contained MusicXML (${parsed.source}).`,
@@ -527,10 +610,11 @@ export function guitarProToBreakdown(
     })
   }
 
+  const tuning = activeTuning(opts?.tuning)
   const midis = parsed.notes.map((n) => n.midi)
   const frets =
     midis.length > 0
-      ? frettingSequence(midis)
+      ? frettingSequence(midis, tuning)
       : []
 
   const tab: TabEvent[] = parsed.notes.map((n, i) => {
@@ -544,7 +628,7 @@ export function guitarProToBreakdown(
       s = frets[i].string
       f = frets[i].fret
     } else {
-      const fr = frettingForMidi(n.midi)
+      const fr = frettingForMidi(n.midi, tuning)
       if (fr) {
         s = fr.string
         f = fr.fret
@@ -574,7 +658,8 @@ export function guitarProToBreakdown(
   return finish({
     kind: 'guitarpro',
     title: parsed.title || fileName.replace(/\.\w+$/, '') || 'GP import',
-    tempoBpm: parsed.tempoBpm || 120,
+    tempoBpm: clampImportBpm(parsed.tempoBpm || 120),
+    timeSig: [4, 4],
     key: {
       root: detected.root,
       scaleId: detected.scaleId,
@@ -626,9 +711,17 @@ export function guitarProToBreakdown(
 export async function breakdownGuitarPro(
   buffer: ArrayBuffer,
   fileName: string,
+  opts?: { tuning?: number[] },
 ): Promise<RemedyBreakdown> {
-  const parsed = await parseGuitarPro(buffer, fileName)
-  return guitarProToBreakdown(parsed, fileName)
+  // GPIF string+fret → MIDI must use the same opens as fretting/session.
+  setGuitarProOpenTuning(opts?.tuning ?? getSessionTuning())
+  try {
+    const parsed = await parseGuitarPro(buffer, fileName)
+    return guitarProToBreakdown(parsed, fileName, opts)
+  } finally {
+    // Leave opens aligned with session for any follow-up parse in this tab.
+    setGuitarProOpenTuning(getSessionTuning())
+  }
 }
 
 export function breakdownAudioAssist(
@@ -934,6 +1027,8 @@ export async function breakdownFile(
     maxSec?: number
     stem?: 'lead' | 'harmonic' | 'mix' | 'percussive'
     skipHpss?: boolean
+    /** Theory-order opens (0 = low E). Overrides session when set. */
+    tuning?: number[]
   },
 ): Promise<RemedyBreakdown> {
   const name = file.name
@@ -964,7 +1059,8 @@ export async function breakdownFile(
   if (isGuitarProName(name) || lower.endsWith('.gpif')) {
     opts?.onProgress?.('midi_to_tabs', 'Guitar Pro → tabs…')
     const buf = await file.arrayBuffer()
-    const result = await breakdownGuitarPro(buf, name)
+    // Session tuning (Profile / Upload setSessionTuning) drives GPIF open strings + fretting.
+    const result = await breakdownGuitarPro(buf, name, { tuning: opts?.tuning })
     opts?.onProgress?.('done', result.statusMessage ?? 'Done')
     return result
   }
@@ -992,6 +1088,7 @@ export async function breakdownFile(
       kind: 'unknown',
       title: name,
       tempoBpm: 100,
+      timeSig: [4, 4],
       isPlaceholder: true,
       key: { root: 'C', scaleId: 'major', scaleName: 'Major (Ionian)' },
       pitchClasses: [],

@@ -145,6 +145,11 @@ async function playClick(kind: ClickKind, time?: number) {
   }
 }
 
+/** One-shot click on the shared metronome voice (no Transport). */
+export async function playOneShotClick(kind: ClickKind = 'beat'): Promise<void> {
+  await playClick(kind)
+}
+
 /**
  * Start a looping metronome on Tone.Transport. Safe to call while running (restarts).
  */

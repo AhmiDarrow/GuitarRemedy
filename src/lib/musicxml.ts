@@ -32,6 +32,8 @@ export interface MusicXmlParseResult {
    * Undefined → callers should pick a sensible default (often 100).
    */
   tempoBpm?: number
+  /** Time signature from first <time> (beats / beat-type). Default 4/4 when absent. */
+  timeSignature?: { numerator: number; denominator: number }
 }
 
 const STEP_PC: Record<string, number> = { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 }
@@ -59,6 +61,17 @@ export function parseMusicXml(xml: string): MusicXmlParseResult {
   const divisions = parseInt(textContent(doc.documentElement, 'divisions') || '1', 10) || 1
   const fifths = parseInt(textContent(doc.documentElement, 'fifths') || '0', 10) || 0
   const mode = textContent(doc.documentElement, 'mode') || 'major'
+
+  // First <time> wins (score-wide or measure attributes).
+  let timeNum = 4
+  let timeDen = 4
+  const timeEl = doc.getElementsByTagName('time')[0]
+  if (timeEl) {
+    const b = parseInt(textContent(timeEl, 'beats') || '4', 10)
+    const bt = parseInt(textContent(timeEl, 'beat-type') || '4', 10)
+    if (Number.isFinite(b) && b >= 1 && b <= 16) timeNum = b
+    if (Number.isFinite(bt) && [1, 2, 4, 8, 16].includes(bt)) timeDen = bt
+  }
 
   // Tempo: first <sound tempo="…"/> or <per-minute> under metronome.
   let tempoBpm: number | undefined
@@ -156,7 +169,16 @@ export function parseMusicXml(xml: string): MusicXmlParseResult {
     ...new Set(notes.map((n) => n.pitch).filter((p): p is number => p != null).map((p) => p % 12)),
   ].sort((a, b) => a - b)
 
-  return { title, notes, pitchClasses, divisions, keyFifths: fifths, mode, tempoBpm }
+  return {
+    title,
+    notes,
+    pitchClasses,
+    divisions,
+    keyFifths: fifths,
+    mode,
+    tempoBpm,
+    timeSignature: { numerator: timeNum, denominator: timeDen },
+  }
 }
 
 /** Very small MusicXML builder for tests / demos */

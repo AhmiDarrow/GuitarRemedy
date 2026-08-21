@@ -5,6 +5,8 @@
  */
 
 import { parseMusicXml, type MusicXmlParseResult } from './musicxml'
+import { STANDARD_TUNING } from './theory'
+import { openMidiHighToLow } from './tabScore'
 
 export type GuitarProSource =
   | 'gpif'
@@ -34,7 +36,27 @@ export interface GuitarProParseResult {
 export const GP_EXPORT_HINT =
   'For accurate tabs, open the file in Guitar Pro / TuxGuitar and export MIDI or MusicXML, then re-upload here.'
 
-const OPEN_MIDI = [64, 59, 55, 50, 45, 40]
+/** Display-order opens (0 = high e … 5 = low E). Override with session/Profile tuning. */
+const STANDARD_OPEN_HIGH_TO_LOW = openMidiHighToLow([...STANDARD_TUNING])
+
+/** Active opens for GPIF string+fret → MIDI (display index 0 = high e). */
+let gpOpenMidiHighToLow: number[] = [...STANDARD_OPEN_HIGH_TO_LOW]
+
+/**
+ * Set open-string MIDI used when GPIF only has string+fret (no concert pitch).
+ * `tuning` is theory order (0 = low E … 5 = high e), matching getTuning() / session.
+ */
+export function setGuitarProOpenTuning(tuning?: number[] | null): void {
+  if (Array.isArray(tuning) && tuning.length === 6) {
+    gpOpenMidiHighToLow = openMidiHighToLow(tuning)
+  } else {
+    gpOpenMidiHighToLow = [...STANDARD_OPEN_HIGH_TO_LOW]
+  }
+}
+
+export function getGuitarProOpenTuning(): number[] {
+  return [...gpOpenMidiHighToLow]
+}
 
 const STEP_PC: Record<string, number> = {
   C: 0,
@@ -288,8 +310,10 @@ export function parseGpif(xml: string): GuitarProParseResult {
     let midi = midiFromNoteXml(full)
     const sf = stringFretFromNoteXml(full)
     if (midi == null && sf.string != null && sf.fret != null) {
+      // GP string 1 = high e … 6 = low E → display index 0…5
       const idx = Math.max(1, Math.min(6, sf.string)) - 1
-      midi = OPEN_MIDI[idx] + sf.fret
+      const open = gpOpenMidiHighToLow[idx] ?? STANDARD_OPEN_HIGH_TO_LOW[idx] ?? 64
+      midi = open + Math.max(0, sf.fret)
     }
     if (midi == null || midi < 12 || midi > 127) {
       beatCursor += dur * 0.25

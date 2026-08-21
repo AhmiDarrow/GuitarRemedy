@@ -3,11 +3,15 @@ import {
   beatDurationSec,
   beatsToSeconds,
   clampPracticeBpm,
+  clampImportBpm,
   BPM_MAX,
   BPM_MIN,
+  openMidiHighToLow,
+  midiFromDisplayStringFret,
   tabSongToScore,
 } from './tabScore'
 import type { TabSong } from '../data/library'
+import { TUNINGS } from './theory'
 
 describe('tabScore', () => {
   it('clampPracticeBpm enforces shared 30–300 policy', () => {
@@ -82,5 +86,47 @@ describe('tabScore', () => {
     const sec = beatsToSeconds(noteBeat, scoreTempo, 1)
     expect(sec).toBeCloseTo(1.2, 5) // 2 beats * 0.6s
     expect(beatDurationSec(scoreTempo, 1)).toBeCloseTo(0.6, 5)
+  })
+
+  it('clampImportBpm matches practice policy', () => {
+    expect(clampImportBpm(10)).toBe(30)
+    expect(clampImportBpm(500)).toBe(300)
+  })
+
+  it('openMidiHighToLow reverses theory tuning (Drop D low open = 38)', () => {
+    const drop = TUNINGS.drop_d.midi
+    const open = openMidiHighToLow(drop)
+    expect(open[5]).toBe(38) // display low E string = Drop D
+    expect(open[0]).toBe(64) // high e unchanged
+    expect(midiFromDisplayStringFret(5, 0, drop)).toBe(38)
+    expect(midiFromDisplayStringFret(0, 0, drop)).toBe(64)
+  })
+
+  it('tabSongToScore uses session tuning for open-string midi', () => {
+    const drop = TUNINGS.drop_d.midi
+    const song: TabSong = {
+      title: 'drop',
+      tempo: 100,
+      timeSig: [4, 4],
+      measures: [{ notes: [{ string: 5, fret: 0, duration: 1, start: 0 }] }],
+    }
+    const score = tabSongToScore(song, { tuning: drop })
+    expect(score.notes[0].midi).toBe(38)
+  })
+
+  it('3/4 timeSig advances measure cursor by 3 beats', () => {
+    const song: TabSong = {
+      title: 'waltz',
+      tempo: 90,
+      timeSig: [3, 4],
+      measures: [
+        { notes: [{ string: 0, fret: 0, duration: 1, start: 0 }] },
+        { notes: [{ string: 0, fret: 2, duration: 1, start: 0 }] },
+      ],
+    }
+    const score = tabSongToScore(song)
+    expect(score.notes[0].time).toBeCloseTo(0, 5)
+    expect(score.notes[1].time).toBeCloseTo(3, 5)
+    expect(score.timeSig).toEqual([3, 4])
   })
 })

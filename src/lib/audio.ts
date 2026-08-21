@@ -94,17 +94,13 @@ export async function playScale(
   return notes.length * step
 }
 
+/**
+ * @deprecated Prefer metronome.ts startMetronome — kept as a thin one-shot
+ * that reuses the shared click voice (no leaked MembraneSynth per call).
+ */
 export async function playMetronomeClick(accent = false) {
-  await ensureAudio()
-  const Tone = await tone()
-  const click = new Tone.MembraneSynth({
-    pitchDecay: 0.008,
-    octaves: 2,
-    envelope: { attack: 0.001, decay: 0.1, sustain: 0, release: 0.05 },
-  }).toDestination()
-  click.volume.value = accent ? -4 : -12
-  click.triggerAttackRelease(accent ? 'C2' : 'G1', '32n')
-  setTimeout(() => click.dispose(), 300)
+  const { playOneShotClick } = await import('./metronome')
+  await playOneShotClick(accent ? 'accent' : 'beat')
 }
 
 export function disposeAudio() {

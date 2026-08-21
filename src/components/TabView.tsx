@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import clsx from 'clsx'
 import type { TabScore } from '../lib/breakdown'
-import { beatDurationSec } from '../lib/tabScore'
+import { beatDurationSec, openMidiHighToLow } from '../lib/tabScore'
 import { audioNow, claimAudioSession, playNote, releaseAudioSession, stopAllNotes } from '../lib/audio'
+import { useAppStore } from '../store/appStore'
 import { Pause, Play, RotateCcw, Gauge, Square } from 'lucide-react'
 
 type Props = {
@@ -31,6 +32,8 @@ export function TabView({ score, className, title }: Props) {
   const stopRef = useRef(false)
   const runIdRef = useRef(0)
   const cursorTimersRef = useRef<number[]>([])
+  const getTuning = useAppStore((s) => s.getTuning)
+  const openMidi = useMemo(() => openMidiHighToLow(getTuning()), [getTuning, score])
 
   const columns = useMemo(() => groupByTime(score.notes), [score.notes])
   const strings = score.strings || 6
@@ -76,7 +79,6 @@ export function TabView({ score, className, title }: Props) {
     const t0 = await audioNow()
     if (stopRef.current || runId !== runIdRef.current) return
 
-    const open = [64, 59, 55, 50, 45, 40]
     let lastOffset = 0
     for (let i = 0; i < columns.length; i++) {
       if (stopRef.current || runId !== runIdRef.current) return
@@ -94,10 +96,11 @@ export function TabView({ score, className, title }: Props) {
       cursorTimersRef.current.push(tid)
 
       for (const n of col) {
+        // Prefer stored midi (correct absolute pitch). Fallback uses session tuning opens.
         const midi =
           typeof n.midi === 'number' && n.midi > 0
             ? n.midi
-            : (open[n.string] ?? 64) + n.fret
+            : (openMidi[n.string] ?? 64) + n.fret
         const durSec = Math.max(0.08, (n.duration || 1) * secPerBeat * 0.9)
         void playNote(midi, durSec, when)
       }
@@ -208,9 +211,19 @@ export function TabView({ score, className, title }: Props) {
 
       <div className="px-4 pb-3 flex flex-wrap gap-3 text-xs text-[var(--text-muted)]">
         {score.tempo ? <span>♩ = {score.tempo}</span> : null}
+        {score.timeSig ? (
+          <span className="inline-flex items-center gap-1 rounded-md border border-mint/25 bg-mint/10 px-1.5 py-0.5 font-mono text-[11px] text-mint">
+            {score.timeSig[0]}/{score.timeSig[1]}
+          </span>
+        ) : null}
         {score.key ? <span>· Key hint: {score.key}</span> : null}
         <span>
-          · {columns.length} hits · ~{Math.max(1, Math.round(((columns[columns.length - 1]?.[0]?.time ?? 0) + 1) * (60 / tempo)))}s
+          · {columns.length} hits · ~
+          {Math.max(
+            1,
+            Math.round(((columns[columns.length - 1]?.[0]?.time ?? 0) + 1) * (60 / tempo)),
+          )}
+          s
         </span>
       </div>
     </div>

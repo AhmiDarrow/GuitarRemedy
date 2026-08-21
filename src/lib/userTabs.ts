@@ -78,8 +78,10 @@ export function scoreToTabSong(
 export function breakdownToTabSong(b: RemedyBreakdown): TabSong {
   const tempo = b.tempoBpm || b.score?.tempo || 100
   const title = b.title || 'Converted tab'
-  const timeSig: [number, number] = [4, 4]
-  const beatsPer = 4
+  const timeSig: [number, number] = b.timeSig?.length === 2
+    ? [Math.max(1, b.timeSig[0] || 4), b.timeSig[1] || 4]
+    : [4, 4]
+  const beatsPer = timeSig[0] || BEATS_PER_MEASURE
 
   if (b.tab?.length) {
     const sorted = [...b.tab].sort((a, c) => a.startBeat - c.startBeat || a.string - c.string)
@@ -116,7 +118,11 @@ export function breakdownToTabSong(b: RemedyBreakdown): TabSong {
     return { title, tempo, timeSig, measures }
   }
 
-  return scoreToTabSong(b.score ?? { notes: b.tabNotes || [], tempo, title }, { title, tempo })
+  return scoreToTabSong(b.score ?? { notes: b.tabNotes || [], tempo, title }, {
+    title,
+    tempo,
+    timeSig,
+  })
 }
 
 function arrayBufferToBase64(buf: ArrayBuffer): string {

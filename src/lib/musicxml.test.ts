@@ -66,6 +66,55 @@ describe('musicxml', () => {
     expect(parsed.tempoBpm).toBe(132)
   })
 
+  it('parses time signature into timeSignature', () => {
+    const xml = `<?xml version="1.0"?>
+<score-partwise>
+  <work><work-title>Waltz</work-title></work>
+  <part id="P1">
+    <measure number="1">
+      <attributes>
+        <divisions>1</divisions>
+        <key><fifths>0</fifths><mode>major</mode></key>
+        <time><beats>3</beats><beat-type>4</beat-type></time>
+      </attributes>
+      <note><pitch><step>C</step><octave>4</octave></pitch><duration>1</duration><voice>1</voice></note>
+    </measure>
+  </part>
+</score-partwise>`
+    const parsed = parseMusicXml(xml)
+    expect(parsed.timeSignature).toEqual({ numerator: 3, denominator: 4 })
+  })
+
+  it('keeps written key when pitch detect disagrees', async () => {
+    // Written G major (1 sharp) but notes are mostly C major triad — must keep G.
+    const xml = `<?xml version="1.0"?>
+<score-partwise>
+  <work><work-title>Written G</work-title></work>
+  <part id="P1">
+    <measure number="1">
+      <attributes>
+        <divisions>1</divisions>
+        <key><fifths>1</fifths><mode>major</mode></key>
+        <time><beats>4</beats><beat-type>4</beat-type></time>
+      </attributes>
+      <note><pitch><step>C</step><octave>4</octave></pitch><duration>1</duration><voice>1</voice></note>
+      <note><pitch><step>E</step><octave>4</octave></pitch><duration>1</duration><voice>1</voice></note>
+      <note><pitch><step>G</step><octave>4</octave></pitch><duration>1</duration><voice>1</voice></note>
+      <note><pitch><step>C</step><octave>5</octave></pitch><duration>1</duration><voice>1</voice></note>
+    </measure>
+  </part>
+</score-partwise>`
+    const bytes = new TextEncoder().encode(xml)
+    const result = await breakdownFile({
+      name: 'written-g.musicxml',
+      arrayBuffer: async () => bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength),
+      text: async () => xml,
+    })
+    expect(result.key.root).toBe('G')
+    expect(result.timeSig).toEqual([4, 4])
+    expect(result.warnings.some((w) => /written key/i.test(w))).toBe(true)
+  })
+
   it('breakdownFile uses MusicXML tempo', async () => {
     const xml = buildSimpleMusicXml({
       title: 'Fast',
