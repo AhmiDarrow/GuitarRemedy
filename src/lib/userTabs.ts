@@ -45,32 +45,32 @@ export function scoreToTabSong(
   const timeSig: [number, number] = opts?.timeSig ?? [4, 4]
   const beatsPer = timeSig[0] || BEATS_PER_MEASURE
 
-  const sorted = [...(score.notes || [])].sort((a, b) => a.time - b.time)
+  const sorted = [...(score.notes || [])].sort((a, b) => a.time - b.time || a.string - b.string)
   if (!sorted.length) {
     return { title, tempo, timeSig, measures: [{ notes: [] }] }
   }
 
+  const firstMeasure = Math.max(0, Math.floor(sorted[0].time / beatsPer))
+  const lastBeat = sorted.reduce((m, n) => Math.max(m, n.time + (n.duration || 0)), 0)
+  const lastMeasure = Math.max(firstMeasure, Math.floor(Math.max(0, lastBeat - 1e-9) / beatsPer))
   const measures: TabMeasure[] = []
-  let measureNotes: TabNote[] = []
-  let measureStart = Math.floor(sorted[0].time / beatsPer) * beatsPer
 
-  const flush = () => {
-    measures.push({ notes: measureNotes })
-    measureNotes = []
-  }
-
-  for (const n of sorted) {
-    while (n.time >= measureStart + beatsPer) {
-      flush()
-      measureStart += beatsPer
+  for (let mi = firstMeasure; mi <= lastMeasure; mi++) {
+    const measureStart = mi * beatsPer
+    const measureEnd = measureStart + beatsPer
+    const measureNotes: TabNote[] = []
+    for (const n of sorted) {
+      if (n.time + 1e-9 < measureStart) continue
+      if (n.time >= measureEnd - 1e-9) continue
+      measureNotes.push({
+        string: Math.max(0, Math.min(5, n.string)),
+        fret: Math.max(0, n.fret),
+        duration: Math.max(0.125, n.duration || 1),
+        start: Math.max(0, n.time - measureStart),
+      })
     }
-    measureNotes.push({
-      string: Math.max(0, Math.min(5, n.string)),
-      fret: Math.max(0, n.fret),
-      duration: Math.max(0.125, n.duration || 1),
-    })
+    measures.push({ notes: measureNotes })
   }
-  flush()
   if (!measures.length) measures.push({ notes: [] })
   return { title, tempo, timeSig, measures }
 }
@@ -82,29 +82,36 @@ export function breakdownToTabSong(b: RemedyBreakdown): TabSong {
   const beatsPer = 4
 
   if (b.tab?.length) {
-    const measures: TabMeasure[] = []
-    let measureNotes: TabNote[] = []
-    const sorted = [...b.tab].sort((a, c) => a.startBeat - c.startBeat)
-    let measureStart = sorted.length
-      ? Math.floor(sorted[0].startBeat / beatsPer) * beatsPer
+    const sorted = [...b.tab].sort((a, c) => a.startBeat - c.startBeat || a.string - c.string)
+    const firstMeasure = sorted.length
+      ? Math.max(0, Math.floor(sorted[0].startBeat / beatsPer))
       : 0
-    const flush = () => {
-      measures.push({ notes: measureNotes })
-      measureNotes = []
-    }
-    for (const ev of sorted) {
-      while (ev.startBeat >= measureStart + beatsPer) {
-        flush()
-        measureStart += beatsPer
+    const lastBeat = sorted.reduce(
+      (m, ev) => Math.max(m, ev.startBeat + (ev.durationBeats || 0)),
+      0,
+    )
+    const lastMeasure = Math.max(
+      firstMeasure,
+      Math.floor(Math.max(0, lastBeat - 1e-9) / beatsPer),
+    )
+    const measures: TabMeasure[] = []
+    for (let mi = firstMeasure; mi <= lastMeasure; mi++) {
+      const measureStart = mi * beatsPer
+      const measureEnd = measureStart + beatsPer
+      const measureNotes: TabNote[] = []
+      for (const ev of sorted) {
+        if (ev.startBeat + 1e-9 < measureStart) continue
+        if (ev.startBeat >= measureEnd - 1e-9) continue
+        // TabEvent.string is low-E=0; library TabSong uses high-e=0
+        measureNotes.push({
+          string: Math.max(0, Math.min(5, 5 - ev.string)),
+          fret: ev.fret,
+          duration: Math.max(0.125, ev.durationBeats || 1),
+          start: Math.max(0, ev.startBeat - measureStart),
+        })
       }
-      // TabEvent.string is low-E=0; library TabSong uses high-e=0
-      measureNotes.push({
-        string: Math.max(0, Math.min(5, 5 - ev.string)),
-        fret: ev.fret,
-        duration: Math.max(0.125, ev.durationBeats || 1),
-      })
+      measures.push({ notes: measureNotes })
     }
-    flush()
     if (!measures.length) measures.push({ notes: [] })
     return { title, tempo, timeSig, measures }
   }
@@ -200,7 +207,10 @@ export function downloadAsciiTab(tab: UserTab, filename?: string) {
   const lines = ['e|', 'B|', 'G|', 'D|', 'A|', 'E|']
   for (const measure of tab.tab.measures) {
     const cells: string[][] = [[], [], [], [], [], []]
-    for (const n of measure.notes) {
+    const ordered = [...measure.notes].sort(
+      (a, b) => (a.start ?? 0) - (b.start ?? 0) || a.string - b.string,
+    )
+    for (const n of ordered) {
       const s = Math.max(0, Math.min(5, n.string))
       const token = String(Math.max(0, n.fret))
       for (let i = 0; i < 6; i++) {

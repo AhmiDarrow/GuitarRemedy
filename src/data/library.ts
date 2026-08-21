@@ -22,9 +22,16 @@ export interface LibraryItem {
 }
 
 export interface TabNote {
-  string: number // 0 = high e
+  /** Display index: 0 = high e … 5 = low E */
+  string: number
   fret: number
-  duration?: number // beats
+  /** Length in beats */
+  duration?: number
+  /**
+   * Onset within the measure in beats (0 = downbeat).
+   * When omitted, notes pack left-to-right (legacy library riffs).
+   */
+  start?: number
 }
 
 export interface TabMeasure {

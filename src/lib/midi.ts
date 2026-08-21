@@ -9,14 +9,30 @@ export interface MidiNote {
   track: number
 }
 
+/** Tempo change at an absolute tick (microseconds-per-quarter → BPM). */
+export interface MidiTempoEvent {
+  tick: number
+  bpm: number
+}
+
 export interface MidiParseResult {
   format: number
   ticksPerQuarter: number
   trackCount: number
   notes: MidiNote[]
+  /** Initial / primary tempo (first map entry, else 120). */
   tempoBpm: number
+  /**
+   * Full tempo map when the file has mid-song tempo changes.
+   * Empty or single-entry files still get one event at tick 0.
+   */
+  tempoMap: MidiTempoEvent[]
+  /** True when more than one distinct tempo appears. */
+  hasTempoChanges: boolean
   timeSignature: { numerator: number; denominator: number }
   pitchClasses: number[]
+  /** True when division used SMPTE (ticks forced to 480). */
+  smpteDivision?: boolean
 }
 
 function readU32(view: DataView, o: number) {
@@ -46,11 +62,12 @@ export function parseMidi(buffer: ArrayBuffer): MidiParseResult {
   const format = readU16(view, 8)
   const trackCount = readU16(view, 10)
   const division = readU16(view, 12)
-  const ticksPerQuarter = division & 0x8000 ? 480 : division
+  const smpteDivision = (division & 0x8000) !== 0
+  const ticksPerQuarter = smpteDivision ? 480 : division
 
   let o = 8 + headerLength
   const notes: MidiNote[] = []
-  let tempoBpm = 120
+  const tempoMap: MidiTempoEvent[] = []
   let timeSignature = { numerator: 4, denominator: 4 }
 
   for (let t = 0; t < trackCount && o + 8 <= bytes.length; t++) {
@@ -88,7 +105,8 @@ export function parseMidi(buffer: ArrayBuffer): MidiParseResult {
         if (meta === 0x51 && len === 3) {
           const us =
             (trackBytes[cur.i] << 16) | (trackBytes[cur.i + 1] << 8) | trackBytes[cur.i + 2]
-          tempoBpm = Math.round(60_000_000 / us)
+          const bpm = Math.max(20, Math.min(400, Math.round(60_000_000 / Math.max(1, us))))
+          tempoMap.push({ tick, bpm })
         } else if (meta === 0x58 && len >= 2) {
           timeSignature = {
             numerator: trackBytes[cur.i],
@@ -146,15 +164,83 @@ export function parseMidi(buffer: ArrayBuffer): MidiParseResult {
   notes.sort((a, b) => a.startTick - b.startTick || a.pitch - b.pitch)
   const pitchClasses = [...new Set(notes.map((n) => n.pitch % 12))].sort((a, b) => a - b)
 
+  // Normalize tempo map: sort, ensure tick 0, dedupe same-tick (last wins).
+  tempoMap.sort((a, b) => a.tick - b.tick)
+  const normalized: MidiTempoEvent[] = []
+  for (const ev of tempoMap) {
+    if (normalized.length && normalized[normalized.length - 1].tick === ev.tick) {
+      normalized[normalized.length - 1] = ev
+    } else {
+      normalized.push(ev)
+    }
+  }
+  if (!normalized.length || normalized[0].tick > 0) {
+    normalized.unshift({ tick: 0, bpm: normalized[0]?.bpm ?? 120 })
+  }
+  const uniqueBpms = new Set(normalized.map((e) => e.bpm))
+  const tempoBpm = normalized[0]?.bpm ?? 120
+
   return {
     format,
     ticksPerQuarter,
     trackCount,
     notes,
     tempoBpm,
+    tempoMap: normalized,
+    hasTempoChanges: uniqueBpms.size > 1,
     timeSignature,
     pitchClasses,
+    smpteDivision: smpteDivision || undefined,
   }
+}
+
+/**
+ * Wall-clock seconds from tick 0 → `tick` using the tempo map.
+ * Between map events, tempo is held constant (SMF default).
+ */
+export function ticksToSeconds(
+  tick: number,
+  ticksPerQuarter: number,
+  tempoMap: MidiTempoEvent[],
+): number {
+  const tpq = Math.max(1, ticksPerQuarter || 480)
+  const map =
+    tempoMap?.length > 0
+      ? [...tempoMap].sort((a, b) => a.tick - b.tick)
+      : [{ tick: 0, bpm: 120 }]
+  if (map[0].tick > 0) map.unshift({ tick: 0, bpm: map[0].bpm })
+
+  const target = Math.max(0, tick)
+  let seconds = 0
+  let i = 0
+  while (i < map.length) {
+    const cur = map[i]
+    const nextTick = i + 1 < map.length ? map[i + 1].tick : Number.POSITIVE_INFINITY
+    const segEnd = Math.min(target, nextTick)
+    if (segEnd > cur.tick) {
+      const bpm = Math.max(20, Math.min(400, cur.bpm || 120))
+      seconds += ((segEnd - cur.tick) / tpq) * (60 / bpm)
+    }
+    if (target <= nextTick) break
+    i += 1
+  }
+  return seconds
+}
+
+/**
+ * Convert a tick to **beats at referenceBpm** so single-tempo tab playback
+ * preserves wall-clock spacing when the MIDI has mid-song tempo changes.
+ * Musical formula: beats_ref = seconds(tick) * (referenceBpm / 60).
+ */
+export function ticksToBeatsWarped(
+  tick: number,
+  ticksPerQuarter: number,
+  tempoMap: MidiTempoEvent[],
+  referenceBpm: number,
+): number {
+  const seconds = ticksToSeconds(tick, ticksPerQuarter, tempoMap)
+  const bpm = Math.max(20, Math.min(400, referenceBpm || 120))
+  return seconds * (bpm / 60)
 }
 
 /** Build a minimal Type-0 MIDI file from note events (for tests / export demos) */

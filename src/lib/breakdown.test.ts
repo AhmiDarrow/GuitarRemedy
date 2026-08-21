@@ -78,4 +78,59 @@ describe('breakdown', () => {
       ),
     ).toBe(true)
   })
+
+  it('warns when MIDI has multiple tempos and warps beat positions', () => {
+    // Minimal multi-tempo via parse result shape
+    const parsed = {
+      format: 0,
+      ticksPerQuarter: 480,
+      trackCount: 1,
+      notes: [
+        { pitch: 60, startTick: 0, durationTicks: 480, velocity: 80, channel: 0, track: 0 },
+        { pitch: 64, startTick: 480, durationTicks: 480, velocity: 80, channel: 0, track: 0 },
+      ],
+      tempoBpm: 100,
+      tempoMap: [
+        { tick: 0, bpm: 100 },
+        { tick: 480, bpm: 140 },
+      ],
+      hasTempoChanges: true,
+      timeSignature: { numerator: 4, denominator: 4 },
+      pitchClasses: [0, 4],
+    }
+    const result = midiToBreakdown(parsed as never, 'tempo map')
+    expect(result.tempoBpm).toBe(100)
+    expect(result.warnings.some((w) => /multiple tempos|tempo changes|warped/i.test(w))).toBe(true)
+    // Second note starts after 1 beat at 100 BPM wall-clock; warped start > pure tick/tpq only if tempos differ mid-note —
+    // at the tempo change boundary startBeat for note 2 equals 1.0 still (change at same tick).
+    const times = result.score.notes.map((n) => n.time).sort((a, b) => a - b)
+    expect(times[0]).toBeCloseTo(0, 5)
+    expect(times[1]).toBeCloseTo(1, 5)
+  })
+
+  it('warps later notes when tempo speeds up mid-file', () => {
+    const parsed = {
+      format: 0,
+      ticksPerQuarter: 480,
+      trackCount: 1,
+      notes: [
+        { pitch: 60, startTick: 0, durationTicks: 480, velocity: 80, channel: 0, track: 0 },
+        // After 1 quarter at 60 BPM then 1 quarter at 120 BPM → wall 1.5s → 1.5 beats at ref 60
+        { pitch: 64, startTick: 960, durationTicks: 480, velocity: 80, channel: 0, track: 0 },
+      ],
+      tempoBpm: 60,
+      tempoMap: [
+        { tick: 0, bpm: 60 },
+        { tick: 480, bpm: 120 },
+      ],
+      hasTempoChanges: true,
+      timeSignature: { numerator: 4, denominator: 4 },
+      pitchClasses: [0, 4],
+    }
+    const result = midiToBreakdown(parsed as never, 'warp')
+    const times = result.score.notes.map((n) => n.time).sort((a, b) => a - b)
+    expect(times[0]).toBeCloseTo(0, 5)
+    // Without warp: 960/480 = 2 beats. With warp at ref 60: 1.5 beats.
+    expect(times[1]).toBeCloseTo(1.5, 5)
+  })
 })

@@ -93,7 +93,8 @@ export const useAppStore = create<AppState>()(
       setA4: (hz) => set({ a4: hz }),
       setShowDegrees: (v) => set({ showDegrees: v }),
       setMetronomeOn: (v) => set({ metronomeOn: v }),
-      setBpm: (n) => set({ bpm: Math.max(40, Math.min(240, Math.round(n) || 80)) }),
+      // Keep in sync with metronome.clampBpm (30–300) so scale play and click share one tempo.
+      setBpm: (n) => set({ bpm: Math.max(30, Math.min(300, Math.round(n) || 80)) }),
       setTimeSignatureBeats: (n) =>
         set({ timeSignatureBeats: Math.max(2, Math.min(8, Math.round(n) || 4)) }),
       setMetronomeSubdivision: (n) =>

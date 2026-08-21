@@ -5,6 +5,8 @@ export interface MusicXmlNote {
   duration: number
   measure: number
   voice: number
+  /** True when <chord/> — shares onset with previous note in the voice. */
+  chord?: boolean
   string?: number
   fret?: number
   lyric?: string
@@ -17,6 +19,11 @@ export interface MusicXmlParseResult {
   divisions: number
   keyFifths: number
   mode: string
+  /**
+   * BPM from <sound tempo="…"/> or metronome per-minute, when present.
+   * Undefined → callers should pick a sensible default (often 100).
+   */
+  tempoBpm?: number
 }
 
 const STEP_PC: Record<string, number> = { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 }
@@ -45,15 +52,51 @@ export function parseMusicXml(xml: string): MusicXmlParseResult {
   const fifths = parseInt(textContent(doc.documentElement, 'fifths') || '0', 10) || 0
   const mode = textContent(doc.documentElement, 'mode') || 'major'
 
+  // Tempo: first <sound tempo="…"/> or <per-minute> under metronome.
+  let tempoBpm: number | undefined
+  const soundEls = Array.from(doc.getElementsByTagName('sound'))
+  for (const el of soundEls) {
+    const t = el.getAttribute('tempo')
+    if (t) {
+      const n = parseFloat(t)
+      if (Number.isFinite(n) && n >= 20 && n <= 400) {
+        tempoBpm = Math.round(n)
+        break
+      }
+    }
+  }
+  if (tempoBpm == null) {
+    const perMin = doc.getElementsByTagName('per-minute')[0]?.textContent?.trim()
+    if (perMin) {
+      const n = parseFloat(perMin)
+      if (Number.isFinite(n) && n >= 20 && n <= 400) tempoBpm = Math.round(n)
+    }
+  }
+
   const notes: MusicXmlNote[] = []
   const measures = Array.from(doc.getElementsByTagName('measure'))
   measures.forEach((measure, mi) => {
     const measureNum = parseInt(measure.getAttribute('number') || String(mi + 1), 10)
+    // Direction/sound tempo inside a measure (first wins if not set yet)
+    if (tempoBpm == null) {
+      const localSound = measure.getElementsByTagName('sound')
+      for (let i = 0; i < localSound.length; i++) {
+        const t = localSound[i].getAttribute('tempo')
+        if (t) {
+          const n = parseFloat(t)
+          if (Number.isFinite(n) && n >= 20 && n <= 400) {
+            tempoBpm = Math.round(n)
+            break
+          }
+        }
+      }
+    }
     const noteEls = Array.from(measure.getElementsByTagName('note'))
     for (const noteEl of noteEls) {
       const isRest = noteEl.getElementsByTagName('rest').length > 0
       const duration = parseInt(textContent(noteEl, 'duration') || '0', 10) || 0
       const voice = parseInt(textContent(noteEl, 'voice') || '1', 10)
+      const isChord = noteEl.getElementsByTagName('chord').length > 0
       let pitch: number | null = null
       let string: number | undefined
       let fret: number | undefined
@@ -80,6 +123,7 @@ export function parseMusicXml(xml: string): MusicXmlParseResult {
         duration,
         measure: measureNum,
         voice,
+        chord: isChord || undefined,
         string,
         fret,
         lyric: textContent(noteEl, 'text') || undefined,
@@ -91,16 +135,30 @@ export function parseMusicXml(xml: string): MusicXmlParseResult {
     ...new Set(notes.map((n) => n.pitch).filter((p): p is number => p != null).map((p) => p % 12)),
   ].sort((a, b) => a - b)
 
-  return { title, notes, pitchClasses, divisions, keyFifths: fifths, mode }
+  return { title, notes, pitchClasses, divisions, keyFifths: fifths, mode, tempoBpm }
 }
 
 /** Very small MusicXML builder for tests / demos */
 export function buildSimpleMusicXml(opts: {
   title: string
-  notes: Array<{ step: string; octave: number; duration: number; alter?: number; string?: number; fret?: number }>
+  notes: Array<{
+    step: string
+    octave: number
+    duration: number
+    alter?: number
+    string?: number
+    fret?: number
+    chord?: boolean
+    voice?: number
+  }>
   divisions?: number
+  tempoBpm?: number
 }): string {
   const div = opts.divisions ?? 1
+  const tempoDir =
+    opts.tempoBpm != null && opts.tempoBpm > 0
+      ? `<direction placement="above"><direction-type><metronome><beat-unit>quarter</beat-unit><per-minute>${Math.round(opts.tempoBpm)}</per-minute></metronome></direction-type><sound tempo="${Math.round(opts.tempoBpm)}"/></direction>`
+      : ''
   const noteXml = opts.notes
     .map((n) => {
       const alter = n.alter ? `<alter>${n.alter}</alter>` : ''
@@ -108,7 +166,9 @@ export function buildSimpleMusicXml(opts: {
         n.string != null && n.fret != null
           ? `<technical><string>${n.string}</string><fret>${n.fret}</fret></technical>`
           : ''
-      return `<note><pitch><step>${n.step}</step>${alter}<octave>${n.octave}</octave></pitch><duration>${n.duration}</duration><voice>1</voice>${tech}</note>`
+      const chord = n.chord ? '<chord/>' : ''
+      const voice = n.voice ?? 1
+      return `<note>${chord}<pitch><step>${n.step}</step>${alter}<octave>${n.octave}</octave></pitch><duration>${n.duration}</duration><voice>${voice}</voice>${tech}</note>`
     })
     .join('')
   // No external DOCTYPE — keeps browser + jsdom parsers happy without network DTD fetch.
@@ -119,6 +179,7 @@ export function buildSimpleMusicXml(opts: {
   <part id="P1">
     <measure number="1">
       <attributes><divisions>${div}</divisions><key><fifths>0</fifths><mode>major</mode></key><time><beats>4</beats><beat-type>4</beat-type></time></attributes>
+      ${tempoDir}
       ${noteXml}
     </measure>
   </part>

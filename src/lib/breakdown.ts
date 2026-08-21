@@ -11,7 +11,7 @@ import {
   smoothFrettingRun,
   type ScaleId,
 } from './theory'
-import { parseMidi, type MidiParseResult } from './midi'
+import { parseMidi, ticksToBeatsWarped, type MidiParseResult } from './midi'
 import { parseMusicXml, type MusicXmlParseResult } from './musicxml'
 import { convertArrayBufferToMidi, type AudioToMidiResult } from './audioToMidi'
 import { applyScoreToBreakdown, cleanUpAfterConvert } from './tabEdit'
@@ -89,6 +89,8 @@ export interface RemedyBreakdown {
  * TabEvent.string is fretting/theory index: 0 = low E … 5 = high e.
  * TabNote / TabView / library use display index: 0 = high e … 5 = low E.
  * Score time/duration are always in **beats** (TabView multiplies by 60/tempo).
+ *
+ * MusicXML / Guitar Pro technical string numbers are 1 = high e … 6 = low E.
  */
 export function theoryStringToDisplay(stringLowE0: number): number {
   return Math.max(0, Math.min(5, 5 - stringLowE0))
@@ -96,6 +98,20 @@ export function theoryStringToDisplay(stringLowE0: number): number {
 
 export function displayStringToTheory(stringHighE0: number): number {
   return Math.max(0, Math.min(5, 5 - stringHighE0))
+}
+
+/** MusicXML/GP 1=high-e … 6=low-E → TabEvent theory 0=low-E … 5=high-e */
+export function musicXmlStringToTheory(string1to6: number): number {
+  const s = Math.round(string1to6)
+  if (s >= 1 && s <= 6) return 6 - s
+  // Already 0–5 display? treat as high-e=0 display → theory
+  if (s >= 0 && s <= 5) return displayStringToTheory(s)
+  return 0
+}
+
+/** MusicXML/GP 1=high-e … 6=low-E → display 0=high-e … 5=low-E */
+export function musicXmlStringToDisplay(string1to6: number): number {
+  return theoryStringToDisplay(musicXmlStringToTheory(string1to6))
 }
 
 function eventsToNotes(tab: TabEvent[]): TabNote[] {
@@ -150,7 +166,11 @@ function fretMelody(midis: number[]): Array<{ string: number; fret: number; midi
   return smoothFrettingRun(frettingSequence(midis))
 }
 
-export function analyzeNotes(midis: number[], title = 'Untitled'): RemedyBreakdown {
+export function analyzeNotes(
+  midis: number[],
+  title = 'Untitled',
+  opts?: { tempoBpm?: number },
+): RemedyBreakdown {
   const pcs = midis.map((m) => ((m % 12) + 12) % 12)
   const detected = detectKeyFromPcs(pcs)
   const frets = fretMelody(midis)
@@ -166,10 +186,12 @@ export function analyzeNotes(midis: number[], title = 'Untitled'): RemedyBreakdo
     }
   })
   const scaleNotes = scaleNoteNames(detected.root, detected.scaleId)
+  const tempoBpm =
+    typeof opts?.tempoBpm === 'number' && opts.tempoBpm > 0 ? opts.tempoBpm : 100
   return finish({
     kind: 'midi',
     title,
-    tempoBpm: 90,
+    tempoBpm,
     key: {
       root: detected.root,
       scaleId: detected.scaleId,
@@ -209,6 +231,13 @@ export function midiToBreakdown(
   title: string,
   opts?: { midiBytes?: ArrayBuffer; cleanUp?: boolean },
 ): RemedyBreakdown {
+  const tpq = parsed.ticksPerQuarter || 480
+  const tempoBpm = parsed.tempoBpm || 120
+  const tempoMap = parsed.tempoMap?.length
+    ? parsed.tempoMap
+    : [{ tick: 0, bpm: tempoBpm }]
+  const warp = Boolean(parsed.hasTempoChanges)
+
   const raw = parsed.notes.map(
     (n: {
       midi?: number
@@ -219,12 +248,24 @@ export function midiToBreakdown(
       duration?: number
     }, i) => {
       const midi = n.midi ?? n.pitch ?? 60
-      const startBeat =
-        n.startTick != null ? n.startTick / (parsed.ticksPerQuarter || 480) : (n.time ?? i)
-      const durationBeats =
-        n.durationTicks != null
-          ? n.durationTicks / (parsed.ticksPerQuarter || 480)
-          : (n.duration ?? 1)
+      let startBeat: number
+      let durationBeats: number
+      if (n.startTick != null) {
+        if (warp) {
+          const startSecBeat = ticksToBeatsWarped(n.startTick, tpq, tempoMap, tempoBpm)
+          const endTick = n.startTick + Math.max(1, n.durationTicks ?? tpq)
+          const endSecBeat = ticksToBeatsWarped(endTick, tpq, tempoMap, tempoBpm)
+          startBeat = startSecBeat
+          durationBeats = Math.max(0.125, endSecBeat - startSecBeat)
+        } else {
+          startBeat = n.startTick / tpq
+          durationBeats =
+            n.durationTicks != null ? n.durationTicks / tpq : (n.duration ?? 1)
+        }
+      } else {
+        startBeat = n.time ?? i
+        durationBeats = n.duration ?? 1
+      }
       return { midi, startBeat, durationBeats }
     },
   )
@@ -243,10 +284,23 @@ export function midiToBreakdown(
   const pcs = notes.map((n) => n.midi % 12)
   const detected = detectKeyFromPcs(pcs)
   const scaleNotes = scaleNoteNames(detected.root, detected.scaleId)
+  const warnings: string[] = []
+  if (parsed.hasTempoChanges) {
+    const bpms = (parsed.tempoMap || []).map((e) => e.bpm)
+    const uniq = [...new Set(bpms)]
+    warnings.push(
+      `MIDI has multiple tempos (${uniq.join(', ')} BPM). Note spacing is tempo-map warped so wall-clock feel is preserved at opening tempo ${tempoBpm} BPM.`,
+    )
+  }
+  if (parsed.smpteDivision) {
+    warnings.push(
+      'MIDI used SMPTE time division; tick grid was normalized to 480 PPQ (timing may be approximate).',
+    )
+  }
   let result = finish({
     kind: 'midi',
     title,
-    tempoBpm: parsed.tempoBpm || 120,
+    tempoBpm,
     key: {
       root: detected.root,
       scaleId: detected.scaleId,
@@ -260,16 +314,19 @@ export function midiToBreakdown(
       `Detected ≈ ${detected.root} ${SCALES[detected.scaleId as ScaleId]?.name || detected.scaleId}.`,
       `Scale tones: ${scaleNotes.join(', ')}.`,
       'Fretting uses hand-continuity mapping (always editable).',
+      parsed.hasTempoChanges
+        ? `Opening tempo ${tempoBpm} BPM — mid-song tempo changes warped into beat positions.`
+        : `Tempo ${tempoBpm} BPM.`,
     ],
     practicePlan: [
       `Play root ${detected.root} drone, then scale at 60% tempo.`,
-      `Isolate early measures at ${Math.round((parsed.tempoBpm || 120) * 0.7)} BPM.`,
+      `Isolate early measures at ${Math.round(tempoBpm * 0.7)} BPM.`,
       'Highlight chord tones (1–3–5) in the tab.',
       'Slow full run, then mark sticky frets.',
     ],
     confidence: Math.min(0.95, 0.55 + pcs.length * 0.04),
     editable: true,
-    warnings: [],
+    warnings,
   })
   if (opts?.cleanUp) {
     const cleaned = cleanUpAfterConvert(result.score)
@@ -302,16 +359,26 @@ function musicXmlToBreakdown(parsed: MusicXmlParseResult): RemedyBreakdown {
       scaleId = d.scaleId
     }
   }
+  // Per-voice cursors so multi-voice scores don't serialize into one line.
+  // <chord/> shares the previous onset in that voice and does not advance time.
+  const voiceCursor = new Map<number, number>()
+  const voiceLastOnset = new Map<number, number>()
   const tab: TabEvent[] = []
-  let beat = 0
   for (const n of parsed.notes) {
+    const voice = n.voice || 1
     const dur = (n.duration || 1) / Math.max(parsed.divisions || 1, 1)
+    const onset = n.chord ? (voiceLastOnset.get(voice) ?? voiceCursor.get(voice) ?? 0) : (voiceCursor.get(voice) ?? 0)
+
     if (n.pitch == null) {
-      beat += dur
+      if (!n.chord) {
+        voiceCursor.set(voice, onset + dur)
+        voiceLastOnset.set(voice, onset)
+      }
       continue
     }
     const midi = n.pitch
-    let s = n.string != null ? Math.max(0, Math.min(5, 6 - n.string)) : 0
+    // TabEvent uses theory index (0=low E). MusicXML string 1=high e … 6=low E.
+    let s = n.string != null ? musicXmlStringToTheory(n.string) : 0
     let f = n.fret ?? 0
     if (n.string == null || n.fret == null) {
       const fr = frettingForMidi(midi)
@@ -330,18 +397,16 @@ function musicXmlToBreakdown(parsed: MusicXmlParseResult): RemedyBreakdown {
       string: s,
       fret: f,
       midi,
-      startBeat: beat,
+      startBeat: onset,
       durationBeats: dur,
       noteName: midiToName(midi),
     })
-    beat += dur
+    voiceLastOnset.set(voice, onset)
+    if (!n.chord) voiceCursor.set(voice, onset + dur)
   }
   const scaleNotes = scaleNoteNames(root, scaleId)
   const xmlTempo =
-    typeof (parsed as { tempoBpm?: number }).tempoBpm === 'number' &&
-    (parsed as { tempoBpm?: number }).tempoBpm! > 0
-      ? (parsed as { tempoBpm?: number }).tempoBpm!
-      : 100
+    typeof parsed.tempoBpm === 'number' && parsed.tempoBpm > 0 ? parsed.tempoBpm : 100
   return finish({
     kind: 'musicxml',
     title: parsed.title || 'MusicXML',
@@ -429,10 +494,7 @@ export function guitarProToBreakdown(
     let f = 0
     if (n.string != null && n.fret != null) {
       // GP strings are often 1=high-e … 6=low-E. TabEvent uses 0=low E … 5=high e.
-      s = Math.max(
-        0,
-        Math.min(5, n.string >= 1 && n.string <= 6 ? 6 - n.string : displayStringToTheory(n.string)),
-      )
+      s = musicXmlStringToTheory(n.string)
       f = Math.max(0, n.fret)
     } else if (frets[i]) {
       s = frets[i].string

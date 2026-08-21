@@ -67,6 +67,20 @@ describe('userTabs', () => {
     expect(song.tempo).toBe(90)
   })
 
+  it('scoreToTabSong keeps onset gaps via start', () => {
+    const song = scoreToTabSong({
+      notes: [
+        { string: 0, fret: 0, time: 0, duration: 1, midi: 64 },
+        { string: 0, fret: 3, time: 2.5, duration: 0.5, midi: 67 },
+      ],
+      tempo: 100,
+      title: 'gaps',
+    })
+    expect(song.measures[0].notes).toHaveLength(2)
+    expect(song.measures[0].notes[0].start).toBeCloseTo(0, 5)
+    expect(song.measures[0].notes[1].start).toBeCloseTo(2.5, 5)
+  })
+
   it('breakdownToUserTab + persist roundtrip', () => {
     const tab = breakdownToUserTab(sampleBreakdown(), { sourceName: 't.mid' })
     expect(tab).not.toBeNull()

@@ -35,9 +35,23 @@ export async function playMidiNote(midi: number, duration: number | string = '8n
   else synth!.triggerAttackRelease(name, duration)
 }
 
-/** Alias used by Fretboard / TabView */
-export async function playNote(midi: number, _duration: number | string = 0.4) {
-  await playMidiNote(midi, '8n')
+/**
+ * Play a MIDI note. When `duration` is a number it is seconds.
+ * Optional `time` is an absolute AudioContext/Tone time (Tone.now()-based).
+ */
+export async function playNote(midi: number, duration: number | string = 0.4, time?: number) {
+  const dur =
+    typeof duration === 'number' && Number.isFinite(duration)
+      ? Math.max(0.05, duration)
+      : duration
+  await playMidiNote(midi, dur, time)
+}
+
+/** Current audio clock time (Tone.now), after ensureAudio. */
+export async function audioNow(): Promise<number> {
+  await ensureAudio()
+  const Tone = await tone()
+  return Tone.now()
 }
 
 export async function playFret(

@@ -1,9 +1,13 @@
 /**
  * Full practice metronome — BPM, time signature, subdivisions, accent, count-in.
  * Schedules on Tone.Transport (audio clock) with one reused click voice.
+ *
+ * Timing: beatDurationSec here matches tabScore.beatDurationSec(bpm, 1)
+ * (metronome clamp 30–300; tabScore clamp 20–400 — both agree inside practice range).
  */
 
 import { ensureAudio } from './audio'
+import { beatDurationSec as sharedBeatDurationSec } from './tabScore'
 
 export type Subdivision = 1 | 2 | 3 | 4
 /** Beats per bar (numerator). Denominator is always quarter = 1 beat. */
@@ -32,8 +36,9 @@ export function clampBpm(n: number): number {
   return Math.max(30, Math.min(300, Math.round(n)))
 }
 
+/** Seconds per beat — shared with tab playback (speed scale = 1). */
 export function beatDurationSec(bpm: number): number {
-  return 60 / clampBpm(bpm)
+  return sharedBeatDurationSec(clampBpm(bpm), 1)
 }
 
 export function subBeatDurationSec(bpm: number, subdivision: Subdivision): number {

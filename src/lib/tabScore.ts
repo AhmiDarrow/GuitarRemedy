@@ -22,23 +22,30 @@ export function tabSongToScore(song: TabSong): TabScore {
   const tempo = song.tempo || 100
   const beatsPer = song.timeSig?.[0] || 4
   const notes: TabNote[] = []
-  let beat = 0
+  let measureBeat = 0
   for (const measure of song.measures || []) {
-    let t = beat
+    // Cursor for legacy notes that omit `start` (pack left-to-right).
+    let packCursor = 0
     for (const n of measure.notes || []) {
       const string = Math.max(0, Math.min(5, n.string))
       const fret = Math.max(0, n.fret)
       const duration = Math.max(0.125, n.duration || 1)
+      const hasStart = typeof n.start === 'number' && Number.isFinite(n.start)
+      const onsetInMeasure = hasStart
+        ? Math.max(0, Math.min(beatsPer - 0.001, n.start as number))
+        : packCursor
+      const time = measureBeat + onsetInMeasure
       notes.push({
         string,
         fret,
-        time: t,
+        time,
         duration,
         midi: OPEN_MIDI[string] + fret,
       })
-      t += duration
+      if (!hasStart) packCursor = onsetInMeasure + duration
+      else packCursor = Math.max(packCursor, onsetInMeasure + duration)
     }
-    beat += beatsPer
+    measureBeat += beatsPer
   }
   return {
     title: song.title,

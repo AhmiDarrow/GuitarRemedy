@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import clsx from 'clsx'
 import type { TabScore } from '../lib/breakdown'
 import { beatDurationSec } from '../lib/tabScore'
-import { playNote, stopAllNotes } from '../lib/audio'
+import { audioNow, playNote, stopAllNotes } from '../lib/audio'
 import { Pause, Play, RotateCcw, Gauge, Square } from 'lucide-react'
 
 type Props = {
@@ -30,14 +30,21 @@ export function TabView({ score, className, title }: Props) {
   const [cursor, setCursor] = useState(-1)
   const stopRef = useRef(false)
   const runIdRef = useRef(0)
+  const cursorTimersRef = useRef<number[]>([])
 
   const columns = useMemo(() => groupByTime(score.notes), [score.notes])
   const strings = score.strings || 6
   const tempo = score.tempo || 100
 
+  const clearCursorTimers = () => {
+    for (const id of cursorTimersRef.current) window.clearTimeout(id)
+    cursorTimersRef.current = []
+  }
+
   const stop = () => {
     stopRef.current = true
     runIdRef.current += 1
+    clearCursorTimers()
     stopAllNotes()
     setPlaying(false)
     setCursor(-1)
@@ -55,51 +62,50 @@ export function TabView({ score, className, title }: Props) {
     if (playing || columns.length === 0) return
     stopRef.current = false
     const runId = ++runIdRef.current
+    clearCursorTimers()
     setPlaying(true)
     setCursor(0)
 
     const secPerBeat = beatDurationSec(tempo, speed)
     const base = columns[0]?.[0]?.time ?? 0
-    const wallStart = performance.now()
+    // Schedule all notes on the audio clock (Tone.now) — no wall-clock drift.
+    const t0 = await audioNow()
+    if (stopRef.current || runId !== runIdRef.current) return
 
+    const open = [64, 59, 55, 50, 45, 40]
+    let lastOffset = 0
     for (let i = 0; i < columns.length; i++) {
       if (stopRef.current || runId !== runIdRef.current) return
       const col = columns[i]
-      const targetMs = (col[0].time - base) * secPerBeat * 1000
-      const wait = targetMs - (performance.now() - wallStart)
-      if (wait > 0) {
-        await new Promise<void>((resolve) => {
-          const t = window.setTimeout(resolve, wait)
-          // Poll stop so we don't sit out long waits after Stop
-          const poll = window.setInterval(() => {
-            if (stopRef.current || runId !== runIdRef.current) {
-              window.clearTimeout(t)
-              window.clearInterval(poll)
-              resolve()
-            }
-          }, 40)
-          window.setTimeout(() => window.clearInterval(poll), wait + 10)
-        })
-      }
-      if (stopRef.current || runId !== runIdRef.current) return
+      const offsetSec = (col[0].time - base) * secPerBeat
+      lastOffset = Math.max(lastOffset, offsetSec)
+      const when = t0 + 0.05 + offsetSec
+      // Cursor follows audio schedule via wall timers aligned to the same offsets.
+      const cursorDelay = Math.max(0, (0.05 + offsetSec) * 1000)
+      const colIndex = i
+      const tid = window.setTimeout(() => {
+        if (stopRef.current || runId !== runIdRef.current) return
+        setCursor(colIndex)
+      }, cursorDelay)
+      cursorTimersRef.current.push(tid)
 
-      setCursor(i)
       for (const n of col) {
-        // Standard tuning MIDI open strings: e4 B3 G3 D3 A2 E2 (high→low, index 0 = high e)
-        const open = [64, 59, 55, 50, 45, 40]
         const midi =
           typeof n.midi === 'number' && n.midi > 0
             ? n.midi
             : (open[n.string] ?? 64) + n.fret
         const durSec = Math.max(0.08, (n.duration || 1) * secPerBeat * 0.9)
-        void playNote(midi, durSec)
+        void playNote(midi, durSec, when)
       }
     }
 
-    if (runId === runIdRef.current && !stopRef.current) {
+    const endDelay = Math.max(0, (0.05 + lastOffset + secPerBeat) * 1000)
+    const endId = window.setTimeout(() => {
+      if (runId !== runIdRef.current || stopRef.current) return
       setPlaying(false)
       setCursor(-1)
-    }
+    }, endDelay)
+    cursorTimersRef.current.push(endId)
   }
 
   const toggle = () => {
