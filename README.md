@@ -53,7 +53,7 @@ GuitarRemedy is a local-first guitar school you can actually practice in — not
 2. **Audio:** decode → **HPSS lead stem** → melody band → pitch → tempo → MIDI → fretting → auto-clean  
 3. **Human loop:** Edit (pitch ±1, keep first N bars, Clean up) → save to **Your tabs** → `.grtab.json` / MIDI / ASCII  
 
-Full-band mixes use a **lead stem** (median HPSS) before pitch track — still monophonic drafts. Clean single-note leads convert best. Always confirm by ear. Stem picker on Upload: Lead / Harmonic / Mix.
+Full-band mixes race **Auto stem** (lead / harmonic / mix via HPSS) before pitch track — still **monophonic drafts**, not multi-voice studio tabs. Clean single-note leads convert best. Always confirm by ear. Guitar Pro is best-effort (placeholders never auto-save); prefer MIDI/MusicXML when you have them.
 
 ---
 

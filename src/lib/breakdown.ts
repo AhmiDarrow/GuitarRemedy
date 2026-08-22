@@ -242,7 +242,7 @@ function fretMelody(
 export function analyzeNotes(
   midis: number[],
   title = 'Untitled',
-  opts?: { tempoBpm?: number; tuning?: number[] },
+  opts?: { tempoBpm?: number; tuning?: number[]; timeSig?: [number, number] },
 ): RemedyBreakdown {
   const pcs = midis.map((m) => ((m % 12) + 12) % 12)
   const detected = detectKeyFromPcs(pcs)
@@ -263,11 +263,18 @@ export function analyzeNotes(
   const tempoBpm = clampImportBpm(
     typeof opts?.tempoBpm === 'number' && opts.tempoBpm > 0 ? opts.tempoBpm : 100,
   )
+  const timeSig: [number, number] =
+    Array.isArray(opts?.timeSig) && opts!.timeSig!.length >= 2
+      ? [
+          Math.max(1, Math.min(16, Math.round(opts!.timeSig![0]) || 4)),
+          Math.max(1, Math.min(16, Math.round(opts!.timeSig![1]) || 4)),
+        ]
+      : [4, 4]
   return finish({
     kind: 'midi',
     title,
     tempoBpm,
-    timeSig: [4, 4],
+    timeSig,
     key: {
       root: detected.root,
       scaleId: detected.scaleId,
@@ -1176,17 +1183,48 @@ export async function breakdownFile(
   }
 }
 
-export function tabToAscii(tab: TabEvent[], measures = 4): string {
+/**
+ * Debug/sample ASCII from theory-index TabEvent[] (0 = low E).
+ * Onset-aware (not left-packed). Prefer `userTabToAscii` for product Export TXT.
+ */
+export function tabToAscii(
+  tab: TabEvent[],
+  measures = 4,
+  opts?: { beatsPerMeasure?: number; colsPerBeat?: number },
+): string {
+  const beatsPer = Math.max(1, Math.min(16, Math.round(opts?.beatsPerMeasure ?? 4)))
+  const colsPerBeat = Math.max(1, Math.min(8, Math.round(opts?.colsPerBeat ?? 2)))
+  const colsPerMeasure = Math.max(colsPerBeat, beatsPer * colsPerBeat)
+  const maxBeat = Math.max(0, measures * beatsPer)
   const lines = ['e|', 'B|', 'G|', 'D|', 'A|', 'E|']
-  const display = tab.slice(0, measures * 8)
-  for (let i = 0; i < display.length; i++) {
-    const t = display[i]
-    const row = 5 - t.string
+
+  for (let m = 0; m < measures; m++) {
+    const grid: (string | null)[][] = Array.from({ length: 6 }, () =>
+      Array.from({ length: colsPerMeasure }, () => null),
+    )
+    const m0 = m * beatsPer
+    const m1 = m0 + beatsPer
+    for (const t of tab) {
+      const start = typeof t.startBeat === 'number' && Number.isFinite(t.startBeat) ? t.startBeat : 0
+      if (start < m0 || start >= m1 || start >= maxBeat) continue
+      const row = theoryStringToDisplay(t.string)
+      const col = Math.max(
+        0,
+        Math.min(colsPerMeasure - 1, Math.round((start - m0) * colsPerBeat)),
+      )
+      const fretLabel = String(Math.max(0, Math.min(24, Math.round(Number(t.fret) || 0))))
+      if (grid[row][col] == null) grid[row][col] = fretLabel
+    }
     for (let r = 0; r < 6; r++) {
-      lines[r] += r === row ? String(t.fret).padStart(2, '-') : '--'
+      let cell = ''
+      for (let c = 0; c < colsPerMeasure; c++) {
+        const v = grid[r][c]
+        cell += v != null ? v.padStart(2, '-').padEnd(2, '-') : '--'
+      }
+      lines[r] += cell + '|'
     }
   }
-  return lines.map((l) => l + '|').join('\n')
+  return lines.join('\n')
 }
 
 /** Alias used by Upload page — must stay after breakdownFile */

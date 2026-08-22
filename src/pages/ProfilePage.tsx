@@ -155,8 +155,9 @@ export function ProfilePage() {
       <div className="card p-5 text-sm text-[var(--text-muted)] leading-relaxed space-y-2">
         <h2 className="font-display font-semibold text-[var(--text)] mb-2">How song breakdown works</h2>
         <p>
-          <strong className="text-[var(--text)]">Solid path:</strong> MIDI, MusicXML, and Guitar Pro
-          (best-effort) → deterministic tabs + key/scale analysis + practice plan.
+          <strong className="text-[var(--text)]">Solid path:</strong> MIDI and MusicXML → deterministic
+          tabs + key/scale analysis + practice plan. Guitar Pro is best-effort (GPIF/zip often
+          works; classic binary may be a placeholder that never auto-saves — export MIDI/MusicXML).
         </p>
         <p>
           <strong className="text-[var(--text)]">Audio path:</strong> MP3/WAV and friends → lead-oriented

@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import {
+  analyzeNotes,
   assertDisplayString,
   assertTheoryString,
   breakdownAudioAssist,
@@ -78,13 +79,36 @@ describe('breakdown', () => {
     )
   })
 
-  it('renders ascii tab', () => {
-    const ascii = tabToAscii([
-      { string: 0, fret: 0, midi: 64, startBeat: 0, durationBeats: 1, noteName: 'E4' },
-      { string: 1, fret: 2, midi: 62, startBeat: 1, durationBeats: 1, noteName: 'D4' },
-    ])
+  it('renders onset-aware ascii tab (not left-packed)', () => {
+    // theory string 5 = high e (display row e|); frets at beat 0 and beat 2
+    const ascii = tabToAscii(
+      [
+        { string: 5, fret: 0, midi: 64, startBeat: 0, durationBeats: 1, noteName: 'E4' },
+        { string: 5, fret: 3, midi: 67, startBeat: 2, durationBeats: 1, noteName: 'G4' },
+      ],
+      1,
+      { beatsPerMeasure: 4, colsPerBeat: 2 },
+    )
     expect(ascii).toContain('e|')
     expect(ascii).toContain('E|')
+    const eLine = ascii.split('\n').find((l) => l.startsWith('e|'))
+    expect(eLine).toBeTruthy()
+    const body = eLine!.slice(2, eLine!.lastIndexOf('|'))
+    // 4 beats × 2 cols × 2 chars = 16
+    expect(body.length).toBe(16)
+    expect(body).toMatch(/0/)
+    expect(body).toMatch(/3/)
+    // frets not packed adjacent at start — rest dashes between
+    const i0 = body.search(/0/)
+    const i3 = body.search(/3/)
+    expect(i3).toBeGreaterThan(i0 + 2)
+  })
+
+  it('analyzeNotes accepts timeSig override', () => {
+    const b = analyzeNotes([60, 64, 67], 'waltz', { timeSig: [3, 4], tempoBpm: 90 })
+    expect(b.timeSig).toEqual([3, 4])
+    expect(b.tempoBpm).toBe(90)
+    expect(b.score.timeSig).toEqual([3, 4])
   })
 
   it('Guitar Pro empty buffer stays editable with honest fallback', async () => {

@@ -243,8 +243,8 @@ export function UploadPage() {
     b.explanation = [
       '1) Decoded demo-melody.mp3 (synthetic).',
       `2) MP3→MIDI locked ${pitches.length} monophonic notes → downloadable .mid.`,
-      '3) MIDI→tabs fretted in standard tuning.',
-      'Upload a real MP3 to run the live converter.',
+      '3) MIDI→tabs fretted in your Profile / session tuning (not always standard).',
+      'Upload a real monophonic or lead-forward MP3 for the live converter — full-band mixes stay drafts.',
     ]
     b.practicePlan = [
       'Drop a clean single-note MP3 to run the real pitch tracker.',
