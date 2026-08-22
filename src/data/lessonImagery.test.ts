@@ -16,6 +16,7 @@ import {
   assertOpenShapeAccurate,
   diagramsForLesson,
   dotsToAsciiTab,
+  libraryDiagramMatchesLesson,
   resolveLessonDiagram,
 } from './lessonImagery'
 
@@ -174,31 +175,60 @@ describe('lesson imagery — free license + accuracy', () => {
       if (list.some((d) => neckKinds.has(d.kind))) withNeck++
     }
     expect(withArt).toBe(365)
-    // Learn only paints neck-quality kinds; empty is OK on text-only days
-    expect(withNeck).toBeGreaterThan(180)
+    // Neck figures only when taught — empty gallery beats wrong pentatonic
+    expect(withNeck).toBeGreaterThan(100)
   })
 
   it('day 1–7 include posture or open-string or Em chord art', () => {
-    const d1 = diagramsForLesson({
+    const L1 = getLesson(1)!
+    const d1specs = diagramsForLesson({
       day: 1,
       phase: 'basics',
-      title: getLesson(1)!.title,
-      goals: getLesson(1)!.goals,
-      drills: getLesson(1)!.drills,
-      theoryBite: getLesson(1)!.theoryBite,
-    }).map((d) => d.kind)
+      title: L1.title,
+      goals: L1.goals,
+      drills: L1.drills,
+      theoryBite: L1.theoryBite,
+      libraryIds: L1.libraryIds,
+    })
+    const d1 = d1specs.map((d) => d.kind)
     expect(d1).toContain('open_strings')
     expect(d1).toContain('posture')
+    // Never scare day-1 with unmentioned scales (even if a bad library id sneaks in)
+    expect(d1specs.some((d) => d.kind === 'scale_tones')).toBe(false)
+    expect(d1specs.some((d) => /pent/i.test(d.title))).toBe(false)
+    expect(L1.libraryIds).not.toContain('sc-pent-min')
 
+    const L3 = getLesson(3)!
     const d3 = diagramsForLesson({
       day: 3,
       phase: 'basics',
-      title: getLesson(3)!.title,
-      goals: getLesson(3)!.goals,
-      drills: getLesson(3)!.drills,
-      theoryBite: getLesson(3)!.theoryBite,
+      title: L3.title,
+      goals: L3.goals,
+      drills: L3.drills,
+      theoryBite: L3.theoryBite,
+      libraryIds: L3.libraryIds,
     })
     expect(d3.some((d) => d.kind === 'chord_shape' && /em/i.test(d.chord ?? d.title))).toBe(true)
+  })
+
+  it('library neck diagrams require matching lesson copy', () => {
+    expect(libraryDiagramMatchesLesson('sc-pent-min', 'open strings only')).toBe(false)
+    expect(libraryDiagramMatchesLesson('sc-pent-min', 'minor pentatonic box 1')).toBe(true)
+    expect(libraryDiagramMatchesLesson('ch-em', 'first clean sounds')).toBe(false)
+    expect(libraryDiagramMatchesLesson('ch-em', 'form open Em with two fingers')).toBe(true)
+
+    // Even with a bad library id, day 1 must not show pentatonic
+    const sneaky = diagramsForLesson({
+      day: 1,
+      phase: 'basics',
+      title: 'Meet the Guitar',
+      goals: ['Name open strings'],
+      drills: ['Pluck open strings'],
+      theoryBite: 'Standard tuning E A D G B E',
+      libraryIds: ['sc-pent-min', 'rf-spider'],
+    })
+    expect(sneaky.some((d) => d.id.includes('sc-pent-min'))).toBe(false)
+    expect(sneaky.some((d) => d.kind === 'scale_tones')).toBe(false)
   })
 
   it('chord catalog intervals stay consistent with CHORDS table', () => {

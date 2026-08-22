@@ -202,6 +202,12 @@ export const OPEN_CHORD_SHAPES: Record<
   C: { frets: ['x', 3, 2, 0, 1, 0], fingers: [null, 3, 2, null, 1, null], rootString: 1 },
   F: { frets: [1, 3, 3, 2, 1, 1], fingers: [1, 3, 4, 2, 1, 1], rootString: 0 }, // mini barre shape
   B7: { frets: ['x', 2, 1, 2, 0, 2], fingers: [null, 2, 1, 3, null, 4], rootString: 1 },
+  // Common open dominants (theory-checked)
+  G7: { frets: [3, 2, 0, 0, 0, 1], fingers: [3, 2, null, null, null, 1], rootString: 0 },
+  D7: { frets: ['x', 'x', 0, 2, 1, 2], fingers: [null, null, null, 2, 1, 3], rootString: 2 },
+  A7: { frets: ['x', 0, 2, 0, 2, 0], fingers: [null, null, 2, null, 3, null], rootString: 1 },
+  E7: { frets: [0, 2, 0, 1, 0, 0], fingers: [null, 2, null, 1, null, null], rootString: 0 },
+  C7: { frets: ['x', 3, 2, 3, 1, 0], fingers: [null, 3, 2, 4, 1, null], rootString: 1 },
 }
 
 function openShapePcs(shapeKey: string): number[] {
@@ -424,8 +430,157 @@ export function resolveLessonDiagram(spec: LessonDiagramSpec): ResolvedLessonDia
   return { ...base, ascii: buildDiagramAscii(base) }
 }
 
+/** Map library item ids → neck diagrams (source of truth for lesson links). */
+const LIBRARY_DIAGRAMS: Record<string, Omit<LessonDiagramSpec, 'id'>> = {
+  'ch-em': { kind: 'chord_shape', title: 'Open Em', chord: 'Em', caption: 'Two-finger home base.' },
+  'ch-e': { kind: 'chord_shape', title: 'Open E', chord: 'E', caption: 'Full six-string major.' },
+  'ch-am': { kind: 'chord_shape', title: 'Open Am', chord: 'Am', caption: 'Open A minor.' },
+  'ch-a': { kind: 'chord_shape', title: 'Open A', chord: 'A', caption: 'Open A major.' },
+  'ch-dm': { kind: 'chord_shape', title: 'Open Dm', chord: 'Dm', caption: 'Open D minor.' },
+  'ch-d': { kind: 'chord_shape', title: 'Open D', chord: 'D', caption: 'Triangle on top four strings.' },
+  'ch-g': { kind: 'chord_shape', title: 'Open G', chord: 'G', caption: 'Open G major.' },
+  'ch-c': { kind: 'chord_shape', title: 'Open C', chord: 'C', caption: 'Five-string open C.' },
+  'ch-f': { kind: 'chord_shape', title: 'F shape', chord: 'F', caption: 'Mini barre gateway.' },
+  'ch-g7': { kind: 'chord_shape', title: 'Open G7', chord: 'G7', caption: 'Dominant pull to C.' },
+  'ch-d7': { kind: 'chord_shape', title: 'Open D7', chord: 'D7', caption: 'Dominant pull to G.' },
+  'ch-a7': { kind: 'chord_shape', title: 'Open A7', chord: 'A7', caption: 'Blues / country dominant.' },
+  'ch-e7': { kind: 'chord_shape', title: 'Open E7', chord: 'E7', caption: 'Blues in A dominant.' },
+  'ch-c7': { kind: 'chord_shape', title: 'Open C7', chord: 'C7', caption: 'Blues turnaround color.' },
+  'ch-b7': { kind: 'chord_shape', title: 'Open B7', chord: 'B7', caption: 'Open B7 shape.' },
+  'sc-pent-min': {
+    kind: 'scale_tones',
+    title: 'A minor pentatonic',
+    root: 'A',
+    scaleId: 'minor_pentatonic',
+    caption: 'Core lead box — roots marked.',
+    frets: 12,
+  },
+  'sc-pent-maj': {
+    kind: 'scale_tones',
+    title: 'C major pentatonic',
+    root: 'C',
+    scaleId: 'major_pentatonic',
+    caption: 'Major pent tones — roots marked.',
+    frets: 12,
+  },
+  'sc-major': {
+    kind: 'scale_tones',
+    title: 'C major scale',
+    root: 'C',
+    scaleId: 'major',
+    caption: 'Ionian tones on the neck.',
+    frets: 12,
+  },
+  'sc-nat-min': {
+    kind: 'scale_tones',
+    title: 'A natural minor',
+    root: 'A',
+    scaleId: 'natural_minor',
+    caption: 'Aeolian — relative minor of C.',
+    frets: 12,
+  },
+  'sc-harm-min': {
+    kind: 'scale_tones',
+    title: 'A harmonic minor',
+    root: 'A',
+    scaleId: 'harmonic_minor',
+    caption: 'Raised 7 — classical / metal pull.',
+    frets: 12,
+  },
+  'sc-blues': {
+    kind: 'scale_tones',
+    title: 'A blues scale',
+    root: 'A',
+    scaleId: 'blues',
+    caption: 'Minor pent + blue note.',
+    frets: 12,
+  },
+  'sc-dorian': {
+    kind: 'scale_tones',
+    title: 'D Dorian',
+    root: 'D',
+    scaleId: 'dorian',
+    caption: 'Minor with raised 6.',
+    frets: 12,
+  },
+  'sc-mixo': {
+    kind: 'scale_tones',
+    title: 'G Mixolydian',
+    root: 'G',
+    scaleId: 'mixolydian',
+    caption: 'Major with flat 7.',
+    frets: 12,
+  },
+  'sc-lydian': {
+    kind: 'scale_tones',
+    title: 'F Lydian',
+    root: 'F',
+    scaleId: 'lydian',
+    caption: 'Major with raised 4.',
+    frets: 12,
+  },
+  'sc-phrygian': {
+    kind: 'scale_tones',
+    title: 'E Phrygian',
+    root: 'E',
+    scaleId: 'phrygian',
+    caption: 'Minor with flat 2.',
+    frets: 12,
+  },
+  'sc-locrian': {
+    kind: 'scale_tones',
+    title: 'B Locrian',
+    root: 'B',
+    scaleId: 'locrian',
+    caption: 'Diminished tonic color.',
+    frets: 12,
+  },
+}
+
+/**
+ * True when lesson copy actually teaches this library neck item.
+ * Prevents Day-1-style junk (e.g. sc-pent-min on open-string day).
+ */
+export function libraryDiagramMatchesLesson(libraryId: string, lessonText: string): boolean {
+  const t = lessonText.toLowerCase()
+  // Normalize en-dashes so "g–c–d" matches
+  const n = t.replace(/[–—]/g, '-')
+  const rules: Record<string, RegExp> = {
+    'ch-em': /\bem\b|e minor/,
+    'ch-e': /\be major\b|(^|[^a-z])open e\b|(^|[^a-z])e chord\b|(^|[^a-z])e\s*&\s*|(^|[^a-z])e major/,
+    'ch-am': /\bam\b|a minor/,
+    'ch-a': /\ba major\b|(^|[^a-z])open a\b|(^|[^a-z])a chord\b|a-d-e|(^|[^a-z])a\s*&\s*e|\ba\b(?=.*\b(d|e|major)\b)/,
+    'ch-dm': /\bdm\b|d minor/,
+    'ch-d': /\bd major\b|(^|[^a-z])open d\b|d triangle|(^|[^a-z])d chord\b|g-c-d|(^|[^a-z])em g c d\b|\bc d\b|\bg c d\b|(^|[^a-z])d\b(?=.*\b(major|triangle|campfire)\b)/,
+    'ch-g': /\bg major\b|(^|[^a-z])open g\b|(^|[^a-z])g chord\b|em.?g|g-c|(^|[^a-z])em g c d\b|(^|[^a-z])g\b(?=.*\b(major|c|d|em)\b)/,
+    'ch-c': /\bc major\b|(^|[^a-z])open c\b|(^|[^a-z])c chord\b|g-c|c-d|(^|[^a-z])em g c d\b|(^|[^a-z])c\b(?=.*\b(major|g|d)\b)/,
+    'ch-f': /\bf major\b|(^|[^a-z])f chord\b|mini.?barre f|(^|[^a-z])full f\b|\bf maj/,
+    'ch-g7': /\bg7\b/,
+    'ch-d7': /\bd7\b/,
+    'ch-a7': /\ba7\b/,
+    'ch-e7': /\be7\b/,
+    'ch-c7': /\bc7\b/,
+    'ch-b7': /\bb7\b/,
+    'sc-pent-min': /minor pent|pentatonic minor|pent box|box 1|a minor pent/,
+    'sc-pent-maj': /major pent|pentatonic major|bright twin/,
+    'sc-major': /major scale|ionian|seven-note map/,
+    'sc-nat-min': /natural minor|aeolian|relative minor/,
+    'sc-harm-min': /harmonic minor/,
+    'sc-blues': /blues scale|blue note/,
+    'sc-dorian': /\bdorian\b/,
+    'sc-mixo': /\bmixolydian\b|\bmixo\b/,
+    'sc-lydian': /\blydian\b/,
+    'sc-phrygian': /\bphrygian\b/,
+    'sc-locrian': /\blocrian\b/,
+  }
+  const re = rules[libraryId]
+  if (!re) return false
+  return re.test(n)
+}
+
 /**
  * Pick diagrams for a curriculum day from phase + title/goals keywords.
+ * Library neck figures only when the lesson text actually teaches them.
  * Always returns at least one plain figure per day (fallback by phase).
  */
 export function diagramsForLesson(input: {
@@ -437,12 +592,25 @@ export function diagramsForLesson(input: {
   theoryBite: string
   libraryIds?: string[]
 }): LessonDiagramSpec[] {
-  const text = [input.title, ...input.goals, ...input.drills, input.theoryBite, input.phase]
+  // Teaching copy only — never join libraryIds (ids like ch-a7 self-match).
+  const text = [input.title, ...input.goals, ...input.drills, input.theoryBite]
     .join(' ')
     .toLowerCase()
   const out: LessonDiagramSpec[] = []
   const add = (spec: LessonDiagramSpec) => {
     out.push(spec)
+  }
+
+  // --- Library-linked neck figures only when lesson copy matches ---
+  for (const lid of input.libraryIds ?? []) {
+    const base = LIBRARY_DIAGRAMS[lid]
+    if (!base) continue
+    if (!libraryDiagramMatchesLesson(lid, text)) continue
+    add({
+      ...base,
+      id: `day${input.day}-lib-${lid}`,
+      frets: base.frets ?? (base.kind === 'scale_tones' ? 12 : 5),
+    })
   }
 
   // --- Universal early foundations ---
@@ -474,15 +642,20 @@ export function diagramsForLesson(input: {
   // --- Named open chords ---
   const chordHits: Array<{ re: RegExp; chord: string; title: string }> = [
     { re: /\bem\b|e minor/, chord: 'Em', title: 'Open Em' },
-    { re: /\be major\b|(^| )e chord/, chord: 'E', title: 'Open E' },
+    { re: /\be major\b|(^|[^a-z])e chord/, chord: 'E', title: 'Open E' },
     { re: /\bam\b|a minor/, chord: 'Am', title: 'Open Am' },
-    { re: /\ba major\b|(^| )a chord/, chord: 'A', title: 'Open A' },
+    { re: /\ba major\b|(^|[^a-z])a chord/, chord: 'A', title: 'Open A' },
     { re: /\bdm\b|d minor/, chord: 'Dm', title: 'Open Dm' },
-    { re: /\bd major\b|(^| )d chord/, chord: 'D', title: 'Open D' },
-    { re: /\bg major\b|(^| )g chord|\bg\b.*chord/, chord: 'G', title: 'Open G' },
-    { re: /\bc major\b|(^| )c chord/, chord: 'C', title: 'Open C' },
+    { re: /\bd major\b|(^|[^a-z])d chord/, chord: 'D', title: 'Open D' },
+    { re: /\bg major\b|(^|[^a-z])g chord|\bg\b.*chord/, chord: 'G', title: 'Open G' },
+    { re: /\bc major\b|(^|[^a-z])c chord/, chord: 'C', title: 'Open C' },
     { re: /\bf major\b|f chord|mini.?barre f/, chord: 'F', title: 'F shape' },
     { re: /\bb7\b/, chord: 'B7', title: 'Open B7' },
+    { re: /\bg7\b/, chord: 'G7', title: 'Open G7' },
+    { re: /\bd7\b/, chord: 'D7', title: 'Open D7' },
+    { re: /\ba7\b/, chord: 'A7', title: 'Open A7' },
+    { re: /\be7\b/, chord: 'E7', title: 'Open E7' },
+    { re: /\bc7\b/, chord: 'C7', title: 'Open C7' },
   ]
   for (const hit of chordHits) {
     if (hit.re.test(text)) {
@@ -514,7 +687,7 @@ export function diagramsForLesson(input: {
   const scaleHits: Array<{ re: RegExp; scaleId: string; root: string; title: string }> = [
     { re: /minor pent|pentatonic minor/, scaleId: 'minor_pentatonic', root: 'A', title: 'A minor pentatonic' },
     { re: /major pent|pentatonic major/, scaleId: 'major_pentatonic', root: 'C', title: 'C major pentatonic' },
-    { re: /blues scale|\bblues\b/, scaleId: 'blues', root: 'A', title: 'A blues scale' },
+    { re: /blues scale|blue note/, scaleId: 'blues', root: 'A', title: 'A blues scale' },
     { re: /natural minor|aeolian/, scaleId: 'natural_minor', root: 'A', title: 'A natural minor' },
     { re: /harmonic minor/, scaleId: 'harmonic_minor', root: 'A', title: 'A harmonic minor' },
     { re: /melodic minor/, scaleId: 'melodic_minor', root: 'A', title: 'A melodic minor (jazz)' },
@@ -583,7 +756,8 @@ export function diagramsForLesson(input: {
     })
   }
 
-  // Phase defaults so no early day is blank
+  // Fallbacks only when nothing matched — never invent unmentioned scales/chords.
+  // Empty visual gallery is better than a scary pentatonic on Day 1.
   if (out.length === 0) {
     if (input.phase === 'basics' || input.day <= 30) {
       add({
@@ -591,24 +765,6 @@ export function diagramsForLesson(input: {
         kind: 'open_strings',
         title: 'Open strings',
         caption: 'Orientation neck — standard tuning.',
-      })
-    } else if (input.phase === 'chords') {
-      add({
-        id: `day${input.day}-em-fallback`,
-        kind: 'chord_shape',
-        title: 'Open Em',
-        caption: 'Home-base open minor shape.',
-        chord: 'Em',
-      })
-    } else if (input.phase === 'scales' || input.phase === 'lead') {
-      add({
-        id: `day${input.day}-pent-fallback`,
-        kind: 'scale_tones',
-        title: 'A minor pentatonic',
-        caption: 'Default lead vocabulary — roots marked.',
-        root: 'A',
-        scaleId: 'minor_pentatonic',
-        frets: 12,
       })
     } else if (input.phase === 'rhythm') {
       add({
@@ -619,20 +775,39 @@ export function diagramsForLesson(input: {
         semitones: 4,
       })
     } else {
+      // chords / scales / lead / repertoire: posture card only (filtered from Learn UI)
       add({
-        id: `day${input.day}-posture-fallback`,
+        id: `day${input.day}-session-fallback`,
         kind: 'posture',
-        title: 'Session setup',
-        caption: 'Comfort + focus before repertoire polish.',
+        title: 'Session focus',
+        caption: 'Follow the drills — no extra neck map today.',
       })
     }
   }
 
-  // De-dupe by id
-  const seen = new Set<string>()
-  return out.filter((d) => {
-    if (seen.has(d.id)) return false
-    seen.add(d.id)
+  // De-dupe by id, then by visual topic (prefer library-linked ids)
+  const seenId = new Set<string>()
+  const seenTopic = new Set<string>()
+  const ranked = [...out].sort((a, b) => {
+    const al = a.id.includes('-lib-') ? 0 : 1
+    const bl = b.id.includes('-lib-') ? 0 : 1
+    return al - bl
+  })
+  return ranked.filter((d) => {
+    if (seenId.has(d.id)) return false
+    seenId.add(d.id)
+    const topic =
+      d.kind === 'chord_shape' || d.kind === 'power_chord'
+        ? `${d.kind}:${(d.chord ?? d.root ?? d.title).toLowerCase()}`
+        : d.kind === 'scale_tones'
+          ? `scale:${d.root ?? ''}:${d.scaleId ?? ''}`
+          : d.kind === 'open_strings'
+            ? 'open_strings'
+            : d.kind === 'interval'
+              ? `interval:${d.semitones ?? ''}`
+              : d.id
+    if (seenTopic.has(topic)) return false
+    seenTopic.add(topic)
     return true
   })
 }
