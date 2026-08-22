@@ -37,13 +37,28 @@ function slugId(title: string): string {
   return `user-${base || 'tab'}-${rand}`
 }
 
+function normalizeTimeSig(
+  ts: [number, number] | undefined | null,
+  fallback: [number, number] = [4, 4],
+): [number, number] {
+  if (!Array.isArray(ts) || ts.length < 2) return fallback
+  return [
+    Math.max(1, Math.min(16, Math.round(Number(ts[0])) || fallback[0])),
+    Math.max(1, Math.min(16, Math.round(Number(ts[1])) || fallback[1])),
+  ]
+}
+
 export function scoreToTabSong(
   score: TabScore,
   opts?: { title?: string; tempo?: number; timeSig?: [number, number] },
 ): TabSong {
   const tempo = opts?.tempo ?? score.tempo ?? 100
   const title = opts?.title ?? score.title ?? 'Converted tab'
-  const timeSig: [number, number] = opts?.timeSig ?? [4, 4]
+  // Prefer explicit opts, then score.timeSig — never silently force 4/4 when the score knows better.
+  const timeSig: [number, number] = normalizeTimeSig(
+    opts?.timeSig ?? score.timeSig ?? undefined,
+    [4, 4],
+  )
   const beatsPer = timeSig[0] || BEATS_PER_MEASURE
 
   const sorted = [...(score.notes || [])].sort((a, b) => a.time - b.time || a.string - b.string)
@@ -283,17 +298,12 @@ export function downloadAsciiTab(tab: UserTab, filename?: string) {
 const DEFAULT_EXPORT_TPQ = 480
 
 /**
- * MIDI bytes for a user tab — prefers stored convert SMF, else rebuilds from score.
- * Always embeds tempo (+ time sig when known) so re-import stays truthful.
+ * MIDI bytes for a user tab — **always rebuilds from the current score**.
+ * Stored convert SMF (`midiBase64`) is kept for provenance / re-analysis only;
+ * exporting it after edits would lie about pitch, tempo, and meter.
+ * Embeds tempo + time sig so re-import stays truthful.
  */
 export function userTabToMidiBytes(tab: UserTab, tpq = DEFAULT_EXPORT_TPQ): ArrayBuffer {
-  if (tab.midiBase64) {
-    try {
-      return base64ToArrayBuffer(tab.midiBase64)
-    } catch {
-      /* fall through to rebuild */
-    }
-  }
   const tempo = Math.max(20, Math.min(400, Math.round(tab.tempoBpm || tab.score?.tempo || 100)))
   const timeSig: [number, number] | undefined =
     tab.score?.timeSig?.length === 2
@@ -309,6 +319,14 @@ export function userTabToMidiBytes(tab: UserTab, tpq = DEFAULT_EXPORT_TPQ): Arra
       duration: Math.max(1, Math.round((n.duration || 1) * tpq)),
       velocity: 80,
     }))
+  // If score is empty, fall back to original convert bytes (unedited import).
+  if (!notes.length && tab.midiBase64) {
+    try {
+      return base64ToArrayBuffer(tab.midiBase64)
+    } catch {
+      /* empty SMF below */
+    }
+  }
   return buildSimpleMidi(notes, { ticksPerQuarter: tpq, tempoBpm: tempo, timeSig })
 }
 

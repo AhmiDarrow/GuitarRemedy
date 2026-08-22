@@ -6,11 +6,14 @@ import {
   emphasizeMelodyBand,
   filterLowConfidenceFrames,
   framesToNotes,
+  guitarRegisterScore,
   hzToMidi,
+  medianFilterMidiFrames,
   midiToHz,
   pcmToMidi,
   quantizeDetectedNotes,
   repairOctaveFrames,
+  snapTempoBpm,
   synthesizeTonePcm,
   trackPitchFrames,
   type PitchFrame,
@@ -49,16 +52,51 @@ describe('audioToMidi', () => {
     expect(r.confidence).toBe(0)
   })
 
-  it('mixes multi-channel buffers to mono', () => {
+  it('mixes multi-channel buffers to mono (mid default + average)', () => {
     const L = new Float32Array([1, 1, 1])
     const R = new Float32Array([0, 0, 0])
-    const mono = audioBufferToMono({
+    const buf = {
       numberOfChannels: 2,
       length: 3,
-      getChannelData: (c) => (c === 0 ? L : R),
-    })
-    expect(mono.length).toBe(3)
-    expect(mono[0]).toBeCloseTo(0.5)
+      getChannelData: (c: number) => (c === 0 ? L : R),
+    }
+    const mid = audioBufferToMono(buf)
+    expect(mid.length).toBe(3)
+    expect(mid[0]).toBeCloseTo(0.5) // (L+R)/2
+    const avg = audioBufferToMono(buf, { mode: 'average' })
+    expect(avg[0]).toBeCloseTo(0.5)
+    const side = audioBufferToMono(buf, { mode: 'side' })
+    expect(side[0]).toBeCloseTo(0.5) // (1-0)/2
+  })
+
+  it('guitarRegisterScore prefers lead range over bass/air', () => {
+    expect(guitarRegisterScore(64)).toBeGreaterThan(guitarRegisterScore(40))
+    expect(guitarRegisterScore(69)).toBeGreaterThan(guitarRegisterScore(88))
+    expect(guitarRegisterScore(60)).toBe(1)
+  })
+
+  it('medianFilterMidiFrames kills single-frame octave blips', () => {
+    const frames: PitchFrame[] = [
+      { timeSec: 0, hz: 440, midi: 69, confidence: 0.8 },
+      { timeSec: 0.05, hz: 880, midi: 81, confidence: 0.5 },
+      { timeSec: 0.1, hz: 440, midi: 69, confidence: 0.8 },
+    ]
+    const m = medianFilterMidiFrames(frames)
+    expect(m[1].midi).toBe(69)
+  })
+
+  it('snapTempoBpm keeps a sane BPM in range', () => {
+    const sr = 8000
+    const pcm = new Float32Array(sr * 2)
+    // weak click every 0.5s → ~120 BPM
+    for (let i = 0; i < pcm.length; i++) {
+      pcm[i] = i % Math.floor(sr * 0.5) < 20 ? 0.9 : 0.02
+    }
+    const snapped = snapTempoBpm(118, pcm, sr)
+    expect(snapped).toBeGreaterThanOrEqual(60)
+    expect(snapped).toBeLessThanOrEqual(180)
+    // half/double of out-of-band raw still clamps
+    expect(snapTempoBpm(40, pcm, sr)).toBeGreaterThanOrEqual(60)
   })
 
   it('tracks frames and groups notes from synthetic melody', () => {
@@ -222,6 +260,23 @@ describe('audioToMidi', () => {
       confidence: 0.4,
     }))
     expect(scorePitchFrames(stable)).toBeGreaterThan(scorePitchFrames(jumpy))
+  })
+
+  it('scorePitchFrames prefers guitar-register pitches over bass thump', async () => {
+    const { scorePitchFrames } = await import('./audioToMidi')
+    const lead: PitchFrame[] = Array.from({ length: 10 }, (_, i) => ({
+      timeSec: i * 0.05,
+      hz: 440,
+      midi: 69,
+      confidence: 0.7,
+    }))
+    const bass: PitchFrame[] = Array.from({ length: 10 }, (_, i) => ({
+      timeSec: i * 0.05,
+      hz: 82,
+      midi: 40,
+      confidence: 0.7,
+    }))
+    expect(scorePitchFrames(lead)).toBeGreaterThan(scorePitchFrames(bass))
   })
 
   it('pickBestMelodyStem + auto stem race a mixed tone+click track', async () => {

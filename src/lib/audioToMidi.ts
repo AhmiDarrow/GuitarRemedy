@@ -3,9 +3,10 @@
  * Browser Web Audio decode + autocorrelation pitch track → SMF MIDI.
  * Monophonic / dominant-pitch only — not multi-voice transcription.
  *
- * Quality pipeline (full-band): auto stem race (lead/harmonic/mix via HPSS) →
- * melody-band → pitch track → octave repair → confidence filter →
- * note group → beat quantize → ghost drop → MIDI.
+ * Quality pipeline (full-band):
+ *   stereo mid (center) extract → auto stem race (lead/harmonic/mix via HPSS) →
+ *   melody-band → pitch track (guitar register) → octave repair → confidence filter →
+ *   note group → tempo snap (½×/2×) → beat quantize → ghost drop → MIDI.
  * Still monophonic assist — not multi-voice transcription.
  */
 
@@ -337,7 +338,9 @@ export function framesToNotes(
   const maxGap = opts?.maxGapSec ?? 0.11
   if (frames.length === 0) return []
 
-  const cleaned = filterLowConfidenceFrames(repairOctaveFrames(frames))
+  const cleaned = filterLowConfidenceFrames(
+    repairOctaveFrames(medianFilterMidiFrames(frames)),
+  )
   if (cleaned.length === 0) return []
 
   const secToTicks = (sec: number) => Math.max(1, Math.round((sec * tempoBpm * tpq) / 60))
@@ -402,15 +405,37 @@ export function framesToNotes(
   return merged
 }
 
-/** Mix AudioBuffer to mono Float32Array. */
-export function audioBufferToMono(buffer: {
-  numberOfChannels: number
-  length: number
-  getChannelData: (channel: number) => Float32Array
-}): Float32Array {
+/**
+ * Mix AudioBuffer toward a mono lead track.
+ * Stereo default: **mid** (L+R)/2 — center-panned leads/vocals sit here;
+ * hard-panned guitars/FX are attenuated vs a plain channel average.
+ * Pass `mode: 'average'` for equal-weight multi-channel mix (tests / mono-safe).
+ */
+export function audioBufferToMono(
+  buffer: {
+    numberOfChannels: number
+    length: number
+    getChannelData: (channel: number) => Float32Array
+  },
+  opts?: { mode?: 'mid' | 'average' | 'side' },
+): Float32Array {
   const ch = buffer.numberOfChannels
   const len = buffer.length
   if (ch === 1) return buffer.getChannelData(0).slice()
+  const mode = opts?.mode ?? 'mid'
+
+  if (ch >= 2 && (mode === 'mid' || mode === 'side')) {
+    const L = buffer.getChannelData(0)
+    const R = buffer.getChannelData(1)
+    const out = new Float32Array(len)
+    if (mode === 'mid') {
+      for (let i = 0; i < len; i++) out[i] = 0.5 * (L[i] + R[i])
+    } else {
+      for (let i = 0; i < len; i++) out[i] = 0.5 * (L[i] - R[i])
+    }
+    return out
+  }
+
   const out = new Float32Array(len)
   for (let c = 0; c < ch; c++) {
     const data = buffer.getChannelData(c)
@@ -418,6 +443,110 @@ export function audioBufferToMono(buffer: {
   }
   const inv = 1 / ch
   for (let i = 0; i < len; i++) out[i] *= inv
+  return out
+}
+
+/**
+ * Guitar / lead register preference for monophonic scoring.
+ * MIDI ~50–76 (D3–E5) is the sweet spot; bass thump and airy hiss score lower.
+ */
+export function guitarRegisterScore(midi: number): number {
+  if (!Number.isFinite(midi)) return 0
+  if (midi >= 52 && midi <= 76) return 1
+  if (midi >= 47 && midi < 52) return 0.75
+  if (midi > 76 && midi <= 84) return 0.7
+  if (midi >= 40 && midi < 47) return 0.45
+  if (midi > 84 && midi <= 88) return 0.35
+  return 0.15
+}
+
+/**
+ * Snap detected BPM toward a musically likely value.
+ * Prefers the candidate (raw / ½× / 2×) whose onset grid best matches energy peaks,
+ * then lightly rounds to a common practice tempo when very close.
+ */
+export function snapTempoBpm(
+  rawBpm: number,
+  samples: Float32Array,
+  sampleRate: number,
+  opts?: { minBpm?: number; maxBpm?: number },
+): number {
+  const minBpm = opts?.minBpm ?? 60
+  const maxBpm = opts?.maxBpm ?? 180
+  if (!Number.isFinite(rawBpm) || rawBpm <= 0) return 100
+
+  const candidates = [rawBpm, rawBpm / 2, rawBpm * 2]
+    .map((b) => Math.round(b))
+    .filter((b, i, arr) => b >= minBpm && b <= maxBpm && arr.indexOf(b) === i)
+
+  if (candidates.length <= 1) {
+    return Math.max(minBpm, Math.min(maxBpm, Math.round(rawBpm)))
+  }
+
+  // Cheap onset envelope @ 10ms
+  const hop = Math.max(64, Math.floor(sampleRate * 0.01))
+  const win = hop * 2
+  const onset: number[] = []
+  for (let i = hop; i + win < samples.length; i += hop) {
+    let e0 = 0
+    let e1 = 0
+    for (let j = 0; j < hop; j++) {
+      const a = samples[i - hop + j]
+      const b = samples[i + j]
+      e0 += a * a
+      e1 += b * b
+    }
+    const d = e1 - e0
+    onset.push(d > 0 ? d : 0)
+  }
+  if (onset.length < 16) {
+    return Math.max(minBpm, Math.min(maxBpm, Math.round(rawBpm)))
+  }
+
+  let bestBpm = Math.round(rawBpm)
+  let bestScore = -Infinity
+  for (const bpm of candidates) {
+    const period = (60 / bpm) * (sampleRate / hop) // onset frames per beat
+    if (period < 2 || period > onset.length / 2) continue
+    let score = 0
+    const steps = Math.min(48, Math.floor(onset.length / period))
+    for (let k = 1; k <= steps; k++) {
+      const idx = Math.round(k * period)
+      if (idx >= 0 && idx < onset.length) score += onset[idx]
+      // favor downbeats slightly
+      const half = Math.round(k * period + period / 2)
+      if (half >= 0 && half < onset.length) score += onset[half] * 0.35
+    }
+    // mild preference for 70–140 (practice range)
+    const centerBias = 1 - Math.min(1, Math.abs(bpm - 100) / 120)
+    score *= 0.85 + 0.15 * centerBias
+    if (score > bestScore) {
+      bestScore = score
+      bestBpm = bpm
+    }
+  }
+
+  // Snap to nearby common tempos when within 1.5 BPM
+  const common = [60, 72, 76, 80, 84, 88, 92, 96, 100, 104, 108, 112, 116, 120, 128, 132, 140, 144, 160]
+  for (const c of common) {
+    if (Math.abs(c - bestBpm) <= 1.5) return c
+  }
+  return bestBpm
+}
+
+/** 3-point median smooth on MIDI stream (kills single-frame pitch flicker). */
+export function medianFilterMidiFrames(frames: PitchFrame[]): PitchFrame[] {
+  if (frames.length < 3) return frames.map((f) => ({ ...f }))
+  const out: PitchFrame[] = frames.map((f) => ({ ...f }))
+  for (let i = 1; i < out.length - 1; i++) {
+    const a = frames[i - 1].midi
+    const b = frames[i].midi
+    const c = frames[i + 1].midi
+    const mid = a + b + c - Math.min(a, b, c) - Math.max(a, b, c)
+    if (mid !== b) {
+      out[i] = { ...out[i], midi: mid, hz: midiToHz(mid) }
+    }
+  }
   return out
 }
 
@@ -463,8 +592,10 @@ export function scorePitchFrames(frames: PitchFrame[]): number {
   if (frames.length < 3) return 0
   let confSum = 0
   let jumps = 0
+  let regSum = 0
   for (let i = 0; i < frames.length; i++) {
     confSum += frames[i].confidence
+    regSum += guitarRegisterScore(frames[i].midi)
     if (i > 0) {
       const d = Math.abs(frames[i].midi - frames[i - 1].midi)
       // Penalize wild leaps more than stepwise motion
@@ -472,8 +603,10 @@ export function scorePitchFrames(frames: PitchFrame[]): number {
     }
   }
   const avgConf = confSum / frames.length
+  const avgReg = regSum / frames.length
   const density = Math.min(1, frames.length / 40)
-  return avgConf * 100 + density * 25 - jumps * 0.35
+  // Prefer guitar/lead register over bass thump or airy hiss
+  return avgConf * 100 + density * 25 + avgReg * 35 - jumps * 0.35
 }
 
 /**
@@ -483,9 +616,14 @@ export function scorePitchFrames(frames: PitchFrame[]): number {
 export function pickBestMelodyStem(
   samples: Float32Array,
   sampleRate: number,
-  opts?: { candidates?: Array<Exclude<StemKind, 'auto' | 'percussive'>> },
+  opts?: {
+    candidates?: Array<Exclude<StemKind, 'auto' | 'percussive'>>
+    /** Concert A4 for pitch→MIDI during the race (Profile). */
+    a4?: number
+  },
 ): { stem: Exclude<StemKind, 'auto'>; pcm: Float32Array; score: number } {
   const candidates = opts?.candidates ?? (['lead', 'harmonic', 'mix'] as const)
+  const a4 = Number.isFinite(opts?.a4) && (opts!.a4 as number) > 0 ? (opts!.a4 as number) : 440
   const sep = separateHpss(samples, sampleRate)
   let best: { stem: Exclude<StemKind, 'auto'>; pcm: Float32Array; score: number } = {
     stem: 'lead',
@@ -496,12 +634,15 @@ export function pickBestMelodyStem(
     const pcm =
       kind === 'mix' ? samples : kind === 'harmonic' ? sep.harmonic : kind === 'lead' ? sep.lead : sep.percussive
     const prepared = emphasizeMelodyBand(pcm, sampleRate, { leadMode: true })
+    // Guitar lead band: slightly raise floor so kick/sub doesn't win the race
     const frames = trackPitchFrames(prepared, sampleRate, {
       minConfidence: 0.34,
       hopSec: 0.042,
       windowSec: 0.09,
+      a4,
     })
-    const repaired = filterLowConfidenceFrames(repairOctaveFrames(frames), {
+    const smoothed = medianFilterMidiFrames(frames)
+    const repaired = filterLowConfidenceFrames(repairOctaveFrames(smoothed), {
       minConfidence: 0.32,
       minRun: 2,
     })
@@ -777,7 +918,7 @@ export function pcmToMidi(
   const a4 = Number.isFinite(opts?.a4) && (opts!.a4 as number) > 0 ? (opts!.a4 as number) : 440
   const warnings: string[] = [
     'Audio→MIDI is monophonic pitch-track assist — not multi-voice transcription.',
-    'Full-band path: HPSS lead stem → melody band → octave repair → confidence gate → beat quantize.',
+    'Full-band path: stereo mid → HPSS stem race → melody band → guitar-register score → tempo snap → quantize.',
     'Edit or Clean up the candidate tab before practicing or saving.',
   ]
   const onProgress = opts?.onProgress
@@ -800,7 +941,7 @@ export function pcmToMidi(
     onProgress?.(10, 'Comparing lead / harmonic / mix stems…')
     // Compete stems on a short window so full-band mixes stay interactive
     const probe = trimSamples(work, sampleRate, Math.min(12, analyzedSec || 12)).samples
-    const best = pickBestMelodyStem(probe, sampleRate)
+    const best = pickBestMelodyStem(probe, sampleRate, { a4 })
     chosenStemLabel = best.stem
     stemPcm = selectStem(work, sampleRate, best.stem === 'mix' ? 'mix' : best.stem)
     warnings.push(
@@ -828,9 +969,15 @@ export function pcmToMidi(
   }
   onProgress?.(26, 'Detecting tempo…')
 
-  const detectedTempo = detectTempoBpm(prepared, sampleRate, {
+  const rawTempo = detectTempoBpm(prepared, sampleRate, {
     defaultBpm: 100,
   })
+  const detectedTempo = snapTempoBpm(rawTempo, prepared, sampleRate)
+  if (detectedTempo !== rawTempo) {
+    warnings.push(
+      `Tempo snap ${rawTempo} → ${detectedTempo} BPM (½×/2× + onset grid check).`,
+    )
+  }
   const tempoBpm = opts?.tempoBpm ?? detectedTempo
   if (opts?.tempoBpm == null) {
     warnings.push(`Estimated tempo ≈ ${detectedTempo} BPM from onset energy.`)
@@ -875,6 +1022,24 @@ export function pcmToMidi(
     }
   }
 
+  // Prefer guitar-register notes when the track is dense (full-band spray)
+  if (notes.length > 12) {
+    const withReg = notes.map((n) => ({
+      n,
+      r: guitarRegisterScore(n.pitch) * (0.55 + 0.45 * (n.confidence ?? 0.5)),
+    }))
+    withReg.sort((a, b) => b.r - a.r)
+    const keepN = Math.max(8, Math.ceil(notes.length * 0.72))
+    const kept = withReg
+      .slice(0, keepN)
+      .map((x) => x.n)
+      .sort((a, b) => a.start - b.start)
+    if (kept.length >= 6 && kept.length < notes.length) {
+      notes = kept
+      warnings.push('Biased note keep toward guitar/lead register (full-band assist).')
+    }
+  }
+
   if (notes.length === 0) {
     warnings.push('No stable pitches found — check that the clip has a clear single-note melody.')
   }
@@ -886,7 +1051,8 @@ export function pcmToMidi(
   }
   onProgress?.(90, 'Writing MIDI…')
 
-  // Embed detected/override tempo in the SMF so download + re-import stay truthful.
+  // Embed detected/override tempo (+ 4/4 meter) so download + re-import stay truthful.
+  // Audio path is monophonic assist — no real compound-meter detection yet.
   const midiBytes = buildSimpleMidi(
     notes.map((n) => ({
       pitch: n.pitch,
@@ -894,7 +1060,7 @@ export function pcmToMidi(
       duration: Math.max(1, n.duration),
       velocity: n.velocity,
     })),
-    { ticksPerQuarter: DEFAULT_TPQ, tempoBpm },
+    { ticksPerQuarter: DEFAULT_TPQ, tempoBpm, timeSig: [4, 4] },
   )
   const midi = parseMidi(midiBytes)
   onProgress?.(100, 'Audio → MIDI done')

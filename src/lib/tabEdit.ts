@@ -130,17 +130,26 @@ export function setScoreTempo(score: TabScore, tempo: number): TabScore {
 /** Rebuild UserTab measure tab + score after edits. */
 export function applyScoreToUserTab(tab: UserTab, score: TabScore): UserTab {
   const tempo = score.tempo ?? tab.tempoBpm ?? 100
-  const titled = {
+  // Prefer score meter, then existing tab song — keep waltz/odd meters through edits.
+  const timeSig: [number, number] =
+    score.timeSig?.length === 2
+      ? [score.timeSig[0], score.timeSig[1]]
+      : tab.tab?.timeSig?.length === 2
+        ? [tab.tab.timeSig[0], tab.tab.timeSig[1]]
+        : tab.score?.timeSig?.length === 2
+          ? [tab.score.timeSig[0], tab.score.timeSig[1]]
+          : [4, 4]
+  const titled: TabScore = {
     ...score,
     title: score.title || tab.title,
     tempo,
     key: score.key || tab.keyLabel,
+    timeSig,
   }
-  const timeSig = tab.tab?.timeSig ?? [4, 4]
   const measures = scoreToTabSong(titled, {
     title: tab.title,
     tempo,
-    timeSig: timeSig as [number, number],
+    timeSig,
   })
   return {
     ...tab,

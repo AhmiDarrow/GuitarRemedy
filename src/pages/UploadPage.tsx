@@ -378,9 +378,10 @@ export function UploadPage() {
         </ol>
         <p className="text-xs text-[var(--text-muted)] mt-3 leading-relaxed">
           <AudioLines className="w-3.5 h-3.5 inline mr-1 text-mint" />
-          Best results: dry single-note melody (no heavy drums/chords). Full-band mixes default to{' '}
-          <strong className="text-[var(--text)]">Auto stem</strong> (races lead / harmonic / mix via
-          HPSS) for a monophonic draft — always edit by ear. Prefer MIDI/MusicXML when you have them.
+          Best results: dry single-note melody (no heavy drums/chords). Full-band mixes use stereo mid
+          + <strong className="text-[var(--text)]">Auto stem</strong> (HPSS lead / harmonic / mix race),
+          guitar-register scoring, and tempo snap — still a monophonic draft; always edit by ear.
+          Prefer MIDI/MusicXML when you have them.
         </p>
         <div className="mt-4 grid sm:grid-cols-3 gap-3">
           <label className="block text-xs text-[var(--text-muted)]">
