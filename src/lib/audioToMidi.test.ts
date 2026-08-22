@@ -20,6 +20,32 @@ import {
 } from './audioToMidi'
 
 describe('audioToMidi', () => {
+  it('pcmToMidiAsync with pitchEngine=autocorr matches classic path', async () => {
+    const { pcmToMidiAsync } = await import('./audioToMidi')
+    const pcm = synthesizeTonePcm(
+      [
+        { hz: 440, startSec: 0, durationSec: 0.35 },
+        { hz: 494, startSec: 0.4, durationSec: 0.35 },
+      ],
+      22050,
+      1.0,
+    )
+    const classic = pcmToMidi(pcm, 22050, {
+      tempoBpm: 100,
+      skipHpss: true,
+      skipMelodyBand: true,
+    })
+    const asyncPath = await pcmToMidiAsync(pcm, 22050, {
+      tempoBpm: 100,
+      skipHpss: true,
+      skipMelodyBand: true,
+      pitchEngine: 'autocorr',
+    })
+    expect(asyncPath.notes.length).toBeGreaterThan(0)
+    expect(asyncPath.tempoBpm).toBe(classic.tempoBpm)
+    expect(asyncPath.midiBytes.byteLength).toBeGreaterThan(20)
+  })
+
   it('converts hz ↔ midi around A4', () => {
     expect(hzToMidi(440)).toBe(69)
     expect(Math.round(midiToHz(69))).toBe(440)

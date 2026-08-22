@@ -452,8 +452,10 @@ export function UploadPage() {
         <FileUp className="w-10 h-10 text-mint mx-auto mb-3" />
         <p className="font-medium">Drop audio here to convert</p>
         <p className="text-sm text-[var(--text-muted)] mt-1 mb-4">
-          Audio: <span className="text-mint">{AUDIO_FORMATS_LABEL}</span> → MIDI → tabs · Also:
-          .mid · .musicxml · .gp / .gpx / .gpif (GP binary often needs MIDI/MusicXML export)
+          Audio: <span className="text-mint">{AUDIO_FORMATS_LABEL}</span> → MIDI → tabs
+          (Basic Pitch Apache-2.0 when the free model loads, else autocorrelation). Also:
+          .mid · .midi · .musicxml · .mxl · .gp / .gp3–5 / .gpx / .gp7 / .gpif · .grtab.json
+          (GP binary often needs MIDI/MusicXML export).
         </p>
         <label
           className={`btn-primary inline-flex cursor-pointer ${busy ? 'opacity-70 pointer-events-none' : ''}`}

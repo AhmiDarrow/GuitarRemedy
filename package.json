@@ -31,6 +31,7 @@
     "cap": "cap"
   },
   "dependencies": {
+    "@spotify/basic-pitch": "^1.0.1",
     "@tauri-apps/api": "^2.2.0",
     "@tauri-apps/plugin-dialog": "^2.2.0",
     "@tauri-apps/plugin-fs": "^2.2.0",

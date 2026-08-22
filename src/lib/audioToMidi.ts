@@ -1,16 +1,22 @@
 /**
  * MP3/WAV/OGG → MIDI converter (light assist).
- * Browser Web Audio decode + autocorrelation pitch track → SMF MIDI.
- * Monophonic / dominant-pitch only — not multi-voice transcription.
+ * Browser Web Audio decode → optional Spotify Basic Pitch (Apache-2.0) multipitch
+ * assist, with autocorrelation fallback → SMF MIDI.
+ * Still a monophonic / lead-biased draft for fretting — not multi-voice studio tabs.
  *
  * Quality pipeline (full-band):
  *   stereo mid (center) extract → auto stem race (lead/harmonic/mix via HPSS) →
- *   melody-band → pitch track (guitar register) → octave repair → confidence filter →
- *   note group → tempo snap (½×/2×) → beat quantize → ghost drop → MIDI.
- * Still monophonic assist — not multi-voice transcription.
+ *   Basic Pitch (when model loads) or melody-band autocorrelation →
+ *   tempo snap (½×/2×) → beat quantize → ghost drop → MIDI.
  */
 
 import { buildSimpleMidi, parseMidi, type MidiNote, type MidiParseResult } from './midi'
+import {
+  basicPitchAvailable,
+  notesFromBasicPitch,
+  preferBasicPitchNotes,
+  resampleMono,
+} from './basicPitchAssist'
 
 export interface PitchFrame {
   timeSec: number
@@ -1101,10 +1107,17 @@ export type AudioConvertOpts = {
   stem?: StemKind
   /** Analyze only first N seconds (0/omit = full track). */
   maxSec?: number
+  /**
+   * Pitch engine:
+   * - `auto` (default) — Basic Pitch when the free model loads, else autocorrelation
+   * - `basic-pitch` — require Basic Pitch (falls back with warning if unavailable)
+   * - `autocorr` — force classic monophonic path
+   */
+  pitchEngine?: 'auto' | 'basic-pitch' | 'autocorr'
   onProgress?: (pct: number, message: string) => void
 }
 
-/** Decode an audio file (mp3/wav/ogg/m4a) via Web Audio, then convert to MIDI. */
+/** Decode an audio file (mp3/wav/ogg/m4a/…) via Web Audio, then convert to MIDI. */
 export async function convertAudioFileToMidi(
   file: File | { name: string; arrayBuffer: () => Promise<ArrayBuffer> },
   opts?: AudioConvertOpts,
@@ -1113,6 +1126,10 @@ export async function convertAudioFileToMidi(
   return convertArrayBufferToMidi(buf, opts)
 }
 
+/**
+ * Decode → stem prep → Basic Pitch (Apache-2.0) when available → MIDI.
+ * Falls back to autocorrelation pcmToMidi if the model is missing or fails.
+ */
 export async function convertArrayBufferToMidi(
   arrayBuffer: ArrayBuffer,
   opts?: AudioConvertOpts,
@@ -1123,19 +1140,239 @@ export async function convertArrayBufferToMidi(
     const copy = arrayBuffer.slice(0)
     const audio = await ctx.decodeAudioData(copy)
     const mono = audioBufferToMono(audio)
-    return pcmToMidi(mono, audio.sampleRate, {
+    return pcmToMidiAsync(mono, audio.sampleRate, {
       tempoBpm: opts?.tempoBpm,
       a4: opts?.a4,
       skipMelodyBand: opts?.skipMelodyBand,
       skipHpss: opts?.skipHpss,
       stem: opts?.stem,
       maxSec: opts?.maxSec,
+      pitchEngine: opts?.pitchEngine ?? 'auto',
       onProgress: opts?.onProgress,
     })
   } finally {
     if (close && typeof ctx.close === 'function') {
       void ctx.close()
     }
+  }
+}
+
+/** Async convert path: optional Basic Pitch + same stem/tempo post as pcmToMidi. */
+export async function pcmToMidiAsync(
+  samples: Float32Array,
+  sampleRate: number,
+  opts?: {
+    tempoBpm?: number
+    a4?: number
+    skipMelodyBand?: boolean
+    skipHpss?: boolean
+    stem?: StemKind
+    noteCap?: number
+    maxSec?: number
+    pitchEngine?: 'auto' | 'basic-pitch' | 'autocorr'
+    onProgress?: (pct: number, message: string) => void
+  },
+): Promise<AudioToMidiResult> {
+  const engine = opts?.pitchEngine ?? 'auto'
+  if (engine === 'autocorr') {
+    return pcmToMidi(samples, sampleRate, opts)
+  }
+
+  const a4 = Number.isFinite(opts?.a4) && (opts!.a4 as number) > 0 ? (opts!.a4 as number) : 440
+  const onProgress = opts?.onProgress
+  const fullDuration = samples.length / sampleRate
+  const trimmed = trimSamples(samples, sampleRate, opts?.maxSec)
+  const work = trimmed.samples
+  const analyzedSec = trimmed.trimSec
+  const warnings: string[] = [
+    'Audio→MIDI is monophonic / lead-biased assist — not multi-voice studio transcription.',
+    'Full-band path: stereo mid → HPSS stem race → Basic Pitch (Apache-2.0) or autocorrelation → tempo snap → quantize.',
+    'Edit or Clean up the candidate tab before practicing or saving.',
+  ]
+  if (opts?.maxSec && opts.maxSec > 0 && analyzedSec + 0.05 < fullDuration) {
+    warnings.push(`Analyzed first ${analyzedSec.toFixed(0)}s of ${fullDuration.toFixed(0)}s (trim).`)
+  }
+
+  onProgress?.(6, 'Separating lead stem (HPSS)…')
+  const stemKind: StemKind = opts?.stem ?? 'auto'
+  let stemPcm = work
+  let chosenStemLabel: string = stemKind
+
+  if (!opts?.skipHpss && stemKind === 'auto') {
+    onProgress?.(10, 'Comparing lead / harmonic / mix stems…')
+    const probe = trimSamples(work, sampleRate, Math.min(12, analyzedSec || 12)).samples
+    const best = pickBestMelodyStem(probe, sampleRate, { a4 })
+    chosenStemLabel = best.stem
+    stemPcm = selectStem(work, sampleRate, best.stem === 'mix' ? 'mix' : best.stem)
+    warnings.push(
+      `Full-band auto-stem picked “${best.stem}” (score ${best.score.toFixed(1)}) — HPSS lead vs harmonic vs mix.`,
+    )
+  } else if (!opts?.skipHpss && stemKind !== 'mix') {
+    stemPcm = selectStem(work, sampleRate, stemKind)
+    chosenStemLabel = stemKind
+    warnings.push(
+      `Applied median HPSS → ${stemKind} stem to reduce drums/bass before pitch track.`,
+    )
+  } else {
+    chosenStemLabel = 'mix'
+  }
+
+  onProgress?.(18, 'Preparing melody band…')
+  const prepared = opts?.skipMelodyBand
+    ? stemPcm
+    : emphasizeMelodyBand(stemPcm, sampleRate, { leadMode: true })
+  if (!opts?.skipMelodyBand) {
+    warnings.push(
+      `Applied lead emphasis (harmonic envelope + melody-band filter) on “${chosenStemLabel}” stem.`,
+    )
+  }
+
+  onProgress?.(26, 'Detecting tempo…')
+  const rawTempo = detectTempoBpm(prepared, sampleRate, { defaultBpm: 100 })
+  const detectedTempo = snapTempoBpm(rawTempo, prepared, sampleRate)
+  if (detectedTempo !== rawTempo) {
+    warnings.push(`Tempo snap ${rawTempo} → ${detectedTempo} BPM (½×/2× + onset grid check).`)
+  }
+  const tempoBpm = opts?.tempoBpm ?? detectedTempo
+  if (opts?.tempoBpm == null) {
+    warnings.push(`Estimated tempo ≈ ${detectedTempo} BPM from onset energy.`)
+  } else {
+    warnings.push(`Using your tempo override: ${tempoBpm} BPM (detected ≈ ${detectedTempo}).`)
+  }
+
+  // --- Basic Pitch attempt (free Apache-2.0 model) ---
+  let notes: DetectedNote[] | null = null
+  const tryBp = engine === 'basic-pitch' || engine === 'auto'
+  if (tryBp) {
+    onProgress?.(32, 'Loading Basic Pitch model (free Apache-2.0)…')
+    const ok = await basicPitchAvailable()
+    if (ok) {
+      try {
+        onProgress?.(40, 'Running Basic Pitch multipitch assist…')
+        const at22k = resampleMono(prepared, sampleRate, 22050)
+        const bpNotes = await notesFromBasicPitch(at22k, 22050, {
+          tempoBpm,
+          a4,
+          onProgress: (pct) => {
+            const mapped = 40 + Math.round(pct * 0.35)
+            onProgress?.(mapped, `Basic Pitch… ${pct}%`)
+          },
+        })
+        if (preferBasicPitchNotes(bpNotes)) {
+          notes = bpNotes
+          warnings.push(
+            'Pitch engine: Spotify Basic Pitch (Apache-2.0) multipitch assist → monophonic fretting draft.',
+          )
+          if (a4 !== 440) {
+            warnings.push(`Using Profile A4 = ${a4} Hz for Basic Pitch pitch shift.`)
+          }
+        } else {
+          warnings.push('Basic Pitch returned too few notes — falling back to autocorrelation.')
+        }
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : String(err)
+        warnings.push(`Basic Pitch failed (${msg}) — falling back to autocorrelation.`)
+      }
+    } else if (engine === 'basic-pitch') {
+      warnings.push(
+        'Basic Pitch model unavailable (need public/models/basic-pitch/) — autocorrelation fallback.',
+      )
+    }
+  }
+
+  if (!notes) {
+    onProgress?.(40, 'Tracking pitch (autocorrelation)…')
+    // Reuse classic path on already-prepared stem (skip second HPSS)
+    const classic = pcmToMidi(prepared, sampleRate, {
+      tempoBpm,
+      a4,
+      skipMelodyBand: true,
+      skipHpss: true,
+      stem: 'mix',
+      noteCap: opts?.noteCap,
+      onProgress: (pct, message) => {
+        const mapped = 40 + Math.round(pct * 0.55)
+        onProgress?.(mapped, message)
+      },
+    })
+    // Preserve outer trim/duration metadata + stem warnings
+    return {
+      ...classic,
+      durationSec: fullDuration,
+      analyzedSec,
+      trimSec: analyzedSec,
+      warnings: [...warnings, ...classic.warnings.filter((w) => !warnings.includes(w))],
+    }
+  }
+
+  onProgress?.(78, 'Building notes…')
+  notes = dropGhostNotes(notes, { minDurationSec: 0.09, minVelocity: 45 })
+  notes = mergeAdjacentNotes(notes, { ticksPerQuarter: DEFAULT_TPQ })
+
+  if (notes.length > 8) {
+    const confSorted = [...notes].sort((a, b) => (b.confidence ?? 0) - (a.confidence ?? 0))
+    const floor = confSorted[Math.min(confSorted.length - 1, Math.floor(confSorted.length * 0.65))]
+      ?.confidence
+    if (typeof floor === 'number' && floor > 0.3) {
+      const filtered = notes.filter((n) => (n.confidence ?? 0) >= floor * 0.92)
+      if (filtered.length >= Math.max(3, Math.floor(notes.length * 0.35))) {
+        notes = filtered.sort((a, b) => a.start - b.start)
+        warnings.push('Dropped lower-confidence ghost notes after multipitch ranking.')
+      }
+    }
+  }
+
+  if (notes.length > 12) {
+    const withReg = notes.map((n) => ({
+      n,
+      r: guitarRegisterScore(n.pitch) * (0.55 + 0.45 * (n.confidence ?? 0.5)),
+    }))
+    withReg.sort((a, b) => b.r - a.r)
+    const keepN = Math.max(8, Math.ceil(notes.length * 0.72))
+    const kept = withReg
+      .slice(0, keepN)
+      .map((x) => x.n)
+      .sort((a, b) => a.start - b.start)
+    if (kept.length >= 6 && kept.length < notes.length) {
+      notes = kept
+      warnings.push('Biased note keep toward guitar/lead register (full-band assist).')
+    }
+  }
+
+  if (notes.length === 0) {
+    warnings.push('No stable pitches found — check that the clip has a clear single-note melody.')
+  }
+
+  const noteCap = opts?.noteCap ?? DEFAULT_NOTE_CAP
+  if (notes.length > noteCap) {
+    notes = notes.slice(0, noteCap)
+    warnings.push(`Truncated to first ${noteCap} detected notes for performance.`)
+  }
+
+  onProgress?.(90, 'Writing MIDI…')
+  const midiBytes = buildSimpleMidi(
+    notes.map((n) => ({
+      pitch: n.pitch,
+      start: n.start,
+      duration: Math.max(1, n.duration),
+      velocity: n.velocity,
+    })),
+    { ticksPerQuarter: DEFAULT_TPQ, tempoBpm, timeSig: [4, 4] },
+  )
+  const midi = parseMidi(midiBytes)
+  onProgress?.(100, 'Audio → MIDI done')
+
+  return {
+    notes,
+    midi,
+    midiBytes,
+    tempoBpm,
+    detectedTempoBpm: detectedTempo,
+    durationSec: fullDuration,
+    sampleRate,
+    warnings,
+    analyzedSec,
+    trimSec: analyzedSec,
   }
 }
 

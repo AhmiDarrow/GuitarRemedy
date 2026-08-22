@@ -13,6 +13,10 @@ import {
   setSessionTuning,
   tabToAscii,
   theoryStringToDisplay,
+  UPLOAD_ACCEPT,
+  AUDIO_EXTENSIONS,
+  AUDIO_FORMATS_LABEL,
+  isAudioUpload,
 } from './breakdown'
 import { buildSimpleMidi, parseMidi } from './midi'
 import { TUNINGS } from './theory'
@@ -220,5 +224,28 @@ describe('breakdown', () => {
     const b = midiBytesToGuitarTabs(buf, 'tempo-truth.mid')
     expect(b.tempoBpm).toBe(88)
     expect(b.score.tempo).toBe(88)
+  })
+})
+
+describe('upload accept extensions', () => {
+  it('lists common audio extensions including CAF/WMA', () => {
+    for (const ext of ['mp3', 'wav', 'm4a', 'ogg', 'flac', 'webm', 'aiff', 'caf', 'wma', 'opus', 'aac']) {
+      expect(AUDIO_EXTENSIONS).toContain(ext)
+    }
+    expect(AUDIO_FORMATS_LABEL).toMatch(/CAF/i)
+    expect(AUDIO_FORMATS_LABEL).toMatch(/WMA/i)
+  })
+
+  it('UPLOAD_ACCEPT includes audio + structured tab sources', () => {
+    for (const token of ['.mp3', '.wav', '.mid', '.musicxml', '.mxl', '.gp5', '.gpx', '.gpif', '.grtab', 'audio/*']) {
+      expect(UPLOAD_ACCEPT).toContain(token)
+    }
+  })
+
+  it('isAudioUpload detects name and mime', () => {
+    expect(isAudioUpload('song.mp3')).toBe(true)
+    expect(isAudioUpload('clip.CAF')).toBe(true)
+    expect(isAudioUpload({ name: 'x.bin', type: 'audio/mpeg' })).toBe(true)
+    expect(isAudioUpload('tab.mid')).toBe(false)
   })
 })

@@ -895,15 +895,21 @@ export const UPLOAD_ACCEPT =
     '.midi',
     '.xml',
     '.musicxml',
+    '.mxl',
     '.gp',
     '.gp3',
     '.gp4',
     '.gp5',
     '.gpx',
     '.gp7',
+    '.gpif',
+    '.grtab',
+    '.grtab.json',
+    '.json',
   ].join(',')
 
-export const AUDIO_FORMATS_LABEL = 'MP3, WAV, M4A, OGG, FLAC, AAC, WebM, AIFF'
+export const AUDIO_FORMATS_LABEL =
+  'MP3, WAV, M4A, OGG/Opus, FLAC, AAC/MP4, WebM, AIFF, CAF, WMA'
 
 /**
  * MIDI bytes → guitar tabs + Remedy breakdown.

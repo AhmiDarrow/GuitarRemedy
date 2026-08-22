@@ -17,7 +17,21 @@ const AUDIO_EXT = [
   'wma',
 ] as const
 
-const TAB_EXT = ['mid', 'midi', 'xml', 'musicxml', 'gp', 'gpx', 'gpif', 'grtab', 'json'] as const
+const TAB_EXT = [
+  'mid',
+  'midi',
+  'xml',
+  'musicxml',
+  'gp',
+  'gp3',
+  'gp4',
+  'gp5',
+  'gpx',
+  'gp7',
+  'gpif',
+  'grtab',
+  'json',
+] as const
 
 export function isTauri(): boolean {
   if (typeof window === 'undefined') return false

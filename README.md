@@ -50,10 +50,15 @@ GuitarRemedy is a local-first guitar school you can actually practice in — not
 ### Song → tabs (honest path)
 
 1. **Solid:** `.mid` / MusicXML (Guitar Pro when GPIF parses) → tabs + scale map  
-2. **Audio:** decode → **HPSS lead stem** → melody band → pitch → tempo → MIDI → fretting → auto-clean  
+2. **Audio:** decode → **HPSS lead stem** → **Basic Pitch** (Apache-2.0 multipitch assist, free model in `public/models/basic-pitch`) or autocorrelation fallback → tempo → MIDI → fretting → auto-clean  
 3. **Human loop:** Edit (pitch ±1, keep first N bars, Clean up) → save to **Your tabs** → `.grtab.json` / MIDI / ASCII  
 
-Full-band mixes race **Auto stem** (lead / harmonic / mix via HPSS) before pitch track — still **monophonic drafts**, not multi-voice studio tabs. Clean single-note leads convert best. Always confirm by ear. Guitar Pro is best-effort (placeholders never auto-save); prefer MIDI/MusicXML when you have them.
+**Accepted audio:** MP3, WAV, M4A, OGG/Opus, FLAC, AAC/MP4, WebM, AIFF, CAF, WMA (when the runtime can decode).  
+**Accepted tabs:** MIDI, MusicXML/MXL, Guitar Pro (best-effort), `.grtab.json`.
+
+Full-band mixes race **Auto stem** (lead / harmonic / mix via HPSS) before pitch — still **lead-biased drafts**, not multi-voice studio tabs. Clean single-note leads convert best. Always confirm by ear. Guitar Pro placeholders never auto-save; prefer MIDI/MusicXML when you have them.
+
+Third-party licenses: [`docs/THIRD_PARTY.md`](docs/THIRD_PARTY.md) (MIT app · Apache-2.0 Basic Pitch · free content only).
 
 ---
 
@@ -146,7 +151,8 @@ React 19 · TypeScript · Vite 6 · Tailwind 4 · Tone.js · Zustand · Tauri 2 
 
 MIT © Ahmi Darrow  
 
-Built-in songs are **public-domain, traditional, or original study** material only. User uploads and **Your tabs** stay on your machine.
+Built-in songs are **public-domain, traditional, or original study** material only. User uploads and **Your tabs** stay on your machine.  
+Dependencies and the Basic Pitch model are **free/open licenses only** — see [`docs/THIRD_PARTY.md`](docs/THIRD_PARTY.md).
 
 <p align="center">
   <sub>GitHub · Releases · <a href="https://www.patreon.com/AhmiDarrow">Patreon</a></sub>
