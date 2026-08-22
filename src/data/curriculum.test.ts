@@ -113,6 +113,13 @@ describe('curriculum', () => {
       new RegExp(String.raw`Section work aimed at .+\(5` + en + String.raw`8 focused minutes\)`, 'i'),
       /do it slowly for 60 seconds/i,
       /restart if time slips/i,
+      // title-echo injections (review fix 1)
+      /keep it slow and clean on /i,
+      /keep it about /i,
+      /finish the drills for /i,
+      /\([^()]*day\s+\d+\)/i,
+      /\(Week\s+\d+\)/i,
+      /\(([A-Za-z0-9 .&–—·→/'"]+)\)\s*\(\1\s*day\s+\d+\)/i,
     ]
     for (const lesson of CURRICULUM) {
       const blob = [

@@ -396,6 +396,102 @@ const GOLD: Partial<Record<number, Partial<PrivateLessonFields> & { teachExtra?:
     encouragement: 'Showing up for a month already shows in your hands.',
     funBonus: 'Text a friend 15 seconds of your favorite bars.',
   },
+  14: {
+    hook: 'Two weeks in — let the week’s wins land.',
+    teacherIntro:
+      'Fourteen days is when the first “this is actually working” moments show up. Play your easiest 30 seconds twice, clean and proud.',
+    encouragement: 'Two weeks of showing up beats two months of thinking about it.',
+  },
+  21: {
+    hook: 'Three weeks — check your before-and-after.',
+    teacherIntro:
+      'Three weeks in, your fingers know things they didn’t on day one. Play the first chord you ever learned and feel the difference.',
+    encouragement: 'That’s real progress, not luck. Feel it.',
+  },
+  28: {
+    hook: 'Month mark — one clean minute, no stopping.',
+    teacherIntro:
+      'Before tomorrow’s capstone, prove to yourself you can keep one clean minute alive. Slow is fine. Stopping is not.',
+    encouragement: 'One continuous minute is a stage-shaped win.',
+  },
+  42: {
+    hook: 'Six weeks — the chords are starting to feel like yours.',
+    teacherIntro:
+      'Six weeks of changes under your belt means the shapes are becoming furniture, not puzzles. Push the sticky one gently today.',
+    encouragement: 'Plateaus end the day you stop fighting them.',
+  },
+  49: {
+    hook: 'Seven weeks — small stage, full honesty.',
+    teacherIntro:
+      'Treat one take like a tiny performance: count-in, play, finish, breathe. Imperfect but complete beats perfect but restarted.',
+    encouragement: 'Recovery is a skill, and you just practiced it.',
+  },
+  56: {
+    hook: 'Eight weeks — your first real A/B.',
+    teacherIntro:
+      'Play the same four bars twice: once tense, once relaxed. Hear what soft hands buy you.',
+    encouragement: 'Tone lives in the hands, and yours are learning.',
+  },
+  63: {
+    hook: 'Nine weeks — the two-month checkpoint.',
+    teacherIntro:
+      'Two months is where beginners either stall or shift. Today you’re shifting: same skills, better ears, lighter hands.',
+    encouragement: 'Nine weeks of clean reps is a serious foundation.',
+  },
+  84: {
+    hook: 'Twelve weeks — quarter of the year.',
+    teacherIntro:
+      'Ninety days in, the guitar is part of your week, not a stranger. Play something that sounds like a song you’d keep.',
+    encouragement: 'A quarter-year of practice is how habits become identity.',
+  },
+  91: {
+    hook: 'Thirteen weeks — scales become sentences.',
+    teacherIntro:
+      'You’ve earned the map. Now today is about hearing the map as music, not homework.',
+    encouragement: 'Fewer notes with meaning beat more notes with noise.',
+  },
+  100: {
+    hook: 'Day 100 — triple digits, real musician energy.',
+    teacherIntro:
+      'A hundred days of showing up. Play a short piece you can already feel proud of, then write down what changed since day one.',
+    encouragement: 'Day 100 is a milestone most people never reach. You did.',
+  },
+  150: {
+    hook: 'Day 150 — the rhythm backbone.',
+    teacherIntro:
+      'Halfway through the year, the groove you can hold matters more than any single lick. Prove it with a clean 16 bars.',
+    encouragement: 'Pocket is a superpower, and you’re building it.',
+  },
+  200: {
+    hook: 'Day 200 — you have a voice now.',
+    teacherIntro:
+      'Two hundred days of practice means you can say something on the guitar. Say it plainly today: one idea, full sentences.',
+    encouragement: 'Two hundred days in, you’re not a beginner anymore.',
+  },
+  250: {
+    hook: 'Day 250 — the year’s back half.',
+    teacherIntro:
+      'Past the 200s, the fun is compounding. Play a section you struggled with in month two and feel how far you’ve come.',
+    encouragement: 'The instrument is becoming part of your language.',
+  },
+  300: {
+    hook: 'Day 300 — arrangements are arrangements.',
+    teacherIntro:
+      'Three hundred days in, you can shape songs instead of just playing them. Simplify one section until it’s bulletproof.',
+    encouragement: 'Consistency is a feature the audience feels.',
+  },
+  330: {
+    hook: 'Day 330 — countdown to the year.',
+    teacherIntro:
+      'The last month of the path. Polish, don’t panic. Choose the one thing that lifts your playing most and give it ten minutes.',
+    encouragement: 'The final stretch is where the habits pay rent.',
+  },
+  350: {
+    hook: 'Day 350 — rehearsal for the year-end set.',
+    teacherIntro:
+      'Two weeks from the finish. Run your set like a show: start ritual, steady pace, strong ending, one honest take.',
+    encouragement: 'You’re finishing a year-shaped promise.',
+  },
   75: {
     hook: 'Chord crest — smooth changes beat fancy ones.',
     teacherIntro:
