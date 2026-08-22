@@ -18,6 +18,11 @@ describe('curriculum', () => {
     expect(getLesson(7)?.title).toMatch(/Week 1|Jam/i)
     expect(getLesson(30)?.goals.length).toBeGreaterThan(0)
     expect(getLesson(1)?.privateLesson.segments.length).toBeGreaterThanOrEqual(5)
+    // theory accuracy spot-checks
+    expect(getLesson(3)?.theoryBite).toMatch(/E\s*G\s*B/i)
+    expect(getLesson(4)?.theoryBite).toMatch(/G\s*B\s*D/i)
+    expect(getLesson(5)?.theoryBite).toMatch(/C\s*E\s*G/i)
+    expect(getLesson(6)?.theoryBite).toMatch(/D\s*F/i)
   })
 
   it('aligns phase boundaries with titles', () => {
@@ -26,7 +31,7 @@ describe('curriculum', () => {
     expect(getLesson(76)?.phase).toBe('scales')
     expect(getLesson(120)?.phase).toBe('scales')
     expect(getLesson(121)?.phase).toBe('rhythm')
-    expect(getLesson(121)?.title).toMatch(/Rhythm/i)
+    expect(getLesson(121)?.title).toMatch(/Rhythm|Pocket|Groove/i)
     expect(getLesson(181)?.phase).toBe('lead')
     expect(getLesson(261)?.phase).toBe('repertoire')
   })
@@ -62,10 +67,12 @@ describe('curriculum', () => {
     expect(new Set(mastery).size).toBe(365)
     // no late-year stencil mastery
     expect(mastery.some((m) => /tangible repertoire outcome today/i.test(m))).toBe(false)
+    expect(mastery.some((m) => /tangible outcome:\s*a cleaner target section/i.test(m))).toBe(false)
   })
 
   it('resolves every libraryIds reference', () => {
     for (const lesson of CURRICULUM) {
+      expect(lesson.libraryIds.length).toBeGreaterThan(0)
       for (const id of lesson.libraryIds) {
         expect(libraryIds.has(id), `day ${lesson.day} missing library id ${id}`).toBe(true)
         expect(getLibraryItem(id)?.id).toBe(id)
@@ -78,19 +85,71 @@ describe('curriculum', () => {
     const drillKey = (d: string[]) => d.join('|')
     const goals = CURRICULUM.map((l) => goalKey(l.goals))
     const drills = CURRICULUM.map((l) => drillKey(l.drills))
-    // Allow some intentional weekly review echoes, but not mass clones
-    expect(new Set(goals).size).toBeGreaterThan(300)
-    expect(new Set(drills).size).toBeGreaterThan(300)
+    expect(new Set(goals).size).toBe(365)
+    expect(new Set(drills).size).toBe(365)
   })
 
   it('keeps theory bites unique enough (no mass clone pedagogy)', () => {
     const bites = CURRICULUM.map((l) => l.theoryBite.trim())
-    expect(new Set(bites).size).toBeGreaterThan(280)
-    // No empty / tiny theory
+    expect(new Set(bites).size).toBe(365)
     expect(bites.every((b) => b.length >= 24)).toBe(true)
-    // Private-lesson hooks should not collapse to one template
     const hooks = CURRICULUM.map((l) => l.privateLesson.hook.trim())
     expect(new Set(hooks).size).toBeGreaterThan(250)
+  })
+
+  it('strips mechanical Day-N chrome from learner-facing strings', () => {
+    const chrome = [
+      /day\s+\d+\s+step\s+\d+/i,
+      /Day\s+\d+\s+focus\s*—/i,
+      /^Day\s+\d+:\s*/m,
+      /\(D\d+\.\d+\)/,
+      /—\s*Repertoire Day\b/i,
+      /Advance your vehicle song through:/i,
+      /Keep one measurable win \(cleaner bar, stabler tempo, or clearer form\)/i,
+      /End the session with a performance-shaped take, not only drills/i,
+      /Motor learning favors slow accurate loops of the sticky bar/i,
+      /Section work aimed at .+\(5–8 focused minutes\)/i,
+    ]
+    for (const lesson of CURRICULUM) {
+      const blob = [
+        lesson.title,
+        lesson.theoryBite,
+        lesson.masteryCheck,
+        ...lesson.goals,
+        ...lesson.drills,
+      ].join('\n')
+      for (const re of chrome) {
+        expect(re.test(blob), `day ${lesson.day} matched ${re}`).toBe(false)
+      }
+    }
+  })
+
+  it('fattens rhythm and lead drills into observable multi-step actions', () => {
+    for (const lesson of CURRICULUM) {
+      if (lesson.phase !== 'rhythm' && lesson.phase !== 'lead') continue
+      expect(lesson.drills.length, `day ${lesson.day} drill count`).toBeGreaterThanOrEqual(3)
+      // average drill text should not be one-word stubs
+      const avg =
+        lesson.drills.reduce((n, d) => n + d.length, 0) / Math.max(1, lesson.drills.length)
+      expect(avg, `day ${lesson.day} thin drills`).toBeGreaterThanOrEqual(36)
+      expect(lesson.drills.every((d) => d.length >= 18), `day ${lesson.day} stub drill`).toBe(
+        true,
+      )
+    }
+  })
+
+  it('writes unique repertoire lessons instead of slot-fill skeletons', () => {
+    const rep = CURRICULUM.filter((l) => l.phase === 'repertoire')
+    expect(rep.length).toBe(105)
+    expect(rep.every((l) => !/Repertoire Day/i.test(l.title))).toBe(true)
+    expect(new Set(rep.map((l) => l.goals.join('|'))).size).toBe(rep.length)
+    expect(new Set(rep.map((l) => l.drills.join('|'))).size).toBe(rep.length)
+    expect(new Set(rep.map((l) => l.theoryBite)).size).toBe(rep.length)
+    // no mass shared mastery skeleton
+    const skeletonHits = rep.filter((l) =>
+      /cleaner target section, a stabler tempo map, or a keepable take slice/i.test(l.masteryCheck),
+    )
+    expect(skeletonHits.length).toBe(0)
   })
 
   it('covers all phases', () => {
