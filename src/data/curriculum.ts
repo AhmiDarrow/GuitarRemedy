@@ -969,7 +969,6 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'Bm–G–D–A half-time groove'
     ],
     libraryIds: [
-      'ch-em',
       'ch-am'
     ],
     masteryCheck: 'Play Bm clear enough for a two-bar loop into G.',

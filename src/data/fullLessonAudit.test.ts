@@ -18,6 +18,7 @@ import {
   OPEN_CHORD_SHAPES,
   analyzeDiagramAccuracy,
   diagramsForLesson,
+  lessonTeachesOpenChord,
   libraryDiagramMatchesLesson,
   resolveLessonDiagram,
   type LessonDiagramSpec,
@@ -373,15 +374,10 @@ describe('full lesson + imagery audit', () => {
           if (!teachesPower) bad.push(`day ${L.day} power chord without power-chord teaching`)
         }
         if (s.kind === 'chord_shape' && s.chord) {
-          const ch = s.chord.toLowerCase()
-          const named =
-            blob.includes(ch) ||
-            (ch === 'em' && /e minor/.test(blob)) ||
-            (ch === 'am' && /a minor/.test(blob)) ||
-            (ch === 'dm' && /d minor/.test(blob)) ||
-            (ch.length === 1 && new RegExp(`(^|[^a-z])${ch}([^a-z]|$)`).test(blob)) ||
-            (ch.endsWith('7') && blob.includes(ch))
-          if (!named) bad.push(`day ${L.day} chord ${s.chord} not named in lesson`)
+          // Must teach the shape — letter inside "notes E G B" is not enough
+          if (!lessonTeachesOpenChord(s.chord, blob)) {
+            bad.push(`day ${L.day} chord ${s.chord} not taught as a shape`)
+          }
         }
       }
 

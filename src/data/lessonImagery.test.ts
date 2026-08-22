@@ -16,6 +16,7 @@ import {
   assertOpenShapeAccurate,
   diagramsForLesson,
   dotsToAsciiTab,
+  lessonTeachesOpenChord,
   libraryDiagramMatchesLesson,
   resolveLessonDiagram,
 } from './lessonImagery'
@@ -228,6 +229,61 @@ describe('lesson imagery — free license + accuracy', () => {
       libraryIds: L3.libraryIds,
     })
     expect(d3.some((d) => d.kind === 'chord_shape' && /em/i.test(d.chord ?? d.title))).toBe(true)
+    // Triad spelling "E G B" must not unlock Open G on the Em day
+    expect(d3.some((d) => d.kind === 'chord_shape' && /^g$/i.test(d.chord ?? ''))).toBe(false)
+    expect(d3.some((d) => /open g/i.test(d.title))).toBe(false)
+  })
+
+  it('triad spelling alone does not teach Open G / Open C', () => {
+    expect(libraryDiagramMatchesLesson('ch-g', 'E minor is the notes E G B. Open Em chord.')).toBe(
+      false,
+    )
+    expect(libraryDiagramMatchesLesson('ch-g', 'Form a clear open G and change Em to G')).toBe(true)
+    expect(libraryDiagramMatchesLesson('ch-c', 'notes C E G in the triad')).toBe(false)
+    expect(libraryDiagramMatchesLesson('ch-c', 'Form open C without choking')).toBe(true)
+  })
+
+  it('English am / a chord never unlock Am or Open A', () => {
+    // "I am" / "you are" style prose after lowercasing
+    expect(lessonTeachesOpenChord('Am', 'I am learning bends today. Target pitch.')).toBe(false)
+    expect(lessonTeachesOpenChord('Am', 'you am not a chord day')).toBe(false)
+    expect(lessonTeachesOpenChord('Am', 'Form open Am and change Am to G')).toBe(true)
+    expect(lessonTeachesOpenChord('Am', 'A minor shape — two fingers')).toBe(true)
+    expect(lessonTeachesOpenChord('Am', 'Andalusian cadence Am G F E')).toBe(true)
+
+    // Bare "a chord" means any chord, not Open A major
+    expect(lessonTeachesOpenChord('A', 'Play a chord cleanly and hold it')).toBe(false)
+    expect(lessonTeachesOpenChord('A', '1 e & a subdivision clinic')).toBe(false)
+    expect(lessonTeachesOpenChord('A', 'Form open A and change A to D')).toBe(true)
+    expect(lessonTeachesOpenChord('A', 'A major shape on frets 0–2')).toBe(true)
+
+    // Same class of bug for E / G / C bare "x chord"
+    expect(lessonTeachesOpenChord('E', 'mute a chord with the palm')).toBe(false)
+    expect(lessonTeachesOpenChord('G', 'notes E G B only')).toBe(false)
+    expect(lessonTeachesOpenChord('C', 'notes C E G in the triad')).toBe(false)
+  })
+
+  it('no false Am / Open A necks across the full curriculum', () => {
+    const bad: string[] = []
+    for (const L of CURRICULUM) {
+      const list = diagramsForLesson({
+        day: L.day,
+        phase: L.phase,
+        title: L.title,
+        goals: L.goals,
+        drills: L.drills,
+        theoryBite: L.theoryBite,
+        libraryIds: L.libraryIds,
+      })
+      const blob = [L.title, ...L.goals, ...L.drills, L.theoryBite, L.masteryCheck].join(' ')
+      for (const d of list) {
+        if (d.kind !== 'chord_shape' || !d.chord) continue
+        if (!lessonTeachesOpenChord(d.chord, blob)) {
+          bad.push(`day ${L.day} ${d.chord} :: ${L.title}`)
+        }
+      }
+    }
+    expect(bad.slice(0, 20), bad.slice(0, 20).join('\n')).toEqual([])
   })
 
   it('library neck diagrams require matching lesson copy', () => {

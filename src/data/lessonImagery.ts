@@ -539,30 +539,254 @@ const LIBRARY_DIAGRAMS: Record<string, Omit<LessonDiagramSpec, 'id'>> = {
   },
 }
 
+/** Normalize lesson blob for chord/scale matching. */
+export function normalizeLessonMatchText(lessonText: string): string {
+  return lessonText.toLowerCase().replace(/[–—]/g, '-')
+}
+
+/**
+ * True when lesson copy actually teaches this open-chord symbol as a shape to form.
+ * Rejects triad spellings alone (e.g. "E G B" must not unlock Open G).
+ */
+/** Space/slash/arrow chord lists like "Em G C D A Am E" (not English prose). */
+const CHORD_LIST_TOKEN =
+  'em|am|dm|bm|f#m|bb|eb|ab|db|gb|g7|d7|a7|e7|c7|b7|fmaj7|maj7|em7|am7|dm7|g|c|d|a|e|f|b'
+const CHORD_LIST_RE = new RegExp(
+  `\\b(?:${CHORD_LIST_TOKEN})(?:\\s*[|→>/,-]\\s*|\\s+)(?:${CHORD_LIST_TOKEN})(?:(?:\\s*[|→>/,-]\\s*|\\s+)(?:${CHORD_LIST_TOKEN}))+\\b`,
+  'i',
+)
+
+function chordAppearsInChordList(key: string, lessonNorm: string): boolean {
+  // Only treat multi-chord runs as lists when at least one token is a multi-letter
+  // chord symbol (em/am/g7/…). Bare "e g b" triad spellings must not qualify.
+  const multiLetter = 'em|am|dm|bm|f#m|bb|eb|ab|db|gb|g7|d7|a7|e7|c7|b7|fmaj7|maj7|em7|am7|dm7'
+  const anyTok = CHORD_LIST_TOKEN
+  const sep = '(?:\\s*[|→>/,-]\\s*|\\s+)'
+  const listRe = new RegExp(
+    `\\b(?:${anyTok})(?:${sep}(?:${anyTok})){2,}\\b`,
+    'gi',
+  )
+  const esc = key.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+  const keyRe = new RegExp(`(^|[^a-z0-9#])${esc}([^a-z0-9#]|$)`, 'i')
+  const multiRe = new RegExp(`(?:^|[^a-z0-9#])(?:${multiLetter})(?:[^a-z0-9#]|$)`, 'i')
+  let m: RegExpExecArray | null
+  while ((m = listRe.exec(lessonNorm)) !== null) {
+    const run = m[0]
+    if (!multiRe.test(run)) continue
+    if (keyRe.test(run)) return true
+  }
+  return false
+}
+
+export function lessonTeachesOpenChord(symbol: string, lessonText: string): boolean {
+  const n = normalizeLessonMatchText(lessonText)
+  const sym = symbol.trim()
+  const key = sym.toLowerCase()
+
+  // Minors / sevenths — unique tokens (never bare English "am" / "i am")
+  if (key === 'em') {
+    return (
+      /\be minor\b/.test(n) ||
+      /(^|[^a-z])open em\b/.test(n) ||
+      /(^|[^a-z])em chord\b/.test(n) ||
+      /(^|[^a-z])em shape\b/.test(n) ||
+      /\bem\s*[|→>to,/-]+\s*(g|am|c|d|a|e)\b/.test(n) ||
+      /\b(g|am|c|d|a|e)\s*[|→>to,/-]+\s*em\b/.test(n) ||
+      /\bform (a clear |an? )?em\b/.test(n) ||
+      /\bbuild em\b/.test(n) ||
+      chordAppearsInChordList('em', n) ||
+      // Chord symbol Em survives lowercasing as "em" — require neighbor chord/context
+      (/(^|[^a-z])em\b/.test(n) &&
+        (/chord|shape|open|change|campfire|strum|progression|grip|fingers|rank|rescue|weak/.test(n) ||
+          /\bem\s*[|→>to,/-]/.test(n) ||
+          /[|→>to,/-]\s*em\b/.test(n)))
+    )
+  }
+  if (key === 'am') {
+    // Do NOT use bare /\bam\b/ — matches English "I am / you am" after lowercasing.
+    return (
+      /\ba minor\b/.test(n) ||
+      /(^|[^a-z])open am\b/.test(n) ||
+      /(^|[^a-z])am chord\b/.test(n) ||
+      /(^|[^a-z])am shape\b/.test(n) ||
+      /\bam7\b/.test(n) ||
+      /\bam\s*[|→>to,/-]+\s*(g|f|e|dm|c|d|em|g7|e7)\b/.test(n) ||
+      /\b(g|f|e|dm|c|d|em)\s*[|→>to,/-]+\s*am\b/.test(n) ||
+      /\bform (a clear |an? )?am\b/.test(n) ||
+      /\bbuild am\b/.test(n) ||
+      /\bandalusian\b/.test(n) ||
+      chordAppearsInChordList('am', n)
+    )
+  }
+  if (key === 'dm') {
+    return (
+      /\bd minor\b/.test(n) ||
+      /(^|[^a-z])open dm\b/.test(n) ||
+      /(^|[^a-z])dm chord\b/.test(n) ||
+      /(^|[^a-z])dm shape\b/.test(n) ||
+      /\bdm\s*[|→>to,/-]+\s*(g|g7|c|am|a|e|em)\b/.test(n) ||
+      /\b(g|g7|c|am|a|e|em)\s*[|→>to,/-]+\s*dm\b/.test(n) ||
+      /\bform (a clear |an? )?dm\b/.test(n) ||
+      /\bbuild dm\b/.test(n) ||
+      chordAppearsInChordList('dm', n) ||
+      // bare dm is rare in English prose
+      (/(^|[^a-z])dm\b/.test(n) && /chord|shape|open|ii|jazz|change|progression/.test(n))
+    )
+  }
+  if (key === 'g7') return /\bg7\b/.test(n)
+  if (key === 'd7') return /\bd7\b/.test(n)
+  if (key === 'a7') return /\ba7\b/.test(n)
+  if (key === 'e7') return /\be7\b/.test(n)
+  if (key === 'c7') return /\bc7\b/.test(n)
+  if (key === 'b7') return /\bb7\b/.test(n)
+
+  // Open majors — require shape language, not a letter inside "notes E G B"
+  // Never match bare "a chord" / "e chord" as English "a chord" (any chord).
+  if (key === 'e') {
+    return (
+      /\be major\b/.test(n) ||
+      /(^|[^a-z])open e\b/.test(n) ||
+      /(^|[^a-z])e maj\b/.test(n) ||
+      /(^|[^a-z])e shape\b/.test(n) ||
+      /(^|[^a-z])open e chord\b/.test(n) ||
+      /(^|[^a-z])e major chord\b/.test(n) ||
+      /\be\s*[|→>]+\s*[ad]\b/.test(n) ||
+      /\b[ad]\s*[|→>]+\s*e\b/.test(n) ||
+      /\b(a|d|am|em)\s*[|→>to,/-]+\s*e\b/.test(n) ||
+      /\be\s*[|→>to,/-]+\s*(a|d|am|em)\b/.test(n) ||
+      /\bform (a clear |an? )?e\b/.test(n) ||
+      /\bbuild open e\b/.test(n) ||
+      chordAppearsInChordList('e', n)
+    )
+  }
+  if (key === 'a') {
+    return (
+      /\ba major\b/.test(n) ||
+      /(^|[^a-z])open a\b/.test(n) ||
+      /(^|[^a-z])a maj\b/.test(n) ||
+      /(^|[^a-z])a shape\b/.test(n) ||
+      /(^|[^a-z])open a chord\b/.test(n) ||
+      /(^|[^a-z])a major chord\b/.test(n) ||
+      /\ba-d-e\b/.test(n) ||
+      /\ba d e\b/.test(n) ||
+      /(^|[^a-z])a\s*&\s*e\b/.test(n) ||
+      /\ba\s*[|→>]+\s*[de]\b/.test(n) ||
+      /\b[de]\s*[|→>]+\s*a\b/.test(n) ||
+      /\b(d|e|em|am|g)\s*[|→>to,/-]+\s*a\b/.test(n) ||
+      /\ba\s*[|→>to,/-]+\s*(d|e|em|am|g)\b/.test(n) ||
+      /\bform (an? )?open a\b/.test(n) ||
+      /\bbuild open a\b/.test(n) ||
+      chordAppearsInChordList('a', n)
+    )
+  }
+  if (key === 'd') {
+    return (
+      /\bd major\b/.test(n) ||
+      /(^|[^a-z])open d\b/.test(n) ||
+      /(^|[^a-z])d maj\b/.test(n) ||
+      /(^|[^a-z])d shape\b/.test(n) ||
+      /(^|[^a-z])open d chord\b/.test(n) ||
+      /(^|[^a-z])d major chord\b/.test(n) ||
+      /\bd triangle\b/.test(n) ||
+      /\bg-c-d\b/.test(n) ||
+      /(^|[^a-z])em g c d\b/.test(n) ||
+      /\bg c d\b/.test(n) ||
+      // campfire set mentions — not bare "c d" in prose
+      /\b(g|c|em|a)\s*[|→>to,/-]+\s*d\b/.test(n) ||
+      /\bd\s*[|→>to,/-]+\s*(em|g|c|a)\b/.test(n) ||
+      /\bform (a clear |an? )?d\b/.test(n) ||
+      /\bbuild open d\b/.test(n) ||
+      chordAppearsInChordList('d', n)
+    )
+  }
+  if (key === 'g') {
+    return (
+      /\bg major\b/.test(n) ||
+      /(^|[^a-z])open g\b/.test(n) ||
+      /(^|[^a-z])g maj\b/.test(n) ||
+      /(^|[^a-z])g shape\b/.test(n) ||
+      /(^|[^a-z])open g chord\b/.test(n) ||
+      /(^|[^a-z])g major chord\b/.test(n) ||
+      // Real changes / campfire sets — not "notes E G B" or bare "g chord"
+      /\bem\s*[|→>to,/-]+\s*g\b/.test(n) ||
+      /\bg\s*[|→>to,/-]+\s*(em|c|d|am)\b/.test(n) ||
+      /(^|[^a-z])em g c d\b/.test(n) ||
+      /\bg-c-d\b/.test(n) ||
+      /\bg c d\b/.test(n) ||
+      /\bform (a clear |an? )?g\b/.test(n) ||
+      /\bbuild (open )?g\b/.test(n) ||
+      /\bsecond chord[^\n.]{0,40}\bg\b/.test(n) ||
+      chordAppearsInChordList('g', n)
+    )
+  }
+  if (key === 'c') {
+    return (
+      /\bc major\b/.test(n) ||
+      /(^|[^a-z])open c\b/.test(n) ||
+      /(^|[^a-z])c maj\b/.test(n) ||
+      /(^|[^a-z])c shape\b/.test(n) ||
+      /(^|[^a-z])open c chord\b/.test(n) ||
+      /(^|[^a-z])c major chord\b/.test(n) ||
+      /\bg-c-d\b/.test(n) ||
+      /\bg-c\b/.test(n) ||
+      /\bc-d\b/.test(n) ||
+      /(^|[^a-z])em g c d\b/.test(n) ||
+      /\bg c d\b/.test(n) ||
+      /\b(g|d|em|am|f)\s*[|→>to,/-]+\s*c\b/.test(n) ||
+      /\bc\s*[|→>to,/-]+\s*(g|d|em|am|f)\b/.test(n) ||
+      /\bform (a clear |an? )?c\b/.test(n) ||
+      /\bbuild (open )?c\b/.test(n) ||
+      chordAppearsInChordList('c', n)
+    )
+  }
+  if (key === 'f') {
+    return (
+      /\bf major\b/.test(n) ||
+      /(^|[^a-z])open f\b/.test(n) ||
+      /(^|[^a-z])f maj\b/.test(n) ||
+      /(^|[^a-z])f shape\b/.test(n) ||
+      /(^|[^a-z])open f chord\b/.test(n) ||
+      /(^|[^a-z])f major chord\b/.test(n) ||
+      /mini.?barre f/.test(n) ||
+      /(^|[^a-z])full f\b/.test(n) ||
+      /\bform (a clear |an? )?f\b/.test(n) ||
+      /\bbuild (open |full )?f\b/.test(n) ||
+      chordAppearsInChordList('f', n)
+    )
+  }
+
+  // Fallback: full symbol as its own token (e.g. future shapes)
+  const esc = key.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+  return new RegExp(`(^|[^a-z0-9])${esc}([^a-z0-9]|$)`).test(n)
+}
+
 /**
  * True when lesson copy actually teaches this library neck item.
  * Prevents Day-1-style junk (e.g. sc-pent-min on open-string day).
  */
 export function libraryDiagramMatchesLesson(libraryId: string, lessonText: string): boolean {
-  const t = lessonText.toLowerCase()
-  // Normalize en-dashes so "g–c–d" matches
-  const n = t.replace(/[–—]/g, '-')
-  const rules: Record<string, RegExp> = {
-    'ch-em': /\bem\b|e minor/,
-    'ch-e': /\be major\b|(^|[^a-z])open e\b|(^|[^a-z])e chord\b|(^|[^a-z])e\s*&\s*|(^|[^a-z])e major/,
-    'ch-am': /\bam\b|a minor/,
-    'ch-a': /\ba major\b|(^|[^a-z])open a\b|(^|[^a-z])a chord\b|a-d-e|(^|[^a-z])a\s*&\s*e|\ba\b(?=.*\b(d|e|major)\b)/,
-    'ch-dm': /\bdm\b|d minor/,
-    'ch-d': /\bd major\b|(^|[^a-z])open d\b|d triangle|(^|[^a-z])d chord\b|g-c-d|(^|[^a-z])em g c d\b|\bc d\b|\bg c d\b|(^|[^a-z])d\b(?=.*\b(major|triangle|campfire)\b)/,
-    'ch-g': /\bg major\b|(^|[^a-z])open g\b|(^|[^a-z])g chord\b|em.?g|g-c|(^|[^a-z])em g c d\b|(^|[^a-z])g\b(?=.*\b(major|c|d|em)\b)/,
-    'ch-c': /\bc major\b|(^|[^a-z])open c\b|(^|[^a-z])c chord\b|g-c|c-d|(^|[^a-z])em g c d\b|(^|[^a-z])c\b(?=.*\b(major|g|d)\b)/,
-    'ch-f': /\bf major\b|(^|[^a-z])f chord\b|mini.?barre f|(^|[^a-z])full f\b|\bf maj/,
-    'ch-g7': /\bg7\b/,
-    'ch-d7': /\bd7\b/,
-    'ch-a7': /\ba7\b/,
-    'ch-e7': /\be7\b/,
-    'ch-c7': /\bc7\b/,
-    'ch-b7': /\bb7\b/,
+  const n = normalizeLessonMatchText(lessonText)
+  const chordLib: Record<string, string> = {
+    'ch-em': 'Em',
+    'ch-e': 'E',
+    'ch-am': 'Am',
+    'ch-a': 'A',
+    'ch-dm': 'Dm',
+    'ch-d': 'D',
+    'ch-g': 'G',
+    'ch-c': 'C',
+    'ch-f': 'F',
+    'ch-g7': 'G7',
+    'ch-d7': 'D7',
+    'ch-a7': 'A7',
+    'ch-e7': 'E7',
+    'ch-c7': 'C7',
+    'ch-b7': 'B7',
+  }
+  const chordSym = chordLib[libraryId]
+  if (chordSym) return lessonTeachesOpenChord(chordSym, n)
+
+  const scaleRules: Record<string, RegExp> = {
     'sc-pent-min': /minor pent|pentatonic minor|pent box|box 1|a minor pent/,
     'sc-pent-maj': /major pent|pentatonic major|bright twin/,
     'sc-major': /major scale|ionian|seven-note map/,
@@ -575,7 +799,7 @@ export function libraryDiagramMatchesLesson(libraryId: string, lessonText: strin
     'sc-phrygian': /\bphrygian\b(?!-ish)/,
     'sc-locrian': /\blocrian\b(?!-ish)/,
   }
-  const re = rules[libraryId]
+  const re = scaleRules[libraryId]
   if (!re) return false
   return re.test(n)
 }
@@ -641,35 +865,34 @@ export function diagramsForLesson(input: {
     })
   }
 
-  // --- Named open chords ---
-  const chordHits: Array<{ re: RegExp; chord: string; title: string }> = [
-    { re: /\bem\b|e minor/, chord: 'Em', title: 'Open Em' },
-    { re: /\be major\b|(^|[^a-z])e chord/, chord: 'E', title: 'Open E' },
-    { re: /\bam\b|a minor/, chord: 'Am', title: 'Open Am' },
-    { re: /\ba major\b|(^|[^a-z])a chord/, chord: 'A', title: 'Open A' },
-    { re: /\bdm\b|d minor/, chord: 'Dm', title: 'Open Dm' },
-    { re: /\bd major\b|(^|[^a-z])d chord/, chord: 'D', title: 'Open D' },
-    { re: /\bg major\b|(^|[^a-z])g chord|\bg\b.*chord/, chord: 'G', title: 'Open G' },
-    { re: /\bc major\b|(^|[^a-z])c chord/, chord: 'C', title: 'Open C' },
-    { re: /\bf major\b|f chord|mini.?barre f/, chord: 'F', title: 'F shape' },
-    { re: /\bb7\b/, chord: 'B7', title: 'Open B7' },
-    { re: /\bg7\b/, chord: 'G7', title: 'Open G7' },
-    { re: /\bd7\b/, chord: 'D7', title: 'Open D7' },
-    { re: /\ba7\b/, chord: 'A7', title: 'Open A7' },
-    { re: /\be7\b/, chord: 'E7', title: 'Open E7' },
-    { re: /\bc7\b/, chord: 'C7', title: 'Open C7' },
+  // --- Named open chords (shape language only — not triad spellings like "E G B") ---
+  const chordHits: Array<{ chord: string; title: string }> = [
+    { chord: 'Em', title: 'Open Em' },
+    { chord: 'E', title: 'Open E' },
+    { chord: 'Am', title: 'Open Am' },
+    { chord: 'A', title: 'Open A' },
+    { chord: 'Dm', title: 'Open Dm' },
+    { chord: 'D', title: 'Open D' },
+    { chord: 'G', title: 'Open G' },
+    { chord: 'C', title: 'Open C' },
+    { chord: 'F', title: 'F shape' },
+    { chord: 'B7', title: 'Open B7' },
+    { chord: 'G7', title: 'Open G7' },
+    { chord: 'D7', title: 'Open D7' },
+    { chord: 'A7', title: 'Open A7' },
+    { chord: 'E7', title: 'Open E7' },
+    { chord: 'C7', title: 'Open C7' },
   ]
   for (const hit of chordHits) {
-    if (hit.re.test(text)) {
-      add({
-        id: `day${input.day}-chord-${hit.chord}`,
-        kind: 'chord_shape',
-        title: hit.title,
-        caption: `${hit.chord} open shape · standard tuning.`,
-        chord: hit.chord,
-        frets: 5,
-      })
-    }
+    if (!lessonTeachesOpenChord(hit.chord, text)) continue
+    add({
+      id: `day${input.day}-chord-${hit.chord}`,
+      kind: 'chord_shape',
+      title: hit.title,
+      caption: `${hit.chord} open shape · standard tuning.`,
+      chord: hit.chord,
+      frets: 5,
+    })
   }
 
   // --- Power chords (need explicit power-chord teaching — not mute drills that say "E5") ---
