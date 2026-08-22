@@ -209,27 +209,46 @@ export function downloadUserTabFile(tab: UserTab, filename?: string) {
   URL.revokeObjectURL(url)
 }
 
-/** Pure ASCII tab text (testable). Display order: e B G D A E. */
-export function userTabToAscii(tab: UserTab): string {
+/**
+ * Pure ASCII tab text (testable). Display order: e B G D A E.
+ * Preserves groove via `start` onsets — rests become `-` columns (not left-packed).
+ */
+export function userTabToAscii(tab: UserTab, opts?: { colsPerBeat?: number }): string {
+  const colsPerBeat = Math.max(1, Math.min(8, Math.round(opts?.colsPerBeat ?? 2)))
+  const beatsPer = Math.max(1, tab.tab.timeSig?.[0] || BEATS_PER_MEASURE)
+  const colsPerMeasure = Math.max(colsPerBeat, Math.round(beatsPer * colsPerBeat))
   const lines = ['e|', 'B|', 'G|', 'D|', 'A|', 'E|']
+
   for (const measure of tab.tab.measures) {
-    const cells: string[][] = [[], [], [], [], [], []]
-    const ordered = [...measure.notes].sort(
+    // One slot per subdivision column × 6 strings (null = rest dash)
+    const grid: (string | null)[][] = Array.from({ length: 6 }, () =>
+      Array.from({ length: colsPerMeasure }, () => null),
+    )
+    const ordered = [...(measure.notes || [])].sort(
       (a, b) => (a.start ?? 0) - (b.start ?? 0) || a.string - b.string,
     )
     for (const n of ordered) {
-      const s = Math.max(0, Math.min(5, n.string))
+      const s = Math.max(0, Math.min(5, Math.round(Number(n.string) || 0)))
+      const start = typeof n.start === 'number' && Number.isFinite(n.start) ? n.start : 0
+      const col = Math.max(0, Math.min(colsPerMeasure - 1, Math.round(start * colsPerBeat)))
       const fretLabel = String(Math.max(0, Math.min(24, Math.round(Number(n.fret) || 0))))
-      for (let i = 0; i < 6; i++) {
-        cells[i].push(i === s ? fretLabel.padStart(2, '-') : '--')
-      }
-      for (let i = 0; i < 6; i++) cells[i].push('-')
+      // Prefer earlier note if two land on same cell
+      if (grid[s][col] == null) grid[s][col] = fretLabel
     }
     for (let i = 0; i < 6; i++) {
-      lines[i] += cells[i].join('') + '|'
+      let row = ''
+      for (let c = 0; c < colsPerMeasure; c++) {
+        const cell = grid[i][c]
+        row += cell != null ? cell.padStart(2, '-').padEnd(2, '-') : '--'
+      }
+      lines[i] += row + '|'
     }
   }
-  const header = `${tab.title}\nTempo: ${tab.tempoBpm} · ${tab.keyLabel || ''}\n\n`
+
+  const ts = tab.tab.timeSig
+  const meter =
+    Array.isArray(ts) && ts.length >= 2 ? `${ts[0]}/${ts[1]}` : `${beatsPer}/4`
+  const header = `${tab.title}\nTempo: ${tab.tempoBpm} · ${meter}${tab.keyLabel ? ` · ${tab.keyLabel}` : ''}\n\n`
   return header + lines.join('\n') + '\n'
 }
 

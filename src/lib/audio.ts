@@ -54,6 +54,32 @@ export async function audioNow(): Promise<number> {
   return Tone.now()
 }
 
+/**
+ * Schedule a UI callback on the animation frame nearest to an audio-clock time.
+ * Keeps tab cursor / transport chrome locked to Tone's clock (not wall setTimeout drift).
+ */
+export async function scheduleDraw(callback: () => void, time: number): Promise<void> {
+  await ensureAudio()
+  const Tone = await tone()
+  Tone.Draw.schedule(() => {
+    try {
+      callback()
+    } catch {
+      /* ignore UI errors mid-draw */
+    }
+  }, time)
+}
+
+/** Cancel pending Draw callbacks at/after `time` (default: all future). */
+export async function cancelDraw(time = 0): Promise<void> {
+  try {
+    const Tone = await tone()
+    Tone.Draw.cancel(time)
+  } catch {
+    /* Tone not loaded */
+  }
+}
+
 export async function playFret(
   stringIndex: number,
   fret: number,

@@ -154,6 +154,8 @@ export function UploadPage() {
           a4: audio ? a4 : undefined,
           maxSec: audio && trimSec > 0 ? trimSec : undefined,
           stem: audio ? stem : undefined,
+          // Explicit tuning on every path — not only module session side-effect.
+          tuning,
         })
         setBreakdown(b)
         setStage(b.kind === 'unknown' ? 'error' : 'done')
@@ -324,9 +326,10 @@ export function UploadPage() {
             Drop an <strong className="text-mint font-medium">MP3 / WAV</strong> and Remedy runs a
             clean three-step converter: <span className="text-[var(--text)]">decode audio</span> →{' '}
             <span className="text-[var(--text)]">audio to MIDI</span> →{' '}
-            <span className="text-[var(--text)]">MIDI to guitar tabs</span>. MIDI / MusicXML / GP are
-            the solid path when you have them. Audio is a monophonic draft — always editable, never a
-            perfect full-band auto-tab.
+            <span className="text-[var(--text)]">MIDI to guitar tabs</span>. MIDI and MusicXML are
+            the solid structured path. Guitar Pro is best-effort (placeholders never auto-save).
+            Audio is a monophonic / lead-biased draft — always editable, never a perfect full-band
+            auto-tab.
           </p>
         </div>
       </div>

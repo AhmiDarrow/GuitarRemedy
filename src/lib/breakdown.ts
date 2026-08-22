@@ -182,10 +182,14 @@ function finish(
   }
 }
 
-/** Active fretting tuning (theory low-E=0). Set from session before convert when possible. */
+/**
+ * Active fretting tuning (theory low-E=0).
+ * Prefer passing `tuning` into *ToBreakdown / breakdownFile — session is a fallback
+ * for call sites that only set it once (Upload still does both).
+ */
 let sessionTuning: number[] = [...STANDARD_TUNING]
 
-/** Use Profile / appStore tuning for fretting on the next convert. */
+/** Use Profile / appStore tuning for fretting when an entry point omits opts.tuning. */
 export function setSessionTuning(tuning: number[] | null | undefined): void {
   if (Array.isArray(tuning) && tuning.length === 6) {
     sessionTuning = tuning.map((n) => Math.max(0, Math.min(127, Math.round(Number(n) || 0))))
@@ -199,8 +203,32 @@ export function getSessionTuning(): number[] {
 }
 
 function activeTuning(override?: number[]): number[] {
-  if (Array.isArray(override) && override.length === 6) return override
-  return sessionTuning.length === 6 ? sessionTuning : [...STANDARD_TUNING]
+  // Explicit per-call tuning always wins over module session state.
+  if (Array.isArray(override) && override.length === 6) {
+    return override.map((n) => Math.max(0, Math.min(127, Math.round(Number(n) || 0))))
+  }
+  return sessionTuning.length === 6 ? [...sessionTuning] : [...STANDARD_TUNING]
+}
+
+/**
+ * Dual string-index guards (theory low-E=0 vs display high-e=0).
+ * Strict: throw on out-of-range (tests + new boundary code).
+ * Everyday mappers still clamp via theoryStringToDisplay / displayStringToTheory.
+ */
+export function assertTheoryString(s: number, label = 'string'): number {
+  const n = Math.round(Number(s))
+  if (!Number.isFinite(n) || n < 0 || n > 5) {
+    throw new Error(`${label}: expected theory string 0..5 (low E=0), got ${s}`)
+  }
+  return n
+}
+
+export function assertDisplayString(s: number, label = 'string'): number {
+  const n = Math.round(Number(s))
+  if (!Number.isFinite(n) || n < 0 || n > 5) {
+    throw new Error(`${label}: expected display string 0..5 (high e=0), got ${s}`)
+  }
+  return n
 }
 
 function fretMelody(
@@ -863,12 +891,16 @@ export function midiBytesToGuitarTabs(
     statusMessage?: string
     confidence?: number
     cleanUp?: boolean
+    /** Theory-order opens (0 = low E). Prefer over module sessionTuning. */
+    tuning?: number[]
   },
 ): RemedyBreakdown {
+  if (extra?.tuning) setSessionTuning(extra.tuning)
   const parsed = parseMidi(midiBytes)
   const base = midiToBreakdown(parsed, title.replace(/\.\w+$/, '') || title, {
     midiBytes,
     cleanUp: extra?.cleanUp,
+    tuning: extra?.tuning,
   })
   if (extra?.kind) base.kind = extra.kind
   if (extra?.warnings?.length) base.warnings = [...extra.warnings, ...base.warnings]
@@ -882,7 +914,9 @@ export function midiBytesToGuitarTabs(
 export function audioMidiToBreakdown(
   converted: AudioToMidiResult,
   fileName: string,
+  opts?: { tuning?: number[] },
 ): RemedyBreakdown {
+  if (opts?.tuning) setSessionTuning(opts.tuning)
   const title = fileName.replace(/\.\w+$/, '') || 'Audio convert'
   if (!converted.notes.length) {
     const empty = breakdownAudioAssist(fileName, [])
@@ -923,6 +957,7 @@ export function audioMidiToBreakdown(
     kind: 'audio',
     cleanUp: true,
     confidence: audioConf,
+    tuning: opts?.tuning,
     warnings: [
       ...converted.warnings,
       'Converted via monophonic pitch-track — use Clean up / Edit tab if anything is off.',
@@ -994,10 +1029,13 @@ export async function convertAudioToGuitarTabs(
     stem?: 'auto' | 'lead' | 'harmonic' | 'mix' | 'percussive'
     skipHpss?: boolean
     onProgress?: ConvertProgress
+    /** Theory-order opens (0 = low E). Prefer over module sessionTuning. */
+    tuning?: number[]
   },
 ): Promise<RemedyBreakdown> {
   const name = file.name || 'audio.mp3'
   const onProgress = opts?.onProgress
+  if (opts?.tuning) setSessionTuning(opts.tuning)
   onProgress?.('decode', '1/3 Decoding audio…')
   try {
     const buf = await file.arrayBuffer()
@@ -1014,7 +1052,7 @@ export async function convertAudioToGuitarTabs(
       },
     })
     onProgress?.('midi_to_tabs', '3/3 MIDI → guitar tabs…')
-    const result = audioMidiToBreakdown(converted, name)
+    const result = audioMidiToBreakdown(converted, name, { tuning: opts?.tuning })
     onProgress?.('done', result.statusMessage ?? 'Done · audio → MIDI → tabs')
     return result
   } catch (err) {
@@ -1051,12 +1089,16 @@ export async function breakdownFile(
   const name = file.name
   const lower = name.toLowerCase()
 
+  // Prefer explicit opts.tuning over module session side-effect alone.
+  if (opts?.tuning) setSessionTuning(opts.tuning)
+
   // Direct MIDI → tabs (skip audio stage)
   if (lower.endsWith('.mid') || lower.endsWith('.midi')) {
     opts?.onProgress?.('midi_to_tabs', 'MIDI → guitar tabs…')
     const buf = await file.arrayBuffer()
     const result = midiBytesToGuitarTabs(buf, name, {
       statusMessage: 'MIDI → tabs · ready',
+      tuning: opts?.tuning,
     })
     opts?.onProgress?.('done', result.statusMessage ?? 'Done')
     return result
@@ -1067,17 +1109,23 @@ export async function breakdownFile(
     const textXml = file.text
       ? await file.text()
       : new TextDecoder().decode(await file.arrayBuffer())
-    const result = musicXmlToBreakdown(parseMusicXml(textXml))
+    const result = musicXmlToBreakdown(parseMusicXml(textXml), { tuning: opts?.tuning })
     result.statusMessage = 'MusicXML → tabs · ready'
     opts?.onProgress?.('done', result.statusMessage)
     return result
   }
 
   if (isGuitarProName(name) || lower.endsWith('.gpif')) {
-    opts?.onProgress?.('midi_to_tabs', 'Guitar Pro → tabs…')
+    opts?.onProgress?.('midi_to_tabs', 'Guitar Pro → tabs (best-effort)…')
     const buf = await file.arrayBuffer()
-    // Session tuning (Profile / Upload setSessionTuning) drives GPIF open strings + fretting.
+    // Explicit opts.tuning (or session) drives GPIF open strings + fretting.
     const result = await breakdownGuitarPro(buf, name, { tuning: opts?.tuning })
+    if (result.isPlaceholder) {
+      result.warnings = [
+        ...(result.warnings || []),
+        'Guitar Pro binary is best-effort — placeholder notes are never auto-saved. Prefer MIDI/MusicXML export from your editor.',
+      ]
+    }
     opts?.onProgress?.('done', result.statusMessage ?? 'Done')
     return result
   }
@@ -1092,6 +1140,7 @@ export async function breakdownFile(
       maxSec: opts?.maxSec,
       stem: opts?.stem ?? 'auto',
       skipHpss: opts?.skipHpss,
+      tuning: opts?.tuning,
     })
   }
 
@@ -1099,7 +1148,7 @@ export async function breakdownFile(
   try {
     opts?.onProgress?.('midi_to_tabs', 'Trying MIDI parse…')
     const buf = await file.arrayBuffer()
-    return midiBytesToGuitarTabs(buf, name)
+    return midiBytesToGuitarTabs(buf, name, { tuning: opts?.tuning })
   } catch {
     opts?.onProgress?.('error', 'Unknown format')
     return finish({

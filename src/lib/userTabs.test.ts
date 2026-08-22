@@ -227,4 +227,39 @@ describe('userTabs', () => {
     expect(ascii).not.toContain('undefined')
     expect(ascii).not.toContain('token')
   })
+
+  it('userTabToAscii preserves groove via start onsets (not left-packed)', () => {
+    const tab = breakdownToUserTab(sampleBreakdown())!
+    // One note at beat 0, one at beat 2.5 in same 4/4 bar → rest columns between
+    tab.tab = {
+      title: 'Groove',
+      tempo: 100,
+      timeSig: [4, 4],
+      measures: [
+        {
+          notes: [
+            { string: 0, fret: 0, duration: 0.5, start: 0 },
+            { string: 0, fret: 3, duration: 0.5, start: 2.5 },
+          ],
+        },
+      ],
+    }
+    tab.tempoBpm = 100
+    tab.title = 'Groove'
+    const ascii = userTabToAscii(tab, { colsPerBeat: 2 })
+    expect(ascii).toContain('4/4')
+    const eLine = ascii.split('\n').find((l) => l.startsWith('e|'))
+    expect(eLine).toBeTruthy()
+    // 4 beats × 2 cols = 8 cells of width 2 before barline
+    const body = eLine!.slice(2, eLine!.lastIndexOf('|'))
+    expect(body.length).toBe(16)
+    // First cell is fret 0, later cell is fret 3 — not adjacent packed
+    expect(body.startsWith('-0') || body.startsWith('0')).toBe(true)
+    expect(body).toMatch(/3/)
+    // Rest dashes exist between the two frets
+    const firstFret = body.search(/0/)
+    const secondFret = body.search(/3/)
+    expect(secondFret).toBeGreaterThan(firstFret + 2)
+    expect(body.slice(firstFret + 1, secondFret)).toMatch(/-/)
+  })
 })

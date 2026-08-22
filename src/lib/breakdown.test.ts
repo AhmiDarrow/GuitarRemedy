@@ -1,12 +1,20 @@
 import { describe, expect, it } from 'vitest'
 import {
+  assertDisplayString,
+  assertTheoryString,
   breakdownAudioAssist,
   breakdownGuitarPro,
+  displayStringToTheory,
   estimateNoteConfidence,
+  getSessionTuning,
+  midiBytesToGuitarTabs,
   midiToBreakdown,
+  setSessionTuning,
   tabToAscii,
+  theoryStringToDisplay,
 } from './breakdown'
 import { buildSimpleMidi, parseMidi } from './midi'
+import { TUNINGS } from './theory'
 
 describe('breakdown', () => {
   it('analyzes a MIDI melody into tab + key', () => {
@@ -146,5 +154,32 @@ describe('breakdown', () => {
     expect(times[0]).toBeCloseTo(0, 5)
     // Without warp: 960/480 = 2 beats. With warp at ref 60: 1.5 beats.
     expect(times[1]).toBeCloseTo(1.5, 5)
+  })
+
+  it('dual string index: theory ↔ display round-trip + assert guards', () => {
+    for (let t = 0; t <= 5; t++) {
+      expect(displayStringToTheory(theoryStringToDisplay(t))).toBe(t)
+      expect(assertTheoryString(t)).toBe(t)
+      expect(assertDisplayString(t)).toBe(t)
+    }
+    expect(() => assertTheoryString(-1)).toThrow(/theory string/)
+    expect(() => assertDisplayString(6)).toThrow(/display string/)
+  })
+
+  it('midiBytesToGuitarTabs honors explicit Drop D tuning over session', () => {
+    setSessionTuning(TUNINGS.standard.midi)
+    // Low D2 = 38 — only open on Drop D low string
+    const buf = buildSimpleMidi([{ pitch: 38, start: 0, duration: 480 }])
+    const drop = midiBytesToGuitarTabs(buf, 'drop-d.mid', {
+      tuning: TUNINGS.drop_d.midi,
+    })
+    expect(drop.tab.length).toBeGreaterThan(0)
+    const low = drop.tab.find((n) => n.midi === 38)
+    expect(low).toBeTruthy()
+    expect(low!.string).toBe(0) // theory low E string
+    expect(low!.fret).toBe(0)
+    // opts.tuning also updates session for follow-up calls
+    expect(getSessionTuning()).toEqual(TUNINGS.drop_d.midi)
+    setSessionTuning(TUNINGS.standard.midi)
   })
 })
