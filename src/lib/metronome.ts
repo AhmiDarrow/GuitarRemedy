@@ -3,10 +3,10 @@
  * Schedules on Tone.Transport (audio clock) with one reused click voice.
  *
  * Timing: beatDurationSec here matches tabScore.beatDurationSec(bpm, 1)
- * (metronome clamp 30–300; tabScore clamp 20–400 — both agree inside practice range).
+ * (both clamp 30–300 via clampPracticeBpm — single shared policy).
  */
 
-import { ensureAudio } from './audio'
+import { claimAudioSession, ensureAudio, releaseAudioSession } from './audio'
 import {
   beatDurationSec as sharedBeatDurationSec,
   clampPracticeBpm,
@@ -165,7 +165,6 @@ export async function startMetronome(
   },
 ): Promise<void> {
   await stopMetronome({ skipSession: true })
-  const { claimAudioSession } = await import('./audio')
   await claimAudioSession('metronome')
   await ensureAudio()
   const Tone = await tone()
@@ -221,7 +220,6 @@ export async function stopMetronome(opts?: { skipSession?: boolean }): Promise<v
   }
   if (!opts?.skipSession) {
     try {
-      const { releaseAudioSession } = await import('./audio')
       releaseAudioSession('metronome')
     } catch {
       /* ignore */

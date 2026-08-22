@@ -1032,8 +1032,21 @@ Hi I'm Ahmi — hope this helps you stay on the path.`,
   },
 ]
 
-export function getWikiArticle(id: string): WikiArticle | undefined {
-  return WIKI_ARTICLES.find((a) => a.id === id)
+function slugify(s: string): string {
+  return s
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+}
+
+export function getWikiArticle(idOrSlug: string): WikiArticle | undefined {
+  const key = (idOrSlug || '').trim().toLowerCase()
+  if (!key) return undefined
+  // Exact id first (canonical), then title-derived slug (deep links / hand-typed URLs).
+  return (
+    WIKI_ARTICLES.find((a) => a.id.toLowerCase() === key) ??
+    WIKI_ARTICLES.find((a) => slugify(a.title) === key)
+  )
 }
 
 export function listWikiByCategory(category: WikiCategory | 'all'): WikiArticle[] {

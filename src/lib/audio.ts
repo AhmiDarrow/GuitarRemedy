@@ -1,8 +1,19 @@
 /** Tone.js play-along helpers — lazy import to keep tests light */
 
 import type { ScaleId } from './theory'
-import { nameToMidi, scalePitchClasses, STANDARD_TUNING } from './theory'
+import {
+  CHORDS,
+  chordNotes,
+  nameToMidi,
+  noteToPc,
+  parseChordSymbol,
+  scalePitchClasses,
+  STANDARD_TUNING,
+} from './theory'
 import { midiToHz } from './audioToMidi'
+// audio ↔ metronome cycle is call-time-only (function bodies), safe for ESM;
+// static imports keep Vite from faking lazy splits it cannot honor.
+import { playOneShotClick, stopMetronome } from './metronome'
 
 let toneModule: typeof import('tone') | null = null
 let synth: import('tone').PolySynth | null = null
@@ -267,7 +278,6 @@ export async function playChord(
     onNotes?: (ev: PlayNotesEvent) => void
   },
 ): Promise<number> {
-  const { chordNotes } = await import('./theory')
   // chordNotes expects quality text; resolveChordId inside handles ChordIds too.
   const midis = chordNotes(root.replace(/\d/g, '') || root, qualityOrId)
   if (!midis.length) return 0
@@ -310,7 +320,6 @@ export async function playProgression(
     onNotes?: (ev: PlayNotesEvent) => void
   },
 ): Promise<number> {
-  const { parseChordSymbol, CHORDS, nameToMidi, noteToPc } = await import('./theory')
   const bpm = opts?.bpm ?? 80
   const beats = opts?.beatsPerChord ?? 2
   const a4 = opts?.a4 ?? playbackA4
@@ -360,7 +369,6 @@ export async function playProgression(
  * that reuses the shared click voice (no leaked MembraneSynth per call).
  */
 export async function playMetronomeClick(accent = false) {
-  const { playOneShotClick } = await import('./metronome')
   await playOneShotClick(accent ? 'accent' : 'beat')
 }
 
@@ -439,7 +447,6 @@ export async function claimAudioSession(owner: Exclude<AudioSessionOwner, 'idle'
   const prev = sessionOwner
   if (prev === 'metronome' && owner !== 'metronome') {
     try {
-      const { stopMetronome } = await import('./metronome')
       await stopMetronome({ skipSession: true })
     } catch {
       /* ignore */

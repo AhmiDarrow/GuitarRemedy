@@ -1,5 +1,4 @@
 /**
-/**
  * Best-effort Guitar Pro import (GPIF/zip + binary header detect).
  * GPIF / zip packages when possible; binary GP3-5 header detect + honest MIDI/MusicXML fallback.
  */
