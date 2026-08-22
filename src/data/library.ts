@@ -14,8 +14,10 @@ export interface LibraryItem {
   description: string
   /** scale/mode id from theory, or chord symbol */
   theoryId?: string
-  /** alias used by Library fretboard preview */
+  /** alias used by Library fretboard preview (canonical snake_case scale id) */
   scaleId?: string
+  /** progression chord symbols (e.g. G, C, D) for fretboard preview */
+  chords?: string[]
   /** simple tab JSON for riffs/songs */
   tab?: TabSong
   openLicense: boolean
@@ -149,6 +151,34 @@ const bluesShuffle: TabSong = {
   ],
 }
 
+/** Canonical snake_case scale ids (matches theory.ScaleId). */
+const SCALE_ID_CANON: Record<string, string> = {
+  major: 'major',
+  naturalMinor: 'natural_minor',
+  natural_minor: 'natural_minor',
+  harmonicMinor: 'harmonic_minor',
+  harmonic_minor: 'harmonic_minor',
+  melodicMinor: 'melodic_minor',
+  melodic_minor: 'melodic_minor',
+  majorPentatonic: 'major_pentatonic',
+  major_pentatonic: 'major_pentatonic',
+  minorPentatonic: 'minor_pentatonic',
+  minor_pentatonic: 'minor_pentatonic',
+  blues: 'blues',
+  dorian: 'dorian',
+  phrygian: 'phrygian',
+  lydian: 'lydian',
+  mixolydian: 'mixolydian',
+  locrian: 'locrian',
+  wholeTone: 'whole_tone',
+  whole_tone: 'whole_tone',
+  halfWholeDim: 'half_whole_dim',
+  half_whole_dim: 'half_whole_dim',
+  wholeHalfDim: 'whole_half_dim',
+  whole_half_dim: 'whole_half_dim',
+  chromatic: 'chromatic',
+}
+
 function scaleItem(
   id: string,
   title: string,
@@ -158,6 +188,7 @@ function scaleItem(
   description: string,
   tags: string[],
 ): LibraryItem {
+  const canon = SCALE_ID_CANON[theoryId] || theoryId
   return {
     id,
     title,
@@ -166,7 +197,9 @@ function scaleItem(
     key,
     tags,
     description,
-    theoryId,
+    theoryId: canon,
+    // Library fretboard reads scaleId — always canonical snake_case.
+    scaleId: canon,
     openLicense: true,
   }
 }
@@ -250,7 +283,7 @@ export const LIBRARY: LibraryItem[] = [
   chordItem('ch-e7', 'E7', 'E7', 'beginner', 'Open E7 — blues in A.'),
   chordItem('ch-dm', 'D Minor', 'Dm', 'beginner', 'Open Dm — sad ballad staple.'),
 
-  // Progressions as library entries
+  // Progressions as library entries (chords[] drives fretboard preview)
   {
     id: 'pr-145',
     title: 'I–IV–V in G',
@@ -260,6 +293,8 @@ export const LIBRARY: LibraryItem[] = [
     genre: 'folk',
     tags: ['progression', 'campfire'],
     description: 'G–C–D — the backbone of countless folk and rock songs.',
+    theoryId: 'G',
+    chords: ['G', 'C', 'D'],
     openLicense: true,
   },
   {
@@ -271,6 +306,8 @@ export const LIBRARY: LibraryItem[] = [
     genre: 'pop',
     tags: ['progression', 'pop'],
     description: 'C–Am–F–G — 50s progression, endless ballads.',
+    theoryId: 'C',
+    chords: ['C', 'Am', 'F', 'G'],
     openLicense: true,
   },
   {
@@ -282,6 +319,8 @@ export const LIBRARY: LibraryItem[] = [
     genre: 'jazz',
     tags: ['progression', 'jazz'],
     description: 'Am–Dm–G–C — jazz turnaround primer.',
+    theoryId: 'Am',
+    chords: ['Am', 'Dm', 'G', 'C'],
     openLicense: true,
   },
   {
@@ -293,6 +332,8 @@ export const LIBRARY: LibraryItem[] = [
     genre: 'blues',
     tags: ['progression', 'blues'],
     description: 'A7–D7–E7 form — shuffle or straight eighths.',
+    theoryId: 'A7',
+    chords: ['A7', 'D7', 'E7'],
     openLicense: true,
   },
   {
@@ -304,6 +345,8 @@ export const LIBRARY: LibraryItem[] = [
     genre: 'flamenco',
     tags: ['progression', 'modal'],
     description: 'Am–G–F–E — Phrygian drama.',
+    theoryId: 'Am',
+    chords: ['Am', 'G', 'F', 'E'],
     openLicense: true,
   },
 

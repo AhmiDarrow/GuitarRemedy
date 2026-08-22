@@ -109,6 +109,8 @@ describe('curriculum', () => {
       /End the session with a performance-shaped take, not only drills/i,
       /Motor learning favors slow accurate loops of the sticky bar/i,
       /Section work aimed at .+\(5–8 focused minutes\)/i,
+      /do it slowly for 60 seconds/i,
+      /restart if time slips/i,
     ]
     for (const lesson of CURRICULUM) {
       const blob = [

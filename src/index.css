@@ -366,3 +366,24 @@ textarea {
 :root {
   --text-secondary: var(--text-muted);
 }
+
+/* Fretboard — pulse dots that match currently sounding notes (Library play-along) */
+@keyframes fret-dot-pulse {
+  0%,
+  100% {
+    box-shadow:
+      0 0 10px rgba(200, 245, 96, 0.55),
+      0 0 22px rgba(93, 255, 176, 0.45);
+    filter: brightness(1.05);
+  }
+  50% {
+    box-shadow:
+      0 0 18px rgba(200, 245, 96, 0.95),
+      0 0 36px rgba(93, 255, 176, 0.7);
+    filter: brightness(1.2);
+  }
+}
+
+.fret-dot-active {
+  animation: fret-dot-pulse 0.55s ease-in-out infinite;
+}

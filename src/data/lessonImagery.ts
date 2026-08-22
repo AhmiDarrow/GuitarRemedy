@@ -567,11 +567,11 @@ export function libraryDiagramMatchesLesson(libraryId: string, lessonText: strin
     'sc-nat-min': /natural minor|aeolian|relative minor/,
     'sc-harm-min': /harmonic minor/,
     'sc-blues': /blues scale|blue note/,
-    'sc-dorian': /\bdorian\b/,
-    'sc-mixo': /\bmixolydian\b|\bmixo\b/,
-    'sc-lydian': /\blydian\b/,
-    'sc-phrygian': /\bphrygian\b/,
-    'sc-locrian': /\blocrian\b/,
+    'sc-dorian': /\bdorian\b(?!-ish)/,
+    'sc-mixo': /\bmixolydian\b(?!-ish)|\bmixo\b/,
+    'sc-lydian': /\blydian\b(?!-ish)/,
+    'sc-phrygian': /\bphrygian\b(?!-ish)/,
+    'sc-locrian': /\blocrian\b(?!-ish)/,
   }
   const re = rules[libraryId]
   if (!re) return false
@@ -670,46 +670,79 @@ export function diagramsForLesson(input: {
     }
   }
 
-  // --- Power chords / barre language ---
-  if (/power chord|root.?fifth|\b5 chord|palm mute/.test(text)) {
-    const root = /\b([A-G](?:#|b)?)\s*5\b/.exec(input.title)?.[1] ?? 'A'
+  // --- Power chords (need explicit power-chord teaching — not mute drills that say "E5") ---
+  const teachesPower =
+    /power\s*chords?/.test(text) ||
+    /movable\s+power/.test(text) ||
+    /root\s*\+?\s*fifth/.test(text) ||
+    (/\b5\s*chords?\b/.test(text) && !/palm\s*mute|mute craft|silence/.test(text))
+  if (teachesPower) {
+    const rootMatch =
+      /\b([A-G](?:#|b)?)\s*5\b/.exec(input.title) ||
+      /\b([A-G](?:#|b)?)\s*5\b/.exec(input.theoryBite) ||
+      /\b([a-g](?:#|b)?)\s*5\b/.exec(text)
+    let rootNote = 'A'
+    if (rootMatch) {
+      const r = rootMatch[1]
+      rootNote = r.charAt(0).toUpperCase() + r.slice(1)
+    }
     add({
       id: `day${input.day}-power`,
       kind: 'power_chord',
-      title: `Power chord ${root}5`,
-      caption: 'Root + fifth only — movable shape on A–D strings.',
-      root,
+      title: `Power chord ${rootNote}5`,
+      caption: 'Root + fifth only — movable shape.',
+      root: rootNote,
       frets: 12,
     })
   }
 
-  // --- Scales / modes ---
+  // --- Scales / modes (only when the lesson actually teaches that map) ---
+  // Reject "-ish" flavor mentions (e.g. "phrygian-ish top notes" on a chord day).
   const scaleHits: Array<{ re: RegExp; scaleId: string; root: string; title: string }> = [
-    { re: /minor pent|pentatonic minor/, scaleId: 'minor_pentatonic', root: 'A', title: 'A minor pentatonic' },
+    { re: /minor pent|pentatonic minor|pent box|box 1/, scaleId: 'minor_pentatonic', root: 'A', title: 'A minor pentatonic' },
     { re: /major pent|pentatonic major/, scaleId: 'major_pentatonic', root: 'C', title: 'C major pentatonic' },
-    { re: /blues scale|blue note/, scaleId: 'blues', root: 'A', title: 'A blues scale' },
-    { re: /natural minor|aeolian/, scaleId: 'natural_minor', root: 'A', title: 'A natural minor' },
+    { re: /blues scale|\bblue note\b/, scaleId: 'blues', root: 'A', title: 'A blues scale' },
+    { re: /natural minor|\baeolian\b/, scaleId: 'natural_minor', root: 'A', title: 'A natural minor' },
     { re: /harmonic minor/, scaleId: 'harmonic_minor', root: 'A', title: 'A harmonic minor' },
     { re: /melodic minor/, scaleId: 'melodic_minor', root: 'A', title: 'A melodic minor (jazz)' },
-    { re: /major scale|ionian/, scaleId: 'major', root: 'C', title: 'C major scale' },
-    { re: /\bdorian\b/, scaleId: 'dorian', root: 'D', title: 'D Dorian' },
-    { re: /\bmixolydian\b/, scaleId: 'mixolydian', root: 'G', title: 'G Mixolydian' },
-    { re: /\blydian\b/, scaleId: 'lydian', root: 'F', title: 'F Lydian' },
-    { re: /\bphrygian\b/, scaleId: 'phrygian', root: 'E', title: 'E Phrygian' },
-    { re: /\blocrian\b/, scaleId: 'locrian', root: 'B', title: 'B Locrian' },
+    { re: /major scale|\bionian\b/, scaleId: 'major', root: 'C', title: 'C major scale' },
+    { re: /\bdorian\b(?!-ish)/, scaleId: 'dorian', root: 'D', title: 'D Dorian' },
+    { re: /\bmixolydian\b(?!-ish)|\bmixo\b/, scaleId: 'mixolydian', root: 'G', title: 'G Mixolydian' },
+    { re: /\blydian\b(?!-ish)/, scaleId: 'lydian', root: 'F', title: 'F Lydian' },
+    { re: /\bphrygian\b(?!-ish)/, scaleId: 'phrygian', root: 'E', title: 'E Phrygian' },
+    { re: /\blocrian\b(?!-ish)/, scaleId: 'locrian', root: 'B', title: 'B Locrian' },
   ]
   for (const hit of scaleHits) {
-    if (hit.re.test(text)) {
-      add({
-        id: `day${input.day}-scale-${hit.scaleId}`,
-        kind: 'scale_tones',
-        title: hit.title,
-        caption: `${hit.root} ${getScale(hit.scaleId).name} tones on the neck — roots marked R.`,
-        root: hit.root,
-        scaleId: hit.scaleId,
-        frets: input.phase === 'scales' || input.phase === 'lead' ? 12 : 5,
-      })
+    if (!hit.re.test(text)) continue
+    // Basics phase: only allow scale necks when the day is clearly a scale/lead-map lesson
+    if (input.phase === 'basics' || input.day < 76) {
+      const teachesScale =
+        /pent|scale|mode|box\s*1|lead map|fretboard map|blues scale|harmonic minor|dorian|mixo|lydian|phrygian|locrian|aeolian|ionian/.test(
+          text,
+        )
+      if (!teachesScale) continue
     }
+    // Chord-phase days: don't drop a full mode neck for a one-word flavor aside
+    if (input.phase === 'chords' && /dorian|mixo|lydian|phrygian|locrian|aeolian|ionian|pent|harmonic|melodic|blues scale|major scale|natural minor/.test(hit.re.source)) {
+      const modeLesson =
+        /mode|scale|box|map|tones|lead/.test(text) ||
+        new RegExp(hit.scaleId.replace('_', ' ')).test(text) ||
+        hit.re.test(input.title.toLowerCase())
+      // Title-primary: if title is a progression (Am G F E) without mode name, skip mode necks
+      if (!hit.re.test(input.title.toLowerCase()) && !/scale|mode|box|pent|lead map/.test(text)) {
+        continue
+      }
+      if (!modeLesson && !hit.re.test(input.title.toLowerCase())) continue
+    }
+    add({
+      id: `day${input.day}-scale-${hit.scaleId}`,
+      kind: 'scale_tones',
+      title: hit.title,
+      caption: `${hit.root} ${getScale(hit.scaleId).name} — roots marked R.`,
+      root: hit.root,
+      scaleId: hit.scaleId,
+      frets: input.phase === 'scales' || input.phase === 'lead' ? 12 : 5,
+    })
   }
 
   // --- Intervals ---

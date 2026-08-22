@@ -548,7 +548,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     ],
     theoryBite: 'Left and Right Hand Silence: Great rhythm guitar is half silence. Mutes turn strums into drums.',
     drills: [
-      'Palm-muted E5 eighths',
+      'Palm-muted open low-E eighths near the bridge',
       'Chuck on &s between chords',
       'Full stop rests for one bar in four'
     ],
@@ -1045,7 +1045,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     goals: [
       'Walk Am–G–F–E slowly',
       'Feel E as dramatic dominant',
-      'Add simple phrygian-ish top notes later if easy'
+      'Optional: add a simple top-note color on E later if easy'
     ],
     theoryBite: 'Am G F E: Am–G–F–E is a centuries-old descent. The E major chord is the spicy door home to Am.',
     drills: [

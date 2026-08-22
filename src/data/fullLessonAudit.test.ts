@@ -344,4 +344,67 @@ describe('full lesson + imagery audit', () => {
     expect(list.some((s) => s.kind === 'scale_tones')).toBe(false)
     expect(list.some((s) => /pent/i.test(s.title))).toBe(false)
   })
+
+  it('every day 1–365: neck diagrams only when the lesson teaches them', () => {
+    const bad: string[] = []
+    for (const L of CURRICULUM) {
+      const blob = [L.title, L.theoryBite, ...L.goals, ...L.drills, L.masteryCheck]
+        .join('\n')
+        .toLowerCase()
+        .replace(/[–—]/g, '-')
+      const list = specsFor(L)
+
+      for (const s of list) {
+        if (s.kind === 'scale_tones') {
+          const teaches =
+            /pent|scale|mode|box\s*1|lead map|blues scale|harmonic minor|melodic minor|dorian|mixo|lydian|phrygian(?!-ish)|locrian|aeolian|ionian|natural minor|major scale/.test(
+              blob,
+            )
+          if (!teaches) bad.push(`day ${L.day} scale "${s.title}" without scale teaching`)
+          // Never show mode necks for "-ish" flavor asides only
+          if (/phrygian-ish|dorian-ish|lydian-ish/.test(blob) && !/\bphrygian\b(?!-ish)/.test(blob)) {
+            if (/phrygian/i.test(s.title)) bad.push(`day ${L.day} phrygian neck from -ish aside`)
+          }
+        }
+        if (s.kind === 'power_chord') {
+          const teachesPower =
+            /power\s*chord|movable\s+power|root\s*\+?\s*fifth/.test(blob) ||
+            (/\b5\s*chords?\b/.test(blob) && !/palm\s*mute|mute craft/.test(blob))
+          if (!teachesPower) bad.push(`day ${L.day} power chord without power-chord teaching`)
+        }
+        if (s.kind === 'chord_shape' && s.chord) {
+          const ch = s.chord.toLowerCase()
+          const named =
+            blob.includes(ch) ||
+            (ch === 'em' && /e minor/.test(blob)) ||
+            (ch === 'am' && /a minor/.test(blob)) ||
+            (ch === 'dm' && /d minor/.test(blob)) ||
+            (ch.length === 1 && new RegExp(`(^|[^a-z])${ch}([^a-z]|$)`).test(blob)) ||
+            (ch.endsWith('7') && blob.includes(ch))
+          if (!named) bad.push(`day ${L.day} chord ${s.chord} not named in lesson`)
+        }
+      }
+
+      // Stale ch-/sc- library links that fail the match gate
+      for (const id of L.libraryIds) {
+        if (!/^(ch-|sc-)/.test(id)) continue
+        const teachText = [L.title, ...L.goals, ...L.drills, L.theoryBite, L.masteryCheck].join(' ')
+        if (!libraryDiagramMatchesLesson(id, teachText)) {
+          bad.push(`day ${L.day} stale library link ${id}`)
+        }
+      }
+    }
+    expect(bad.slice(0, 40), bad.slice(0, 40).join('\n')).toEqual([])
+  })
+
+  it('day 24 mute craft is not a power-chord diagram day', () => {
+    const list = specsFor(getLesson(24)!)
+    expect(list.some((s) => s.kind === 'power_chord')).toBe(false)
+  })
+
+  it('day 48 Andalusian shows chords not Phrygian scale', () => {
+    const list = specsFor(getLesson(48)!)
+    expect(list.some((s) => s.kind === 'scale_tones')).toBe(false)
+    expect(list.some((s) => s.kind === 'chord_shape' && s.chord === 'Am')).toBe(true)
+  })
 })

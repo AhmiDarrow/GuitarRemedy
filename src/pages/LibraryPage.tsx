@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
-import { Download, FileUp, Heart, Pencil, Search, Trash2, Upload } from 'lucide-react'
+import { Download, FileUp, Heart, Pencil, Play, Search, Square, Trash2, Upload } from 'lucide-react'
 import clsx from 'clsx'
 import {
   LIBRARY,
@@ -22,16 +22,121 @@ import { applyScoreToUserTab } from '../lib/tabEdit'
 import type { TabScore } from '../lib/breakdown'
 import { TabView } from '../components/TabView'
 import { TabEditor } from '../components/TabEditor'
-import { SCALES, type ScaleId } from '../lib/theory'
+import {
+  CHORDS,
+  getScale,
+  noteToPc,
+  parseChordSymbol,
+  type ScaleDef,
+} from '../lib/theory'
 import { Fretboard } from '../components/Fretboard'
 import { tabSongToScore } from '../lib/tabScore'
+import {
+  getPlayGeneration,
+  midisToPitchClasses,
+  playChord,
+  playProgression,
+  playScale,
+  releaseAudioSession,
+  stopAllNotes,
+} from '../lib/audio'
 
 const KINDS: Array<LibraryKind | 'all'> = ['all', 'scale', 'chord', 'riff', 'song', 'progression']
 const SKILLS: Array<SkillLevel | 'all'> = ['all', 'beginner', 'intermediate', 'advanced']
 
+/** Build a temporary ScaleDef from chord-tone pitch classes (for Fretboard). */
+function chordTonesAsScale(
+  label: string,
+  rootPc: number,
+  intervals: number[],
+): ScaleDef {
+  const uniq = Array.from(new Set(intervals.map((i) => ((i % 12) + 12) % 12))).sort(
+    (a, b) => a - b,
+  )
+  return {
+    id: 'major',
+    name: label,
+    intervals: uniq,
+    degrees: uniq.map((_, i) => String(i + 1)),
+    category: 'other',
+  }
+}
+
+/** Resolve a library item into a fretboard scale + root (scales, chords, progressions). */
+function libraryFretboardPreview(item: LibraryItem): { scale: ScaleDef; root: number } | null {
+  if (item.kind === 'scale' || (item.scaleId && item.kind !== 'chord' && item.kind !== 'progression')) {
+    const id = item.scaleId || item.theoryId
+    if (!id) return null
+    const scale = getScale(id)
+    if (!scale) return null
+    let root = 0
+    if (item.key) {
+      try {
+        root = noteToPc(item.key.replace(/m$/i, ''))
+      } catch {
+        root = 0
+      }
+    }
+    return { scale, root }
+  }
+
+  if (item.kind === 'chord') {
+    const id = item.theoryId || item.scaleId
+    if (!id) return null
+    const parsed = parseChordSymbol(id)
+    if (!parsed) return null
+    const chord = CHORDS[parsed.chordId]
+    if (!chord) return null
+    return {
+      scale: chordTonesAsScale(
+        parsed.root + (chord.symbol || ''),
+        noteToPc(parsed.root),
+        chord.intervals,
+      ),
+      root: noteToPc(parsed.root),
+    }
+  }
+
+  // Progressions: union of chord tones so the neck shows the progression vocabulary.
+  if (item.kind === 'progression') {
+    const symbols =
+      item.chords && item.chords.length
+        ? item.chords
+        : item.theoryId
+          ? [item.theoryId]
+          : []
+    if (!symbols.length) return null
+    const pcs = new Set<number>()
+    let rootPc = 0
+    let gotRoot = false
+    for (const sym of symbols) {
+      const parsed = parseChordSymbol(sym)
+      if (!parsed) continue
+      const chord = CHORDS[parsed.chordId]
+      if (!chord) continue
+      const r = noteToPc(parsed.root)
+      if (!gotRoot) {
+        rootPc = r
+        gotRoot = true
+      }
+      for (const iv of chord.intervals) pcs.add((r + (iv % 12)) % 12)
+    }
+    if (!gotRoot || !pcs.size) return null
+    // Intervals relative to first chord root for Fretboard degree coloring.
+    const intervals = Array.from(pcs)
+      .map((pc) => (pc - rootPc + 12) % 12)
+      .sort((a, b) => a - b)
+    const label = symbols.join('–')
+    return { scale: chordTonesAsScale(label, rootPc, intervals), root: rootPc }
+  }
+
+  return null
+}
+
 export function LibraryPage() {
   const [searchParams, setSearchParams] = useSearchParams()
   const mineParam = searchParams.get('mine') === '1'
+  const itemParam = searchParams.get('item') || searchParams.get('id')
   const [q, setQ] = useState('')
   const [kind, setKind] = useState<LibraryKind | 'all'>('all')
   const [skill, setSkill] = useState<SkillLevel | 'all'>('all')
@@ -44,17 +149,75 @@ export function LibraryPage() {
   const upsertTab = useUserTabsStore((s) => s.upsertTab)
   const activeTabId = useUserTabsStore((s) => s.activeTabId)
   const setActiveTabId = useUserTabsStore((s) => s.setActiveTabId)
-  const [selectedId, setSelectedId] = useState<string | null>(activeTabId || LIBRARY[0]?.id || null)
+  const [selectedId, setSelectedId] = useState<string | null>(
+    itemParam || activeTabId || LIBRARY[0]?.id || null,
+  )
   const [importMsg, setImportMsg] = useState<string | null>(null)
   const [editingMine, setEditingMine] = useState(false)
+  const [theoryPlaying, setTheoryPlaying] = useState(false)
+  /** Pitch classes currently sounding — drives Fretboard pulse during Play. */
+  const [activePcs, setActivePcs] = useState<number[]>([])
+  const [tabStopNonce, setTabStopNonce] = useState(0)
+  const theoryEndTimerRef = useRef<number | null>(null)
+  const theoryGenRef = useRef(0)
   const grtabInputRef = useRef<HTMLInputElement>(null)
   const favorites = useAppStore((s) => s.favorites)
   const toggleFavorite = useAppStore((s) => s.toggleFavorite)
   const showDegrees = useAppStore((s) => s.showDegrees)
+  const a4 = useAppStore((s) => s.a4)
+  const bpm = useAppStore((s) => s.bpm)
+
+  const clearTheoryTimer = () => {
+    if (theoryEndTimerRef.current != null) {
+      window.clearTimeout(theoryEndTimerRef.current)
+      theoryEndTimerRef.current = null
+    }
+  }
+
+  /** Hard-stop tabs + scale/chord/progression audio (item switch or Stop). */
+  const stopLibraryAudio = () => {
+    clearTheoryTimer()
+    theoryGenRef.current = getPlayGeneration() + 1
+    stopAllNotes()
+    releaseAudioSession('scale')
+    releaseAudioSession('tabs')
+    setTheoryPlaying(false)
+    setActivePcs([])
+    setTabStopNonce((n) => n + 1)
+  }
+
+  /** Map sounding MIDI notes → pitch classes for fretboard highlight. */
+  const onTheoryNotes = (midis: number[]) => {
+    setActivePcs(midisToPitchClasses(midis))
+  }
 
   useEffect(() => { hydrate() }, [hydrate])
   useEffect(() => { if (mineParam) setMineOnly(true) }, [mineParam])
   useEffect(() => { if (activeTabId) setSelectedId(activeTabId) }, [activeTabId])
+
+  // Auto-stop whenever the selected library item changes.
+  useEffect(() => {
+    stopLibraryAudio()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedId])
+
+  useEffect(() => () => stopLibraryAudio(), [])
+
+  // Deep link: /library?item=sc-major or /library?id=sg-amazing-grace
+  useEffect(() => {
+    if (!itemParam) return
+    const inBuiltin = LIBRARY.some((i) => i.id === itemParam)
+    const inUser = userTabs.some((t) => t.id === itemParam)
+    if (!inBuiltin && !inUser) return
+    setSelectedId(itemParam)
+    if (itemParam.startsWith('user-') || inUser) {
+      setMineOnly(true)
+      setActiveTabId(itemParam)
+    } else {
+      setMineOnly(false)
+      setActiveTabId(null)
+    }
+  }, [itemParam, userTabs, setActiveTabId])
 
   const importGrtab = async (file: File) => {
     setImportMsg(null)
@@ -122,6 +285,97 @@ export function LibraryPage() {
   const selected: LibraryItem | null =
     items.find((i) => i.id === selectedId) ?? items[0] ?? null
   const selectedUser = selected ? userTabs.find((t) => t.id === selected.id) : undefined
+
+  const theoryPlayable =
+    !!selected &&
+    (selected.kind === 'scale' ||
+      selected.kind === 'chord' ||
+      selected.kind === 'progression' ||
+      (!!selected.scaleId && !selected.tab && !selectedUser))
+
+  const playTheoryItem = async (item: LibraryItem) => {
+    stopLibraryAudio()
+    setTheoryPlaying(true)
+    let durationSec = 0
+    try {
+      if (item.kind === 'scale' || (item.scaleId && item.kind !== 'chord' && item.kind !== 'progression')) {
+        const id = item.scaleId || item.theoryId
+        if (!id) {
+          setTheoryPlaying(false)
+          return
+        }
+        const rootName = (item.key || 'C').replace(/m$/i, '')
+        durationSec = await playScale(rootName, id, {
+          bpm: bpm || 80,
+          octaves: 1,
+          a4,
+          onNotes: (ev) => onTheoryNotes(ev.midis),
+        })
+      } else if (item.kind === 'chord') {
+        const id = item.theoryId || item.scaleId
+        if (!id) {
+          setTheoryPlaying(false)
+          return
+        }
+        const parsed = parseChordSymbol(id)
+        if (!parsed) {
+          setTheoryPlaying(false)
+          return
+        }
+        durationSec = await playChord(parsed.root, parsed.chordId, {
+          a4,
+          bpm: bpm || 90,
+          onNotes: (ev) => onTheoryNotes(ev.midis),
+        })
+      } else if (item.kind === 'progression') {
+        const symbols =
+          item.chords && item.chords.length
+            ? item.chords
+            : item.theoryId
+              ? item.theoryId.split(/[–\-–,|/]+/).map((s) => s.trim()).filter(Boolean)
+              : []
+        if (!symbols.length) {
+          setTheoryPlaying(false)
+          return
+        }
+        durationSec = await playProgression(symbols, {
+          bpm: bpm || 80,
+          beatsPerChord: 2,
+          a4,
+          onNotes: (ev) => onTheoryNotes(ev.midis),
+        })
+      } else {
+        setTheoryPlaying(false)
+        return
+      }
+    } catch {
+      setTheoryPlaying(false)
+      setActivePcs([])
+      releaseAudioSession('scale')
+      return
+    }
+    // Capture generation AFTER schedule (play* hard-stops first, bumping gen).
+    const startGen = getPlayGeneration()
+    theoryGenRef.current = startGen
+    // Auto-clear playing state when sequence should be done (stop bumps generation).
+    clearTheoryTimer()
+    theoryEndTimerRef.current = window.setTimeout(() => {
+      if (getPlayGeneration() !== startGen) return
+      stopAllNotes()
+      releaseAudioSession('scale')
+      setTheoryPlaying(false)
+      setActivePcs([])
+    }, Math.max(200, durationSec * 1000 + 120))
+  }
+
+  const toggleTheoryPlay = () => {
+    if (!selected) return
+    if (theoryPlaying) {
+      stopLibraryAudio()
+      return
+    }
+    void playTheoryItem(selected)
+  }
 
   return (
     <div className="space-y-6 animate-fade-up">
@@ -304,6 +558,21 @@ export function LibraryPage() {
                   <p className="text-sm text-[var(--text-muted)] mt-1">{selected.description}</p>
                 </div>
                 <div className="flex flex-wrap gap-2">
+                  {theoryPlayable ? (
+                    <button
+                      type="button"
+                      className="btn-primary text-xs"
+                      onClick={() => toggleTheoryPlay()}
+                      aria-label={theoryPlaying ? 'Stop playback' : 'Play'}
+                    >
+                      {theoryPlaying ? (
+                        <Square className="w-3.5 h-3.5" />
+                      ) : (
+                        <Play className="w-3.5 h-3.5" />
+                      )}
+                      {theoryPlaying ? 'Stop' : 'Play'}
+                    </button>
+                  ) : null}
                   {selectedUser && (
                     <>
                       <button
@@ -354,13 +623,18 @@ export function LibraryPage() {
                 </div>
               </div>
 
-              {selected.scaleId && SCALES[selected.scaleId as ScaleId] ? (
-                <Fretboard
-                  scale={SCALES[selected.scaleId as ScaleId]}
-                  root={0}
-                  showDegrees={showDegrees}
-                />
-              ) : null}
+              {(() => {
+                const preview = libraryFretboardPreview(selected)
+                return preview ? (
+                  <Fretboard
+                    scale={preview.scale}
+                    root={preview.root}
+                    showDegrees={showDegrees}
+                    activePcs={theoryPlaying ? activePcs : undefined}
+                    dimInactiveWhilePlaying={theoryPlaying}
+                  />
+                ) : null
+              })()}
 
               {editingMine && selectedUser ? (
                 <TabEditor
@@ -375,12 +649,27 @@ export function LibraryPage() {
                   }}
                 />
               ) : selectedUser?.score?.notes?.length ? (
-                <TabView title={selectedUser.title} score={selectedUser.score} />
+                <TabView
+                  title={selectedUser.title}
+                  score={selectedUser.score}
+                  stopToken={tabStopNonce}
+                />
               ) : selected.tab ? (
                 <TabView
                   title={selected.tab.title}
                   score={tabSongToScore(selected.tab, { tuning: getTuning() })}
+                  stopToken={tabStopNonce}
                 />
+              ) : theoryPlayable ? (
+                <p className="text-xs text-[var(--text-muted)] px-1">
+                  Use <span className="text-mint">Play</span> to hear this{' '}
+                  {selected.kind === 'progression'
+                    ? 'progression'
+                    : selected.kind === 'chord'
+                      ? 'chord'
+                      : 'scale'}
+                  . Switching items stops audio automatically.
+                </p>
               ) : null}
             </>
           ) : (

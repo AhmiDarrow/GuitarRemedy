@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { Minus, Plus, Play, Square } from 'lucide-react'
+import { Minus, Plus, Play, RotateCcw, Square } from 'lucide-react'
 import clsx from 'clsx'
 import {
   bpmFromTaps,
@@ -32,6 +32,7 @@ export function MetronomePanel() {
   const countInBars = useAppStore((s) => s.metronomeCountInBars)
   const setCountInBars = useAppStore((s) => s.setMetronomeCountInBars)
   const setMetronomeOn = useAppStore((s) => s.setMetronomeOn)
+  const resetMetronomeDefaults = useAppStore((s) => s.resetMetronomeDefaults)
   const recordPractice = useAppStore((s) => s.recordPractice)
 
   const [running, setRunning] = useState(false)
@@ -47,6 +48,12 @@ export function MetronomePanel() {
     setPulse(0)
     setCountingIn(false)
   }, [setMetronomeOn])
+
+  const resetDefaults = useCallback(async () => {
+    await stop()
+    taps.current = []
+    resetMetronomeDefaults()
+  }, [resetMetronomeDefaults, stop])
 
   const start = useCallback(async () => {
     recordPractice()
@@ -99,21 +106,33 @@ export function MetronomePanel() {
           <p className="text-xs uppercase tracking-widest text-mint/80 font-semibold">Metronome</p>
           <h2 className="font-display text-xl font-bold mt-0.5">Keep time</h2>
         </div>
-        <button
-          type="button"
-          className={clsx(running ? 'btn-ghost' : 'btn-primary', 'min-w-[7rem]')}
-          onClick={() => void (running ? stop() : start())}
-        >
-          {running ? (
-            <>
-              <Square className="w-4 h-4" /> Stop
-            </>
-          ) : (
-            <>
-              <Play className="w-4 h-4" /> Start
-            </>
-          )}
-        </button>
+        <div className="flex flex-wrap items-center gap-2">
+          <button
+            type="button"
+            className="btn-ghost !py-2 !px-3"
+            onClick={() => void resetDefaults()}
+            title="Reset to defaults (80 BPM, 4/4, quarters, accent on, 1-bar count-in)"
+            aria-label="Reset metronome to defaults"
+          >
+            <RotateCcw className="w-4 h-4" />
+            Defaults
+          </button>
+          <button
+            type="button"
+            className={clsx(running ? 'btn-ghost' : 'btn-primary', 'min-w-[7rem]')}
+            onClick={() => void (running ? stop() : start())}
+          >
+            {running ? (
+              <>
+                <Square className="w-4 h-4" /> Stop
+              </>
+            ) : (
+              <>
+                <Play className="w-4 h-4" /> Start
+              </>
+            )}
+          </button>
+        </div>
       </div>
 
       <div className="flex flex-wrap items-center gap-2">

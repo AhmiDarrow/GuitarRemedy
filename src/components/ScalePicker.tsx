@@ -1,4 +1,4 @@
-import { NOTE_NAMES, SCALES, type ScaleDefinition } from '../lib/theory'
+import { NOTE_NAMES, SCALE_LIST, resolveScaleId, type ScaleDefinition } from '../lib/theory'
 import clsx from 'clsx'
 
 type Props = {
@@ -15,9 +15,11 @@ export function ScalePicker({
   scaleId,
   onRootChange,
   onScaleChange,
-  scales = Object.values(SCALES),
+  // SCALE_LIST is deduped canonical ids — Object.values(SCALES) doubles camelCase aliases.
+  scales = SCALE_LIST,
   className,
 }: Props) {
+  const value = resolveScaleId(scaleId)
   return (
     <div className={clsx('flex flex-wrap gap-3', className)}>
       <label className="flex flex-col gap-1 text-xs text-[var(--text-muted)]">
@@ -38,7 +40,7 @@ export function ScalePicker({
         Scale / mode
         <select
           className="input !py-2 !text-sm"
-          value={scaleId}
+          value={value}
           onChange={(e) => onScaleChange(e.target.value)}
         >
           {scales.map((s) => (

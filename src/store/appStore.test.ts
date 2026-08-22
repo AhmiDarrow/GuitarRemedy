@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it } from 'vitest'
-import { useAppStore } from './appStore'
+import { METRONOME_DEFAULTS, useAppStore } from './appStore'
 import { STANDARD_TUNING } from '../lib/theory'
 
 describe('appStore tuning + onboarding', () => {
@@ -9,6 +9,11 @@ describe('appStore tuning + onboarding', () => {
       customTuning: [...STANDARD_TUNING],
       onboarded: false,
       bpm: 80,
+      timeSignatureBeats: 4,
+      metronomeSubdivision: 1,
+      metronomeAccent: true,
+      metronomeCountInBars: 1,
+      metronomeOn: false,
     })
   })
 
@@ -31,6 +36,25 @@ describe('appStore tuning + onboarding', () => {
     expect(useAppStore.getState().bpm).toBe(30)
     useAppStore.getState().setBpm(999)
     expect(useAppStore.getState().bpm).toBe(300)
+  })
+
+  it('resetMetronomeDefaults restores factory click settings', () => {
+    useAppStore.setState({
+      bpm: 160,
+      timeSignatureBeats: 7,
+      metronomeSubdivision: 4,
+      metronomeAccent: false,
+      metronomeCountInBars: 3,
+      metronomeOn: true,
+    })
+    useAppStore.getState().resetMetronomeDefaults()
+    const s = useAppStore.getState()
+    expect(s.bpm).toBe(METRONOME_DEFAULTS.bpm)
+    expect(s.timeSignatureBeats).toBe(METRONOME_DEFAULTS.timeSignatureBeats)
+    expect(s.metronomeSubdivision).toBe(METRONOME_DEFAULTS.metronomeSubdivision)
+    expect(s.metronomeAccent).toBe(METRONOME_DEFAULTS.metronomeAccent)
+    expect(s.metronomeCountInBars).toBe(METRONOME_DEFAULTS.metronomeCountInBars)
+    expect(s.metronomeOn).toBe(false)
   })
 
   it('completeOnboarding only needs onboarded flag', () => {

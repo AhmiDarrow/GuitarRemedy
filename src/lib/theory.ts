@@ -31,6 +31,8 @@ export type ScaleId =
   | 'minor_pentatonic'
   | 'blues'
   | 'whole_tone'
+  | 'half_whole_dim'
+  | 'whole_half_dim'
   | 'chromatic'
 
 /** @deprecated Prefer snake_case ScaleId — kept for call-site compatibility */
@@ -83,6 +85,21 @@ const minor_pentatonic = def('minor_pentatonic', 'Minor Pentatonic', [0, 3, 5, 7
 const blues = def('blues', 'Blues', [0, 3, 5, 6, 7, 10], ['1', 'b3', '4', 'b5', '5', 'b7'], 'other')
 // Whole-tone degrees: six equal steps — label as 1 2 3 #4 #5 #6 (not b7).
 const whole_tone = def('whole_tone', 'Whole Tone', [0, 2, 4, 6, 8, 10], ['1', '2', '3', '#4', '#5', '#6'], 'other')
+// Symmetrical diminished octatonics (jazz / metal vocabulary).
+const half_whole_dim = def(
+  'half_whole_dim',
+  'Half-Whole Diminished',
+  [0, 1, 3, 4, 6, 7, 9, 10],
+  ['1', 'b2', 'b3', '3', '#4', '5', '6', 'b7'],
+  'other',
+)
+const whole_half_dim = def(
+  'whole_half_dim',
+  'Whole-Half Diminished',
+  [0, 2, 3, 5, 6, 8, 9, 11],
+  ['1', '2', 'b3', '4', 'b5', 'b6', '6', '7'],
+  'other',
+)
 const chromatic = def('chromatic', 'Chromatic', [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11], ['1', 'b2', '2', 'b3', '3', '4', 'b5', '5', 'b6', '6', 'b7', '7'], 'other')
 
 export const SCALES: Record<string, ScaleDef> = {
@@ -99,12 +116,17 @@ export const SCALES: Record<string, ScaleDef> = {
   minor_pentatonic,
   blues,
   whole_tone,
+  half_whole_dim,
+  whole_half_dim,
   chromatic,
   naturalMinor: { ...natural_minor, id: 'natural_minor' },
   harmonicMinor: { ...harmonic_minor, id: 'harmonic_minor' },
   melodicMinor: { ...melodic_minor, id: 'melodic_minor' },
   majorPentatonic: { ...major_pentatonic, id: 'major_pentatonic' },
   minorPentatonic: { ...minor_pentatonic, id: 'minor_pentatonic' },
+  halfWholeDim: { ...half_whole_dim, id: 'half_whole_dim' },
+  wholeHalfDim: { ...whole_half_dim, id: 'whole_half_dim' },
+  wholeTone: { ...whole_tone, id: 'whole_tone' },
 }
 
 export const SCALE_CATALOG = SCALES
@@ -123,6 +145,8 @@ export const SCALE_LIST: ScaleDef[] = [
   minor_pentatonic,
   blues,
   whole_tone,
+  half_whole_dim,
+  whole_half_dim,
   chromatic,
 ]
 
@@ -194,7 +218,7 @@ export const TUNINGS: Record<string, { name: string; midi: number[] }> = {
 }
 
 export function resolveScaleId(id: string): string {
-  if (SCALES[id]) return id
+  if (SCALES[id]) return SCALES[id].id ?? id
   const map: Record<string, string> = {
     naturalMinor: 'natural_minor',
     harmonicMinor: 'harmonic_minor',
@@ -206,8 +230,14 @@ export function resolveScaleId(id: string): string {
     melodic_minor: 'melodic_minor',
     major_pentatonic: 'major_pentatonic',
     minor_pentatonic: 'minor_pentatonic',
+    wholeTone: 'whole_tone',
+    whole_tone: 'whole_tone',
+    halfWholeDim: 'half_whole_dim',
+    half_whole_dim: 'half_whole_dim',
+    wholeHalfDim: 'whole_half_dim',
+    whole_half_dim: 'whole_half_dim',
   }
-  return map[id] ?? 'major'
+  return map[id] ?? (SCALES[id] ? id : 'major')
 }
 
 export function getScale(id: string): ScaleDef {

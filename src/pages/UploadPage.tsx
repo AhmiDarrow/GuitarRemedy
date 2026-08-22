@@ -38,7 +38,7 @@ import {
 import { TabView } from '../components/TabView'
 import { TabEditor } from '../components/TabEditor'
 import { Fretboard } from '../components/Fretboard'
-import { SCALES, noteToPc } from '../lib/theory'
+import { getScale, noteToPc } from '../lib/theory'
 import { applyScoreToBreakdown } from '../lib/tabEdit'
 import { useAppStore } from '../store/appStore'
 import { useUserTabsStore } from '../store/userTabsStore'
@@ -314,7 +314,8 @@ export function UploadPage() {
   }
 
   const scaleId = breakdown?.scaleId || 'major'
-  const scale = SCALES[scaleId] || SCALES.major
+  // Prefer getScale so camelCase / alias ids from analysis still resolve.
+  const scale = getScale(scaleId)
   const root = breakdown ? noteToPc(breakdown.key.root) : 0
   const activeIdx = stageIndex(stage)
 

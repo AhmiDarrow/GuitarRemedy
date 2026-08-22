@@ -88,7 +88,7 @@ export function HomePage() {
             {featured.map((item) => (
               <Link
                 key={item.id}
-                to="/library"
+                to={`/library?item=${encodeURIComponent(item.id)}`}
                 className="block rounded-xl border border-[var(--border)] bg-[var(--bg-elevated)] px-4 py-3 hover:border-mint/40 transition-colors"
               >
                 <div className="text-sm font-medium">{item.title}</div>

@@ -20,6 +20,17 @@ type Props = {
   showDegrees?: boolean
   interactive?: boolean
   className?: string
+  /**
+   * Pitch classes (0–11) currently sounding — all matching in-scale dots pulse.
+   * Used by Library play-along so the neck tracks scale/chord/progression audio.
+   */
+  activePcs?: number[]
+  /** When true, non-active in-scale dots dim so the sounding tones read clearly. */
+  dimInactiveWhilePlaying?: boolean
+}
+
+function normPc(pc: number): number {
+  return ((pc % 12) + 12) % 12
 }
 
 export function Fretboard({
@@ -29,6 +40,8 @@ export function Fretboard({
   showDegrees = true,
   interactive = true,
   className,
+  activePcs,
+  dimInactiveWhilePlaying = true,
 }: Props) {
   const lefty = useAppStore((s) => s.lefty)
   // Subscribe to tuning fields — getTuning alone is a stable fn and won't re-render.
@@ -58,6 +71,12 @@ export function Fretboard({
     : Array.from({ length: FRETS + 1 }, (_, i) => i)
 
   const markers = [3, 5, 7, 9, 12]
+
+  const activeSet = useMemo(() => {
+    if (!activePcs?.length) return null
+    return new Set(activePcs.map(normPc))
+  }, [activePcs])
+  const playing = !!activeSet && activeSet.size > 0
 
   return (
     <div
@@ -106,6 +125,12 @@ export function Fretboard({
                     const deg = cell.inScale ? degreeOf(cell.pc, root, scale) : null
                     const isRoot = cell.isRoot
                     const dim = !inPosition(fret)
+                    const isActive = !!activeSet?.has(normPc(cell.pc))
+                    const dimForPlay =
+                      playing &&
+                      dimInactiveWhilePlaying &&
+                      cell.inScale &&
+                      !isActive
                     return (
                       <button
                         key={fret}
@@ -118,17 +143,28 @@ export function Fretboard({
                           'flex-1 h-full flex items-center justify-center relative z-10',
                           interactive && cell.inScale && 'cursor-pointer',
                         )}
-                        aria-label={cell.inScale ? `${NOTE_NAMES[cell.pc]} fret ${fret}` : undefined}
+                        aria-label={
+                          cell.inScale
+                            ? `${NOTE_NAMES[cell.pc]} fret ${fret}${isActive ? ' playing' : ''}`
+                            : undefined
+                        }
+                        aria-current={isActive ? 'true' : undefined}
                       >
                         {cell.inScale && (
                           <span
                             className={clsx(
-                              'min-w-[1.75rem] h-7 md:min-w-[2rem] md:h-8 px-1 rounded-full flex items-center justify-center text-[11px] md:text-xs font-bold tracking-tight transition-transform border',
-                              isRoot
-                                ? 'bg-lime text-[var(--color-ink)] border-lime shadow-[0_0_14px_rgba(200,245,96,0.55)] ring-2 ring-mint/70'
-                                : 'bg-mint text-[var(--color-ink)] border-mint/80 shadow-[0_0_12px_rgba(93,255,176,0.4)] ring-1 ring-white/25',
-                              dim && 'opacity-40',
-                              interactive && 'hover:scale-110 active:scale-95',
+                              'min-w-[1.75rem] h-7 md:min-w-[2rem] md:h-8 px-1 rounded-full flex items-center justify-center text-[11px] md:text-xs font-bold tracking-tight border',
+                              isActive
+                                ? 'fret-dot-active bg-lime text-[var(--color-ink)] border-white shadow-[0_0_22px_rgba(200,245,96,0.85)] ring-2 ring-mint scale-125 z-20'
+                                : isRoot
+                                  ? 'bg-lime text-[var(--color-ink)] border-lime shadow-[0_0_14px_rgba(200,245,96,0.55)] ring-2 ring-mint/70'
+                                  : 'bg-mint text-[var(--color-ink)] border-mint/80 shadow-[0_0_12px_rgba(93,255,176,0.4)] ring-1 ring-white/25',
+                              dim && !isActive && 'opacity-40',
+                              dimForPlay && 'opacity-25 scale-90',
+                              !isActive &&
+                                interactive &&
+                                'transition-transform hover:scale-110 active:scale-95',
+                              isActive && 'transition-transform duration-75',
                             )}
                           >
                             {showDegrees && deg != null ? deg : NOTE_NAMES[cell.pc]}

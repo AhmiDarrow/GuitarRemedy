@@ -124,16 +124,115 @@ export async function playFret(
   await playMidiNote(midi, '8n', undefined, opts)
 }
 
+/** Bump generation so in-flight schedulers abandon after stop. */
+let playGeneration = 0
+
+export function getPlayGeneration(): number {
+  return playGeneration
+}
+
+/** UI callback when notes fire — midis sounding together (scale step or full chord). */
+export type PlayNotesEvent = {
+  midis: number[]
+  /** Step index in the sequence (scale degree walk / chord index). */
+  index: number
+  /** Audio-clock time the notes start. */
+  time: number
+}
+
+/** Map sounding MIDI notes → unique pitch classes 0–11 (fretboard highlight). */
+export function midisToPitchClasses(midis: number[]): number[] {
+  if (!midis.length) return []
+  return Array.from(new Set(midis.map((m) => ((m % 12) + 12) % 12))).sort(
+    (a, b) => a - b,
+  )
+}
+
+function schedulePlayNotes(
+  Tone: typeof import('tone'),
+  gen: number,
+  time: number,
+  midis: number[],
+  index: number,
+  onNotes?: (ev: PlayNotesEvent) => void,
+) {
+  if (!onNotes || !midis.length) return
+  const payload: PlayNotesEvent = { midis: [...midis], index, time }
+  Tone.Draw.schedule(() => {
+    if (gen !== playGeneration) return
+    try {
+      onNotes(payload)
+    } catch {
+      /* ignore UI errors mid-draw */
+    }
+  }, time)
+}
+
+/**
+ * Schedule MIDI notes on the audio clock. Returns duration (sec) and generation.
+ * If stopAllNotes() runs mid-sequence, the disposed synth + generation kill the rest.
+ * Optional onNotes fires on Tone.Draw locked to each note (for fretboard animation).
+ */
+export async function playMidiSequence(
+  midis: number[],
+  opts?: {
+    bpm?: number
+    /** Note length in beats (default 0.5 = eighth at bpm) */
+    noteBeats?: number
+    gapBeats?: number
+    a4?: number
+    /** Hold each note this many seconds (overrides noteBeats for duration only) */
+    holdSec?: number
+    session?: Exclude<AudioSessionOwner, 'idle'>
+    /** Fired per note on the audio clock (UI highlight). */
+    onNotes?: (ev: PlayNotesEvent) => void
+  },
+): Promise<{ durationSec: number; generation: number }> {
+  const session = opts?.session ?? 'scale'
+  // Kill any prior scheduled sequence before arming a new one.
+  stopAllNotes()
+  await claimAudioSession(session)
+  await ensureAudio()
+  const Tone = await tone()
+  const gen = playGeneration
+  const bpm = opts?.bpm ?? 80
+  const a4 = opts?.a4 ?? playbackA4
+  const noteBeats = opts?.noteBeats ?? 0.5
+  const gapBeats = opts?.gapBeats ?? noteBeats
+  const step = (60 / bpm) * gapBeats
+  const hold =
+    opts?.holdSec != null
+      ? Math.max(0.05, opts.holdSec)
+      : Math.max(0.05, (60 / bpm) * noteBeats * 0.9)
+  if (!midis.length || !synth) return { durationSec: 0, generation: gen }
+  const now = Tone.now() + 0.05
+  for (let i = 0; i < midis.length; i++) {
+    if (gen !== playGeneration || !synth) break
+    const t = now + i * step
+    const hz = midiNoteHz(midis[i], a4)
+    try {
+      synth.triggerAttackRelease(hz, hold, t)
+      schedulePlayNotes(Tone, gen, t, [midis[i]], i, opts?.onNotes)
+    } catch {
+      break
+    }
+  }
+  return { durationSec: Math.max(0, midis.length * step), generation: gen }
+}
+
 export async function playScale(
   root: string,
   scaleId: ScaleId | string,
-  opts?: { bpm?: number; octaves?: number; reverse?: boolean; a4?: number },
-) {
-  await ensureAudio()
-  const Tone = await tone()
+  opts?: {
+    bpm?: number
+    octaves?: number
+    reverse?: boolean
+    a4?: number
+    onNotes?: (ev: PlayNotesEvent) => void
+  },
+): Promise<number> {
   const bpm = opts?.bpm ?? 80
   const octaves = opts?.octaves ?? 1
-  const a4 = opts?.a4 ?? playbackA4
   const pcs = scalePitchClasses(root, scaleId)
   const rootMidi = nameToMidi(root.match(/\d/) ? root : `${root}3`)
   const notes: number[] = []
@@ -147,13 +246,113 @@ export async function playScale(
   notes.push(rootMidi + octaves * 12)
   if (opts?.reverse) notes.push(...[...notes].reverse().slice(1))
 
-  const now = Tone.now() + 0.05
-  const step = 60 / bpm / 2
-  notes.forEach((m, i) => {
-    const hz = midiNoteHz(m, a4)
-    synth!.triggerAttackRelease(hz, step * 0.9, now + i * step)
+  const { durationSec } = await playMidiSequence(notes, {
+    bpm,
+    noteBeats: 0.5,
+    a4: opts?.a4,
+    session: 'scale',
+    onNotes: opts?.onNotes,
   })
-  return notes.length * step
+  return durationSec
+}
+
+/** Strum / arpeggiate a chord (root + quality or ChordId). */
+export async function playChord(
+  root: string,
+  qualityOrId: string,
+  opts?: {
+    a4?: number
+    arpeggio?: boolean
+    bpm?: number
+    onNotes?: (ev: PlayNotesEvent) => void
+  },
+): Promise<number> {
+  const { chordNotes } = await import('./theory')
+  // chordNotes expects quality text; resolveChordId inside handles ChordIds too.
+  const midis = chordNotes(root.replace(/\d/g, '') || root, qualityOrId)
+  if (!midis.length) return 0
+  if (opts?.arpeggio) {
+    const { durationSec } = await playMidiSequence(midis, {
+      bpm: opts?.bpm ?? 90,
+      noteBeats: 0.5,
+      a4: opts?.a4,
+      session: 'scale',
+      onNotes: opts?.onNotes,
+    })
+    return durationSec
+  }
+  stopAllNotes()
+  await claimAudioSession('scale')
+  await ensureAudio()
+  const gen = playGeneration
+  const a4 = opts?.a4 ?? playbackA4
+  const Tone = await tone()
+  const when = Tone.now() + 0.05
+  if (gen !== playGeneration || !synth) return 0
+  for (let i = 0; i < midis.length; i++) {
+    if (gen !== playGeneration || !synth) break
+    const hz = midiNoteHz(midis[i], a4)
+    // Slight roll so the chord isn't a click
+    synth.triggerAttackRelease(hz, 1.2, when + i * 0.03)
+  }
+  // One highlight for the full strum (all chord tones together).
+  schedulePlayNotes(Tone, gen, when, midis, 0, opts?.onNotes)
+  return 1.4
+}
+
+/** Play a progression of chord symbols (e.g. G, Em, C, D) one bar each. */
+export async function playProgression(
+  symbols: string[],
+  opts?: {
+    bpm?: number
+    beatsPerChord?: number
+    a4?: number
+    onNotes?: (ev: PlayNotesEvent) => void
+  },
+): Promise<number> {
+  const { parseChordSymbol, CHORDS, nameToMidi, noteToPc } = await import('./theory')
+  const bpm = opts?.bpm ?? 80
+  const beats = opts?.beatsPerChord ?? 2
+  const a4 = opts?.a4 ?? playbackA4
+  const beatSec = 60 / bpm
+  const hold = Math.max(0.2, beats * beatSec * 0.85)
+  const gap = beats * beatSec
+
+  // Restart cleanly if something was already playing.
+  stopAllNotes()
+  await claimAudioSession('scale')
+  await ensureAudio()
+  const Tone = await tone()
+  const gen = playGeneration
+  const t0 = Tone.now() + 0.05
+  let i = 0
+  for (const sym of symbols) {
+    if (gen !== playGeneration || !synth) break
+    const parsed = parseChordSymbol(sym)
+    if (!parsed) continue
+    const chord = CHORDS[parsed.chordId]
+    if (!chord) continue
+    const rootMidi = nameToMidi(`${parsed.root}3`)
+    const rootPc = noteToPc(parsed.root)
+    const when = t0 + i * gap
+    const chordMidis: number[] = []
+    for (let v = 0; v < chord.intervals.length; v++) {
+      if (gen !== playGeneration || !synth) break
+      const pc = (rootPc + (chord.intervals[v] % 12)) % 12
+      let midi = rootMidi + ((pc - (rootMidi % 12) + 12) % 12)
+      if (midi < rootMidi) midi += 12
+      chordMidis.push(midi)
+      const hz = midiNoteHz(midi, a4)
+      try {
+        synth.triggerAttackRelease(hz, hold, when + v * 0.025)
+      } catch {
+        break
+      }
+    }
+    schedulePlayNotes(Tone, gen, when, chordMidis, i, opts?.onNotes)
+    i += 1
+  }
+  return Math.max(0, i * gap + hold)
 }
 
 /**
@@ -171,10 +370,32 @@ export function disposeAudio() {
   started = false
 }
 
-/** Silence any hanging voices (TabView stop). */
+/**
+ * Hard-stop playback: cancel Draw callbacks, bump generation, and dispose the
+ * synth so already-scheduled Tone events cannot keep firing after Stop.
+ * (releaseAll alone only quiets currently sounding voices.)
+ */
 export function stopAllNotes() {
+  playGeneration += 1
   try {
-    synth?.releaseAll()
+    void cancelDraw(0)
+  } catch {
+    /* ignore */
+  }
+  try {
+    if (synth) {
+      try {
+        synth.releaseAll()
+      } catch {
+        /* ignore */
+      }
+      try {
+        synth.dispose()
+      } catch {
+        /* ignore */
+      }
+      synth = null
+    }
   } catch {
     // ignore if Tone not loaded
   }
@@ -224,7 +445,8 @@ export async function claimAudioSession(owner: Exclude<AudioSessionOwner, 'idle'
       /* ignore */
     }
   }
-  if ((prev === 'tabs' || prev === 'scale') && owner === 'metronome') {
+  // Leaving tabs/scale (or switching between them) must hard-stop scheduled notes.
+  if (prev === 'tabs' || prev === 'scale') {
     stopAllNotes()
   }
   setSessionOwner(owner)

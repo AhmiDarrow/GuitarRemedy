@@ -7,6 +7,16 @@ import { setPlaybackA4 } from '../lib/audio'
 
 export type Handedness = 'right' | 'left'
 
+/** Factory defaults for the practice metronome (Reset button). */
+export const METRONOME_DEFAULTS = {
+  bpm: BPM_DEFAULT,
+  timeSignatureBeats: 4,
+  metronomeSubdivision: 1,
+  metronomeAccent: true,
+  metronomeCountInBars: 1,
+  metronomeOn: false,
+} as const
+
 interface AppState {
   displayName: string
   lefty: boolean
@@ -45,6 +55,8 @@ interface AppState {
   setMetronomeSubdivision: (n: number) => void
   setMetronomeAccent: (v: boolean) => void
   setMetronomeCountInBars: (n: number) => void
+  /** Restore BPM, meter, subdivision, accent, count-in to factory defaults. */
+  resetMetronomeDefaults: () => void
   completeOnboarding: (name?: string, lefty?: boolean) => void
   toggleFavorite: (id: string) => void
   completeLesson: (day: number) => void
@@ -73,12 +85,12 @@ export const useAppStore = create<AppState>()(
       customTuning: [...STANDARD_TUNING],
       a4: 440,
       showDegrees: true,
-      metronomeOn: false,
-      bpm: 80,
-      timeSignatureBeats: 4,
-      metronomeSubdivision: 1,
-      metronomeAccent: true,
-      metronomeCountInBars: 1,
+      metronomeOn: METRONOME_DEFAULTS.metronomeOn,
+      bpm: METRONOME_DEFAULTS.bpm,
+      timeSignatureBeats: METRONOME_DEFAULTS.timeSignatureBeats,
+      metronomeSubdivision: METRONOME_DEFAULTS.metronomeSubdivision,
+      metronomeAccent: METRONOME_DEFAULTS.metronomeAccent,
+      metronomeCountInBars: METRONOME_DEFAULTS.metronomeCountInBars,
       onboarded: false,
       favorites: [],
       completedLessons: [],
@@ -111,6 +123,15 @@ export const useAppStore = create<AppState>()(
       setMetronomeAccent: (v) => set({ metronomeAccent: v }),
       setMetronomeCountInBars: (n) =>
         set({ metronomeCountInBars: Math.max(0, Math.min(4, Math.round(n) || 0)) }),
+      resetMetronomeDefaults: () =>
+        set({
+          bpm: METRONOME_DEFAULTS.bpm,
+          timeSignatureBeats: METRONOME_DEFAULTS.timeSignatureBeats,
+          metronomeSubdivision: METRONOME_DEFAULTS.metronomeSubdivision,
+          metronomeAccent: METRONOME_DEFAULTS.metronomeAccent,
+          metronomeCountInBars: METRONOME_DEFAULTS.metronomeCountInBars,
+          metronomeOn: METRONOME_DEFAULTS.metronomeOn,
+        }),
       completeOnboarding: (name, leftyFlag) =>
         set((s) => ({
           onboarded: true,

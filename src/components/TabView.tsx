@@ -6,6 +6,7 @@ import {
   audioNow,
   cancelDraw,
   claimAudioSession,
+  ensureAudio,
   playNote,
   releaseAudioSession,
   scheduleDraw,
@@ -18,6 +19,10 @@ type Props = {
   score: TabScore
   className?: string
   title?: string
+  /** Bump or change to force-stop (e.g. library item switch). */
+  stopToken?: string | number | null
+  /** Notify parent when play/stop changes (library auto-stop coordination). */
+  onPlayingChange?: (playing: boolean) => void
 }
 
 function groupByTime(notes: TabScore['notes']) {
@@ -33,13 +38,15 @@ function groupByTime(notes: TabScore['notes']) {
     .map(([, v]) => v)
 }
 
-export function TabView({ score, className, title }: Props) {
+export function TabView({ score, className, title, stopToken, onPlayingChange }: Props) {
   const [speed, setSpeed] = useState(1)
   const [playing, setPlaying] = useState(false)
   const [cursor, setCursor] = useState(-1)
   const stopRef = useRef(false)
   const runIdRef = useRef(0)
   const endTimerRef = useRef<number | null>(null)
+  const onPlayingChangeRef = useRef(onPlayingChange)
+  onPlayingChangeRef.current = onPlayingChange
   // Subscribe to tuning fields so open-string fallbacks refresh when Profile changes.
   const tuningName = useAppStore((s) => s.tuningName)
   const customTuning = useAppStore((s) => s.customTuning)
@@ -55,6 +62,11 @@ export function TabView({ score, className, title }: Props) {
   const strings = score.strings || 6
   const tempo = score.tempo || 100
 
+  const setPlayingState = (next: boolean) => {
+    setPlaying(next)
+    onPlayingChangeRef.current?.(next)
+  }
+
   const clearEndTimer = () => {
     if (endTimerRef.current != null) {
       window.clearTimeout(endTimerRef.current)
@@ -69,7 +81,7 @@ export function TabView({ score, className, title }: Props) {
     void cancelDraw(0)
     stopAllNotes()
     releaseAudioSession('tabs')
-    setPlaying(false)
+    setPlayingState(false)
     setCursor(-1)
   }
 
@@ -79,15 +91,24 @@ export function TabView({ score, className, title }: Props) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [score])
 
+  // Parent-driven stop (library item switch)
+  useEffect(() => {
+    if (stopToken === undefined || stopToken === null) return
+    stop()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [stopToken])
+
   useEffect(() => () => stop(), [])
 
   const play = async () => {
     if (playing || columns.length === 0) return
+    // Hard-stop anything already scheduled (other tabs / scale).
+    stopAllNotes()
     stopRef.current = false
     const runId = ++runIdRef.current
     clearEndTimer()
     void cancelDraw(0)
-    setPlaying(true)
+    setPlayingState(true)
     setCursor(0)
 
     await claimAudioSession('tabs')
@@ -98,6 +119,8 @@ export function TabView({ score, className, title }: Props) {
     const secPerBeat = beatDurationSec(tempo, speed)
     const base = columns[0]?.[0]?.time ?? 0
     // Schedule notes + cursor on the audio clock (Tone.now / Tone.Draw).
+    // Recreate synth after hard-stop dispose, then take audio clock.
+    await ensureAudio()
     const t0 = await audioNow()
     if (stopRef.current || runId !== runIdRef.current) return
 
@@ -131,7 +154,7 @@ export function TabView({ score, className, title }: Props) {
       if (runId !== runIdRef.current || stopRef.current) return
       stopAllNotes()
       releaseAudioSession('tabs')
-      setPlaying(false)
+      setPlayingState(false)
       setCursor(-1)
     }, endAt)
     // Safety net if Draw is delayed (tab blur / background).
@@ -140,7 +163,7 @@ export function TabView({ score, className, title }: Props) {
       if (runId !== runIdRef.current || stopRef.current) return
       stopAllNotes()
       releaseAudioSession('tabs')
-      setPlaying(false)
+      setPlayingState(false)
       setCursor(-1)
     }, endDelay)
   }
