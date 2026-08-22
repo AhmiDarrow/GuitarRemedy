@@ -31,8 +31,12 @@ export function Fretboard({
   className,
 }: Props) {
   const lefty = useAppStore((s) => s.lefty)
+  // Subscribe to tuning fields — getTuning alone is a stable fn and won't re-render.
+  const tuningName = useAppStore((s) => s.tuningName)
+  const customTuning = useAppStore((s) => s.customTuning)
   const getTuning = useAppStore((s) => s.getTuning)
-  const tuning = getTuning()
+  const a4 = useAppStore((s) => s.a4)
+  const tuning = useMemo(() => getTuning(), [getTuning, tuningName, customTuning])
   const t = tuning?.length === 6 ? tuning : [...STANDARD_TUNING]
 
   const board = useMemo(
@@ -108,7 +112,7 @@ export function Fretboard({
                         type="button"
                         disabled={!interactive || !cell.inScale}
                         onClick={() => {
-                          if (cell.inScale) void playNote(cell.midi)
+                          if (cell.inScale) void playNote(cell.midi, 0.4, undefined, { a4 })
                         }}
                         className={clsx(
                           'flex-1 h-full flex items-center justify-center relative z-10',

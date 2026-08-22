@@ -152,13 +152,28 @@ export function breakdownToUserTab(
   if (!notes?.length && !b.tab?.length) return null
 
   const tab = breakdownToTabSong(b)
+  const timeSig: [number, number] =
+    b.timeSig?.length === 2
+      ? [Math.max(1, b.timeSig[0] || 4), b.timeSig[1] || 4]
+      : b.score?.timeSig?.length === 2
+        ? [Math.max(1, b.score.timeSig[0] || 4), b.score.timeSig[1] || 4]
+        : tab.timeSig?.length === 2
+          ? tab.timeSig
+          : [4, 4]
   const score: TabScore = b.score?.notes?.length
-    ? { ...b.score, title: b.title, tempo: b.tempoBpm || b.score.tempo }
+    ? {
+        ...b.score,
+        title: b.title,
+        tempo: b.tempoBpm || b.score.tempo,
+        timeSig: b.score.timeSig ?? timeSig,
+        key: b.score.key || b.keyLabel,
+      }
     : {
         title: b.title,
         tempo: b.tempoBpm || 100,
         key: b.keyLabel,
         strings: 6,
+        timeSig,
         notes: notes || [],
       }
 

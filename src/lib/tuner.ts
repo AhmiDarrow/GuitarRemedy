@@ -44,10 +44,13 @@ export type TunerLiveOptions = {
   rmsGate?: number
   /** Apply slight steel-string inharmonicity bias */
   guitarTemperament?: boolean
+  /** Theory-order open MIDI (0=low E). Defaults to standard EADGBE. */
+  tuning?: number[] | null
 }
 
-/** Standard tuning open-string MIDI (E2 A2 D3 G3 B3 E4). */
+/** Standard tuning open-string MIDI (E2 A2 D3 G3 B3 E4) — theory low-E = 0. */
 export const GUITAR_OPEN_MIDI = [40, 45, 50, 55, 59, 64] as const
+/** Default labels for standard; use openStringLabels(tuning) when Profile tuning differs. */
 export const GUITAR_STRING_LABELS = ['E2', 'A2', 'D3', 'G3', 'B3', 'E4'] as const
 
 export const DEFAULT_CENTS_IN_TUNE = 5
@@ -64,6 +67,22 @@ export function noteNameFromMidi(midi: number): { name: string; octave: number }
   return { name: NOTE_NAMES[pc], octave }
 }
 
+/** Open-string MIDI in theory order (0 = low E … 5 = high e). Falls back to standard. */
+export function openStringMidis(tuning?: number[] | null): number[] {
+  if (Array.isArray(tuning) && tuning.length === 6) {
+    return tuning.map((n) => Math.max(0, Math.min(127, Math.round(Number(n) || 0))))
+  }
+  return [...GUITAR_OPEN_MIDI]
+}
+
+/** Short labels like E2 / A2 for the given theory-order tuning. */
+export function openStringLabels(tuning?: number[] | null): string[] {
+  return openStringMidis(tuning).map((m) => {
+    const { name, octave } = noteNameFromMidi(m)
+    return `${name}${octave}`
+  })
+}
+
 /** Cents deviation of hz from nearest equal-tempered pitch at a4. */
 export function centsOffPitch(hz: number, a4 = 440): { midi: number; cents: number; targetHz: number } {
   if (!Number.isFinite(hz) || hz <= 0) {
@@ -76,11 +95,16 @@ export function centsOffPitch(hz: number, a4 = 440): { midi: number; cents: numb
   return { midi, cents, targetHz }
 }
 
-export function nearestGuitarString(midi: number, maxSemitones = 2): number | null {
+export function nearestGuitarString(
+  midi: number,
+  maxSemitones = 2,
+  tuning?: number[] | null,
+): number | null {
+  const opens = openStringMidis(tuning)
   let best: number | null = null
   let bestDist = Infinity
-  for (let i = 0; i < GUITAR_OPEN_MIDI.length; i++) {
-    const d = Math.abs(GUITAR_OPEN_MIDI[i] - midi)
+  for (let i = 0; i < opens.length; i++) {
+    const d = Math.abs(opens[i] - midi)
     if (d < bestDist) {
       bestDist = d
       best = i
@@ -421,8 +445,10 @@ export function stringHzBand(
   stringIndex: number,
   a4 = 440,
   semitones = 4,
+  tuning?: number[] | null,
 ): { minHz: number; maxHz: number } {
-  const midi = GUITAR_OPEN_MIDI[stringIndex] ?? 40
+  const opens = openStringMidis(tuning)
+  const midi = opens[stringIndex] ?? GUITAR_OPEN_MIDI[stringIndex] ?? 40
   const center = midiToHz(midi, a4)
   const minHz = Math.max(55, center * 2 ** (-semitones / 12))
   const maxHz = Math.min(1400, center * 2 ** (semitones / 12))
@@ -528,6 +554,8 @@ export function readingFromHz(
     phase?: number
     clarity?: number
     guitarTemperament?: boolean
+    /** Theory-order opens for string tagging */
+    tuning?: number[] | null
   },
 ): TunerReading {
   if (!Number.isFinite(hz) || hz < 60 || confidence < 0.28) {
@@ -562,7 +590,7 @@ export function readingFromHz(
     cents,
     targetHz,
     inTune: Math.abs(cents) <= inTuneCents,
-    stringIndex: nearestGuitarString(midi),
+    stringIndex: nearestGuitarString(midi, 2, extra?.tuning),
     level: extra?.level,
     lock: extra?.lock ?? 0,
     phase: extra?.phase ?? 0,
@@ -583,14 +611,17 @@ export function analyzeTunerFrame(
     focusString?: number | null
     guitarTemperament?: boolean
     locked?: boolean
+    tuning?: number[] | null
   },
 ): TunerReading {
   const rmsGate = opts?.rmsGate ?? DEFAULT_RMS_GATE
+  const tuning = opts?.tuning
   const gate = shouldAnalyzeFrame(frame, rmsGate)
   if (!gate.ok) {
     return readingFromHz(0, 0, a4, inTuneCents, {
       level: gate.level,
       clarity: Math.max(0, 1 - gate.flux),
+      tuning,
     })
   }
 
@@ -598,7 +629,7 @@ export function analyzeTunerFrame(
   let minHz = 70
   let maxHz = 1200
   if (opts?.focusString != null && opts.focusString >= 0 && opts.focusString < 6) {
-    const band = stringHzBand(opts.focusString, a4, 5)
+    const band = stringHzBand(opts.focusString, a4, 5, tuning)
     minHz = band.minHz
     maxHz = band.maxHz
   }
@@ -617,6 +648,7 @@ export function analyzeTunerFrame(
     clarity: Math.max(0, Math.min(1, fused.confidence * (1 - gate.flux * 0.35))),
     phase,
     guitarTemperament: opts?.guitarTemperament,
+    tuning,
   })
 }
 
@@ -677,6 +709,7 @@ export async function startLiveTuner(
   let rmsGate = opts?.rmsGate ?? DEFAULT_RMS_GATE
   let focusString = opts?.focusString ?? null
   const guitarTemperament = opts?.guitarTemperament !== false
+  const tuning = openStringMidis(opts?.tuning)
 
   if (typeof navigator === 'undefined' || !navigator.mediaDevices?.getUserMedia) {
     throw new Error('Microphone not available in this environment')
@@ -727,6 +760,7 @@ export async function startLiveTuner(
             level,
             lock: Math.min(1, lockCount / 12),
             clarity: Math.max(0, 1 - gate.flux),
+            tuning,
           }),
         )
       } else if (hasSmooth && lockedMidi >= 0) {
@@ -740,7 +774,7 @@ export async function startLiveTuner(
           cents: Math.round(smoothC * 10) / 10,
           targetHz: midiToHz(lockedMidi, a4),
           inTune: Math.abs(smoothC) <= inTuneCents,
-          stringIndex: nearestGuitarString(lockedMidi),
+          stringIndex: nearestGuitarString(lockedMidi, 2, tuning),
           level,
           lock: Math.min(1, lockCount / 12) * 0.6,
           phase: 0,
@@ -751,6 +785,7 @@ export async function startLiveTuner(
           readingFromHz(0, 0, a4, inTuneCents, {
             level,
             clarity: Math.max(0, 1 - gate.flux),
+            tuning,
           }),
         )
       }
@@ -761,7 +796,7 @@ export async function startLiveTuner(
     let minHz = 70
     let maxHz = 1200
     if (focusString != null && focusString >= 0 && focusString < 6) {
-      const band = stringHzBand(focusString, a4, 5)
+      const band = stringHzBand(focusString, a4, 5, tuning)
       minHz = band.minHz
       maxHz = band.maxHz
     }
@@ -782,6 +817,7 @@ export async function startLiveTuner(
         level,
         guitarTemperament,
         clarity: Math.max(0, Math.min(1, raw.confidence * (1 - gate.flux * 0.35))),
+        tuning,
       })
 
       if (base.midi === lockedMidi) {
@@ -821,7 +857,7 @@ export async function startLiveTuner(
         cents: Math.round(c * 10) / 10,
         targetHz: midiToHz(displayMidi, a4),
         inTune: Math.abs(c) <= inTuneCents,
-        stringIndex: nearestGuitarString(displayMidi),
+        stringIndex: nearestGuitarString(displayMidi, 2, tuning),
         level,
         lock,
         phase,
@@ -840,6 +876,7 @@ export async function startLiveTuner(
             level,
             lock: Math.min(1, lockCount / 12),
             clarity: Math.max(0, 1 - gate.flux),
+            tuning,
           }),
         )
       } else if (hasSmooth && lockedMidi >= 0) {
@@ -853,7 +890,7 @@ export async function startLiveTuner(
           cents: Math.round(smoothC * 10) / 10,
           targetHz: midiToHz(lockedMidi, a4),
           inTune: Math.abs(smoothC) <= inTuneCents,
-          stringIndex: nearestGuitarString(lockedMidi),
+          stringIndex: nearestGuitarString(lockedMidi, 2, tuning),
           level,
           lock: Math.min(1, lockCount / 12) * 0.6,
           phase: 0,
@@ -864,6 +901,7 @@ export async function startLiveTuner(
           readingFromHz(0, raw.confidence, a4, inTuneCents, {
             level,
             clarity: Math.max(0, 1 - gate.flux),
+            tuning,
           }),
         )
       }

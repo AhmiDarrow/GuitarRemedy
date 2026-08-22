@@ -3,14 +3,14 @@ import { Mic, MicOff, Volume2, Waves } from 'lucide-react'
 import clsx from 'clsx'
 import {
   DEFAULT_RMS_GATE,
-  GUITAR_OPEN_MIDI,
-  GUITAR_STRING_LABELS,
+  openStringLabels,
+  openStringMidis,
   pushHistory,
   startLiveTuner,
   type TunerReading,
   type TunerStopHandle,
 } from '../lib/tuner'
-import { playMidiNote } from '../lib/audio'
+import { playMidiNote, setPlaybackA4 } from '../lib/audio'
 import { useAppStore } from '../store/appStore'
 
 const empty: TunerReading = {
@@ -195,6 +195,12 @@ export function TunerPanel() {
   const a4 = useAppStore((s) => s.a4)
   const setA4 = useAppStore((s) => s.setA4)
   const recordPractice = useAppStore((s) => s.recordPractice)
+  const tuningName = useAppStore((s) => s.tuningName)
+  const customTuning = useAppStore((s) => s.customTuning)
+  const getTuning = useAppStore((s) => s.getTuning)
+  const tuning = useMemo(() => getTuning(), [getTuning, tuningName, customTuning])
+  const openMidis = useMemo(() => openStringMidis(tuning), [tuning])
+  const stringLabels = useMemo(() => openStringLabels(tuning), [tuning])
 
   const [reading, setReading] = useState<TunerReading>(empty)
   const [live, setLive] = useState(false)
@@ -255,11 +261,13 @@ export function TunerPanel() {
     setCalNote(null)
     try {
       recordPractice()
+      setPlaybackA4(a4)
       const stopHandle = (await startLiveTuner(onReading, {
         a4,
         rmsGate,
         focusString,
         guitarTemperament: guitarTemp,
+        tuning,
       })) as TunerStopHandle
       setStopFn(() => stopHandle)
       setLive(true)
@@ -267,7 +275,7 @@ export function TunerPanel() {
       setError(e instanceof Error ? e.message : 'Microphone permission denied')
       setLive(false)
     }
-  }, [a4, focusString, guitarTemp, onReading, recordPractice, rmsGate])
+  }, [a4, focusString, guitarTemp, onReading, recordPractice, rmsGate, tuning])
 
   useEffect(() => {
     return () => {
@@ -292,11 +300,13 @@ export function TunerPanel() {
     void (async () => {
       stopFn?.()
       try {
+        setPlaybackA4(a4)
         const stopHandle = (await startLiveTuner(onReading, {
           a4,
           rmsGate,
           focusString,
           guitarTemperament: guitarTemp,
+          tuning,
         })) as TunerStopHandle
         setStopFn(() => stopHandle)
       } catch (e) {
@@ -305,7 +315,7 @@ export function TunerPanel() {
       }
     })()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [a4, guitarTemp])
+  }, [a4, guitarTemp, tuningName, customTuning])
 
   const calibrate = useCallback(async () => {
     if (!live || !stopFn?.calibrateNoiseFloor) {
@@ -625,12 +635,12 @@ export function TunerPanel() {
           </button>
         </div>
         <div className="grid grid-cols-6 gap-1.5">
-          {GUITAR_STRING_LABELS.map((label, i) => {
+          {stringLabels.map((label, i) => {
             const active = reading.stringIndex === i
             const focused = focusString === i
             return (
               <button
-                key={label}
+                key={`${label}-${i}`}
                 type="button"
                 className={clsx(
                   'rounded-xl border px-1 py-2 text-center transition-all',
@@ -641,10 +651,11 @@ export function TunerPanel() {
                 )}
                 onClick={() => {
                   setFocusString((prev) => (prev === i ? null : i))
-                  // duration is seconds — A4 Hz is for detection only, not playMidiNote
-                  void playMidiNote(GUITAR_OPEN_MIDI[i], 0.45)
+                  // duration is seconds; pitch uses Profile A4 via setPlaybackA4
+                  setPlaybackA4(a4)
+                  void playMidiNote(openMidis[i], 0.45, undefined, { a4 })
                 }}
-                title={`Focus ${label} (± band) · play reference`}
+                title={`Focus ${label} (± band) · play reference at A4=${a4}`}
               >
                 <span className="block text-xs font-semibold">{label}</span>
                 <span className="block text-[9px] text-[var(--text-muted)] mt-0.5">
@@ -683,8 +694,11 @@ export function TunerPanel() {
         <button
           type="button"
           className="btn-ghost text-xs py-1.5"
-          onClick={() => void playMidiNote(69, 0.6)}
-          title="Play A4 reference"
+          onClick={() => {
+            setPlaybackA4(a4)
+            void playMidiNote(69, 0.6, undefined, { a4 })
+          }}
+          title={`Play concert A at ${a4} Hz`}
         >
           <Volume2 className="w-3.5 h-3.5" /> A4
         </button>

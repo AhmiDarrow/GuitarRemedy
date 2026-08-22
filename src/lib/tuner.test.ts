@@ -10,6 +10,8 @@ import {
   medianFilter,
   nearestGuitarString,
   noteNameFromMidi,
+  openStringLabels,
+  openStringMidis,
   parabolicOffset,
   phaseVsTarget,
   pushHistory,
@@ -24,6 +26,7 @@ import {
   TUNER_ANALYSIS_SR,
 } from './tuner'
 import { midiToHz } from './audioToMidi'
+import { TUNINGS } from './theory'
 
 /** Synthesize a pure sine at hz into a mono buffer. */
 function sineFrame(hz: number, sampleRate: number, seconds = 0.12, amp = 0.35): Float32Array {
@@ -60,6 +63,20 @@ describe('tuner', () => {
     expect(nearestGuitarString(45)).toBe(1)
     expect(nearestGuitarString(64)).toBe(5)
     expect(nearestGuitarString(72)).toBeNull()
+  })
+
+  it('maps open strings under Drop D tuning', () => {
+    const drop = TUNINGS.drop_d.midi
+    expect(openStringMidis(drop)[0]).toBe(38)
+    expect(nearestGuitarString(38, 2, drop)).toBe(0)
+    // Standard low E (40) is only 2 st from Drop D open — still tags string 0.
+    expect(nearestGuitarString(40, 2, drop)).toBe(0)
+    // Far from all Drop D opens → null
+    expect(nearestGuitarString(72, 2, drop)).toBeNull()
+    expect(openStringLabels(drop)[0]).toMatch(/^D/)
+    const band = stringHzBand(0, 440, 4, drop)
+    expect(band.minHz).toBeLessThan(midiToHz(38, 440))
+    expect(band.maxHz).toBeGreaterThan(midiToHz(38, 440))
   })
 
   it('builds a full reading', () => {

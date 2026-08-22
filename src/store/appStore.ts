@@ -3,6 +3,7 @@ import { persist } from 'zustand/middleware'
 import type { TuningName } from '../lib/theory'
 import { STANDARD_TUNING, TUNINGS } from '../lib/theory'
 import { BPM_DEFAULT, clampPracticeBpm } from '../lib/tabScore'
+import { setPlaybackA4 } from '../lib/audio'
 
 export type Handedness = 'right' | 'left'
 
@@ -94,7 +95,11 @@ export const useAppStore = create<AppState>()(
         const midi = notes.map((n) => Math.max(0, Math.min(127, Math.round(Number(n) || 0))))
         set({ customTuning: midi, tuningName: 'custom' })
       },
-      setA4: (hz) => set({ a4: hz }),
+      setA4: (hz) => {
+        const next = Number.isFinite(hz) && hz >= 400 && hz <= 480 ? Math.round(hz) : 440
+        setPlaybackA4(next)
+        set({ a4: next })
+      },
       setShowDegrees: (v) => set({ showDegrees: v }),
       setMetronomeOn: (v) => set({ metronomeOn: v }),
       // Keep in sync with clampPracticeBpm (30–300) so scale play, tabs, and click share one tempo.

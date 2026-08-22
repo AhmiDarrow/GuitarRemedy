@@ -69,7 +69,8 @@ const locrian = def('locrian', 'Locrian', [0, 1, 3, 5, 6, 8, 10], ['1', 'b2', 'b
 const major_pentatonic = def('major_pentatonic', 'Major Pentatonic', [0, 2, 4, 7, 9], ['1', '2', '3', '5', '6'], 'pentatonic')
 const minor_pentatonic = def('minor_pentatonic', 'Minor Pentatonic', [0, 3, 5, 7, 10], ['1', 'b3', '4', '5', 'b7'], 'pentatonic')
 const blues = def('blues', 'Blues', [0, 3, 5, 6, 7, 10], ['1', 'b3', '4', 'b5', '5', 'b7'], 'other')
-const whole_tone = def('whole_tone', 'Whole Tone', [0, 2, 4, 6, 8, 10], ['1', '2', '3', '#4', '#5', 'b7'], 'other')
+// Whole-tone degrees: six equal steps — label as 1 2 3 #4 #5 #6 (not b7).
+const whole_tone = def('whole_tone', 'Whole Tone', [0, 2, 4, 6, 8, 10], ['1', '2', '3', '#4', '#5', '#6'], 'other')
 const chromatic = def('chromatic', 'Chromatic', [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11], ['1', 'b2', '2', 'b3', '3', '4', 'b5', '5', 'b6', '6', 'b7', '7'], 'other')
 
 export const SCALES: Record<string, ScaleDef> = {

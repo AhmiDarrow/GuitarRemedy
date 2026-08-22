@@ -2,14 +2,33 @@
 
 import type { ScaleId } from './theory'
 import { nameToMidi, scalePitchClasses, STANDARD_TUNING } from './theory'
+import { midiToHz } from './audioToMidi'
 
 let toneModule: typeof import('tone') | null = null
 let synth: import('tone').PolySynth | null = null
 let started = false
+/** Active concert pitch for playback (Profile A4). Tone's MIDI map is always A4=440. */
+let playbackA4 = 440
 
 async function tone() {
   if (!toneModule) toneModule = await import('tone')
   return toneModule
+}
+
+/** Set concert A used for MIDI→Hz when playing notes/tabs/refs. */
+export function setPlaybackA4(hz: number): void {
+  if (Number.isFinite(hz) && hz >= 400 && hz <= 480) playbackA4 = hz
+  else playbackA4 = 440
+}
+
+export function getPlaybackA4(): number {
+  return playbackA4
+}
+
+/** Absolute frequency for a MIDI note at the active (or override) A4. */
+export function midiNoteHz(midi: number, a4 = playbackA4): number {
+  const a = Number.isFinite(a4) && a4 > 0 ? a4 : 440
+  return midiToHz(midi, a)
 }
 
 export async function ensureAudio(): Promise<void> {
@@ -27,24 +46,39 @@ export async function ensureAudio(): Promise<void> {
   }
 }
 
-export async function playMidiNote(midi: number, duration: number | string = '8n', time?: number) {
+/**
+ * Play a MIDI note. Duration: Tone notation (`8n`) or seconds (number).
+ * Uses Profile A4 via setPlaybackA4 / opts.a4 — not Tone's fixed 440 MIDI map.
+ */
+export async function playMidiNote(
+  midi: number,
+  duration: number | string = '8n',
+  time?: number,
+  opts?: { a4?: number },
+) {
   await ensureAudio()
-  const Tone = await tone()
-  const name = Tone.Frequency(midi, 'midi').toNote()
-  if (time != null) synth!.triggerAttackRelease(name, duration, time)
-  else synth!.triggerAttackRelease(name, duration)
+  const a4 = opts?.a4 ?? playbackA4
+  const hz = midiNoteHz(midi, a4)
+  // Frequency in Hz so A4≠440 is truthful (Tone.Frequency(midi,'midi') is always 440-based).
+  if (time != null) synth!.triggerAttackRelease(hz, duration, time)
+  else synth!.triggerAttackRelease(hz, duration)
 }
 
 /**
  * Play a MIDI note. When `duration` is a number it is seconds.
  * Optional `time` is an absolute AudioContext/Tone time (Tone.now()-based).
  */
-export async function playNote(midi: number, duration: number | string = 0.4, time?: number) {
+export async function playNote(
+  midi: number,
+  duration: number | string = 0.4,
+  time?: number,
+  opts?: { a4?: number },
+) {
   const dur =
     typeof duration === 'number' && Number.isFinite(duration)
       ? Math.max(0.05, duration)
       : duration
-  await playMidiNote(midi, dur, time)
+  await playMidiNote(midi, dur, time, opts)
 }
 
 /** Current audio clock time (Tone.now), after ensureAudio. */
@@ -92,12 +126,13 @@ export async function playFret(
 export async function playScale(
   root: string,
   scaleId: ScaleId | string,
-  opts?: { bpm?: number; octaves?: number; reverse?: boolean },
+  opts?: { bpm?: number; octaves?: number; reverse?: boolean; a4?: number },
 ) {
   await ensureAudio()
   const Tone = await tone()
   const bpm = opts?.bpm ?? 80
   const octaves = opts?.octaves ?? 1
+  const a4 = opts?.a4 ?? playbackA4
   const pcs = scalePitchClasses(root, scaleId)
   const rootMidi = nameToMidi(root.match(/\d/) ? root : `${root}3`)
   const notes: number[] = []
@@ -114,8 +149,8 @@ export async function playScale(
   const now = Tone.now() + 0.05
   const step = 60 / bpm / 2
   notes.forEach((m, i) => {
-    const name = Tone.Frequency(m, 'midi').toNote()
-    synth!.triggerAttackRelease(name, step * 0.9, now + i * step)
+    const hz = midiNoteHz(m, a4)
+    synth!.triggerAttackRelease(hz, step * 0.9, now + i * step)
   })
   return notes.length * step
 }

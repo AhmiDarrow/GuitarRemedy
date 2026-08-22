@@ -44,6 +44,7 @@ export function TabView({ score, className, title }: Props) {
   const tuningName = useAppStore((s) => s.tuningName)
   const customTuning = useAppStore((s) => s.customTuning)
   const getTuning = useAppStore((s) => s.getTuning)
+  const a4 = useAppStore((s) => s.a4)
   const openMidi = useMemo(
     () => openMidiHighToLow(getTuning()),
     // eslint-disable-next-line react-hooks/exhaustive-deps -- getTuning closes over tuningName/customTuning
@@ -121,7 +122,7 @@ export function TabView({ score, className, title }: Props) {
             ? n.midi
             : (opens[n.string] ?? 64) + n.fret
         const durSec = Math.max(0.08, (n.duration || 1) * secPerBeat * 0.9)
-        void playNote(midi, durSec, when)
+        void playNote(midi, durSec, when, { a4 })
       }
     }
 

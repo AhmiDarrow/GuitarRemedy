@@ -27,6 +27,11 @@ describe('theory', () => {
     expect(scaleNoteNames('A', 'natural_minor')).toEqual(['A', 'B', 'C', 'D', 'E', 'F', 'G'])
   })
 
+  it('labels whole-tone degrees without b7 mush', () => {
+    expect(SCALES.whole_tone.degrees).toEqual(['1', '2', '3', '#4', '#5', '#6'])
+    expect(SCALES.whole_tone.intervals).toEqual([0, 2, 4, 6, 8, 10])
+  })
+
   it('supports camelCase scale aliases', () => {
     expect(SCALES.minorPentatonic.intervals).toEqual([0, 3, 5, 7, 10])
     expect(scalePitchClasses('A', 'minorPentatonic')).toEqual([9, 0, 2, 4, 7])

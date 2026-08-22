@@ -46,7 +46,7 @@ export interface AudioToMidiResult {
 
 const DEFAULT_TPQ = 480
 
-/** Hz → nearest MIDI note (A4=440). */
+/** Hz → nearest MIDI note (default A4=440; pass Profile a4 when converting). */
 export function hzToMidi(hz: number, a4 = 440): number {
   if (!Number.isFinite(hz) || hz <= 0) return -1
   return Math.round(69 + 12 * Math.log2(hz / a4))

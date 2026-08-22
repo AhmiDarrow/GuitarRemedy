@@ -29,6 +29,7 @@ export function PracticePage() {
   const setShowDegrees = useAppStore((s) => s.setShowDegrees)
   const bpm = useAppStore((s) => s.bpm)
   const setBpm = useAppStore((s) => s.setBpm)
+  const a4 = useAppStore((s) => s.a4)
   const recordPractice = useAppStore((s) => s.recordPractice)
   const lefty = useAppStore((s) => s.lefty)
 
@@ -136,7 +137,7 @@ export function PracticePage() {
                 className="btn-primary"
                 onClick={() => {
                   recordPractice()
-                  void playScale(rootName, scale.id, { bpm, octaves: 1 })
+                  void playScale(rootName, scale.id, { bpm, octaves: 1, a4 })
                 }}
               >
                 <Play className="w-4 h-4" /> Play scale

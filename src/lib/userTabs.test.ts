@@ -203,6 +203,24 @@ describe('userTabs', () => {
     expect(breakdownToUserTab(b)).toBeNull()
   })
 
+  it('preserves timeSig on saved user score', () => {
+    const b = {
+      ...sampleBreakdown(),
+      timeSig: [3, 4] as [number, number],
+      tempoBpm: 90,
+      score: {
+        ...sampleBreakdown().score!,
+        timeSig: [3, 4] as [number, number],
+        tempo: 90,
+      },
+    }
+    const tab = breakdownToUserTab(b)
+    expect(tab).not.toBeNull()
+    expect(tab!.tab.timeSig).toEqual([3, 4])
+    expect(tab!.score.timeSig).toEqual([3, 4])
+    expect(tab!.tempoBpm).toBe(90)
+  })
+
   it('parseGrTabFile accepts export payload', () => {
     const tab = breakdownToUserTab(sampleBreakdown())!
     const payload = userTabToExportPayload(tab)

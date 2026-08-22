@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { Navigate, Route, Routes } from 'react-router-dom'
 import { AppShell } from './components/AppShell'
 import { HomePage } from './pages/HomePage'
@@ -10,9 +11,16 @@ import { AboutPage } from './pages/AboutPage'
 import { WikiPage } from './pages/WikiPage'
 import { Onboarding } from './components/Onboarding'
 import { useAppStore } from './store/appStore'
+import { setPlaybackA4 } from './lib/audio'
 
 export default function App() {
   const onboarded = useAppStore((s) => s.onboarded)
+  const a4 = useAppStore((s) => s.a4)
+
+  // Keep Tone playback concert pitch in sync with Profile A4 (incl. rehydrate).
+  useEffect(() => {
+    setPlaybackA4(a4)
+  }, [a4])
 
   return (
     <>
