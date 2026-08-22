@@ -1,11 +1,11 @@
 /**
- * Lesson imagery — free-license, theory-verified diagrams only.
+ * Lesson diagrams — plain data→ASCII (and optional simple UI), theory-backed.
  *
  * Policy (hard):
  * - No stock photos, no freeform AI fretting art (too easy to mislabel frets/strings).
- * - Every diagram is generated from `src/lib/theory.ts` at render time.
- * - Accuracy is enforced by unit tests against the theory engine, not by eye alone.
- * - License: original GuitarRemedy code (MIT) — diagrams are data/SVG, not third-party assets.
+ * - Every diagram is generated from `src/lib/theory.ts` at resolve time.
+ * - Accuracy is enforced by unit tests against the theory engine.
+ * - UI shows simple monospace figures only — no license/verified chrome.
  */
 
 import {
@@ -41,9 +41,9 @@ export interface LessonDiagramSpec {
   /** Stable id for tests + analytics */
   id: string
   kind: LessonDiagramKind
-  /** Short caption under the figure */
+  /** Short title above the figure */
   title: string
-  /** One-line accuracy claim the student can trust (optional in tests) */
+  /** Optional one-line teaching note (plain language, no license claims) */
   caption?: string
   /** Optional root note name (C, G, Em root, …) */
   root?: string
@@ -55,10 +55,10 @@ export interface LessonDiagramSpec {
   semitones?: number
   /** Max frets to draw (default 5 for shapes, 12 for scales) */
   frets?: number
-  /** License stamp shown in UI */
-  license: 'MIT · GuitarRemedy original'
-  /** How this figure was verified */
-  verifiedBy: 'theory-engine'
+  /** Optional internal stamp for tests only — never shown in UI */
+  license?: string
+  /** Optional internal stamp for tests only — never shown in UI */
+  verifiedBy?: 'theory-engine'
 }
 
 export interface DiagramDot {
@@ -79,6 +79,107 @@ export interface ResolvedLessonDiagram {
   notes: string[]
   /** Pitch classes the figure claims — used by accuracy tests */
   claimedPcs: number[]
+  /** Plain monospace figure for the Learn UI (high→low e…E) */
+  ascii: string
+}
+
+/** Display order high e → low E (tab convention). */
+const ASCII_STRING_LABELS = ['e', 'B', 'G', 'D', 'A', 'E'] as const
+
+/**
+ * Build a monospace chord/tab block from theory-string dots (0 = low E).
+ * Open = 0, mute = x, fretted = fret number (multi-digit ok).
+ */
+export function dotsToAsciiTab(dots: DiagramDot[], title?: string): string {
+  const byTheory = new Map<number, DiagramDot>()
+  for (const d of dots) byTheory.set(d.string, d)
+  const lines: string[] = []
+  if (title) lines.push(title)
+  for (let display = 0; display < 6; display++) {
+    const theory = 5 - display
+    const lab = ASCII_STRING_LABELS[display]
+    const d = byTheory.get(theory)
+    let cell = '-'
+    if (d?.muted) cell = 'x'
+    else if (d) cell = d.fret === 0 ? '0' : String(d.fret)
+    // pad frets to keep columns readable
+    const body = cell.length === 1 ? `-${cell}-` : `-${cell}`
+    lines.push(`${lab}|${body.padEnd(5, '-')}|`)
+  }
+  return lines.join('\n')
+}
+
+/** Horizontal fret slice for scales / intervals (high e → low E). */
+export function dotsToAsciiFretMap(
+  dots: DiagramDot[],
+  frets = 5,
+  title?: string,
+): string {
+  const maxF = Math.max(frets, ...dots.filter((d) => !d.muted).map((d) => d.fret), 0)
+  const end = Math.min(12, Math.max(maxF, 3))
+  const lines: string[] = []
+  if (title) lines.push(title)
+  const header = ['  ', ...Array.from({ length: end + 1 }, (_, f) => String(f).padStart(2, ' '))].join(
+    ' ',
+  )
+  lines.push(header)
+  for (let display = 0; display < 6; display++) {
+    const theory = 5 - display
+    const lab = ASCII_STRING_LABELS[display]
+    const cells: string[] = []
+    for (let f = 0; f <= end; f++) {
+      const hit = dots.find((d) => d.string === theory && !d.muted && d.fret === f)
+      if (!hit) cells.push(' .')
+      else if (hit.isRoot) cells.push(' R')
+      else if (hit.label && hit.label !== '·' && hit.label !== '●' && hit.label.length <= 2)
+        cells.push(hit.label.padStart(2, ' '))
+      else cells.push(' o')
+    }
+    lines.push(`${lab} ${cells.join(' ')}`)
+  }
+  return lines.join('\n')
+}
+
+export function notesToAsciiBlock(notes: string[], title?: string): string {
+  const lines: string[] = []
+  if (title) lines.push(title)
+  for (const n of notes) {
+    // Full sentences — never truncate mid-thought for display data
+    lines.push(`· ${n}`)
+  }
+  return lines.join('\n')
+}
+
+export function rhythmToAscii(beats = 4, title?: string): string {
+  const n = Math.max(2, Math.min(8, beats))
+  const cells = Array.from({ length: n }, (_, i) => (i === 0 ? '[1]' : ` ${i + 1} `))
+  const lines = [
+    title ?? 'Beat grid',
+    cells.join(' '),
+    'Accent beat 1 · count out loud',
+  ]
+  return lines.join('\n')
+}
+
+/** Attach ascii field from dots/notes/kind. */
+export function buildDiagramAscii(resolved: Omit<ResolvedLessonDiagram, 'ascii'>): string {
+  const { spec, dots, notes } = resolved
+  switch (spec.kind) {
+    case 'chord_shape':
+    case 'open_strings':
+    case 'power_chord':
+      return dotsToAsciiTab(dots, spec.title)
+    case 'scale_tones':
+    case 'interval':
+      return dotsToAsciiFretMap(dots, spec.frets ?? (spec.kind === 'interval' ? 12 : 5), spec.title)
+    case 'rhythm_grid':
+      return rhythmToAscii(spec.semitones ?? 4, spec.title)
+    case 'posture':
+    case 'finger_numbers':
+    case 'caged_map':
+    default:
+      return notesToAsciiBlock(notes, spec.title)
+  }
 }
 
 const OPEN_LABELS_LOW_TO_HIGH = ['E', 'A', 'D', 'G', 'B', 'e'] as const
@@ -317,12 +418,13 @@ export function resolveLessonDiagram(spec: LessonDiagramSpec): ResolvedLessonDia
       notes.push('No diagram data.')
   }
 
-  return { spec, openLabels, dots, notes, claimedPcs }
+  const base = { spec, openLabels, dots, notes, claimedPcs }
+  return { ...base, ascii: buildDiagramAscii(base) }
 }
 
 /**
  * Pick diagrams for a curriculum day from phase + title/goals keywords.
- * Always returns at least one verified figure for days 1–90; lighter after.
+ * Always returns at least one plain figure per day (fallback by phase).
  */
 export function diagramsForLesson(input: {
   day: number
@@ -337,12 +439,8 @@ export function diagramsForLesson(input: {
     .join(' ')
     .toLowerCase()
   const out: LessonDiagramSpec[] = []
-  const add = (spec: Omit<LessonDiagramSpec, 'license' | 'verifiedBy'> & Partial<Pick<LessonDiagramSpec, 'license' | 'verifiedBy'>>) => {
-    out.push({
-      license: 'MIT · GuitarRemedy original',
-      verifiedBy: 'theory-engine',
-      ...spec,
-    })
+  const add = (spec: LessonDiagramSpec) => {
+    out.push(spec)
   }
 
   // --- Universal early foundations ---
@@ -351,7 +449,7 @@ export function diagramsForLesson(input: {
       id: `day${input.day}-open-strings`,
       kind: 'open_strings',
       title: 'Open strings (standard)',
-      caption: 'Low E–A–D–G–B–high e — labels match STANDARD_TUNING MIDI.',
+      caption: 'Low E through high e in standard tuning.',
     })
   }
   if (input.day <= 5 || /finger|posture|sit|thumb|hand/.test(text)) {
@@ -359,7 +457,7 @@ export function diagramsForLesson(input: {
       id: `day${input.day}-posture`,
       kind: 'posture',
       title: 'Posture checklist',
-      caption: 'Comfort first — no pain. Text guidance only (no fake anatomy art).',
+      caption: 'Comfort first — no pain.',
     })
   }
   if (input.day <= 7 || /finger number|index|pinky|fretting hand/.test(text)) {
@@ -367,7 +465,7 @@ export function diagramsForLesson(input: {
       id: `day${input.day}-fingers`,
       kind: 'finger_numbers',
       title: 'Finger numbers',
-      caption: '1–4 fretting-hand convention used in all GuitarRemedy diagrams.',
+      caption: '1 = index · 2 = middle · 3 = ring · 4 = pinky.',
     })
   }
 
@@ -390,7 +488,7 @@ export function diagramsForLesson(input: {
         id: `day${input.day}-chord-${hit.chord}`,
         kind: 'chord_shape',
         title: hit.title,
-        caption: `${hit.chord} open shape — frets verified against chord tones in standard tuning.`,
+        caption: `${hit.chord} open shape · standard tuning.`,
         chord: hit.chord,
         frets: 5,
       })
@@ -478,7 +576,7 @@ export function diagramsForLesson(input: {
       id: `day${input.day}-caged`,
       kind: 'caged_map',
       title: 'CAGED map',
-      caption: 'Five major forms — root frets from theory, not memorized pictures alone.',
+      caption: 'Five major forms and where the root sits.',
       root: 'C',
     })
   }
@@ -497,7 +595,7 @@ export function diagramsForLesson(input: {
         id: `day${input.day}-em-fallback`,
         kind: 'chord_shape',
         title: 'Open Em',
-        caption: 'Home-base minor shape — verified tones.',
+        caption: 'Home-base open minor shape.',
         chord: 'Em',
       })
     } else if (input.phase === 'scales' || input.phase === 'lead') {

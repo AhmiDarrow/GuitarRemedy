@@ -363,8 +363,8 @@ export function LearnPage() {
         {diagrams.length > 0 && (
           <LessonDiagramGallery
             diagrams={diagrams}
-            title="Lesson diagrams"
-            subtitle="Theory-engine SVGs — frets and notes checked against the app’s pitch model before render."
+            title="Diagrams"
+            subtitle="Simple fret/tab figures for this lesson."
           />
         )}
 

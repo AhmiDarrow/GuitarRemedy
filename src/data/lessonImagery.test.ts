@@ -15,6 +15,7 @@ import {
   analyzeDiagramAccuracy,
   assertOpenShapeAccurate,
   diagramsForLesson,
+  dotsToAsciiTab,
   resolveLessonDiagram,
 } from './lessonImagery'
 
@@ -43,13 +44,28 @@ describe('lesson imagery — free license + accuracy', () => {
       id: 'test-open',
       kind: 'open_strings',
       title: 'Open strings',
-      license: 'MIT · GuitarRemedy original',
-      verifiedBy: 'theory-engine',
     })
     expect(resolved.dots.every((m) => m.fret === 0)).toBe(true)
     expect(resolved.dots).toHaveLength(6)
+    expect(resolved.ascii).toMatch(/e\|/)
+    expect(resolved.ascii).toMatch(/E\|/)
     const report = analyzeDiagramAccuracy(resolved)
     expect(report.ok, report.issues.join('; ')).toBe(true)
+  })
+
+  it('Em open shape renders a plain ASCII tab block', () => {
+    const resolved = resolveLessonDiagram({
+      id: 'test-em-ascii',
+      kind: 'chord_shape',
+      title: 'Em',
+      chord: 'Em',
+    })
+    const ascii = dotsToAsciiTab(resolved.dots, 'Em')
+    expect(ascii).toContain('e|-0')
+    expect(ascii).toContain('E|-0')
+    expect(resolved.ascii).toContain('e|')
+    // no license chrome in ascii payload
+    expect(resolved.ascii.toLowerCase()).not.toMatch(/mit|verified|theory-engine/)
   })
 
   it('every catalog open shape is theory-accurate', () => {
@@ -68,8 +84,6 @@ describe('lesson imagery — free license + accuracy', () => {
         kind: 'chord_shape',
         title: chord,
         chord,
-        license: 'MIT · GuitarRemedy original',
-        verifiedBy: 'theory-engine',
       })
       const report = analyzeDiagramAccuracy(resolved)
       expect(report.ok, `${chord}: ${report.issues.join('; ')}`).toBe(true)
@@ -94,8 +108,6 @@ describe('lesson imagery — free license + accuracy', () => {
         root,
         scaleId,
         frets: 5,
-        license: 'MIT · GuitarRemedy original',
-        verifiedBy: 'theory-engine',
       })
       const report = analyzeDiagramAccuracy(resolved)
       expect(report.ok, `${root} ${scaleId}: ${report.issues.join('; ')}`).toBe(true)
@@ -122,8 +134,6 @@ describe('lesson imagery — free license + accuracy', () => {
         id: `t-${kind}`,
         kind,
         title: kind,
-        license: 'MIT · GuitarRemedy original',
-        verifiedBy: 'theory-engine',
         root: 'C',
         semitones: 4,
       })
@@ -132,7 +142,7 @@ describe('lesson imagery — free license + accuracy', () => {
     }
   })
 
-  it('every curriculum day resolves only verified, accurate diagrams', () => {
+  it('every curriculum day resolves accurate plain diagrams with ascii', () => {
     expect(CURRICULUM).toHaveLength(365)
     let withArt = 0
     for (let day = 1; day <= 365; day++) {
@@ -147,9 +157,10 @@ describe('lesson imagery — free license + accuracy', () => {
         libraryIds: lesson.libraryIds,
       })
       for (const d of list) {
-        expect(d.verifiedBy).toBe('theory-engine')
-        expect((d.license ?? '').toLowerCase()).toMatch(/mit|cc0|public domain/)
+        // UI must not depend on license chrome fields
         const resolved = resolveLessonDiagram(d)
+        expect(resolved.ascii.length).toBeGreaterThan(0)
+        expect(resolved.ascii.toLowerCase()).not.toMatch(/\bverified\b|theory-engine/)
         const report = analyzeDiagramAccuracy(resolved)
         expect(report.ok, `day ${day} ${d.id}: ${report.issues.join('; ')}`).toBe(true)
       }
@@ -194,8 +205,6 @@ describe('lesson imagery — free license + accuracy', () => {
       kind: 'power_chord',
       title: 'A5',
       root: 'A',
-      license: 'MIT · GuitarRemedy original',
-      verifiedBy: 'theory-engine',
     })
     const report = analyzeDiagramAccuracy(resolved)
     expect(report.ok, report.issues.join('; ')).toBe(true)
