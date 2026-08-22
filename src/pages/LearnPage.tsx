@@ -14,6 +14,8 @@ import {
 } from 'lucide-react'
 import { getLesson, getPhaseMeta, CURRICULUM, type LessonPhase } from '../data/curriculum'
 import { getLibraryItem } from '../data/library'
+import { diagramsForLesson } from '../data/lessonImagery'
+import { LessonDiagramGallery } from '../components/LessonDiagram'
 import { useAppStore } from '../store/appStore'
 import clsx from 'clsx'
 
@@ -98,6 +100,20 @@ export function LearnPage() {
   const related = lesson.libraryIds
     .map((id) => getLibraryItem(id))
     .filter((item): item is NonNullable<typeof item> => Boolean(item))
+
+  const diagrams = useMemo(
+    () =>
+      diagramsForLesson({
+        day: lesson.day,
+        phase: lesson.phase,
+        title: lesson.title,
+        goals: lesson.goals,
+        drills: lesson.drills,
+        theoryBite: lesson.theoryBite,
+        libraryIds: lesson.libraryIds,
+      }),
+    [lesson],
+  )
 
   const nearby = [-2, -1, 0, 1, 2]
     .map((off) => day + off)
@@ -344,6 +360,14 @@ export function LearnPage() {
           </div>
         )}
 
+        {diagrams.length > 0 && (
+          <LessonDiagramGallery
+            diagrams={diagrams}
+            title="Lesson diagrams"
+            subtitle="Theory-engine SVGs — frets and notes checked against the app’s pitch model before render."
+          />
+        )}
+
         <div className="grid md:grid-cols-2 gap-4">
           <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-elevated)]/70 p-4">
             <h3 className="text-sm font-semibold text-[var(--text-muted)] uppercase tracking-wide flex items-center gap-2">
@@ -424,7 +448,7 @@ export function LearnPage() {
               {related.map((item) => (
                 <Link
                   key={item.id}
-                  to="/library"
+                  to={`/library?item=${encodeURIComponent(item.id)}`}
                   className="rounded-xl border border-[var(--border)] px-3 py-2.5 hover:border-mint/40 transition-colors"
                 >
                   <div className="text-sm font-medium truncate">{item.title}</div>

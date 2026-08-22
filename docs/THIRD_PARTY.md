@@ -35,6 +35,12 @@ When the model cannot load, the app **falls back** to the built-in autocorrelati
 
 Public-domain, traditional, or original study material only. No commercial copyrighted tracks in the library.
 
+## Lesson diagrams
+
+| Asset | License | Notes |
+|-------|---------|-------|
+| Theory-engine SVG diagrams (`src/data/lessonImagery.ts`) | MIT · GuitarRemedy original | Chord shapes, open strings, scale maps, posture/rhythm/CAGED guides. Frets and pitch classes are checked against `src/lib/theory.ts` in unit tests before ship. No third-party stock photos or unverified AI fretting art. |
+
 ## Policy
 
 If a dependency or asset is not free/open, it must not ship in GuitarRemedy.
