@@ -209,7 +209,8 @@ export function downloadUserTabFile(tab: UserTab, filename?: string) {
   URL.revokeObjectURL(url)
 }
 
-export function downloadAsciiTab(tab: UserTab, filename?: string) {
+/** Pure ASCII tab text (testable). Display order: e B G D A E. */
+export function userTabToAscii(tab: UserTab): string {
   const lines = ['e|', 'B|', 'G|', 'D|', 'A|', 'E|']
   for (const measure of tab.tab.measures) {
     const cells: string[][] = [[], [], [], [], [], []]
@@ -218,9 +219,9 @@ export function downloadAsciiTab(tab: UserTab, filename?: string) {
     )
     for (const n of ordered) {
       const s = Math.max(0, Math.min(5, n.string))
-      const token = String(Math.max(0, n.fret))
+      const fretLabel = String(Math.max(0, Math.min(24, Math.round(Number(n.fret) || 0))))
       for (let i = 0; i < 6; i++) {
-        cells[i].push(i === s ? token.padStart(2, '-') : '--')
+        cells[i].push(i === s ? fretLabel.padStart(2, '-') : '--')
       }
       for (let i = 0; i < 6; i++) cells[i].push('-')
     }
@@ -229,8 +230,12 @@ export function downloadAsciiTab(tab: UserTab, filename?: string) {
     }
   }
   const header = `${tab.title}\nTempo: ${tab.tempoBpm} · ${tab.keyLabel || ''}\n\n`
-  const body = lines.join('\n')
-  const blob = new Blob([header + body + '\n'], { type: 'text/plain' })
+  return header + lines.join('\n') + '\n'
+}
+
+export function downloadAsciiTab(tab: UserTab, filename?: string) {
+  const text = userTabToAscii(tab)
+  const blob = new Blob([text], { type: 'text/plain' })
   const url = URL.createObjectURL(blob)
   const a = document.createElement('a')
   const base = (filename || tab.title || 'tab').replace(/[^\w\-]+/g, '_').slice(0, 48)

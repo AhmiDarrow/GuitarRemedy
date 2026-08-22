@@ -641,7 +641,8 @@ export function TunerPanel() {
                 )}
                 onClick={() => {
                   setFocusString((prev) => (prev === i ? null : i))
-                  void playMidiNote(GUITAR_OPEN_MIDI[i], a4, 0.45)
+                  // duration is seconds — A4 Hz is for detection only, not playMidiNote
+                  void playMidiNote(GUITAR_OPEN_MIDI[i], 0.45)
                 }}
                 title={`Focus ${label} (± band) · play reference`}
               >
@@ -682,7 +683,7 @@ export function TunerPanel() {
         <button
           type="button"
           className="btn-ghost text-xs py-1.5"
-          onClick={() => void playMidiNote(69, a4, 0.6)}
+          onClick={() => void playMidiNote(69, 0.6)}
           title="Play A4 reference"
         >
           <Volume2 className="w-3.5 h-3.5" /> A4

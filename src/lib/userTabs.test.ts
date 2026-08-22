@@ -8,6 +8,7 @@ import {
   saveUserTabs,
   scoreToTabSong,
   upsertUserTab,
+  userTabToAscii,
   userTabToExportPayload,
   type UserTab,
 } from './userTabs'
@@ -213,5 +214,17 @@ describe('userTabs', () => {
     const a = { id: 'a' } as UserTab
     const b = { id: 'b' } as UserTab
     expect(removeUserTab([a, b], 'a').map((t) => t.id)).toEqual(['b'])
+  })
+
+  it('userTabToAscii includes frets without throwing', () => {
+    const tab = breakdownToUserTab(sampleBreakdown())!
+    const ascii = userTabToAscii(tab)
+    expect(ascii).toContain('Test Melody')
+    expect(ascii).toMatch(/e\|/)
+    // open high-e fret 0 and fret 2 should appear as labels
+    expect(ascii).toMatch(/0/)
+    expect(ascii).toMatch(/2/)
+    expect(ascii).not.toContain('undefined')
+    expect(ascii).not.toContain('token')
   })
 })

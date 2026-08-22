@@ -655,11 +655,22 @@ export function guitarProToBreakdown(
         { source: 'gp' },
       )
 
+  const gpTimeSig: [number, number] = parsed.timeSignature
+    ? [
+        Math.max(1, Math.min(16, parsed.timeSignature.numerator || 4)),
+        parsed.timeSignature.denominator || 4,
+      ]
+    : [4, 4]
+  const gpTimeWarnings =
+    gpTimeSig[0] !== 4 || gpTimeSig[1] !== 4
+      ? [`Time signature ${gpTimeSig[0]}/${gpTimeSig[1]} preserved from Guitar Pro.`]
+      : []
+
   return finish({
     kind: 'guitarpro',
     title: parsed.title || fileName.replace(/\.\w+$/, '') || 'GP import',
     tempoBpm: clampImportBpm(parsed.tempoBpm || 120),
-    timeSig: [4, 4],
+    timeSig: gpTimeSig,
     key: {
       root: detected.root,
       scaleId: detected.scaleId,
@@ -694,6 +705,7 @@ export function guitarProToBreakdown(
     editable: true,
     isPlaceholder: isStub,
     warnings: [
+      ...gpTimeWarnings,
       ...(parsed.warnings || []),
       ...(isStub
         ? [
@@ -974,6 +986,8 @@ export async function convertAudioToGuitarTabs(
   file: File | { name: string; arrayBuffer: () => Promise<ArrayBuffer> },
   opts?: {
     tempoBpm?: number
+    /** Concert A4 Hz from Profile (default 440). */
+    a4?: number
     /** Analyze only first N seconds (0/omit = full). */
     maxSec?: number
     /** HPSS stem: auto (default · races lead/harmonic/mix) | lead | harmonic | mix | percussive */
@@ -991,6 +1005,7 @@ export async function convertAudioToGuitarTabs(
     // Omit tempo unless user set one — lets detectTempoBpm run
     const converted = await convertArrayBufferToMidi(buf, {
       tempoBpm: opts?.tempoBpm,
+      a4: opts?.a4,
       maxSec: opts?.maxSec,
       stem: opts?.stem ?? 'auto',
       skipHpss: opts?.skipHpss,
@@ -1024,6 +1039,8 @@ export async function breakdownFile(
   opts?: {
     onProgress?: ConvertProgress
     tempoBpm?: number
+    /** Concert A4 Hz from Profile (audio convert). */
+    a4?: number
     maxSec?: number
     stem?: 'auto' | 'lead' | 'harmonic' | 'mix' | 'percussive'
     skipHpss?: boolean
@@ -1071,6 +1088,7 @@ export async function breakdownFile(
     return convertAudioToGuitarTabs(file, {
       onProgress: opts?.onProgress,
       tempoBpm: opts?.tempoBpm,
+      a4: opts?.a4,
       maxSec: opts?.maxSec,
       stem: opts?.stem ?? 'auto',
       skipHpss: opts?.skipHpss,

@@ -5,6 +5,7 @@ import {
   parseGuitarPro,
   setGuitarProOpenTuning,
 } from './guitarpro'
+import { guitarProToBreakdown } from './breakdown'
 import { TUNINGS } from './theory'
 import { openMidiHighToLow } from './tabScore'
 
@@ -28,6 +29,22 @@ describe('guitarpro', () => {
     const result = await parseGuitarPro(bytes.buffer, 'demo.gp5')
     expect(typeof result.title).toBe('string')
     expect(result.source === 'binary-header' || result.source === 'stub' || result.notes).toBeTruthy()
+  })
+
+  it('GPIF parses time signature 3/4 and breakdown preserves it', () => {
+    const xml = `<?xml version="1.0"?>
+      <GPIF>
+        <title>Waltz</title>
+        <tempo>90</tempo>
+        <time>3/4</time>
+        <note><string>1</string><fret>0</fret><duration>1</duration></note>
+      </GPIF>`
+    const parsed = parseGpif(xml)
+    expect(parsed.timeSignature).toEqual({ numerator: 3, denominator: 4 })
+    expect(parsed.tempoBpm).toBe(90)
+    const b = guitarProToBreakdown(parsed, 'waltz.gpif')
+    expect(b.timeSig).toEqual([3, 4])
+    expect(b.warnings.some((w) => w.includes('3/4'))).toBe(true)
   })
 
   it('GPIF string+fret uses session Drop D opens (low open = 38)', () => {

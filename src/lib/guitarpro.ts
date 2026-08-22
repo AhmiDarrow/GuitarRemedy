@@ -26,6 +26,8 @@ export interface GuitarProNote {
 export interface GuitarProParseResult {
   title: string
   tempoBpm: number
+  /** When known from GPIF / embedded MusicXML (numerator, denominator). */
+  timeSignature?: { numerator: number; denominator: number }
   notes: GuitarProNote[]
   source: GuitarProSource
   versionHint?: string
@@ -276,6 +278,7 @@ export function parseGpif(xml: string): GuitarProParseResult {
   const warnings: string[] = []
   let title = 'Guitar Pro import'
   let tempoBpm = 120
+  let timeSignature: { numerator: number; denominator: number } | undefined
   const notes: GuitarProNote[] = []
 
   const t1 = tagText(xml, 'title') || tagText(xml, 'WorkName')
@@ -296,6 +299,30 @@ export function parseGpif(xml: string): GuitarProParseResult {
   if (tempo) {
     const n = parseInt(tempo, 10)
     if (n >= 40 && n <= 280) tempoBpm = n
+  }
+
+  // GPIF time: <time>4/4</time> or separate numerator/denominator tags
+  const timeText = tagText(xml, 'time') || tagText(xml, 'TimeSignature')
+  if (timeText) {
+    const m = timeText.trim().match(/^(\d+)\s*\/\s*(\d+)/)
+    if (m) {
+      const num = parseInt(m[1], 10)
+      const den = parseInt(m[2], 10)
+      if (num >= 1 && num <= 16 && den >= 1 && den <= 16) {
+        timeSignature = { numerator: num, denominator: den }
+      }
+    }
+  }
+  if (!timeSignature) {
+    const numRaw = tagText(xml, 'numerator') || tagText(xml, 'beats')
+    const denRaw = tagText(xml, 'denominator') || tagText(xml, 'beat-type') || tagText(xml, 'beatValue')
+    if (numRaw && denRaw) {
+      const num = parseInt(numRaw, 10)
+      const den = parseInt(denRaw, 10)
+      if (num >= 1 && num <= 16 && den >= 1 && den <= 16) {
+        timeSignature = { numerator: num, denominator: den }
+      }
+    }
   }
 
   let beatCursor = 0
@@ -339,7 +366,7 @@ export function parseGpif(xml: string): GuitarProParseResult {
     )
   }
 
-  return { title, tempoBpm, notes, source: 'gpif', warnings }
+  return { title, tempoBpm, timeSignature, notes, source: 'gpif', warnings }
 }
 
 function detectBinaryVersion(bytes: Uint8Array): string | undefined {

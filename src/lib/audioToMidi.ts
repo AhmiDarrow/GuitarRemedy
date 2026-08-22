@@ -138,11 +138,12 @@ export function detectPitchHz(
 export function trackPitchFrames(
   samples: Float32Array,
   sampleRate: number,
-  opts?: { hopSec?: number; windowSec?: number; minConfidence?: number },
+  opts?: { hopSec?: number; windowSec?: number; minConfidence?: number; a4?: number },
 ): PitchFrame[] {
   const hopSec = opts?.hopSec ?? 0.046
   const windowSec = opts?.windowSec ?? 0.09
   const minConf = opts?.minConfidence ?? 0.28
+  const a4 = Number.isFinite(opts?.a4) && (opts!.a4 as number) > 0 ? (opts!.a4 as number) : 440
   const hop = Math.max(1, Math.floor(sampleRate * hopSec))
   const win = Math.max(64, Math.floor(sampleRate * windowSec))
   const frames: PitchFrame[] = []
@@ -151,7 +152,7 @@ export function trackPitchFrames(
     const slice = samples.subarray(start, start + win)
     const { hz, confidence } = detectPitchHz(slice, sampleRate)
     if (hz > 0 && confidence >= minConf) {
-      const midi = hzToMidi(hz)
+      const midi = hzToMidi(hz, a4)
       if (midi >= 36 && midi <= 88) {
         frames.push({
           timeSec: start / sampleRate,
@@ -759,6 +760,8 @@ export function pcmToMidi(
   opts?: {
     tempoBpm?: number
     title?: string
+    /** Concert A4 in Hz (Profile). Default 440. */
+    a4?: number
     /** Skip melody-band emphasis (tests / already-filtered PCM) */
     skipMelodyBand?: boolean
     /** Skip median HPSS stem split (tests / already separated). */
@@ -771,6 +774,7 @@ export function pcmToMidi(
     onProgress?: (pct: number, message: string) => void
   },
 ): AudioToMidiResult {
+  const a4 = Number.isFinite(opts?.a4) && (opts!.a4 as number) > 0 ? (opts!.a4 as number) : 440
   const warnings: string[] = [
     'Audio→MIDI is monophonic pitch-track assist — not multi-voice transcription.',
     'Full-band path: HPSS lead stem → melody band → octave repair → confidence gate → beat quantize.',
@@ -841,7 +845,11 @@ export function pcmToMidi(
     minConfidence: minConf,
     hopSec: 0.038,
     windowSec: 0.09,
+    a4,
   })
+  if (a4 !== 440) {
+    warnings.push(`Using Profile A4 = ${a4} Hz for pitch → MIDI.`)
+  }
   onProgress?.(70, 'Building notes…')
   let notes = framesToNotes(frames, {
     tempoBpm,
@@ -919,6 +927,8 @@ function getDecodeContext(): { ctx: AudioContext; close: boolean } {
 
 export type AudioConvertOpts = {
   tempoBpm?: number
+  /** Concert A4 in Hz from Profile (default 440). */
+  a4?: number
   skipMelodyBand?: boolean
   skipHpss?: boolean
   stem?: StemKind
@@ -948,6 +958,7 @@ export async function convertArrayBufferToMidi(
     const mono = audioBufferToMono(audio)
     return pcmToMidi(mono, audio.sampleRate, {
       tempoBpm: opts?.tempoBpm,
+      a4: opts?.a4,
       skipMelodyBand: opts?.skipMelodyBand,
       skipHpss: opts?.skipHpss,
       stem: opts?.stem,

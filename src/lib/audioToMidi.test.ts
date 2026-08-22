@@ -23,6 +23,13 @@ describe('audioToMidi', () => {
     expect(hzToMidi(0)).toBe(-1)
   })
 
+  it('hzToMidi respects Profile A4 (432 Hz)', () => {
+    // 432 Hz is A4 when a4=432 → MIDI 69
+    expect(hzToMidi(432, 432)).toBe(69)
+    // 440 Hz with a4=432 is slightly sharp of A4
+    expect(hzToMidi(440, 432)).toBeGreaterThanOrEqual(69)
+  })
+
   it('detects a clear sine pitch near A4', () => {
     const sr = 22050
     const hz = 440

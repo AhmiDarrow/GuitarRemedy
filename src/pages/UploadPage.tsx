@@ -71,6 +71,7 @@ function stageIndex(stage: ConvertStage | null): number {
 export function UploadPage() {
   const recordPractice = useAppStore((s) => s.recordPractice)
   const getTuning = useAppStore((s) => s.getTuning)
+  const a4 = useAppStore((s) => s.a4)
   const saveFromBreakdown = useUserTabsStore((s) => s.saveFromBreakdown)
   const userTabCount = useUserTabsStore((s) => s.tabs.length)
   const [breakdown, setBreakdown] = useState<RemedyBreakdown | null>(null)
@@ -150,6 +151,7 @@ export function UploadPage() {
             else if (s === 'done') setProgressPct(100)
           },
           tempoBpm: audio && tempoOverride > 0 ? tempoOverride : undefined,
+          a4: audio ? a4 : undefined,
           maxSec: audio && trimSec > 0 ? trimSec : undefined,
           stem: audio ? stem : undefined,
         })
@@ -173,7 +175,7 @@ export function UploadPage() {
         setBusy(false)
       }
     },
-    [persistBreakdown, sourceAudioUrl, tempoOverride, trimSec, stem, getTuning],
+    [persistBreakdown, sourceAudioUrl, tempoOverride, trimSec, stem, getTuning, a4],
   )
 
   const onInput = (e: React.ChangeEvent<HTMLInputElement>) => {
