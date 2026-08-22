@@ -168,22 +168,20 @@ function warmupFor(phase: LessonPhase, day: number, seed: LessonSeed): { coach: 
 }
 
 function teachBlock(phase: LessonPhase, seed: LessonSeed, day: number): { coach: string; youDo: string[] } {
-  const goalLine = seed.goals.slice(0, 2).join(' · ')
   return {
-    coach: `${seed.theoryBite} Today’s focus: ${goalLine}. We’ll go slower than your ego wants — that’s the pro move.`,
+    coach: `${seed.theoryBite} We’ll go slower than your ego wants — that’s the pro move.`,
     youDo: [
-      'Read the idea once out loud (seriously — it sticks).',
-      `Picture success: ${seed.masteryCheck}`,
+      'Skim the theory bite once, then put your hands on the guitar.',
       phase === 'chords'
         ? 'Build the shape finger-by-finger; pluck strings one at a time before strumming.'
         : phase === 'scales'
-          ? 'Trace the shape visually on the neck before you play it.'
-          : 'Watch your hands in a mirror or phone camera for 20s — fix one tension spot.',
+          ? 'Trace the shape on the neck with your eyes before you play it.'
+          : 'Watch your hands 20 seconds — fix one tense spot, not ten.',
       pick(
         [
-          'Set a metronome quieter than your playing.',
-          'If anything hurts (sharp pain), stop and loosen — fatigue ≠ injury.',
-          'Smile when one note rings clean. That’s the dopamine we want.',
+          'Metronome quieter than you are.',
+          'Sharp pain = stop. Tired is fine; injury is not.',
+          'When one note rings clean, notice it. That’s the win.',
         ],
         day,
       ),
@@ -192,10 +190,13 @@ function teachBlock(phase: LessonPhase, seed: LessonSeed, day: number): { coach:
 }
 
 function guidedBlock(seed: LessonSeed, day: number): { coach: string; youDo: string[] } {
-  const drills = seed.drills.length >= 3 ? seed.drills : [...seed.drills, 'Repeat the cleanest take twice', 'Half-speed pass with a metronome']
+  const drills =
+    seed.drills.length >= 3
+      ? seed.drills
+      : [...seed.drills, 'Repeat the cleanest take twice', 'Half-speed pass with a metronome']
   return {
     coach:
-      'Guided practice — I’m metaphorically pointing at the sticky spot. Stay at a tempo where 8 of 10 reps are clean. Speed is a reward, not a tax.',
+      'Guided practice. Stay at a tempo where most reps are clean. Speed is a reward, not a tax.',
     youDo: drills.map((d, i) => {
       const mins = i === 0 ? '~3 min' : i === 1 ? '~3 min' : '~2 min'
       return `${mins}: ${d}`
@@ -204,52 +205,50 @@ function guidedBlock(seed: LessonSeed, day: number): { coach: string; youDo: str
 }
 
 function jamBlock(phase: LessonPhase, seed: LessonSeed, day: number): { coach: string; youDo: string[]; tip: string } {
-  const lib = seed.libraryIds[0]
-  const libHint = lib ? `Open library item “${lib}” when you want sound under you.` : 'Loop a simple open-string groove if you need a bed.'
   const ideas: Record<LessonPhase, string[]> = {
     basics: [
-      'Make a tiny “song”: 4 open-string hits, 4 fretted notes, repeat.',
-      'Call-and-response with yourself — play, rest, answer.',
+      'Tiny song: 4 open-string hits, 4 fretted notes, repeat.',
+      'Play, rest a bar, answer yourself.',
     ],
     chords: [
-      'Campfire loop: 4 beats per chord through today’s set. Miss a change? Keep the strum arm going.',
-      'Dynamics game: verse soft, chorus bigger — same shapes.',
+      'Campfire loop: 4 beats per chord. Miss a change? Keep the strum arm moving.',
+      'Same shapes, two volumes — soft then bigger.',
     ],
     scales: [
-      'Improv rule: only 3 notes for a whole minute. Make them funky with rhythm.',
-      'Question phrase up high, answer down low — leave rests.',
+      'Only 3 notes for a whole minute. Make rhythm do the work.',
+      'Question up high, answer down low — leave rests.',
     ],
     rhythm: [
-      'Groove sandwich: 4 bars pattern A, 4 bars pattern B, back to A.',
-      'Drop out on bar 4 on purpose — silence is musical.',
+      '4 bars pattern A, 4 bars B, back to A.',
+      'Drop out on bar 4 on purpose — silence counts.',
     ],
     lead: [
-      'Motif gym: same 4 notes, new rhythm each bar for 8 bars.',
-      'Target game: end every phrase on the root or 3rd.',
+      'Same 4 notes, new rhythm each bar for 8 bars.',
+      'End every phrase on the root or the 3rd.',
     ],
     repertoire: [
-      'Full section take — no stopping. If you flub, recover like a show.',
-      'Record one phone take; listen once with kindness, once with a pencil.',
+      'Full section — no stopping. Flub? Recover like a show.',
+      'One phone take. Listen once kind, once with a note.',
     ],
   }
   return {
-    coach: `Jam / song time — this is the fun you earned. ${libHint}`,
+    coach: 'Jam time — this is the fun you earned. Play something that sounds like music.',
     youDo: [
       pick(ideas[phase], day),
-      seed.goals[2] ? `Sneak this goal into the jam: ${seed.goals[2]}` : 'Keep your foot tapping the whole time.',
-      'Last 60s: play the cleanest, simplest version — that’s your victory lap.',
+      'Keep your foot tapping the whole time.',
+      'Last 60s: simplest clean version. Victory lap.',
     ],
-    tip: 'If you freeze, play one note in time until the brain comes back online.',
+    tip: 'If you freeze, one note in time until your brain comes back.',
   }
 }
 
 function cooldownBlock(seed: LessonSeed): { coach: string; youDo: string[] } {
   return {
-    coach: 'Cool-down protects your hands and locks the memory. Pros don’t skip this.',
+    coach: 'Cool-down. Soft hands, short check, done.',
     youDo: [
-      'Soft open strings or a gentle chord for 30–45s.',
-      `Mastery mirror: could you claim this? “${seed.masteryCheck}” — if not, note one sticky bar for tomorrow.`,
-      'Stretch fretting hand + shake out picking arm. One sentence in a notes app: what felt good.',
+      'Soft open strings or one gentle chord for 30–45s.',
+      `Quick check — could you do this yet? ${seed.masteryCheck}`,
+      'Stretch fretting hand, shake the picking arm. One note to yourself: what felt good.',
     ],
   }
 }
@@ -363,72 +362,70 @@ function funBonus(phase: LessonPhase, day: number): string {
 /** Gold-standard private-lesson copy for early days (teacher-written). */
 const GOLD: Partial<Record<number, Partial<PrivateLessonFields> & { teachExtra?: string }>> = {
   1: {
-    hook: 'Day one energy: make noise that feels good — no wrong notes yet.',
+    hook: 'Day one: make noise that feels good. No wrong notes yet.',
     teacherIntro:
-      'Hey — welcome. Today isn’t about being “good.” It’s about holding the guitar so your hands can relax, learning the string names, and hearing six clear open notes. That’s a real musician’s first win.',
+      'Hey — welcome. Today isn’t about being “good.” Hold the guitar so your hands can relax, learn the string names, and hear six clear open notes. That’s a real first win.',
     commonMistakes: [
-      'Hunching over the guitar — bring the guitar up, don’t dive down.',
-      'Right hand floating randomly; rest near the bridge lightly if it helps.',
+      'Hunching over — bring the guitar up, don’t dive down.',
+      'Right hand floating; rest near the bridge lightly if it helps.',
       'Skipping string names because it feels childish — it’s not.',
     ],
-    encouragement: 'You made the guitar speak. That’s the start of everything cool later.',
-    funBonus: 'Give each string a nickname. You’ll remember faster.',
+    encouragement: 'You made the guitar speak. That’s the start.',
+    funBonus: 'Nickname each string. You’ll remember faster.',
   },
   3: {
-    hook: 'Your first real chord: Em — two fingers, instant band energy.',
+    hook: 'First real chord: Em — two fingers, instant band energy.',
     teacherIntro:
-      'Em is the friendliest full chord on the guitar. Two fingers, all six strings, moody and strong. We’ll build it slow, check every string, then strum like a song already started.',
-    encouragement: 'If Em rings, you can learn every other open chord. Serious.',
+      'Em is the friendliest full chord on the guitar. Two fingers, all six strings. We’ll build it slow, check every string, then strum like a song already started.',
+    encouragement: 'If Em rings, you can learn every other open chord.',
   },
   7: {
-    hook: 'Week 1 jam — this is the party for showing up seven days.',
+    hook: 'Week 1 jam — party for showing up seven days.',
     teacherIntro:
-      'Checkpoints are celebrations with a clipboard. We’ll run Em G C D, keep a pulse, and record something short you can laugh at later when you’re shredding.',
+      'We’ll run Em G C D, keep a pulse, and record something short. Laugh at it later when you’re better — that’s the point.',
   },
   11: {
     hook: 'Pentatonic box 1 — the shape behind a thousand rock solos.',
     teacherIntro:
-      'Minor pentatonic is the “can’t mess it up too bad” scale. We’ll find A at fret 5, walk the box like stepping stones, and leave space so it sounds like music, not an elevator.',
+      'Minor pentatonic is the “hard to mess up” scale. Find A at fret 5, walk the box like stepping stones, and leave space so it sounds like music.',
   },
-
-  // Weekly-ish anchors get richer teacher voice (research: spaced retrieval + celebration)
   30: {
-    hook: 'Basics capstone — prove the campfire core with kindness.',
+    hook: 'Basics capstone — tiny set, not an exam.',
     teacherIntro:
-      'Thirty days in: you are not “behind.” You are collecting clean reps. Today we perform a tiny set, not a exam.',
-    encouragement: 'Foundations compound. Showing up for a month is already rare — and it shows in your hands.',
-    funBonus: 'Text a friend a 15s clip of your favorite 8 bars. Witnesses make wins real.',
+      'Thirty days in: you are not behind. You’re stacking clean reps. Today we play a little set and finish on a chord.',
+    encouragement: 'Showing up for a month already shows in your hands.',
+    funBonus: 'Text a friend 15 seconds of your favorite bars.',
   },
   75: {
-    hook: 'Chord phase crest — fluency over fancy.',
+    hook: 'Chord crest — smooth changes beat fancy ones.',
     teacherIntro:
-      'If changes are getting smoother, that is the whole plot. We polish the sticky door today and play music through it.',
-    encouragement: 'Chord comfort arrives in jumps after plateaus. Trust the slow days.',
+      'If your changes are getting smoother, that is the whole plot. Polish the sticky one and play music through it.',
+    encouragement: 'Chord comfort shows up in jumps after plateaus. Trust the slow days.',
   },
   120: {
-    hook: 'Scales become stories today — not exams.',
+    hook: 'Scales as stories — not a quiz.',
     teacherIntro:
-      'A 16-bar pent story beats a perfect box run. Shape a beginning, a little peak, and a landing on the root.',
-    encouragement: 'If you left space in your solo, you are already thinking like a musician.',
+      'A 16-bar pent story beats a perfect box run. Start, little peak, land on the root.',
+    encouragement: 'Left space in your solo? You are already thinking like a musician.',
   },
   180: {
-    hook: 'Rhythm checkpoint — pocket is a superpower.',
+    hook: 'Rhythm checkpoint — pocket first.',
     teacherIntro:
-      'We bridge toward lead by locking time. If the groove is honest, notes you add later will sit like furniture on a good floor.',
-    encouragement: 'People feel your time before they admire your fretting. You are training what listeners love first.',
+      'Lock time before you chase lead notes. Honest groove makes everything you add later sit better.',
+    encouragement: 'People feel your time before they notice your fretting. That is the skill.',
   },
   260: {
-    hook: 'Lead checkpoint — speech, not sport.',
+    hook: 'Lead checkpoint — talk, do not sprint.',
     teacherIntro:
-      'Bring a motif, a bend with a target, and silence. That trio outperforms a hundred rushed scale runs on stage.',
+      'Bring a short idea, a bend with a target, and some silence. That beats a hundred rushed scale runs.',
     encouragement: 'Your voice on the instrument is forming. Protect it with rests.',
   },
   365: {
-    hook: 'Day 365 — finish art on a long horizon.',
+    hook: 'Day 365 — play a set that sounds like you.',
     teacherIntro:
-      'This is a celebration performance, not a jury. Play a mini-set that sounds like you. Then write the next arc with kindness.',
-    encouragement: 'You finished a year-shaped path. That identity shift matters as much as any lick.',
-    funBonus: 'Schedule the first practice of the next 30 days on your calendar before you put the guitar down.',
+      'Celebration, not a jury. Mini-set, honest take, then jot what you want next month.',
+    encouragement: 'You finished a year-shaped path. That matters as much as any lick.',
+    funBonus: 'Put the first practice of the next 30 days on your calendar before you put the guitar down.',
   },
 }
 
@@ -451,10 +448,13 @@ export function expandPrivateLesson(
   const cool = cooldownBlock(seed)
   const gold = GOLD[day]
 
-  const hook = gold?.hook ?? `${pick(PHASE_HOOKS[phase], day)} · ${seed.title}`
+  // Unique per day without title-paste chrome in goals/drills — casual topic tag only.
+  const hook =
+    gold?.hook ??
+    `${pick(PHASE_HOOKS[phase], day)} ${seed.title.includes('—') ? seed.title.split('—').slice(1).join('—').trim() : seed.title}.`
   const teacherIntro =
     gold?.teacherIntro ??
-    `Private lesson — Day ${day}. We’ll treat the next ${durationMin} minutes like I’m here: warm up, learn one clear idea, practice it in small reps, then play something that feels like music. Focus: ${seed.goals[0] ?? seed.title}.`
+    `Next ${durationMin} minutes: warm up, one clear idea, small reps, then something that feels like music. Start with: ${seed.goals[0] ?? 'stay relaxed and in time'}.`
 
   const segments: LessonSegment[] = [
     {
@@ -463,9 +463,9 @@ export function expandPrivateLesson(
       minutes: plan.arrive,
       coach: pick(ARRIVE_LINES, day),
       youDo: [
-        `Today’s win: ${seed.goals[0] ?? seed.title}`,
-        `Secondary: ${seed.goals[1] ?? 'stay relaxed'}`,
-        'Metronome ready (or foot tap). Water nearby.',
+        seed.goals[0] ?? 'One clean win today.',
+        seed.goals[1] ?? 'Stay relaxed.',
+        'Metronome or foot tap ready. Water nearby.',
       ],
     },
     {

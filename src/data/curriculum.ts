@@ -66,60 +66,60 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     title: 'Meet the Guitar — First Clean Sounds',
     durationMin: 25,
     goals: [
-      'Hold the guitar so shoulders stay soft',
-      'Name open strings low→high E A D G B E',
-      'Make six open strings ring without buzz'
+      'Sit so your shoulders can stay loose',
+      'Name the open strings low to high: E A D G B E',
+      'Get all six open strings to ring without buzz',
     ],
-    theoryBite: 'First Clean Sounds: Standard tuning thick→thin: E A D G B E. In-tune strings train your ear for free.',
+    theoryBite: 'Thick to thin, standard tuning is E A D G B E. Saying the names out loud while you pluck trains your ear for free.',
     drills: [
-      'Sit tall, guitar on leg, fretting thumb behind neck',
-      'Pluck open strings low→high naming each',
-      'Sustain check: each string rings ~2 seconds'
+      'Get comfortable: guitar on your leg, fretting thumb behind the neck',
+      'Pluck open strings low to high and say each name',
+      'Hold each open string about two seconds — if it dies early, pluck again softer and cleaner',
     ],
     libraryIds: [
-      'rf-spider'
+      'rf-spider',
     ],
-    masteryCheck: 'Name and pluck all six open strings in order without looking at the headstock.',
+    masteryCheck: 'Name and pluck all six open strings in order without peeking at the headstock.',
   },
   2: {
 
     title: 'Fretting Hand — Just Enough Pressure',
     durationMin: 25,
     goals: [
-      'Fret with fingertips behind the fretwire',
-      'Use minimum pressure that still sounds clean',
-      'Play frets 1–4 on high E evenly'
+      'Fret with fingertips, right behind the metal fret',
+      'Use the lightest press that still sounds clean',
+      'Play frets 1–4 on the high E evenly',
     ],
-    theoryBite: 'Just Enough Pressure: One fret ≈ one semitone. Press just behind the metal fret — not the middle of the box.',
+    theoryBite: 'One fret is one half-step. Press just behind the fret wire — middle of the box makes you squeeze harder for a worse sound.',
     drills: [
-      'Spider 1-2-3-4 on high E at 50 BPM',
-      'Buzz-then-add: release until buzz, add a hair of pressure',
-      'Mirror check: knuckles curved, wrist neutral'
+      'Slow spider 1-2-3-4 on the high E around 50 BPM',
+      'Buzz-then-add: ease off until it buzzes, then add a hair of pressure',
+      'Quick mirror check — curved knuckles, wrist not collapsed',
     ],
     libraryIds: [
-      'rf-spider'
+      'rf-spider',
     ],
-    masteryCheck: 'Play frets 1–4 on the high E string evenly at 60 BPM with clear tone.',
+    masteryCheck: 'Play frets 1–4 on the high E evenly at 60 BPM with clear tone.',
   },
   3: {
 
     title: 'First Chord Win — E Minor',
     durationMin: 25,
     goals: [
-      'Form open Em with two fingers',
+      'Build open Em with two fingers',
       'Strum all six strings on the beat',
-      'Lift and replace Em ten times cleanly'
+      'Lift Em off and put it back ten times cleanly',
     ],
-    theoryBite: 'E Minor: E minor = E G B. Open Em: middle on A2, ring on D2. Easiest full-sounding chord — early win on purpose.',
+    theoryBite: 'E minor is the notes E G B. Open Em: middle finger on A string fret 2, ring on D string fret 2. Easiest full-sounding chord — we start here on purpose.',
     drills: [
-      'Build Em, count to 4, release ×10',
+      'Build Em, count to four, release — do that ten times',
       'Down-strums on beats 1 and 3 only',
-      'String audit: pluck each string alone'
+      'String audit: pluck each string alone and fix anything dead',
     ],
     libraryIds: [
-      'ch-em'
+      'ch-em',
     ],
-    masteryCheck: 'Hold Em for 8 steady down-strums with every string ringing.',
+    masteryCheck: 'Hold Em for eight steady down-strums with every string ringing.',
   },
   4: {
 
@@ -127,18 +127,18 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     durationMin: 25,
     goals: [
       'Form a clear open G',
-      'Strum from the low E',
-      'Change Em→G in slow motion'
+      'Strum from the low E string',
+      'Change Em to G in slow motion',
     ],
-    theoryBite: 'G Major + First Change: G major = G B D. Changes — not single shapes — are the real beginner skill.',
+    theoryBite: 'G major is G B D. Single shapes are nice; smooth changes are the real beginner skill.',
     drills: [
       'Build G one finger at a time',
-      'Em | G at 50 BPM, two bars each',
-      'Keep the strum arm moving during the change'
+      'Em | G at about 50 BPM, two bars each',
+      'Keep the strum arm moving while your fretting hand switches',
     ],
     libraryIds: [
       'ch-g',
-      'ch-em'
+      'ch-em',
     ],
     masteryCheck: 'Complete four clean Em→G changes in 30 seconds.',
   },
@@ -147,19 +147,19 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     title: 'C Major — Five-String Clarity',
     durationMin: 25,
     goals: [
-      'Form open C without choking B or G',
-      'Avoid accidental low-E clashes',
-      'Connect C with G'
+      'Form open C without choking the B or G strings',
+      'Skip accidental bangs on the low E',
+      'Connect C with G',
     ],
-    theoryBite: 'Five-String Clarity: C major = C E G. Open C frets A3, D2, B1; low E is often omitted on purpose.',
+    theoryBite: 'C major is C E G. Open C frets A3, D2, B1. Leaving the low E out is normal — not a mistake.',
     drills: [
-      'Place C, pluck strings 5→1 individually',
-      'G–C–G–C at walking tempo',
-      'Thumb mid-neck — not strangling the top'
+      'Place C, then pluck strings 5 down to 1 one at a time',
+      'G–C–G–C at a walking tempo',
+      'Thumb mid-neck — don’t strangle the top of the neck',
     ],
     libraryIds: [
       'ch-c',
-      'ch-g'
+      'ch-g',
     ],
     masteryCheck: 'Play C with five clear strings and no unwanted low-E bang.',
   },
@@ -170,18 +170,18 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     goals: [
       'Form the open D triangle',
       'Strum only strings 4–1',
-      'Loop G–C–D as real music'
+      'Loop G–C–D like a real song bit',
     ],
-    theoryBite: 'Triangle + Campfire Set: D major = D F# A. Top-four-string chord — missing lows is correct, not a mistake.',
+    theoryBite: 'D major is D F# A. It’s a top-four-string chord — missing the low strings is correct.',
     drills: [
       'Freeze the D triangle cleanly for ten full seconds',
       'G–C–D–G loop four times',
-      'Soft down-up strums on D only'
+      'Soft down-up strums on D only',
     ],
     libraryIds: [
       'ch-d',
       'ch-g',
-      'ch-c'
+      'ch-c',
     ],
     masteryCheck: 'Play the G–C–D progression twice without stopping.',
   },
@@ -190,21 +190,21 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     title: 'Week 1 Jam — Em G C D Music',
     durationMin: 35,
     goals: [
-      'Review Em G C D as one vocabulary',
+      'Treat Em G C D as one little vocabulary',
       'Lock a slow metronome pulse',
-      'Record 60 seconds of honest music'
+      'Record about 60 seconds of honest playing',
     ],
-    theoryBite: 'Em G C D Music: In G: G=I, C=IV, D=V, Em=vi. Four chords unlock thousands of songs — play them today.',
+    theoryBite: 'In the key of G: G is I, C is IV, D is V, Em is vi. Four chords unlock a ton of songs — play them today, don’t just name them.',
     drills: [
-      '4 bars each chord at 70 BPM',
-      'Two-minute continuous change loop',
-      'Phone-record one kind take; listen once'
+      'Four bars on each chord at 70 BPM',
+      'Two minutes of continuous changes — keep the arm moving if you flub',
+      'Phone-record one kind take; listen once without cringing',
     ],
     libraryIds: [
       'ch-em',
       'ch-g',
       'ch-c',
-      'ch-d'
+      'ch-d',
     ],
     masteryCheck: 'Play two continuous minutes moving among Em, G, C, and D in time.',
   },
@@ -214,18 +214,18 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     durationMin: 30,
     goals: [
       'Add clear Am and E shapes',
-      'Notice kinship between shapes',
-      'Color a loop Am–E–Am–E'
+      'Notice how the shapes are cousins',
+      'Color a loop Am–E–Am–E',
     ],
-    theoryBite: 'Shape Family: Am is the relative minor of C. Shared shape families shrink the learning load.',
+    theoryBite: 'Am is the relative minor of C. Shared shape families mean less to memorize — your hand already knows half the job.',
     drills: [
-      'Visualize Am as Em moved toward the floor',
+      'See Am as Em slid toward the floor',
       'Am–E changes at 60 BPM',
-      'Loop C–Am–E–Am four times and name the mood shift'
+      'Loop C–Am–E–Am four times and notice the mood shift',
     ],
     libraryIds: [
       'ch-am',
-      'ch-e'
+      'ch-e',
     ],
     masteryCheck: 'Eight clean strums each on Am and E with no dead notes.',
   },
@@ -234,19 +234,19 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     title: 'Strum Patterns — Downs, Ups, and &s',
     durationMin: 30,
     goals: [
-      'Downstrokes land on numbered beats',
-      'Upstrokes on the & counts',
-      'Apply D-DU-D-DU to G–C–D'
+      'Land downstrokes on the numbered beats',
+      'Put upstrokes on the & counts',
+      'Run D-DU-D-DU over G–C–D',
     ],
-    theoryBite: 'Downs, Ups, and &s: Count 1 & 2 & 3 & 4 &. Right hand is the drummer; fretting hand only changes costumes.',
+    theoryBite: 'Count 1 & 2 & 3 & 4 &. Your right hand is the drummer; the fretting hand just changes costumes.',
     drills: [
       'Muted D-D-D-D for 60 seconds',
       'D-DU-D-DU on G for 8 bars',
-      'Ghost strums: miss strings on purpose for groove'
+      'Ghost strums: miss the strings on purpose for groove',
     ],
     libraryIds: [
       'ch-d',
-      'sg-fr-re-jacques'
+      'sg-fr-re-jacques',
     ],
     masteryCheck: 'Play D-DU-D-DU on G for 8 bars without losing the count.',
   },
@@ -257,17 +257,17 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     goals: [
       'Form open A cleanly',
       'Loop A–D–E with steady time',
-      'Toggle A vs Am to hear the third'
+      'Toggle A vs Am so you hear the third',
     ],
-    theoryBite: 'A–D–E Starter Set: A major = A C# E. Gateway to blues and rock in A. One finger often separates major/minor color.',
+    theoryBite: 'A major is A C# E. It’s a gateway to blues and rock in A. Often one finger is all that separates major from minor color.',
     drills: [
-      'A freeze + string-by-string audit',
+      'Freeze A and audit string by string',
       'A–D–E–A twice slowly',
-      'A vs Am toggle on a drone beat'
+      'A vs Am toggle on a steady beat',
     ],
     libraryIds: [
       'ch-a',
-      'sg-go-tell-aunt-rhody'
+      'sg-go-tell-aunt-rhody',
     ],
     masteryCheck: 'Play two full A–D–E loops with steady time.',
   },
@@ -276,19 +276,19 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     title: 'Minor Pentatonic Box 1 — First Lead Map',
     durationMin: 30,
     goals: [
-      'Find A root on string 5 fret 5',
-      'Ascend and descend box 1 slowly',
-      'Improvise using only three notes'
+      'Find the A root for box 1 (low E string, fret 5)',
+      'Walk box 1 up and down slowly',
+      'Improvise using only three notes',
     ],
-    theoryBite: 'First Lead Map: A minor pentatonic: A C D E G. Box 1 is the most used rock/blues map — fewer notes, more music.',
+    theoryBite: 'A minor pentatonic is A C D E G. Box 1 is the rock/blues map everyone bumps into first — fewer notes, easier music.',
     drills: [
-      'Root pulses on beat 1 for 30 seconds',
-      'Ascend box, rest one bar, descend',
-      '3-note solo rule for a full minute'
+      'Pulse the root on beat 1 for 30 seconds',
+      'Ascend the box, rest one bar, then descend',
+      'Three-note solo rule for a full minute',
     ],
     libraryIds: [
       'sc-pent-min',
-      'rf-em-pentatonic-box-study'
+      'rf-em-pentatonic-box-study',
     ],
     masteryCheck: 'Play box 1 up and down in time at 60 BPM, landing on the root.',
   },
@@ -299,17 +299,17 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     goals: [
       'Learn the melody in short phrases',
       'Sing a phrase, then play it',
-      'Connect phrases without panic stops'
+      'Connect phrases without panic stops',
     ],
-    theoryBite: 'Twinkle in Open Position: Melodies train ear and timing faster than empty shapes. A phrase is a musical sentence — breathe between them.',
+    theoryBite: 'Melodies train ear and timing faster than empty shapes. A phrase is a musical sentence — breathe between them.',
     drills: [
-      'Map phrase 1 only until easy',
-      'Call-and-response: sing then play',
-      'One slow clean full melody'
+      'Map phrase 1 only until it feels easy',
+      'Call-and-response: sing, then play',
+      'One slow clean pass through the whole melody',
     ],
     libraryIds: [
       'sg-twinkle',
-      'sg-ode'
+      'sg-ode',
     ],
     masteryCheck: 'Play Twinkle phrase-by-phrase with a steady pulse and no rushing.',
   },
@@ -318,18 +318,18 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     title: 'Finger Independence — Spider Across Strings',
     durationMin: 30,
     goals: [
-      'Run 1-2-3-4 moving string to string',
+      'Run 1-2-3-4 moving from string to string',
       'Keep idle fingers soft',
-      'Stay under tempo ego'
+      'Stay under tempo ego',
     ],
-    theoryBite: 'Spider Across Strings: Independence is coordination, not strength. Slow spiders wire clean fretting for every future chord.',
+    theoryBite: 'Independence is coordination, not strength. Slow spiders wire clean fretting for every chord you’ll learn later.',
     drills: [
       'Spider on B and high E only',
-      'Add G string when even',
-      'Stop at first tension; shake out 10 seconds'
+      'Add the G string when it’s even',
+      'Stop at the first real tension; shake out ten seconds',
     ],
     libraryIds: [
-      'rf-spider'
+      'rf-spider',
     ],
     masteryCheck: 'Play a calm two-string spider for 60 seconds with even volume.',
   },
@@ -338,18 +338,18 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     title: 'Power Chords Intro — Two-Finger Rock',
     durationMin: 35,
     goals: [
-      'Fret root + fifth power shape',
+      'Fret a root + fifth power shape',
       'Mute unused strings lightly',
-      'Move the shape on the E string'
+      'Move the shape on the low E string',
     ],
-    theoryBite: 'Two-Finger Rock: Power chord = root + fifth (sometimes + octave). Movable, tough-sounding, beginner-friendly harmony.',
+    theoryBite: 'A power chord is root + fifth (sometimes plus the octave). Movable, tough-sounding, and friendly when full barres still hurt.',
     drills: [
-      'E5 at frets 0/2 then 3/5',
-      'Palm-mute downstrokes eighths',
-      'Riff: root movement in time'
+      'E5 at open/2, then at frets 3/5',
+      'Palm-mute downstroke eighths',
+      'Little riff: move the root in time',
     ],
     libraryIds: [
-      'sg-mary-had-a-little-lamb'
+      'sg-mary-had-a-little-lamb',
     ],
     masteryCheck: 'Play a four-bar power-chord riff twice with muted clarity.',
   },
@@ -359,17 +359,17 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     durationMin: 30,
     goals: [
       'Watch which fingers travel farthest',
-      'Park shared fingers when possible',
-      'Change G–C–D with smaller motions'
+      'Park shared fingers when you can',
+      'Change G–C–D with smaller motions',
     ],
-    theoryBite: 'Shrink the Motion: Economy of motion beats finger speed. The shortest path between shapes is a practice skill of its own.',
+    theoryBite: 'Economy of motion beats raw finger speed. The shortest path between shapes is its own practice skill.',
     drills: [
       'Film one change in slow-mo if you can',
-      'G–C isolation 2 minutes',
-      'C–D isolation 2 minutes'
+      'G–C isolation for two minutes',
+      'C–D isolation for two minutes',
     ],
     libraryIds: [
-      'sg-london-bridge'
+      'sg-london-bridge',
     ],
     masteryCheck: 'Make eight G–C–D changes where each landing is clean on beat 1.',
   },
@@ -379,18 +379,18 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     durationMin: 30,
     goals: [
       'Learn the opening motif cleanly',
-      'Alternate motif and a C or G chord',
-      'Keep tempo humble'
+      'Alternate the motif with a C or G chord',
+      'Keep the tempo humble',
     ],
-    theoryBite: 'Melody Meets Chords: Single-note themes over open chords build the lead+rhythm brain without theory overload.',
+    theoryBite: 'A single-note theme over open chords builds the lead-and-rhythm brain without drowning you in theory.',
     drills: [
       'Play the motif only, four times, before expanding',
       'Motif | C chord | motif | G chord',
-      'Light dynamics: soft question, fuller answer'
+      'Soft question, fuller answer — light dynamics',
     ],
     libraryIds: [
       'sg-twinkle',
-      'sg-ode'
+      'sg-ode',
     ],
     masteryCheck: 'Play the Ode motif twice and answer each time with a clean open chord.',
   },
@@ -400,18 +400,18 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     durationMin: 30,
     goals: [
       'Foot taps quarters the whole drill',
-      'Strum arm stays fluid on misses',
-      'Prefer pocket at 70 BPM over chaos at 100'
+      'Strum arm keeps moving even when you miss a change',
+      'Prefer pocket at 70 BPM over chaos at 100',
     ],
-    theoryBite: 'Pocket Over Speed: Listeners feel time before they notice fancy chords. Pocket = notes agreeing with the pulse.',
+    theoryBite: 'Listeners feel time before they notice fancy chords. Pocket means your notes agree with the pulse.',
     drills: [
-      'Foot-only quarters 30 seconds',
-      'Muted groove 1 minute',
-      'G–C–D with foot locked'
+      'Foot-only quarters for 30 seconds',
+      'Muted groove for one minute',
+      'G–C–D with the foot locked',
     ],
     libraryIds: [
       'ch-d',
-      'sg-ode'
+      'sg-ode',
     ],
     masteryCheck: 'Two minutes of chord changes where your foot never stops the pulse.',
   },
@@ -422,19 +422,19 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     goals: [
       'Form clear open Dm',
       'Toggle D major vs D minor',
-      'Play a tiny sad-loop Dm–C–G'
+      'Play a tiny sad loop Dm–C–G',
     ],
-    theoryBite: 'Major vs Minor Ears: Minor lowers the third (F vs F# in D). Your ear learns faster when you A/B colors on purpose.',
+    theoryBite: 'Minor lowers the third — F instead of F# in D. Your ear learns faster when you A/B the colors on purpose.',
     drills: [
-      'Pluck Dm string-by-string and fix any dead notes',
+      'Pluck Dm string-by-string and fix dead notes',
       'D | Dm | D | Dm slow',
-      'Loop Dm–C–G–G four times with even strums'
+      'Loop Dm–C–G–G four times with even strums',
     ],
     libraryIds: [
       'ch-dm',
-      'ch-d'
+      'ch-d',
     ],
-    masteryCheck: 'Demonstrate D vs Dm and play one clean Dm–C–G loop.',
+    masteryCheck: 'Show D vs Dm clearly, then play one clean Dm–C–G loop.',
   },
   19: {
 
@@ -442,20 +442,20 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     durationMin: 30,
     goals: [
       'Form G7 and D7',
-      'Feel how V7 pulls to I',
-      'Use G7→C and D7→G resolutions'
+      'Feel how V7 pulls toward I',
+      'Use G7→C and D7→G resolutions',
     ],
-    theoryBite: 'G7 and D7 as Magnets: Dominant 7th (1–3–5–b7) creates tension that wants the tonic. Folk and blues live here.',
+    theoryBite: 'A dominant 7th (1–3–5–b7) creates tension that wants the home chord. Folk and blues live on that pull.',
     drills: [
-      'G7 freeze + resolve to C',
-      'D7 freeze + resolve to G',
-      'Loop G–G7–C four times hearing the pull of G7'
+      'Freeze G7, then resolve to C',
+      'Freeze D7, then resolve to G',
+      'Loop G–G7–C four times and listen for the magnet',
     ],
     libraryIds: [
       'ch-g7',
-      'ch-d7'
+      'ch-d7',
     ],
-    masteryCheck: 'Play two clear V7→I resolutions (G7→C and D7→G).',
+    masteryCheck: 'Play two clear V7→I resolutions: G7→C and D7→G.',
   },
   20: {
 
@@ -464,16 +464,16 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     goals: [
       'Thumb plays bass on beat 1',
       'Index answers on a higher string',
-      'Keep pattern boringly steady'
+      'Keep the pattern boringly steady',
     ],
-    theoryBite: 'Thumb + i: Travis seeds start with thumb independence. Steady bass makes sparse treble sound pro.',
+    theoryBite: 'Travis-style seeds start with thumb independence. A steady bass makes sparse treble sound pro.',
     drills: [
-      'Thumb on open A only for 1 minute',
-      'Add index on B string &s',
-      'Apply the pattern over an Am shape for 8 bars'
+      'Thumb on open A only for one minute',
+      'Add index on the B string on the &s',
+      'Run the pattern over an Am shape for 8 bars',
     ],
     libraryIds: [
-      'sg-row-row-row-your-boat'
+      'sg-row-row-row-your-boat',
     ],
     masteryCheck: 'Play 8 bars of thumb-bass + index answer without rushing.',
   },
@@ -482,18 +482,18 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     title: 'Barre Preview — One-Finger Mini F',
     durationMin: 35,
     goals: [
-      'Barre high E+B at fret 1 lightly',
-      'Add F shape pieces only if painless',
-      'Stop at fatigue — tendons first'
+      'Barre high E and B at fret 1 lightly',
+      'Add more of the F shape only if it stays painless',
+      'Stop at fatigue — tendons first',
     ],
-    theoryBite: 'One-Finger Mini F: Full F barre is a milestone, not day-one law. Mini shapes and strength build beat forced pain.',
+    theoryBite: 'Full F barre is a milestone, not a day-one law. Mini shapes and patience beat forced pain.',
     drills: [
-      '1-finger barre chirps 10×',
-      'Fmaj7 (easy) as alternate win',
-      'Shake out every 30 seconds'
+      'One-finger barre chirps, ten times',
+      'Fmaj7 (easy version) as an alternate win',
+      'Shake out every 30 seconds',
     ],
     libraryIds: [
-      'sg-this-old-man'
+      'sg-this-old-man',
     ],
     masteryCheck: 'Sound two clean treble strings under a light fret-1 barre ten times.',
   },
@@ -504,16 +504,16 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     goals: [
       'Hum a 3-note idea',
       'Find it starting on open B or high E',
-      'Repeat until fingers match voice'
+      'Repeat until fingers match your voice',
     ],
-    theoryBite: 'Find Melodies You Hum: Voice→fret is the shortest path to musical ownership. Wrong notes are clues, not crimes.',
+    theoryBite: 'Voice to fret is the shortest path to owning music. Wrong notes are clues, not crimes.',
     drills: [
-      'Hum → hunt → verify ×5',
-      'Change starting pitch once',
-      'Write nothing; trust ears'
+      'Hum → hunt → check, five times',
+      'Change the starting pitch once',
+      'Don’t write it down — trust your ears',
     ],
     libraryIds: [
-      'sg-she-ll-be-coming-round-the-mount'
+      'sg-she-ll-be-coming-round-the-mount',
     ],
     masteryCheck: 'Match a hummed 3-note idea on the guitar twice in a row.',
   },
@@ -522,20 +522,20 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     title: 'Dynamics — Soft Verse, Bigger Chorus',
     durationMin: 30,
     goals: [
-      'Play the same progression two volumes',
-      'Use right-hand height/speed, not fretting squeeze',
-      'Make a 16-bar mini arrangement'
+      'Play the same progression at two volumes',
+      'Change volume with the right hand, not a death grip',
+      'Make a 16-bar mini arrangement',
     ],
-    theoryBite: 'Soft Verse, Bigger Chorus: Expression is mostly right hand. Same chords, different story — instant ‘pro’ upgrade.',
+    theoryBite: 'Expression is mostly right hand. Same chords, different story — instant “oh, that sounds like a song” upgrade.',
     drills: [
-      'Play G–C–D at whisper volume with locked time',
-      'Same progression conversation level',
-      '8 soft + 8 fuller bars'
+      'G–C–D at whisper volume with locked time',
+      'Same progression at conversation level',
+      'Eight soft bars, then eight fuller bars',
     ],
     libraryIds: [
-      'sg-drums'
+      'sg-drums',
     ],
-    masteryCheck: 'Perform 16 bars with a clear soft-to-louder lift listeners could notice.',
+    masteryCheck: 'Play 16 bars with a soft-to-louder lift someone else could notice.',
   },
   24: {
 
@@ -543,19 +543,19 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     durationMin: 30,
     goals: [
       'Palm mute near the bridge',
-      'Fret-hand mute idle strings',
-      'Play rest strokes on purpose'
+      'Mute idle strings with the fretting hand',
+      'Play rest strokes on purpose',
     ],
-    theoryBite: 'Left and Right Hand Silence: Great rhythm guitar is half silence. Mutes turn strums into drums.',
+    theoryBite: 'Great rhythm guitar is half silence. Mutes turn strums into drums.',
     drills: [
       'Palm-muted open low-E eighths near the bridge',
-      'Chuck on &s between chords',
-      'Full stop rests for one bar in four'
+      'Chuck on the &s between chords',
+      'Full stop rests for one bar in every four',
     ],
     libraryIds: [
-      'sg-camptown-races'
+      'sg-camptown-races',
     ],
-    masteryCheck: 'Play 8 bars where mutes and rings are obviously intentional.',
+    masteryCheck: 'Play 8 bars where mutes and rings are obviously on purpose.',
   },
   25: {
 
@@ -563,18 +563,18 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     durationMin: 30,
     goals: [
       'Pick a 4-note melody cell',
-      'Answer with Em or G',
-      'Loop as a tiny original'
+      'Answer it with Em or G',
+      'Loop it as a tiny original',
     ],
-    theoryBite: 'Combine Melody + Two Chords: Creative ownership locks skills better than drills alone. Tiny songs beat perfect exercises.',
+    theoryBite: 'Making something tiny of your own locks skills better than drills alone. Small songs beat perfect exercises.',
     drills: [
-      'Compose cell on high strings',
+      'Build a cell on the high strings',
       'Cell | Em | cell | G',
-      'Name your sketch out loud'
+      'Say the sketch’s name out loud — silly names welcome',
     ],
     libraryIds: [
       'sg-twinkle',
-      'sg-ode'
+      'sg-ode',
     ],
     masteryCheck: 'Perform your 4-bar sketch twice from memory.',
   },
@@ -583,18 +583,18 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     title: 'Timing Honesty — Metronome as Friend',
     durationMin: 30,
     goals: [
-      'Play only on beat 1 of each bar for 1 minute',
-      'Fill quarters only when solid',
-      'Notice rush on easy bars'
+      'Play only on beat 1 of each bar for one minute',
+      'Add more beats only when that feels solid',
+      'Notice when you rush the easy bars',
     ],
-    theoryBite: 'Metronome as Friend: Metronomes expose truth kindly. Landing late/early is data for the next rep.',
+    theoryBite: 'A metronome tells the truth kindly. Landing late or early is just data for the next rep.',
     drills: [
-      'Chord hits on 1 only',
-      'Add chord hits on beats 1 and 3 only for 8 bars',
-      'Full quarters at 65 BPM'
+      'Chord hits on beat 1 only',
+      'Hits on 1 and 3 for 8 bars',
+      'Full quarters at 65 BPM',
     ],
     libraryIds: [
-      'sg-fr-re-jacques'
+      'sg-fr-re-jacques',
     ],
     masteryCheck: 'Stay with the click for 90 seconds of simple chord hits.',
   },
@@ -603,21 +603,21 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     title: 'Review Web — Weakest Chord Rescue',
     durationMin: 30,
     goals: [
-      'Identify your messiest shape',
-      'Isolate it for 5 focused minutes',
-      'Reinsert into a progression'
+      'Name your messiest shape honestly',
+      'Give it five focused minutes alone',
+      'Drop it back into a progression',
     ],
-    theoryBite: 'Weakest Chord Rescue: Spaced repair beats random replay. Weak links define the chain — fix one per session.',
+    theoryBite: 'Fixing the weak link beats replaying what already feels good. One rescue per session adds up fast.',
     drills: [
-      'Honest ranking of Em G C D A Am E',
-      'Ugly-chord gym 5 minutes',
-      'Progression with ugly chord every bar 2'
+      'Rank Em G C D A Am E from cleanest to messiest',
+      'Ugly-chord gym for five minutes',
+      'Progression with the ugly chord on every bar 2',
     ],
     libraryIds: [
       'ch-am',
-      'sg-go-tell-aunt-rhody'
+      'sg-go-tell-aunt-rhody',
     ],
-    masteryCheck: 'Name your weakest chord and show 10 cleaner frets of it than yesterday’s average.',
+    masteryCheck: 'Name your weakest chord and show ten cleaner frets of it than your usual rush job.',
   },
   28: {
 
@@ -625,61 +625,61 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     durationMin: 35,
     goals: [
       'Form E7 and A7',
-      'Two-bar shuffle strums',
-      'Keep it greasy, not fast'
+      'Try a two-bar shuffle strum',
+      'Keep it greasy, not fast',
     ],
-    theoryBite: 'E7 A7 Shuffle Feel: Dominant chords + swing/shuffle hint = instant blues flavor without full 12-bar yet.',
+    theoryBite: 'Dominant chords plus a long-short shuffle feel = instant blues flavor, even before a full 12-bar form.',
     drills: [
-      'E7 for 4 bars, A7 for 2, back',
-      'Long-short shuffle strum try',
-      'Smile — feel over perfection'
+      'E7 for four bars, A7 for two, back again',
+      'Long-short shuffle strum attempt',
+      'Smile — feel over perfection today',
     ],
     libraryIds: [
       'ch-e7',
-      'ch-a7'
+      'ch-a7',
     ],
-    masteryCheck: 'Play a 12-bar-ish E7/A7 groove slowly for one full chorus feel.',
+    masteryCheck: 'Play a slow E7/A7 groove that feels like one full blues chorus.',
   },
   29: {
 
     title: 'Comfort Setup — Pain Flags and Breaks',
     durationMin: 30,
     goals: [
-      'Check thumb/wrist for strain signs',
-      'Schedule 30s breaks each 5 minutes',
-      'Adjust strap/seat before pushing hard'
+      'Check thumb and wrist for strain signs',
+      'Take a 30-second break every five minutes',
+      'Fix strap or seat before you push hard',
     ],
-    theoryBite: 'Pain Flags and Breaks: No badge for pain. Sustainable technique is the only technique that reaches day 365.',
+    theoryBite: 'There’s no badge for pain. The only technique that reaches day 365 is the one you can still do next week.',
     drills: [
-      'Posture reset checklist',
-      'Play 4 minutes, break 30s, repeat',
-      'Note any hotspots in a phone memo'
+      'Run a quick posture checklist',
+      'Play four minutes, break thirty seconds, repeat',
+      'Note any hotspots in your phone',
     ],
     libraryIds: [
-      'sg-amazing-grace'
+      'sg-amazing-grace',
     ],
-    masteryCheck: 'Complete today’s playing with zero ‘push through sharp pain’ moments.',
+    masteryCheck: 'Finish today’s playing without pushing through sharp pain.',
   },
   30: {
 
     title: 'Basics Capstone — 3-Minute Campfire Set',
     durationMin: 30,
     goals: [
-      'Medley: progression + tiny melody + groove',
+      'Medley: a progression, a tiny melody, a groove',
       'Recover from one intentional mistake',
-      'End with a held final chord'
+      'End on a held final chord',
     ],
-    theoryBite: '3-Minute Campfire Set: Performance is a skill: start, continue, recover, end. Capstones prove transfer, not trivia.',
+    theoryBite: 'Performance is a skill: start, keep going, recover, end. Today proves you can transfer the month — not recite trivia.',
     drills: [
-      'Plan 3-minute order on paper',
+      'Jot a three-minute order on paper',
       'Full run with no stops — restart only after the end',
-      'Second run with dynamics'
+      'Second run with soft and loud sections',
     ],
     libraryIds: [
       'rf-spider',
-      'sg-twinkle'
+      'sg-twinkle',
     ],
-    masteryCheck: 'Deliver a ~3-minute mini-set using at least three chords and one melodic idea.',
+    masteryCheck: 'Deliver about three minutes using at least three chords and one melodic idea.',
   },
   31: {
 
@@ -1097,7 +1097,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     libraryIds: [
       'pr-andalu'
     ],
-    masteryCheck: 'Demonstrate one progression where bass motion is obviously intentional.',
+    masteryCheck: 'Show one progression where bass motion is obviously intentional.',
   },
   51: {
 
@@ -1197,7 +1197,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     libraryIds: [
       'pr-andalu'
     ],
-    masteryCheck: 'Demonstrate the same progression in two pitch levels (capo or movable idea).',
+    masteryCheck: 'Show the same progression in two pitch levels (capo or movable idea).',
   },
   56: {
 
@@ -1532,7 +1532,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'Include one stretch chord (F/Bm/7th)',
       'Record a keepable take (Weekly Chord Checkpoint 6 · Focus D7/DM)'
     ],
-    theoryBite: 'Weekly retrieval practice strengthens memory more than massed cramming — make it musical. Today\'s angle: Weekly Chord Checkpoint 6 · Focus D7/DM.',
+    theoryBite: 'Weekly retrieval practice strengthens memory more than massed cramming — make it musical. Today: Weekly Chord Checkpoint 6 · Focus D7/DM.',
     drills: [
       '3-minute medley plan',
       'Record one full take without stopping mid-form',
@@ -1871,7 +1871,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     libraryIds: [
       'rf-d-folk-pattern-study'
     ],
-    masteryCheck: 'Demonstrate one lydian color tone and a satisfying resolution.',
+    masteryCheck: 'Show one lydian color tone and a satisfying resolution.',
   },
   89: {
 
@@ -2156,127 +2156,127 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
   },
   103: {
 
-    title: 'Weekly Scales Checkpoint (103)',
+    title: 'Weekly Scales Checkpoint day 103',
     durationMin: 30,
     goals: [
       'Pent story 8 bars',
       'One modal or major scale color',
-      'Resolve everything home (Weekly Scales Checkpoint (103))'
+      'Resolve everything home (Weekly Scales Checkpoint day 103)'
     ],
     theoryBite: 'Weekly Scales Checkpoint 4: Checkpoints retrieve multiple skills in one performance — stronger memory than isolated drills.',
     drills: [
       'Warm up with minor pentatonic box 1 slowly',
       'Play the color section once soft and once fuller',
-      'Final landing take (Weekly Scales Checkpoint (103))'
+      'Final landing take (Weekly Scales Checkpoint day 103)'
     ],
     libraryIds: [
       'rf-jazz-chromatic-approach-study'
     ],
-    masteryCheck: 'Perform a short multi-color take that still feels like one piece of music. [Weekly Scales Checkpoint (103)]',
+    masteryCheck: 'Perform a short multi-color take that still feels like one piece of music. [Weekly Scales Checkpoint day 103]',
   },
   104: {
 
-    title: 'Neck Geography — Root Finder Drill (104)',
+    title: 'Neck Geography — Root Finder Drill day 104',
     durationMin: 30,
     goals: [
       'Find today’s root on at least three strings',
       'Pulse each root on beat 1',
-      'Connect roots with scale steps (Neck Geography — Root Finder Drill (104))'
+      'Connect roots with scale steps (Neck Geography — Root Finder Drill day 104)'
     ],
     theoryBite: 'Root Finder Drill 28: Root awareness is the difference between wandering and soloing. Map first, decorate second.',
     drills: [
       'Root hunt low to high',
       'Jump root octaves cleanly on beats 1 and 3',
-      'Scale path between two roots (Neck Geography — Root Finder Drill (104))'
+      'Scale path between two roots (Neck Geography — Root Finder Drill day 104)'
     ],
     libraryIds: [
       'rf-travis-pick-sketch-in-c'
     ],
-    masteryCheck: 'Hit three different-string roots in time within one position neighborhood. [Neck Geography — Root Finder Drill (104)]',
+    masteryCheck: 'Hit three different-string roots in time within one position neighborhood. [Neck Geography — Root Finder Drill day 104]',
   },
   105: {
 
-    title: 'Phrase Gym — Copy → Vary → Own (105)',
+    title: 'Phrase Gym — Copy → Vary → Own day 105',
     durationMin: 35,
     goals: [
       'Learn a 4-note library motif',
       'Vary rhythm only',
-      'Vary ending note only (Phrase Gym — Copy → Vary → Own (105))'
+      'Vary ending note only (Phrase Gym — Copy → Vary → Own day 105)'
     ],
     theoryBite: 'Copy → Vary → Own 29: Imitation with constrained variation is how oral traditions and great players train vocabulary.',
     drills: [
       'Copy the motif four times before changing a note',
       'Play four rhythm variants of the same chord loop',
-      'New ending 4× (Phrase Gym — Copy → Vary → Own (105))'
+      'New ending 4× (Phrase Gym — Copy → Vary → Own day 105)'
     ],
     libraryIds: [
       'rf-spider'
     ],
-    masteryCheck: 'Show the motif, one rhythm variant, and one ending variant in a single take. [Phrase Gym — Copy → Vary → Own (105)]',
+    masteryCheck: 'Show the motif, one rhythm variant, and one ending variant in a single take. [Phrase Gym — Copy → Vary → Own day 105]',
   },
   106: {
 
-    title: 'Metronome Subdivision — Scale Eighths (106)',
+    title: 'Metronome Subdivision — Scale Eighths day 106',
     durationMin: 30,
     goals: [
       'Align scale notes to eighths',
       'Then only quarters if rushing',
-      'Record 20 seconds for honesty (Metronome Subdivision — Scale Eighths (106))'
+      'Record 20 seconds for honesty (Metronome Subdivision — Scale Eighths day 106)'
     ],
     theoryBite: 'Scale Eighths 30: Subdivisions expose whether fingers or time is leading. Time should lead.',
     drills: [
       'Play steady eighths with the metronome click locked',
       'Downshift the tempo immediately if notes get messy',
-      'Listen back once (Metronome Subdivision — Scale Eighths (106))'
+      'Listen back once (Metronome Subdivision — Scale Eighths day 106)'
     ],
     libraryIds: [
       'rf-blues-sh'
     ],
-    masteryCheck: 'Play one octave in steady eighths that would pass a kind click test. [Metronome Subdivision — Scale Eighths (106)]',
+    masteryCheck: 'Play one octave in steady eighths that would pass a kind click test. [Metronome Subdivision — Scale Eighths day 106]',
   },
   107: {
 
-    title: 'Mode Mood Board — A/B Day (107)',
+    title: 'Mode Mood Board — A/B Day day 107',
     durationMin: 30,
     goals: [
       'Contrast sc-nat-min against sc-mel-min colors',
       'Use the same rhythm skeleton',
       'Name the mood in one adjective each'
     ],
-    theoryBite: 'A/B Modes are moods with rules. A/B listening teaches faster than definitions alone. Today\'s angle: Mode Mood Board — A/B Day (107).',
+    theoryBite: 'A/B Modes are moods with rules. A/B listening teaches faster than definitions alone. Today: Mode Mood Board — A/B Day.',
     drills: [
       'Rhythm skeleton on open strings',
       'Apply mode A tones over the vamp for 8 bars',
-      'Apply mode B same rhythm (Mode Mood Board — A/B Day (107))'
+      'Apply mode B same rhythm (Mode Mood Board — A/B Day day 107)'
     ],
     libraryIds: [
       'rf-caged-c'
     ],
-    masteryCheck: 'Play the same rhythm in two modal colors and name each mood. [Mode Mood Board — A/B Day (107)]',
+    masteryCheck: 'Play the same rhythm in two modal colors and name each mood. [Mode Mood Board — A/B Day day 107]',
   },
   108: {
 
-    title: 'Scale → Riff Extraction (108)',
+    title: 'Scale → Riff Extraction day 108',
     durationMin: 30,
     goals: [
       'Improv 1 minute',
       'Circle one accidental cool bar',
-      'Repeat that bar until it is a riff (Scale → Riff Extraction (108))'
+      'Repeat that bar until it is a riff (Scale → Riff Extraction day 108)'
     ],
     theoryBite: 'Scale → Riff Extraction 32: Riffs are frozen luck. Capture and repeat — composition skill for lead players.',
     drills: [
-      'Riff loop 8× (Scale → Riff Extraction (108))',
-      'Slow loop applying «Scale → Riff Extraction (108)» with a metronome you trust',
-      'Slow loop applying «Scale → Riff Extraction (108)» with a metronome you trust'
+      'Riff loop 8× (Scale → Riff Extraction day 108)',
+      'Slow loop applying «Scale → Riff Extraction day 108» with a metronome you trust',
+      'Slow loop applying «Scale → Riff Extraction day 108» with a metronome you trust'
     ],
     libraryIds: [
       'rf-g-caged-run-study'
     ],
-    masteryCheck: 'Leave with a 1- or 2-bar riff you can repeat from memory five times. [Scale → Riff Extraction (108)]',
+    masteryCheck: 'Leave with a 1- or 2-bar riff you can repeat from memory five times. [Scale → Riff Extraction day 108]',
   },
   109: {
 
-    title: 'Chord-Scale Match Briefing (109)',
+    title: 'Chord-Scale Match Briefing day 109',
     durationMin: 30,
     goals: [
       'Play ch-em as harmony home',
@@ -2287,138 +2287,138 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     drills: [
       'Loop a two-chord vamp for 8 bars with steady time',
       'Hold long tones on each target note for two beats',
-      'Passing tone runs (Chord-Scale Match Briefing (109))'
+      'Passing tone runs (Chord-Scale Match Briefing day 109)'
     ],
     libraryIds: [
       'rf-funk-chicka-study'
     ],
-    masteryCheck: 'Hold three long tones over the chord that all sound intentional. [Chord-Scale Match Briefing (109)]',
+    masteryCheck: 'Hold three long tones over the chord that all sound intentional. [Chord-Scale Match Briefing day 109]',
   },
   110: {
 
-    title: 'Weekly Scales Checkpoint (110)',
+    title: 'Weekly Scales Checkpoint day 110',
     durationMin: 30,
     goals: [
       'Pent story 8 bars',
       'One modal or major scale color',
-      'Resolve everything home (Weekly Scales Checkpoint (110))'
+      'Resolve everything home (Weekly Scales Checkpoint day 110)'
     ],
     theoryBite: 'Weekly Scales Checkpoint 5: Checkpoints retrieve multiple skills in one performance — stronger memory than isolated drills.',
     drills: [
       'Warm up with minor pentatonic box 1 slowly',
       'Play the color section once soft and once fuller',
-      'Final landing take (Weekly Scales Checkpoint (110))'
+      'Final landing take (Weekly Scales Checkpoint day 110)'
     ],
     libraryIds: [
       'sc-pent-min',
       'rf-am-arpeggio-cascade'
     ],
-    masteryCheck: 'Perform a short multi-color take that still feels like one piece of music. [Weekly Scales Checkpoint (110)]',
+    masteryCheck: 'Perform a short multi-color take that still feels like one piece of music. [Weekly Scales Checkpoint day 110]',
   },
   111: {
 
-    title: 'Neck Geography — Root Finder Drill (111)',
+    title: 'Neck Geography — Root Finder Drill day 111',
     durationMin: 30,
     goals: [
       'Find today’s root on at least three strings',
       'Pulse each root on beat 1',
-      'Connect roots with scale steps (Neck Geography — Root Finder Drill (111))'
+      'Connect roots with scale steps (Neck Geography — Root Finder Drill day 111)'
     ],
     theoryBite: 'Root Finder Drill 35: Root awareness is the difference between wandering and soloing. Map first, decorate second.',
     drills: [
       'Root hunt low to high',
       'Jump root octaves cleanly on beats 1 and 3',
-      'Scale path between two roots (Neck Geography — Root Finder Drill (111))'
+      'Scale path between two roots (Neck Geography — Root Finder Drill day 111)'
     ],
     libraryIds: [
       'rf-natural-harmonics-study'
     ],
-    masteryCheck: 'Hit three different-string roots in time within one position neighborhood. [Neck Geography — Root Finder Drill (111)]',
+    masteryCheck: 'Hit three different-string roots in time within one position neighborhood. [Neck Geography — Root Finder Drill day 111]',
   },
   112: {
 
-    title: 'Phrase Gym — Copy → Vary → Own (112)',
+    title: 'Phrase Gym — Copy → Vary → Own day 112',
     durationMin: 35,
     goals: [
       'Learn a 4-note library motif',
       'Vary rhythm only',
-      'Vary ending note only (Phrase Gym — Copy → Vary → Own (112))'
+      'Vary ending note only (Phrase Gym — Copy → Vary → Own day 112)'
     ],
     theoryBite: 'Copy → Vary → Own 36: Imitation with constrained variation is how oral traditions and great players train vocabulary.',
     drills: [
       'Copy the motif four times before changing a note',
       'Play four rhythm variants of the same chord loop',
-      'New ending 4× (Phrase Gym — Copy → Vary → Own (112))'
+      'New ending 4× (Phrase Gym — Copy → Vary → Own day 112)'
     ],
     libraryIds: [
       'rf-open-am'
     ],
-    masteryCheck: 'Show the motif, one rhythm variant, and one ending variant in a single take. [Phrase Gym — Copy → Vary → Own (112)]',
+    masteryCheck: 'Show the motif, one rhythm variant, and one ending variant in a single take. [Phrase Gym — Copy → Vary → Own day 112]',
   },
   113: {
 
-    title: 'Metronome Subdivision — Scale Eighths (113)',
+    title: 'Metronome Subdivision — Scale Eighths day 113',
     durationMin: 30,
     goals: [
       'Align scale notes to eighths',
       'Then only quarters if rushing',
-      'Record 20 seconds for honesty (Metronome Subdivision — Scale Eighths (113))'
+      'Record 20 seconds for honesty (Metronome Subdivision — Scale Eighths day 113)'
     ],
     theoryBite: 'Scale Eighths 37: Subdivisions expose whether fingers or time is leading. Time should lead.',
     drills: [
       'Play steady eighths with the metronome click locked',
       'Downshift the tempo immediately if notes get messy',
-      'Listen back once (Metronome Subdivision — Scale Eighths (113))'
+      'Listen back once (Metronome Subdivision — Scale Eighths day 113)'
     ],
     libraryIds: [
       'rf-caged-c'
     ],
-    masteryCheck: 'Play one octave in steady eighths that would pass a kind click test. [Metronome Subdivision — Scale Eighths (113)]',
+    masteryCheck: 'Play one octave in steady eighths that would pass a kind click test. [Metronome Subdivision — Scale Eighths day 113]',
   },
   114: {
 
-    title: 'Mode Mood Board — A/B Day (114)',
+    title: 'Mode Mood Board — A/B Day day 114',
     durationMin: 30,
     goals: [
       'Contrast sc-phrygian against sc-mixo colors',
       'Use the same rhythm skeleton',
       'Name the mood in one adjective each'
     ],
-    theoryBite: 'A/B Modes are moods with rules. A/B listening teaches faster than definitions alone. Today\'s angle: Mode Mood Board — A/B Day (114).',
+    theoryBite: 'A/B Modes are moods with rules. A/B listening teaches faster than definitions alone. Today: Mode Mood Board — A/B Day. Day 114.',
     drills: [
       'Rhythm skeleton on open strings',
       'Apply mode A tones over the vamp for 8 bars',
-      'Apply mode B same rhythm (Mode Mood Board — A/B Day (114))'
+      'Apply mode B same rhythm (Mode Mood Board — A/B Day day 114)'
     ],
     libraryIds: [
       'sc-mixo',
       'rf-open-g-roll-study'
     ],
-    masteryCheck: 'Play the same rhythm in two modal colors and name each mood. [Mode Mood Board — A/B Day (114)]',
+    masteryCheck: 'Play the same rhythm in two modal colors and name each mood. [Mode Mood Board — A/B Day day 114]',
   },
   115: {
 
-    title: 'Scale → Riff Extraction (115)',
+    title: 'Scale → Riff Extraction day 115',
     durationMin: 30,
     goals: [
       'Improv 1 minute',
       'Circle one accidental cool bar',
-      'Repeat that bar until it is a riff (Scale → Riff Extraction (115))'
+      'Repeat that bar until it is a riff (Scale → Riff Extraction day 115)'
     ],
     theoryBite: 'Scale → Riff Extraction 39: Riffs are frozen luck. Capture and repeat — composition skill for lead players.',
     drills: [
-      'Riff loop 8× (Scale → Riff Extraction (115))',
-      'Slow loop applying «Scale → Riff Extraction (115)» with a metronome you trust',
-      'Slow loop applying «Scale → Riff Extraction (115)» with a metronome you trust'
+      'Riff loop 8× (Scale → Riff Extraction day 115)',
+      'Slow loop applying «Scale → Riff Extraction day 115» with a metronome you trust',
+      'Slow loop applying «Scale → Riff Extraction day 115» with a metronome you trust'
     ],
     libraryIds: [
       'rf-c-bass-walk-study'
     ],
-    masteryCheck: 'Leave with a 1- or 2-bar riff you can repeat from memory five times. [Scale → Riff Extraction (115)]',
+    masteryCheck: 'Leave with a 1- or 2-bar riff you can repeat from memory five times. [Scale → Riff Extraction day 115]',
   },
   116: {
 
-    title: 'Chord-Scale Match Briefing (116)',
+    title: 'Chord-Scale Match Briefing day 116',
     durationMin: 30,
     goals: [
       'Play ch-g7 as harmony home',
@@ -2429,72 +2429,72 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     drills: [
       'Loop a two-chord vamp for 8 bars with steady time',
       'Hold long tones on each target note for two beats',
-      'Passing tone runs (Chord-Scale Match Briefing (116))'
+      'Passing tone runs (Chord-Scale Match Briefing day 116)'
     ],
     libraryIds: [
       'rf-palm-mute-chug-study'
     ],
-    masteryCheck: 'Hold three long tones over the chord that all sound intentional. [Chord-Scale Match Briefing (116)]',
+    masteryCheck: 'Hold three long tones over the chord that all sound intentional. [Chord-Scale Match Briefing day 116]',
   },
   117: {
 
-    title: 'Weekly Scales Checkpoint (117)',
+    title: 'Weekly Scales Checkpoint day 117',
     durationMin: 30,
     goals: [
       'Pent story 8 bars',
       'One modal or major scale color',
-      'Resolve everything home (Weekly Scales Checkpoint (117))'
+      'Resolve everything home (Weekly Scales Checkpoint day 117)'
     ],
     theoryBite: 'Weekly Scales Checkpoint 6: Checkpoints retrieve multiple skills in one performance — stronger memory than isolated drills.',
     drills: [
       'Warm up with minor pentatonic box 1 slowly',
       'Play the color section once soft and once fuller',
-      'Final landing take (Weekly Scales Checkpoint (117))'
+      'Final landing take (Weekly Scales Checkpoint day 117)'
     ],
     libraryIds: [
       'rf-drop-d-power-study'
     ],
-    masteryCheck: 'Perform a short multi-color take that still feels like one piece of music. [Weekly Scales Checkpoint (117)]',
+    masteryCheck: 'Perform a short multi-color take that still feels like one piece of music. [Weekly Scales Checkpoint day 117]',
   },
   118: {
 
-    title: 'Neck Geography — Root Finder Drill (118)',
+    title: 'Neck Geography — Root Finder Drill day 118',
     durationMin: 30,
     goals: [
       'Find today’s root on at least three strings',
       'Pulse each root on beat 1',
-      'Connect roots with scale steps (Neck Geography — Root Finder Drill (118))'
+      'Connect roots with scale steps (Neck Geography — Root Finder Drill day 118)'
     ],
     theoryBite: 'Root Finder Drill 42: Root awareness is the difference between wandering and soloing. Map first, decorate second.',
     drills: [
       'Root hunt low to high',
       'Jump root octaves cleanly on beats 1 and 3',
-      'Scale path between two roots (Neck Geography — Root Finder Drill (118))'
+      'Scale path between two roots (Neck Geography — Root Finder Drill day 118)'
     ],
     libraryIds: [
       'rf-minor-slide-lick-study'
     ],
-    masteryCheck: 'Hit three different-string roots in time within one position neighborhood. [Neck Geography — Root Finder Drill (118)]',
+    masteryCheck: 'Hit three different-string roots in time within one position neighborhood. [Neck Geography — Root Finder Drill day 118]',
   },
   119: {
 
-    title: 'Phrase Gym — Copy → Vary → Own (119)',
+    title: 'Phrase Gym — Copy → Vary → Own day 119',
     durationMin: 35,
     goals: [
       'Learn a 4-note library motif',
       'Vary rhythm only',
-      'Vary ending note only (Phrase Gym — Copy → Vary → Own (119))'
+      'Vary ending note only (Phrase Gym — Copy → Vary → Own day 119)'
     ],
     theoryBite: 'Copy → Vary → Own 43: Imitation with constrained variation is how oral traditions and great players train vocabulary.',
     drills: [
       'Copy the motif four times before changing a note',
       'Play four rhythm variants of the same chord loop',
-      'New ending 4× (Phrase Gym — Copy → Vary → Own (119))'
+      'New ending 4× (Phrase Gym — Copy → Vary → Own day 119)'
     ],
     libraryIds: [
       'rf-power'
     ],
-    masteryCheck: 'Show the motif, one rhythm variant, and one ending variant in a single take. [Phrase Gym — Copy → Vary → Own (119)]',
+    masteryCheck: 'Show the motif, one rhythm variant, and one ending variant in a single take. [Phrase Gym — Copy → Vary → Own day 119]',
   },
   120: {
 
@@ -2525,9 +2525,9 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'Turn muted strums into a drum kit that never rushes',
       'Prove the groove still feels good when you add only one chord'
     ],
-    theoryBite: 'Listeners forgive simple harmony faster than shaky time. Pocket is agreement with pulse — research on ensemble timing shows micro-consistency beats ornamental complexity.',
+    theoryBite: 'Listeners forgive simple harmony faster than shaky time. Pocket means your notes agree with the pulse. Steady and simple beats fancy and shaky.',
     drills: [
-      'Foot quarters alone for 60 seconds at 70 BPM — no guitar — focus «Rhythm Phase Open — Pocket Is the Skill»',
+      'Foot quarters alone for 60 seconds at 70 BPM — no guitar — keep it about Rhythm Phase Open — Pocket Is the Skill',
       'Muted downstrokes on open strings, one per beat, 60 seconds',
       'Muted D-DU pattern for 60 seconds while counting 1 & 2 & 3 & 4 & aloud',
       'Add a single G chord only after 8 clean muted bars; stop if the pocket slips'
@@ -2536,7 +2536,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'pr-12bar',
       'rf-spanish-e-phrygian-study'
     ],
-    masteryCheck: 'Hold 32 bars of muted groove at 70 BPM with foot and hand locked, then add one chord without rushing — applied to «Rhythm Phase Open — Pocket Is the Skill».',
+    masteryCheck: 'Hold 32 bars of muted groove at 70 BPM with foot and hand locked, then add one chord without rushing while working on Rhythm Phase Open — Pocket Is the Skill.',
   },
   122: {
 
@@ -2549,7 +2549,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     ],
     theoryBite: 'Subdivision is how musicians share a clock. Naming 1 e & a externalizes the grid so fretting-hand panic cannot steal the beat.',
     drills: [
-      'Count 1 e & a aloud with foot quarters for 45 seconds — focus «Subdivision Clinic — 1 e & a»',
+      'Count 1 e & a aloud with foot quarters for 45 seconds — keep it about Subdivision Clinic — 1 e & a',
       'Muted 16th strums (or ghost strums) matching every syllable for 60 seconds',
       'Freeze a chord shape and only move the right hand on the grid for 8 bars',
       'Change chords only on beat 1 for 8 bars, then only on the & of 2 for 8 bars'
@@ -2558,7 +2558,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'pr-1645',
       'rf-jazz-chromatic-approach-study'
     ],
-    masteryCheck: 'Play 16 bars where you can point to any 1 e & a slot and land a muted click there on command — applied to «Subdivision Clinic — 1 e & a».',
+    masteryCheck: 'Play 16 bars where you can point to any 1 e & a slot and land a muted click there on command while working on Subdivision Clinic — 1 e & a.',
   },
   123: {
 
@@ -2571,7 +2571,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     ],
     theoryBite: 'Syncopation is tension against a known downbeat. If the body loses beat 1, accents become sloppy noise — keep the foot honest.',
     drills: [
-      'Foot on quarters; hand accents only on & of each beat for 60 seconds muted — focus «Syncopation Intro — Accent the Offbeat»',
+      'Foot on quarters; hand accents only on & of each beat for 60 seconds muted — keep it about Syncopation Intro — Accent the Offbeat',
       'Accent map: circle beats 2 and the & of 4 on paper, then play it',
       'Same map with G–C–D, two bars each, at a tempo you can hum',
       'Record 8 bars and check that downbeats still feel grounded'
@@ -2580,7 +2580,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'pr-andalu',
       'rf-travis-pick-sketch-in-c'
     ],
-    masteryCheck: 'Perform your 4-bar accent map twice in a row with steady foot quarters and clear offbeat pops — applied to «Syncopation Intro — Accent the Offbeat».',
+    masteryCheck: 'Perform your 4-bar accent map twice in a row with steady foot quarters and clear offbeat pops while working on Syncopation Intro — Accent the Offbeat.',
   },
   124: {
 
@@ -2593,7 +2593,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     ],
     theoryBite: 'Shuffle is a triplet-based long-short feel, not \'sloppy straight.\' The swing ratio should stay stable across the form.',
     drills: [
-      'Muted straight eighths 30s, then shuffle eighths 30s, back and forth 4 times — focus «Shuffle vs Straight — Feel Toggle»',
+      'Muted straight eighths 30s, then shuffle eighths 30s, back and forth 4 times — keep it about Shuffle vs Straight — Feel Toggle',
       'Say long-short while playing shuffle on open strings',
       'A7–D7–E7 skeleton with shuffle strum, 12 bars slow',
       'One chorus straight, one chorus shuffle — same tempo marking'
@@ -2603,7 +2603,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'rf-blues-sh',
       'ch-a7'
     ],
-    masteryCheck: 'Play one 12-bar chorus straight and one shuffled at the same BPM without drifting the pulse — applied to «Shuffle vs Straight — Feel Toggle».',
+    masteryCheck: 'Play one 12-bar chorus straight and one shuffled at the same BPM without drifting the pulse while working on Shuffle vs Straight — Feel Toggle.',
   },
   125: {
 
@@ -2616,7 +2616,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     ],
     theoryBite: 'Palm mute is a dynamic and articulation tool. Edge-of-palm near the bridge shortens sustain; too far forward kills tone.',
     drills: [
-      'Find the mute sweet spot on open low E: tight thunk, still pitched — focus «Palm Mute Engine — Chug Control»',
+      'Find the mute sweet spot on open low E: tight thunk, still pitched — keep it about Palm Mute Engine — Chug Control',
       'Chug quarters 60s, then add release hits on beat 3 only',
       'Power-shape fretting with muted eighths for 8 bars',
       'Alternate 2 bars muted / 2 bars open at steady tempo'
@@ -2625,7 +2625,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'rf-palm-mute-chug-study',
       'rf-power'
     ],
-    masteryCheck: 'Play 16 bars alternating muted chug and open hits without tempo drift or left-hand squeeze — applied to «Palm Mute Engine — Chug Control».',
+    masteryCheck: 'Play 16 bars alternating muted chug and open hits without tempo drift or left-hand squeeze while working on Palm Mute Engine — Chug Control.',
   },
   126: {
 
@@ -2638,7 +2638,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     ],
     theoryBite: 'Rests are notes with zero amplitude. Great rhythm players schedule silence; beginners fill every beat from anxiety.',
     drills: [
-      'Play beat 1 only; rest 2–3–4 — 8 bars muted clicks on 1 — focus «Rest as a Weapon — Play Less»',
+      'Play beat 1 only; rest 2–3–4 — 8 bars muted clicks on 1 — keep it about Rest as a Weapon — Play Less',
       'Play 1 and 3; rest 2 and 4 — keep foot on all quarters',
       'Add a chord on the hits; freeze fretting hand during rests',
       'Compose a 4-bar hit chart with at least four full beats of rest total'
@@ -2647,7 +2647,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'pr-12bar',
       'rf-em-pentatonic-box-study'
     ],
-    masteryCheck: 'Perform an 8-bar hit chart that includes deliberate multi-beat rests without rushing the re-entries — applied to «Rest as a Weapon — Play Less».',
+    masteryCheck: 'Perform an 8-bar hit chart that includes deliberate multi-beat rests without rushing the re-entries while working on Rest as a Weapon — Play Less.',
   },
   127: {
 
@@ -2660,7 +2660,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     ],
     theoryBite: 'Accent is relative. If everything is loud, nothing is accented. Dynamic contrast is a timing skill as much as a volume skill.',
     drills: [
-      'Write accents on a blank 4-bar grid (at least 6 accent marks) — focus «Accent Maps — Compose a Strum Chart»',
+      'Write accents on a blank 4-bar grid (at least 6 accent marks) — keep it about Accent Maps — Compose a Strum Chart',
       'Muted performance of the chart at 75 BPM',
       'Same chart with two chords, changing only on bar lines',
       'Whisper-loud check: unaccented strokes stay clearly softer'
@@ -2669,7 +2669,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'pr-1645',
       'rf-g-caged-run-study'
     ],
-    masteryCheck: 'Hand a stranger (or future you) your chart and perform it so the written accents are obvious — applied to «Accent Maps — Compose a Strum Chart».',
+    masteryCheck: 'Hand a stranger (or future you) your chart and perform it so the written accents are obvious while working on Accent Maps — Compose a Strum Chart.',
   },
   128: {
 
@@ -2682,7 +2682,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     ],
     theoryBite: 'Triplets divide the beat into three equal parts. Even speech first — uneven speech becomes uneven hands.',
     drills: [
-      'Foot quarters + voice 1-trip-let for 45 seconds — focus «Triplet Feel — 1 trip-let»',
+      'Foot quarters + voice 1-trip-let for 45 seconds — keep it about Triplet Feel — 1 trip-let',
       'Muted triplet strums matching the voice for 60 seconds',
       'G–C–D with triplet down-up patterning on one chord only, then rotate',
       'Two bars duple, two bars triple — keep foot identical'
@@ -2691,7 +2691,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'rf-blues-sh',
       'pr-12bar'
     ],
-    masteryCheck: 'Alternate 2 bars of straight eighths and 2 bars of triplets for 16 bars with a steady foot — applied to «Triplet Feel — 1 trip-let».',
+    masteryCheck: 'Alternate 2 bars of straight eighths and 2 bars of triplets for 16 bars with a steady foot while working on Triplet Feel — 1 trip-let.',
   },
   129: {
 
@@ -2704,7 +2704,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     ],
     theoryBite: 'Stop-time is coordinated hits and rests — a band skill you can practice alone by being strict with the click.',
     drills: [
-      'Click on; play only beat 1 of each bar for 8 bars — focus «Stop-Time Blues — Hits With the Imaginary Band»',
+      'Click on; play only beat 1 of each bar for 8 bars — keep it about Stop-Time Blues — Hits With the Imaginary Band',
       'Hits on 1 and the & of 2; rest elsewhere — 8 bars',
       'Apply hits to a 12-bar blues skeleton',
       'Record one chorus and verify silences are truly silent'
@@ -2713,7 +2713,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'pr-12bar',
       'rf-blues-sh'
     ],
-    masteryCheck: 'Perform one 12-bar stop-time chorus where every rest is clean and every re-entry lands with the click — applied to «Stop-Time Blues — Hits With the Imaginary Band».',
+    masteryCheck: 'Perform one 12-bar stop-time chorus where every rest is clean and every re-entry lands with the click while working on Stop-Time Blues — Hits With the Imaginary Band.',
   },
   130: {
 
@@ -2726,7 +2726,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     ],
     theoryBite: 'Funk rhythm is often more ghost than note. The grid never stops; pitches appear as decorations on a continuous 16th engine.',
     drills: [
-      '16th ghost strums muted 60 seconds at a slow BPM — focus «Funk Chicka — 16th Speckles»',
+      '16th ghost strums muted 60 seconds at a slow BPM — keep it about Funk Chicka — 16th Speckles',
       'Add fretting-hand left mute chucks on &s for 8 bars',
       'Two-chord funk vamp: 1 bar each, ghosts continuous',
       'Shift from on-top to slightly behind the click for 8 bars'
@@ -2734,7 +2734,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     libraryIds: [
       'rf-funk-chicka-study'
     ],
-    masteryCheck: 'Play a 16-bar funk vamp with continuous 16th ghosts and clear pitched hits on chosen slots only — applied to «Funk Chicka — 16th Speckles».',
+    masteryCheck: 'Play a 16-bar funk vamp with continuous 16th ghosts and clear pitched hits on chosen slots only while working on Funk Chicka — 16th Speckles.',
   },
   131: {
 
@@ -2747,7 +2747,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     ],
     theoryBite: 'Ballads punish impatience. Harmonic rhythm (how often chords change) can be slow while the inner pulse stays firm.',
     drills: [
-      'One chord per two bars at 60 BPM — count every beat aloud — focus «Ballad Space — Slow Harmonic Rhythm»',
+      'One chord per two bars at 60 BPM — count every beat aloud — keep it about Ballad Space — Slow Harmonic Rhythm',
       'Crescendo across 4 bars on a single chord, then release',
       'Change chords only after a full sung breath',
       'Play a folk melody fragment between changes (optional hum)'
@@ -2756,7 +2756,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-amazing-grace',
       'sg-danny-boy-londonderry-air'
     ],
-    masteryCheck: 'Perform 16 slow bars with at most one chord change every two bars, steady pulse, and audible dynamic shape — applied to «Ballad Space — Slow Harmonic Rhythm».',
+    masteryCheck: 'Perform 16 slow bars with at most one chord change every two bars, steady pulse, and audible dynamic shape while working on Ballad Space — Slow Harmonic Rhythm.',
   },
   132: {
 
@@ -2769,7 +2769,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     ],
     theoryBite: 'A push places a harmony early against a stable meter. The ear loves the tension only if beat 1 remains clear in the body.',
     drills: [
-      'Normal changes on beat 1 for 8 bars — focus «Push Chords — Anticipate the Downbeat»',
+      'Normal changes on beat 1 for 8 bars — keep it about Push Chords — Anticipate the Downbeat',
       'Same progression with each change on the & of 4',
       'Alternate pushed and square phrases every 4 bars',
       'Mute check: foot never moves with the push'
@@ -2778,7 +2778,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'pr-1645',
       'rf-caged-c'
     ],
-    masteryCheck: 'Play 16 bars alternating square and pushed changes with an obviously steady foot — applied to «Push Chords — Anticipate the Downbeat».',
+    masteryCheck: 'Play 16 bars alternating square and pushed changes with an obviously steady foot while working on Push Chords — Anticipate the Downbeat.',
   },
   133: {
 
@@ -2791,7 +2791,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     ],
     theoryBite: 'Polyrhythm taste training builds independence. Start loud and slow; speed is not the point — layered clarity is.',
     drills: [
-      'Foot in 2s; hand taps groups of 3 for 45 seconds — focus «Polyrhythm Taste — 3 Against 2 Feel»',
+      'Foot in 2s; hand taps groups of 3 for 45 seconds — keep it about Polyrhythm Taste — 3 Against 2 Feel',
       'Swap layers: foot in 3, hand in 2',
       'Muted guitar hand plays the 3-layer while foot keeps duple',
       'Return to a plain 8th groove for 8 bars to reset'
@@ -2800,7 +2800,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'pr-andalu',
       'rf-d-folk-pattern-study'
     ],
-    masteryCheck: 'Demonstrate 30 seconds of clear 3-against-2 with foot and hand roles identifiable — applied to «Polyrhythm Taste — 3 Against 2 Feel».',
+    masteryCheck: 'Show 30 seconds of clear 3-against-2 with foot and hand roles identifiable while working on Polyrhythm Taste — 3 Against 2 Feel.',
   },
   134: {
 
@@ -2813,7 +2813,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     ],
     theoryBite: 'Texture is how many musical layers speak. Great rhythm players arrange with the right hand: low density vs full strums.',
     drills: [
-      'Write a 32-bar map: 8 sparse, 8 medium, 8 full, 8 sparse — focus «Texture Arrangement Lab — 32-Bar Map»',
+      'Write a 32-bar map: 8 sparse, 8 medium, 8 full, 8 sparse — keep it about Texture Arrangement Lab — 32-Bar Map',
       'Perform the map on one chord only',
       'Perform the map on a 3-chord loop',
       'Mark one bar that got busy too early and fix it'
@@ -2822,7 +2822,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'pr-6251',
       'rf-c-bass-walk-study'
     ],
-    masteryCheck: 'Perform the full 32-bar texture map once with tempo flat and density changes obvious — applied to «Texture Arrangement Lab — 32-Bar Map».',
+    masteryCheck: 'Perform the full 32-bar texture map once with tempo flat and density changes obvious while working on Texture Arrangement Lab — 32-Bar Map.',
   },
   135: {
 
@@ -2835,7 +2835,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     ],
     theoryBite: 'Time feel is a placement choice. Behind can feel heavier; ahead can feel urgent. Control requires a reference click.',
     drills: [
-      '8 bars dead on the click (muted) — focus «Click Trust — Play Behind/On/Ahead»',
+      '8 bars dead on the click (muted) — keep it about Click Trust — Play Behind/On/Ahead',
       '8 bars intentionally late (still even)',
       '8 bars intentionally early (still even)',
       '8 bars back on center — notice body tension differences'
@@ -2844,7 +2844,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'pr-145',
       'rf-palm-mute-chug-study'
     ],
-    masteryCheck: 'Label and perform on / behind / ahead for 8 bars each without losing the form of a simple vamp — applied to «Click Trust — Play Behind/On/Ahead».',
+    masteryCheck: 'Label and perform on / behind / ahead for 8 bars each without losing the form of a simple vamp while working on Click Trust — Play Behind/On/Ahead.',
   },
   136: {
 
@@ -2857,7 +2857,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     ],
     theoryBite: 'Separating dynamics from tempo is elite right-hand control. Most players get louder by getting faster — break that link.',
     drills: [
-      '4 bars soft→loud on muted strums with a click — focus «Dynamic Waves — Crescendo Strum»',
+      '4 bars soft→loud on muted strums with a click — keep it about Dynamic Waves — Crescendo Strum',
       '4 bars loud→soft immediately after',
       'Repeat with chords G–Em–C–D',
       'Friend test: can someone hear the wave with eyes closed?'
@@ -2866,7 +2866,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'pr-12bar',
       'rf-drop-d-power-study'
     ],
-    masteryCheck: 'Perform an 8-bar dynamic wave (up then down) without speeding up or collapsing the groove — applied to «Dynamic Waves — Crescendo Strum».',
+    masteryCheck: 'Perform an 8-bar dynamic wave (up then down) without speeding up or collapsing the groove while working on Dynamic Waves — Crescendo Strum.',
   },
   137: {
 
@@ -2879,7 +2879,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     ],
     theoryBite: 'Odd meters train attention. Even a light 5/4 taste improves how securely you feel barlines in 4/4.',
     drills: [
-      'Count 1-2-3-4-5 aloud with foot for 60 seconds — focus «Odd Accent — 5/4 Taste»',
+      'Count 1-2-3-4-5 aloud with foot for 60 seconds — keep it about Odd Accent — 5/4 Taste',
       'Muted hit on 1 and 4 only in a 5-beat cycle',
       'Two-chord idea in 5: bar of A, bar of G feeling',
       'Play 8 bars of 4/4 afterward — notice the calm'
@@ -2888,7 +2888,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'pr-1645',
       'rf-minor-slide-lick-study'
     ],
-    masteryCheck: 'Loop 8 cycles of a 5-beat groove you can count aloud while playing — applied to «Odd Accent — 5/4 Taste».',
+    masteryCheck: 'Loop 8 cycles of a 5-beat groove you can count aloud while playing while working on Odd Accent — 5/4 Taste.',
   },
   138: {
 
@@ -2901,7 +2901,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     ],
     theoryBite: 'Comp patterns are reusable right-hand sentences. Great accompanists repeat a clear idea more than they invent chaos.',
     drills: [
-      'Design a 2-bar pattern on paper (D = down, U = up, . = rest) — focus «Comp Patterns — Two Rights, One Left»',
+      'Design a 2-bar pattern on paper (D = down, U = up, . = rest) — keep it about Comp Patterns — Two Rights, One Left',
       'Mute-perform it 8 times',
       'Add G and C, two bars each, pattern continuous',
       'Sing nonsense syllables over it to test space'
@@ -2910,7 +2910,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'pr-andalu',
       'rf-power'
     ],
-    masteryCheck: 'Loop your 2-bar comp for 16 bars with chord changes and still-recognizable pattern identity — applied to «Comp Patterns — Two Rights, One Left».',
+    masteryCheck: 'Loop your 2-bar comp for 16 bars with chord changes and still-recognizable pattern identity while working on Comp Patterns — Two Rights, One Left.',
   },
   139: {
 
@@ -2923,7 +2923,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     ],
     theoryBite: 'Boom-chuck is an American rhythm engine: bass / chord / bass / chord. Independence between thumb-side and strum-side is the skill.',
     drills: [
-      'Bass on open D/G strings beats 1 & 3 only for 60s — focus «Genre Day — Country Boom-Chuck Deepening»',
+      'Bass on open D/G strings beats 1 & 3 only for 60s — keep it about Genre Day — Country Boom-Chuck Deepening',
       'Add light chucks on 2 & 4 muted',
       'G–C–D boom-chuck at walking tempo',
       'Remove chucks for 4 bars, bring back — pocket must stay'
@@ -2934,7 +2934,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'ch-c',
       'ch-d'
     ],
-    masteryCheck: 'Play 16 bars of boom-chuck on a three-chord loop with clear bass vs chuck roles — applied to «Genre Day — Country Boom-Chuck Deepening».',
+    masteryCheck: 'Play 16 bars of boom-chuck on a three-chord loop with clear bass vs chuck roles while working on Genre Day — Country Boom-Chuck Deepening.',
   },
   140: {
 
@@ -2947,7 +2947,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     ],
     theoryBite: 'Rock eighth drive is stamina plus evenness. The story is often density and mute color, not chord complexity.',
     drills: [
-      'Straight eighth downs-ups muted 90 seconds — focus «Genre Day — Rock Eighth Drive»',
+      'Straight eighth downs-ups muted 90 seconds — keep it about Genre Day — Rock Eighth Drive',
       'Power-shape fretting with eighth drive 8 bars',
       'Verse mute / chorus open for a 16-bar form',
       'Check shoulders at bar 12 — drop them if high'
@@ -2956,7 +2956,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'pr-145',
       'rf-a-blues-turnaround-study'
     ],
-    masteryCheck: 'Perform a 16-bar verse/chorus mute story at steady eighths without rushing the chorus open — applied to «Genre Day — Rock Eighth Drive».',
+    masteryCheck: 'Perform a 16-bar verse/chorus mute story at steady eighths without rushing the chorus open while working on Genre Day — Rock Eighth Drive.',
   },
   141: {
 
@@ -2967,9 +2967,9 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'Record evidence rather than trusting memory',
       'Name one keep and one fix afterward'
     ],
-    theoryBite: 'Checkpoints convert practice into proof. A short recorded take plus a kind note beats vague \'I practiced rhythm.\'',
+    theoryBite: 'Checkpoints convert practice into proof. A short recorded take plus a kind note beats vague \'I practiced rhythm.\'.',
     drills: [
-      '60s pocket warm-up muted — focus «Weekly Rhythm Checkpoint»',
+      '60s pocket warm-up muted — keep it about Weekly Rhythm Checkpoint',
       '8 bars subdivision or accent focus',
       '8 bars dynamic wave on a progression',
       'Record a 16-bar medley of those skills; write keep/fix'
@@ -2978,111 +2978,111 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'pr-12bar',
       'rf-spanish-e-phrygian-study'
     ],
-    masteryCheck: 'Save one 16-bar take that shows steady time plus one expressive rhythm choice, with a written keep and fix — applied to «Weekly Rhythm Checkpoint».',
+    masteryCheck: 'Save one 16-bar take that shows steady time plus one expressive rhythm choice, with a written keep and fix while working on Weekly Rhythm Checkpoint.',
   },
   142: {
 
-    title: 'Click Trust — Play Behind/On/Ahead (142)',
+    title: 'Click Trust — Play Behind/On/Ahead day 142',
     durationMin: 30,
     goals: [
       'Play on top of, with, and slightly behind the click on command',
       'Hear the click as a collaborator, not an enemy',
-      'Return to \'with\' after exploring the edges (Click Trust — Play Behind/On/Ahead (142))'
+      'Return to \'with\' after exploring the edges (Click Trust — Play Behind/On/Ahead day 142)'
     ],
-    theoryBite: 'Time feel is a placement choice. Behind can feel heavier; ahead can feel urgent. Control requires a reference click. Today\'s angle: Click Trust — Play Behind/On/Ahead (142).',
+    theoryBite: 'Time feel is a placement choice. Behind can feel heavier; ahead can feel urgent. Control requires a reference click. Today: Click Trust — Play Behind/On/Ahead.',
     drills: [
-      '8 bars dead on the click (muted) — focus «Click Trust — Play Behind/On/Ahead»',
+      '8 bars dead on the click (muted) — keep it about Click Trust — Play Behind/On/Ahead',
       '8 bars intentionally late (still even)',
       '8 bars intentionally early (still even)',
-      '8 bars back on center — notice body tension differences (Click Trust — Play Behind/On/Ahead (142))'
+      '8 bars back on center — notice body tension differences (Click Trust — Play Behind/On/Ahead day 142)'
     ],
     libraryIds: [
       'pr-1645',
       'rf-jazz-chromatic-approach-study'
     ],
-    masteryCheck: 'Label and perform on / behind / ahead for 8 bars each without losing the form of a simple vamp — applied to «Click Trust — Play Behind/On/Ahead». [Click Trust — Play Behind/On/Ahead (142)]',
+    masteryCheck: 'Label and perform on / behind / ahead for 8 bars each without losing the form of a simple vamp while working on Click Trust — Play Behind/On/Ahead. [Click Trust — Play Behind/On/Ahead day 142]',
   },
   143: {
 
-    title: 'Dynamic Waves — Crescendo Strum (143)',
+    title: 'Dynamic Waves — Crescendo Strum day 143',
     durationMin: 30,
     goals: [
       'Crescendo and decrescendo across multi-bar phrases',
       'Keep tempo flat while volume moves',
-      'Use dynamics as storytelling inside one progression (Dynamic Waves — Crescendo Strum (143))'
+      'Use dynamics as storytelling inside one progression (Dynamic Waves — Crescendo Strum day 143)'
     ],
-    theoryBite: 'Separating dynamics from tempo is elite right-hand control. Most players get louder by getting faster — break that link. Today\'s angle: Dynamic Waves — Crescendo Strum (143).',
+    theoryBite: 'Separating dynamics from tempo is elite right-hand control. Most players get louder by getting faster — break that link. Today: Dynamic Waves — Crescendo Strum.',
     drills: [
-      '4 bars soft→loud on muted strums with a click — focus «Dynamic Waves — Crescendo Strum»',
+      '4 bars soft→loud on muted strums with a click — keep it about Dynamic Waves — Crescendo Strum',
       '4 bars loud→soft immediately after',
       'Repeat with chords G–Em–C–D',
-      'Friend test: can someone hear the wave with eyes closed? (Dynamic Waves — Crescendo Strum (143))'
+      'Friend test: can someone hear the wave with eyes closed? (Dynamic Waves — Crescendo Strum day 143)'
     ],
     libraryIds: [
       'pr-andalu',
       'rf-travis-pick-sketch-in-c'
     ],
-    masteryCheck: 'Perform an 8-bar dynamic wave (up then down) without speeding up or collapsing the groove — applied to «Dynamic Waves — Crescendo Strum». [Dynamic Waves — Crescendo Strum (143)]',
+    masteryCheck: 'Perform an 8-bar dynamic wave (up then down) without speeding up or collapsing the groove while working on Dynamic Waves — Crescendo Strum. [Dynamic Waves — Crescendo Strum day 143]',
   },
   144: {
 
-    title: 'Odd Accent — 5/4 Taste (144)',
+    title: 'Odd Accent — 5/4 Taste day 144',
     durationMin: 30,
     goals: [
       'Count a simple 5/4 or 5-beat cycle without panic',
       'Loop a short riff that makes the odd meter feel natural',
-      'Return to 4/4 cleanly so 4/4 feels even more solid (Odd Accent — 5/4 Taste (144))'
+      'Return to 4/4 cleanly so 4/4 feels even more solid (Odd Accent — 5/4 Taste day 144)'
     ],
-    theoryBite: 'Odd meters train attention. Even a light 5/4 taste improves how securely you feel barlines in 4/4. Today\'s angle: Odd Accent — 5/4 Taste (144).',
+    theoryBite: 'Odd meters train attention. Even a light 5/4 taste improves how securely you feel barlines in 4/4. Today: Odd Accent — 5/4 Taste.',
     drills: [
-      'Count 1-2-3-4-5 aloud with foot for 60 seconds — focus «Odd Accent — 5/4 Taste»',
+      'Count 1-2-3-4-5 aloud with foot for 60 seconds — keep it about Odd Accent — 5/4 Taste',
       'Muted hit on 1 and 4 only in a 5-beat cycle',
       'Two-chord idea in 5: bar of A, bar of G feeling',
-      'Play 8 bars of 4/4 afterward — notice the calm (Odd Accent — 5/4 Taste (144))'
+      'Play 8 bars of 4/4 afterward — notice the calm (Odd Accent — 5/4 Taste day 144)'
     ],
     libraryIds: [
       'pr-6251',
       'rf-spider'
     ],
-    masteryCheck: 'Loop 8 cycles of a 5-beat groove you can count aloud while playing — applied to «Odd Accent — 5/4 Taste». [Odd Accent — 5/4 Taste (144)]',
+    masteryCheck: 'Loop 8 cycles of a 5-beat groove you can count aloud while playing while working on Odd Accent — 5/4 Taste. [Odd Accent — 5/4 Taste day 144]',
   },
   145: {
 
-    title: 'Comp Patterns — Two Rights, One Left (145)',
+    title: 'Comp Patterns — Two Rights, One Left day 145',
     durationMin: 30,
     goals: [
       'Build a two-bar comp pattern you could hand to a singer',
       'Balance low thumps and higher scratches',
-      'Leave space for an imaginary vocal (Comp Patterns — Two Rights, One Left (145))'
+      'Leave space for an imaginary vocal (Comp Patterns — Two Rights, One Left day 145)'
     ],
-    theoryBite: 'Comp patterns are reusable right-hand sentences. Great accompanists repeat a clear idea more than they invent chaos. Today\'s angle: Comp Patterns — Two Rights, One Left (145).',
+    theoryBite: 'Comp patterns are reusable right-hand sentences. Great accompanists repeat a clear idea more than they invent chaos. Today: Comp Patterns — Two Rights, One Left.',
     drills: [
-      'Design a 2-bar pattern on paper (D = down, U = up, . = rest) — focus «Comp Patterns — Two Rights, One Left»',
+      'Design a 2-bar pattern on paper (D = down, U = up, . = rest) — keep it about Comp Patterns — Two Rights, One Left',
       'Mute-perform it 8 times',
       'Add G and C, two bars each, pattern continuous',
-      'Sing nonsense syllables over it to test space (Comp Patterns — Two Rights, One Left (145))'
+      'Sing nonsense syllables over it to test space (Comp Patterns — Two Rights, One Left day 145)'
     ],
     libraryIds: [
       'pr-145',
       'rf-blues-sh'
     ],
-    masteryCheck: 'Loop your 2-bar comp for 16 bars with chord changes and still-recognizable pattern identity — applied to «Comp Patterns — Two Rights, One Left». [Comp Patterns — Two Rights, One Left (145)]',
+    masteryCheck: 'Loop your 2-bar comp for 16 bars with chord changes and still-recognizable pattern identity while working on Comp Patterns — Two Rights, One Left. [Comp Patterns — Two Rights, One Left day 145]',
   },
   146: {
 
-    title: 'Genre Day — Country Boom-Chuck Deepening (146)',
+    title: 'Genre Day — Country Boom-Chuck Deepening day 146',
     durationMin: 30,
     goals: [
       'Separate bass notes on beats 1 and 3 from higher chucks on 2 and 4',
       'Keep boom-chuck steady through chord changes',
-      'Smile test: it should feel like a train, not a scramble (Genre Day — Country Boom-Chuck Deepening (146))'
+      'Smile test: it should feel like a train, not a scramble (Genre Day — Country Boom-Chuck Deepening day 146)'
     ],
-    theoryBite: 'Boom-chuck is an American rhythm engine: bass / chord / bass / chord. Independence between thumb-side and strum-side is the skill. Today\'s angle: Genre Day — Country Boom-Chuck Deepening (146).',
+    theoryBite: 'Boom-chuck is an American rhythm engine: bass / chord / bass / chord. Independence between thumb-side and strum-side is the skill. Today: Genre Day — Country Boom-Chuck Deepening.',
     drills: [
-      'Bass on open D/G strings beats 1 & 3 only for 60s — focus «Genre Day — Country Boom-Chuck Deepening»',
+      'Bass on open D/G strings beats 1 & 3 only for 60s — keep it about Genre Day — Country Boom-Chuck Deepening',
       'Add light chucks on 2 & 4 muted',
       'G–C–D boom-chuck at walking tempo',
-      'Remove chucks for 4 bars, bring back — pocket must stay (Genre Day — Country Boom-Chuck Deepening (146))'
+      'Remove chucks for 4 bars, bring back — pocket must stay (Genre Day — Country Boom-Chuck Deepening day 146)'
     ],
     libraryIds: [
       'rf-d-folk-pattern-study',
@@ -3090,73 +3090,73 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'ch-c',
       'ch-d'
     ],
-    masteryCheck: 'Play 16 bars of boom-chuck on a three-chord loop with clear bass vs chuck roles — applied to «Genre Day — Country Boom-Chuck Deepening». [Genre Day — Country Boom-Chuck Deepening (146)]',
+    masteryCheck: 'Play 16 bars of boom-chuck on a three-chord loop with clear bass vs chuck roles while working on Genre Day — Country Boom-Chuck Deepening. [Genre Day — Country Boom-Chuck Deepening day 146]',
   },
   147: {
 
-    title: 'Genre Day — Rock Eighth Drive (147)',
+    title: 'Genre Day — Rock Eighth Drive day 147',
     durationMin: 35,
     goals: [
       'Drive straight eighths with consistent down-up energy',
       'Lean on power shapes or open chords without tensing the fretting hand',
-      'Use palm mute as a chorus/verse texture switch (Genre Day — Rock Eighth Drive (147))'
+      'Use palm mute as a chorus/verse texture switch (Genre Day — Rock Eighth Drive day 147)'
     ],
-    theoryBite: 'Rock eighth drive is stamina plus evenness. The story is often density and mute color, not chord complexity. Today\'s angle: Genre Day — Rock Eighth Drive (147).',
+    theoryBite: 'Rock eighth drive is stamina plus evenness. The story is often density and mute color, not chord complexity. Today: Genre Day — Rock Eighth Drive.',
     drills: [
-      'Straight eighth downs-ups muted 90 seconds — focus «Genre Day — Rock Eighth Drive»',
+      'Straight eighth downs-ups muted 90 seconds — keep it about Genre Day — Rock Eighth Drive',
       'Power-shape fretting with eighth drive 8 bars',
       'Verse mute / chorus open for a 16-bar form',
-      'Check shoulders at bar 12 — drop them if high (Genre Day — Rock Eighth Drive (147))'
+      'Check shoulders at bar 12 — drop them if high (Genre Day — Rock Eighth Drive day 147)'
     ],
     libraryIds: [
       'pr-1645',
       'rf-g-caged-run-study'
     ],
-    masteryCheck: 'Perform a 16-bar verse/chorus mute story at steady eighths without rushing the chorus open — applied to «Genre Day — Rock Eighth Drive». [Genre Day — Rock Eighth Drive (147)]',
+    masteryCheck: 'Perform a 16-bar verse/chorus mute story at steady eighths without rushing the chorus open while working on Genre Day — Rock Eighth Drive. [Genre Day — Rock Eighth Drive day 147]',
   },
   148: {
 
-    title: 'Weekly Rhythm Checkpoint (148)',
+    title: 'Weekly Rhythm Checkpoint day 148',
     durationMin: 30,
     goals: [
       'Combine pocket, one subdivision skill, and dynamics in one take',
       'Record evidence rather than trusting memory',
-      'Name one keep and one fix afterward (Weekly Rhythm Checkpoint (148))'
+      'Name one keep and one fix afterward (Weekly Rhythm Checkpoint day 148)'
     ],
-    theoryBite: 'Checkpoints convert practice into proof. A short recorded take plus a kind note beats vague \'I practiced rhythm.\' Today\'s angle: Weekly Rhythm Checkpoint (148).',
+    theoryBite: 'Checkpoints convert practice into proof. A short recorded take plus a kind note beats vague \'I practiced rhythm.\' Today: Weekly Rhythm Checkpoint.',
     drills: [
-      '60s pocket warm-up muted — focus «Weekly Rhythm Checkpoint»',
+      '60s pocket warm-up muted — keep it about Weekly Rhythm Checkpoint',
       '8 bars subdivision or accent focus',
       '8 bars dynamic wave on a progression',
-      'Record a 16-bar medley of those skills; write keep/fix (Weekly Rhythm Checkpoint (148))'
+      'Record a 16-bar medley of those skills; write keep/fix (Weekly Rhythm Checkpoint day 148)'
     ],
     libraryIds: [
       'pr-andalu',
       'rf-funk-chicka-study'
     ],
-    masteryCheck: 'Save one 16-bar take that shows steady time plus one expressive rhythm choice, with a written keep and fix — applied to «Weekly Rhythm Checkpoint». [Weekly Rhythm Checkpoint (148)]',
+    masteryCheck: 'Save one 16-bar take that shows steady time plus one expressive rhythm choice, with a written keep and fix while working on Weekly Rhythm Checkpoint. [Weekly Rhythm Checkpoint day 148]',
   },
   149: {
 
-    title: 'Click Trust — Play Behind/On/Ahead (149)',
+    title: 'Click Trust — Play Behind/On/Ahead day 149',
     durationMin: 30,
     goals: [
       'Play on top of, with, and slightly behind the click on command',
       'Hear the click as a collaborator, not an enemy',
-      'Return to \'with\' after exploring the edges (Click Trust — Play Behind/On/Ahead (149))'
+      'Return to \'with\' after exploring the edges (Click Trust — Play Behind/On/Ahead day 149)'
     ],
-    theoryBite: 'Time feel is a placement choice. Behind can feel heavier; ahead can feel urgent. Control requires a reference click. Today\'s angle: Click Trust — Play Behind/On/Ahead (149).',
+    theoryBite: 'Time feel is a placement choice. Behind can feel heavier; ahead can feel urgent. Control requires a reference click. Today: Click Trust — Play Behind/On/Ahead. Day 149.',
     drills: [
-      '8 bars dead on the click (muted) — focus «Click Trust — Play Behind/On/Ahead»',
+      '8 bars dead on the click (muted) — keep it about Click Trust — Play Behind/On/Ahead',
       '8 bars intentionally late (still even)',
       '8 bars intentionally early (still even)',
-      '8 bars back on center — notice body tension differences (Click Trust — Play Behind/On/Ahead (149))'
+      '8 bars back on center — notice body tension differences (Click Trust — Play Behind/On/Ahead day 149)'
     ],
     libraryIds: [
       'pr-6251',
       'rf-am-arpeggio-cascade'
     ],
-    masteryCheck: 'Label and perform on / behind / ahead for 8 bars each without losing the form of a simple vamp — applied to «Click Trust — Play Behind/On/Ahead». [Click Trust — Play Behind/On/Ahead (149)]',
+    masteryCheck: 'Label and perform on / behind / ahead for 8 bars each without losing the form of a simple vamp while working on Click Trust — Play Behind/On/Ahead. [Click Trust — Play Behind/On/Ahead day 149]',
   },
   150: {
 
@@ -3167,9 +3167,9 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'Change right-hand density without changing tempo',
       'Treat arrangement as a practice skill, not only a studio skill (Rhythm Capstone Mid — 32-Bar Texture Ride)'
     ],
-    theoryBite: 'Texture is how many musical layers speak. Great rhythm players arrange with the right hand: low density vs full strums. Today\'s angle: Rhythm Capstone Mid — 32-Bar Texture Ride.',
+    theoryBite: 'Texture is how many musical layers speak. Great rhythm players arrange with the right hand: low density vs full strums. Today: Rhythm Capstone Mid — 32-Bar Texture Ride.',
     drills: [
-      'Write a 32-bar map: 8 sparse, 8 medium, 8 full, 8 sparse — focus «Rhythm Capstone Mid — 32-Bar Texture Ride»',
+      'Write a 32-bar map: 8 sparse, 8 medium, 8 full, 8 sparse — keep it about Rhythm Capstone Mid — 32-Bar Texture Ride',
       'Perform the map on one chord only',
       'Perform the map on a 3-chord loop',
       'Mark one bar that got busy too early and fix it'
@@ -3178,7 +3178,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'pr-145',
       'rf-natural-harmonics-study'
     ],
-    masteryCheck: 'Perform the full 32-bar texture map once with tempo flat and density changes obvious — applied to «Rhythm Capstone Mid — 32-Bar Texture Ride».',
+    masteryCheck: 'Perform the full 32-bar texture map once with tempo flat and density changes obvious while working on Rhythm Capstone Mid — 32-Bar Texture Ride.',
   },
   151: {
 
@@ -3189,9 +3189,9 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'Turn muted strums into a drum kit that never rushes',
       'Prove the groove still feels good when you add only one chord (Groove Deepening — Pocket Variations)'
     ],
-    theoryBite: 'Listeners forgive simple harmony faster than shaky time. Pocket is agreement with pulse — research on ensemble timing shows micro-consistency beats ornamental complexity. Today\'s angle: Groove Deepening — Pocket Variations.',
+    theoryBite: 'Listeners forgive simple harmony faster than shaky time. Pocket means your notes agree with the pulse. Steady and simple beats fancy and shaky. Today: Groove Deepening — Pocket Variations.',
     drills: [
-      'Foot quarters alone for 60 seconds at 70 BPM — no guitar — focus «Groove Deepening — Pocket Variations»',
+      'Foot quarters alone for 60 seconds at 70 BPM — no guitar — keep it about Groove Deepening — Pocket Variations',
       'Muted downstrokes on open strings, one per beat, 60 seconds',
       'Muted D-DU pattern for 60 seconds while counting 1 & 2 & 3 & 4 & aloud',
       'Add a single G chord only after 8 clean muted bars; stop if the pocket slips'
@@ -3200,45 +3200,45 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'pr-12bar',
       'rf-open-am'
     ],
-    masteryCheck: 'Hold 32 bars of muted groove at 70 BPM with foot and hand locked, then add one chord without rushing — applied to «Groove Deepening — Pocket Variations».',
+    masteryCheck: 'Hold 32 bars of muted groove at 70 BPM with foot and hand locked, then add one chord without rushing while working on Groove Deepening — Pocket Variations.',
   },
   152: {
 
-    title: 'Comp Patterns — Two Rights, One Left (152)',
+    title: 'Comp Patterns — Two Rights, One Left day 152',
     durationMin: 30,
     goals: [
       'Build a two-bar comp pattern you could hand to a singer',
       'Balance low thumps and higher scratches',
-      'Leave space for an imaginary vocal (Comp Patterns — Two Rights, One Left (152))'
+      'Leave space for an imaginary vocal (Comp Patterns — Two Rights, One Left day 152)'
     ],
-    theoryBite: 'Comp patterns are reusable right-hand sentences. Great accompanists repeat a clear idea more than they invent chaos. Today\'s angle: Comp Patterns — Two Rights, One Left (152).',
+    theoryBite: 'Comp patterns are reusable right-hand sentences. Great accompanists repeat a clear idea more than they invent chaos. Today: Comp Patterns — Two Rights, One Left. Day 152.',
     drills: [
-      'Design a 2-bar pattern on paper (D = down, U = up, . = rest) — focus «Comp Patterns — Two Rights, One Left»',
+      'Design a 2-bar pattern on paper (D = down, U = up, . = rest) — keep it about Comp Patterns — Two Rights, One Left',
       'Mute-perform it 8 times',
       'Add G and C, two bars each, pattern continuous',
-      'Sing nonsense syllables over it to test space (Comp Patterns — Two Rights, One Left (152))'
+      'Sing nonsense syllables over it to test space (Comp Patterns — Two Rights, One Left day 152)'
     ],
     libraryIds: [
       'pr-1645',
       'rf-caged-c'
     ],
-    masteryCheck: 'Loop your 2-bar comp for 16 bars with chord changes and still-recognizable pattern identity — applied to «Comp Patterns — Two Rights, One Left». [Comp Patterns — Two Rights, One Left (152)]',
+    masteryCheck: 'Loop your 2-bar comp for 16 bars with chord changes and still-recognizable pattern identity while working on Comp Patterns — Two Rights, One Left. [Comp Patterns — Two Rights, One Left day 152]',
   },
   153: {
 
-    title: 'Genre Day — Country Boom-Chuck Deepening (153)',
+    title: 'Genre Day — Country Boom-Chuck Deepening day 153',
     durationMin: 30,
     goals: [
       'Separate bass notes on beats 1 and 3 from higher chucks on 2 and 4',
       'Keep boom-chuck steady through chord changes',
-      'Smile test: it should feel like a train, not a scramble (Genre Day — Country Boom-Chuck Deepening (153))'
+      'Smile test: it should feel like a train, not a scramble (Genre Day — Country Boom-Chuck Deepening day 153)'
     ],
-    theoryBite: 'Boom-chuck is an American rhythm engine: bass / chord / bass / chord. Independence between thumb-side and strum-side is the skill. Today\'s angle: Genre Day — Country Boom-Chuck Deepening (153).',
+    theoryBite: 'Boom-chuck is an American rhythm engine: bass / chord / bass / chord. Independence between thumb-side and strum-side is the skill. Today: Genre Day — Country Boom-Chuck Deepening. Day 153.',
     drills: [
-      'Bass on open D/G strings beats 1 & 3 only for 60s — focus «Genre Day — Country Boom-Chuck Deepening»',
+      'Bass on open D/G strings beats 1 & 3 only for 60s — keep it about Genre Day — Country Boom-Chuck Deepening',
       'Add light chucks on 2 & 4 muted',
       'G–C–D boom-chuck at walking tempo',
-      'Remove chucks for 4 bars, bring back — pocket must stay (Genre Day — Country Boom-Chuck Deepening (153))'
+      'Remove chucks for 4 bars, bring back — pocket must stay (Genre Day — Country Boom-Chuck Deepening day 153)'
     ],
     libraryIds: [
       'rf-d-folk-pattern-study',
@@ -3246,155 +3246,155 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'ch-c',
       'ch-d'
     ],
-    masteryCheck: 'Play 16 bars of boom-chuck on a three-chord loop with clear bass vs chuck roles — applied to «Genre Day — Country Boom-Chuck Deepening». [Genre Day — Country Boom-Chuck Deepening (153)]',
+    masteryCheck: 'Play 16 bars of boom-chuck on a three-chord loop with clear bass vs chuck roles while working on Genre Day — Country Boom-Chuck Deepening. [Genre Day — Country Boom-Chuck Deepening day 153]',
   },
   154: {
 
-    title: 'Genre Day — Rock Eighth Drive (154)',
+    title: 'Genre Day — Rock Eighth Drive day 154',
     durationMin: 35,
     goals: [
       'Drive straight eighths with consistent down-up energy',
       'Lean on power shapes or open chords without tensing the fretting hand',
-      'Use palm mute as a chorus/verse texture switch (Genre Day — Rock Eighth Drive (154))'
+      'Use palm mute as a chorus/verse texture switch (Genre Day — Rock Eighth Drive day 154)'
     ],
-    theoryBite: 'Rock eighth drive is stamina plus evenness. The story is often density and mute color, not chord complexity. Today\'s angle: Genre Day — Rock Eighth Drive (154).',
+    theoryBite: 'Rock eighth drive is stamina plus evenness. The story is often density and mute color, not chord complexity. Today: Genre Day — Rock Eighth Drive. Day 154.',
     drills: [
-      'Straight eighth downs-ups muted 90 seconds — focus «Genre Day — Rock Eighth Drive»',
+      'Straight eighth downs-ups muted 90 seconds — keep it about Genre Day — Rock Eighth Drive',
       'Power-shape fretting with eighth drive 8 bars',
       'Verse mute / chorus open for a 16-bar form',
-      'Check shoulders at bar 12 — drop them if high (Genre Day — Rock Eighth Drive (154))'
+      'Check shoulders at bar 12 — drop them if high (Genre Day — Rock Eighth Drive day 154)'
     ],
     libraryIds: [
       'pr-6251',
       'rf-c-bass-walk-study'
     ],
-    masteryCheck: 'Perform a 16-bar verse/chorus mute story at steady eighths without rushing the chorus open — applied to «Genre Day — Rock Eighth Drive». [Genre Day — Rock Eighth Drive (154)]',
+    masteryCheck: 'Perform a 16-bar verse/chorus mute story at steady eighths without rushing the chorus open while working on Genre Day — Rock Eighth Drive. [Genre Day — Rock Eighth Drive day 154]',
   },
   155: {
 
-    title: 'Weekly Rhythm Checkpoint (155)',
+    title: 'Weekly Rhythm Checkpoint day 155',
     durationMin: 30,
     goals: [
       'Combine pocket, one subdivision skill, and dynamics in one take',
       'Record evidence rather than trusting memory',
-      'Name one keep and one fix afterward (Weekly Rhythm Checkpoint (155))'
+      'Name one keep and one fix afterward (Weekly Rhythm Checkpoint day 155)'
     ],
-    theoryBite: 'Checkpoints convert practice into proof. A short recorded take plus a kind note beats vague \'I practiced rhythm.\' Today\'s angle: Weekly Rhythm Checkpoint (155).',
+    theoryBite: 'Checkpoints convert practice into proof. A short recorded take plus a kind note beats vague \'I practiced rhythm.\' Today: Weekly Rhythm Checkpoint. Day 155.',
     drills: [
-      '60s pocket warm-up muted — focus «Weekly Rhythm Checkpoint»',
+      '60s pocket warm-up muted — keep it about Weekly Rhythm Checkpoint',
       '8 bars subdivision or accent focus',
       '8 bars dynamic wave on a progression',
-      'Record a 16-bar medley of those skills; write keep/fix (Weekly Rhythm Checkpoint (155))'
+      'Record a 16-bar medley of those skills; write keep/fix (Weekly Rhythm Checkpoint day 155)'
     ],
     libraryIds: [
       'pr-145',
       'rf-palm-mute-chug-study'
     ],
-    masteryCheck: 'Save one 16-bar take that shows steady time plus one expressive rhythm choice, with a written keep and fix — applied to «Weekly Rhythm Checkpoint». [Weekly Rhythm Checkpoint (155)]',
+    masteryCheck: 'Save one 16-bar take that shows steady time plus one expressive rhythm choice, with a written keep and fix while working on Weekly Rhythm Checkpoint. [Weekly Rhythm Checkpoint day 155]',
   },
   156: {
 
-    title: 'Click Trust — Play Behind/On/Ahead (156)',
+    title: 'Click Trust — Play Behind/On/Ahead day 156',
     durationMin: 30,
     goals: [
       'Play on top of, with, and slightly behind the click on command',
       'Hear the click as a collaborator, not an enemy',
-      'Return to \'with\' after exploring the edges (Click Trust — Play Behind/On/Ahead (156))'
+      'Return to \'with\' after exploring the edges (Click Trust — Play Behind/On/Ahead day 156)'
     ],
-    theoryBite: 'Time feel is a placement choice. Behind can feel heavier; ahead can feel urgent. Control requires a reference click. Today\'s angle: Click Trust — Play Behind/On/Ahead (156).',
+    theoryBite: 'Time feel is a placement choice. Behind can feel heavier; ahead can feel urgent. Control requires a reference click. Today: Click Trust — Play Behind/On/Ahead. Day 156.',
     drills: [
-      '8 bars dead on the click (muted) — focus «Click Trust — Play Behind/On/Ahead»',
+      '8 bars dead on the click (muted) — keep it about Click Trust — Play Behind/On/Ahead',
       '8 bars intentionally late (still even)',
       '8 bars intentionally early (still even)',
-      '8 bars back on center — notice body tension differences (Click Trust — Play Behind/On/Ahead (156))'
+      '8 bars back on center — notice body tension differences (Click Trust — Play Behind/On/Ahead day 156)'
     ],
     libraryIds: [
       'pr-12bar',
       'rf-drop-d-power-study'
     ],
-    masteryCheck: 'Label and perform on / behind / ahead for 8 bars each without losing the form of a simple vamp — applied to «Click Trust — Play Behind/On/Ahead». [Click Trust — Play Behind/On/Ahead (156)]',
+    masteryCheck: 'Label and perform on / behind / ahead for 8 bars each without losing the form of a simple vamp while working on Click Trust — Play Behind/On/Ahead. [Click Trust — Play Behind/On/Ahead day 156]',
   },
   157: {
 
-    title: 'Dynamic Waves — Crescendo Strum (157)',
+    title: 'Dynamic Waves — Crescendo Strum day 157',
     durationMin: 30,
     goals: [
       'Crescendo and decrescendo across multi-bar phrases',
       'Keep tempo flat while volume moves',
-      'Use dynamics as storytelling inside one progression (Dynamic Waves — Crescendo Strum (157))'
+      'Use dynamics as storytelling inside one progression (Dynamic Waves — Crescendo Strum day 157)'
     ],
-    theoryBite: 'Separating dynamics from tempo is elite right-hand control. Most players get louder by getting faster — break that link. Today\'s angle: Dynamic Waves — Crescendo Strum (157).',
+    theoryBite: 'Separating dynamics from tempo is elite right-hand control. Most players get louder by getting faster — break that link. Today: Dynamic Waves — Crescendo Strum. Day 157.',
     drills: [
-      '4 bars soft→loud on muted strums with a click — focus «Dynamic Waves — Crescendo Strum»',
+      '4 bars soft→loud on muted strums with a click — keep it about Dynamic Waves — Crescendo Strum',
       '4 bars loud→soft immediately after',
       'Repeat with chords G–Em–C–D',
-      'Friend test: can someone hear the wave with eyes closed? (Dynamic Waves — Crescendo Strum (157))'
+      'Friend test: can someone hear the wave with eyes closed? (Dynamic Waves — Crescendo Strum day 157)'
     ],
     libraryIds: [
       'pr-1645',
       'rf-minor-slide-lick-study'
     ],
-    masteryCheck: 'Perform an 8-bar dynamic wave (up then down) without speeding up or collapsing the groove — applied to «Dynamic Waves — Crescendo Strum». [Dynamic Waves — Crescendo Strum (157)]',
+    masteryCheck: 'Perform an 8-bar dynamic wave (up then down) without speeding up or collapsing the groove while working on Dynamic Waves — Crescendo Strum. [Dynamic Waves — Crescendo Strum day 157]',
   },
   158: {
 
-    title: 'Odd Accent — 5/4 Taste (158)',
+    title: 'Odd Accent — 5/4 Taste day 158',
     durationMin: 30,
     goals: [
       'Count a simple 5/4 or 5-beat cycle without panic',
       'Loop a short riff that makes the odd meter feel natural',
-      'Return to 4/4 cleanly so 4/4 feels even more solid (Odd Accent — 5/4 Taste (158))'
+      'Return to 4/4 cleanly so 4/4 feels even more solid (Odd Accent — 5/4 Taste day 158)'
     ],
-    theoryBite: 'Odd meters train attention. Even a light 5/4 taste improves how securely you feel barlines in 4/4. Today\'s angle: Odd Accent — 5/4 Taste (158).',
+    theoryBite: 'Odd meters train attention. Even a light 5/4 taste improves how securely you feel barlines in 4/4. Today: Odd Accent — 5/4 Taste. Day 158.',
     drills: [
-      'Count 1-2-3-4-5 aloud with foot for 60 seconds — focus «Odd Accent — 5/4 Taste»',
+      'Count 1-2-3-4-5 aloud with foot for 60 seconds — keep it about Odd Accent — 5/4 Taste',
       'Muted hit on 1 and 4 only in a 5-beat cycle',
       'Two-chord idea in 5: bar of A, bar of G feeling',
-      'Play 8 bars of 4/4 afterward — notice the calm (Odd Accent — 5/4 Taste (158))'
+      'Play 8 bars of 4/4 afterward — notice the calm (Odd Accent — 5/4 Taste day 158)'
     ],
     libraryIds: [
       'pr-andalu',
       'rf-power'
     ],
-    masteryCheck: 'Loop 8 cycles of a 5-beat groove you can count aloud while playing — applied to «Odd Accent — 5/4 Taste». [Odd Accent — 5/4 Taste (158)]',
+    masteryCheck: 'Loop 8 cycles of a 5-beat groove you can count aloud while playing while working on Odd Accent — 5/4 Taste. [Odd Accent — 5/4 Taste day 158]',
   },
   159: {
 
-    title: 'Comp Patterns — Two Rights, One Left (159)',
+    title: 'Comp Patterns — Two Rights, One Left day 159',
     durationMin: 30,
     goals: [
       'Build a two-bar comp pattern you could hand to a singer',
       'Balance low thumps and higher scratches',
-      'Leave space for an imaginary vocal (Comp Patterns — Two Rights, One Left (159))'
+      'Leave space for an imaginary vocal (Comp Patterns — Two Rights, One Left day 159)'
     ],
-    theoryBite: 'Comp patterns are reusable right-hand sentences. Great accompanists repeat a clear idea more than they invent chaos. Today\'s angle: Comp Patterns — Two Rights, One Left (159).',
+    theoryBite: 'Comp patterns are reusable right-hand sentences. Great accompanists repeat a clear idea more than they invent chaos. Today: Comp Patterns — Two Rights, One Left. Day 159.',
     drills: [
-      'Design a 2-bar pattern on paper (D = down, U = up, . = rest) — focus «Comp Patterns — Two Rights, One Left»',
+      'Design a 2-bar pattern on paper (D = down, U = up, . = rest) — keep it about Comp Patterns — Two Rights, One Left',
       'Mute-perform it 8 times',
       'Add G and C, two bars each, pattern continuous',
-      'Sing nonsense syllables over it to test space (Comp Patterns — Two Rights, One Left (159))'
+      'Sing nonsense syllables over it to test space (Comp Patterns — Two Rights, One Left day 159)'
     ],
     libraryIds: [
       'pr-6251',
       'rf-open-g-roll-study'
     ],
-    masteryCheck: 'Loop your 2-bar comp for 16 bars with chord changes and still-recognizable pattern identity — applied to «Comp Patterns — Two Rights, One Left». [Comp Patterns — Two Rights, One Left (159)]',
+    masteryCheck: 'Loop your 2-bar comp for 16 bars with chord changes and still-recognizable pattern identity while working on Comp Patterns — Two Rights, One Left. [Comp Patterns — Two Rights, One Left day 159]',
   },
   160: {
 
-    title: 'Genre Day — Country Boom-Chuck Deepening (160)',
+    title: 'Genre Day — Country Boom-Chuck Deepening day 160',
     durationMin: 30,
     goals: [
       'Separate bass notes on beats 1 and 3 from higher chucks on 2 and 4',
       'Keep boom-chuck steady through chord changes',
-      'Smile test: it should feel like a train, not a scramble (Genre Day — Country Boom-Chuck Deepening (160))'
+      'Smile test: it should feel like a train, not a scramble (Genre Day — Country Boom-Chuck Deepening day 160)'
     ],
-    theoryBite: 'Boom-chuck is an American rhythm engine: bass / chord / bass / chord. Independence between thumb-side and strum-side is the skill. Today\'s angle: Genre Day — Country Boom-Chuck Deepening (160).',
+    theoryBite: 'Boom-chuck is an American rhythm engine: bass / chord / bass / chord. Independence between thumb-side and strum-side is the skill. Today: Genre Day — Country Boom-Chuck Deepening. Day 160.',
     drills: [
-      'Bass on open D/G strings beats 1 & 3 only for 60s — focus «Genre Day — Country Boom-Chuck Deepening»',
+      'Bass on open D/G strings beats 1 & 3 only for 60s — keep it about Genre Day — Country Boom-Chuck Deepening',
       'Add light chucks on 2 & 4 muted',
       'G–C–D boom-chuck at walking tempo',
-      'Remove chucks for 4 bars, bring back — pocket must stay (Genre Day — Country Boom-Chuck Deepening (160))'
+      'Remove chucks for 4 bars, bring back — pocket must stay (Genre Day — Country Boom-Chuck Deepening day 160)'
     ],
     libraryIds: [
       'rf-d-folk-pattern-study',
@@ -3402,155 +3402,155 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'ch-c',
       'ch-d'
     ],
-    masteryCheck: 'Play 16 bars of boom-chuck on a three-chord loop with clear bass vs chuck roles — applied to «Genre Day — Country Boom-Chuck Deepening». [Genre Day — Country Boom-Chuck Deepening (160)]',
+    masteryCheck: 'Play 16 bars of boom-chuck on a three-chord loop with clear bass vs chuck roles while working on Genre Day — Country Boom-Chuck Deepening. [Genre Day — Country Boom-Chuck Deepening day 160]',
   },
   161: {
 
-    title: 'Genre Day — Rock Eighth Drive (161)',
+    title: 'Genre Day — Rock Eighth Drive day 161',
     durationMin: 35,
     goals: [
       'Drive straight eighths with consistent down-up energy',
       'Lean on power shapes or open chords without tensing the fretting hand',
-      'Use palm mute as a chorus/verse texture switch (Genre Day — Rock Eighth Drive (161))'
+      'Use palm mute as a chorus/verse texture switch (Genre Day — Rock Eighth Drive day 161)'
     ],
-    theoryBite: 'Rock eighth drive is stamina plus evenness. The story is often density and mute color, not chord complexity. Today\'s angle: Genre Day — Rock Eighth Drive (161).',
+    theoryBite: 'Rock eighth drive is stamina plus evenness. The story is often density and mute color, not chord complexity. Today: Genre Day — Rock Eighth Drive. Day 161.',
     drills: [
-      'Straight eighth downs-ups muted 90 seconds — focus «Genre Day — Rock Eighth Drive»',
+      'Straight eighth downs-ups muted 90 seconds — keep it about Genre Day — Rock Eighth Drive',
       'Power-shape fretting with eighth drive 8 bars',
       'Verse mute / chorus open for a 16-bar form',
-      'Check shoulders at bar 12 — drop them if high (Genre Day — Rock Eighth Drive (161))'
+      'Check shoulders at bar 12 — drop them if high (Genre Day — Rock Eighth Drive day 161)'
     ],
     libraryIds: [
       'pr-12bar',
       'rf-spanish-e-phrygian-study'
     ],
-    masteryCheck: 'Perform a 16-bar verse/chorus mute story at steady eighths without rushing the chorus open — applied to «Genre Day — Rock Eighth Drive». [Genre Day — Rock Eighth Drive (161)]',
+    masteryCheck: 'Perform a 16-bar verse/chorus mute story at steady eighths without rushing the chorus open while working on Genre Day — Rock Eighth Drive. [Genre Day — Rock Eighth Drive day 161]',
   },
   162: {
 
-    title: 'Weekly Rhythm Checkpoint (162)',
+    title: 'Weekly Rhythm Checkpoint day 162',
     durationMin: 30,
     goals: [
       'Combine pocket, one subdivision skill, and dynamics in one take',
       'Record evidence rather than trusting memory',
-      'Name one keep and one fix afterward (Weekly Rhythm Checkpoint (162))'
+      'Name one keep and one fix afterward (Weekly Rhythm Checkpoint day 162)'
     ],
-    theoryBite: 'Checkpoints convert practice into proof. A short recorded take plus a kind note beats vague \'I practiced rhythm.\' Today\'s angle: Weekly Rhythm Checkpoint (162).',
+    theoryBite: 'Checkpoints convert practice into proof. A short recorded take plus a kind note beats vague \'I practiced rhythm.\' Today: Weekly Rhythm Checkpoint. Day 162.',
     drills: [
-      '60s pocket warm-up muted — focus «Weekly Rhythm Checkpoint»',
+      '60s pocket warm-up muted — keep it about Weekly Rhythm Checkpoint',
       '8 bars subdivision or accent focus',
       '8 bars dynamic wave on a progression',
-      'Record a 16-bar medley of those skills; write keep/fix (Weekly Rhythm Checkpoint (162))'
+      'Record a 16-bar medley of those skills; write keep/fix (Weekly Rhythm Checkpoint day 162)'
     ],
     libraryIds: [
       'pr-1645',
       'rf-jazz-chromatic-approach-study'
     ],
-    masteryCheck: 'Save one 16-bar take that shows steady time plus one expressive rhythm choice, with a written keep and fix — applied to «Weekly Rhythm Checkpoint». [Weekly Rhythm Checkpoint (162)]',
+    masteryCheck: 'Save one 16-bar take that shows steady time plus one expressive rhythm choice, with a written keep and fix while working on Weekly Rhythm Checkpoint. [Weekly Rhythm Checkpoint day 162]',
   },
   163: {
 
-    title: 'Click Trust — Play Behind/On/Ahead (163)',
+    title: 'Click Trust — Play Behind/On/Ahead day 163',
     durationMin: 30,
     goals: [
       'Play on top of, with, and slightly behind the click on command',
       'Hear the click as a collaborator, not an enemy',
-      'Return to \'with\' after exploring the edges (Click Trust — Play Behind/On/Ahead (163))'
+      'Return to \'with\' after exploring the edges (Click Trust — Play Behind/On/Ahead day 163)'
     ],
-    theoryBite: 'Time feel is a placement choice. Behind can feel heavier; ahead can feel urgent. Control requires a reference click. Today\'s angle: Click Trust — Play Behind/On/Ahead (163).',
+    theoryBite: 'Time feel is a placement choice. Behind can feel heavier; ahead can feel urgent. Control requires a reference click. Today: Click Trust — Play Behind/On/Ahead. Day 163.',
     drills: [
-      '8 bars dead on the click (muted) — focus «Click Trust — Play Behind/On/Ahead»',
+      '8 bars dead on the click (muted) — keep it about Click Trust — Play Behind/On/Ahead',
       '8 bars intentionally late (still even)',
       '8 bars intentionally early (still even)',
-      '8 bars back on center — notice body tension differences (Click Trust — Play Behind/On/Ahead (163))'
+      '8 bars back on center — notice body tension differences (Click Trust — Play Behind/On/Ahead day 163)'
     ],
     libraryIds: [
       'pr-andalu',
       'rf-travis-pick-sketch-in-c'
     ],
-    masteryCheck: 'Label and perform on / behind / ahead for 8 bars each without losing the form of a simple vamp — applied to «Click Trust — Play Behind/On/Ahead». [Click Trust — Play Behind/On/Ahead (163)]',
+    masteryCheck: 'Label and perform on / behind / ahead for 8 bars each without losing the form of a simple vamp while working on Click Trust — Play Behind/On/Ahead. [Click Trust — Play Behind/On/Ahead day 163]',
   },
   164: {
 
-    title: 'Dynamic Waves — Crescendo Strum (164)',
+    title: 'Dynamic Waves — Crescendo Strum day 164',
     durationMin: 30,
     goals: [
       'Crescendo and decrescendo across multi-bar phrases',
       'Keep tempo flat while volume moves',
-      'Use dynamics as storytelling inside one progression (Dynamic Waves — Crescendo Strum (164))'
+      'Use dynamics as storytelling inside one progression (Dynamic Waves — Crescendo Strum day 164)'
     ],
-    theoryBite: 'Separating dynamics from tempo is elite right-hand control. Most players get louder by getting faster — break that link. Today\'s angle: Dynamic Waves — Crescendo Strum (164).',
+    theoryBite: 'Separating dynamics from tempo is elite right-hand control. Most players get louder by getting faster — break that link. Today: Dynamic Waves — Crescendo Strum. Day 164.',
     drills: [
-      '4 bars soft→loud on muted strums with a click — focus «Dynamic Waves — Crescendo Strum»',
+      '4 bars soft→loud on muted strums with a click — keep it about Dynamic Waves — Crescendo Strum',
       '4 bars loud→soft immediately after',
       'Repeat with chords G–Em–C–D',
-      'Friend test: can someone hear the wave with eyes closed? (Dynamic Waves — Crescendo Strum (164))'
+      'Friend test: can someone hear the wave with eyes closed? (Dynamic Waves — Crescendo Strum day 164)'
     ],
     libraryIds: [
       'pr-6251',
       'rf-spider'
     ],
-    masteryCheck: 'Perform an 8-bar dynamic wave (up then down) without speeding up or collapsing the groove — applied to «Dynamic Waves — Crescendo Strum». [Dynamic Waves — Crescendo Strum (164)]',
+    masteryCheck: 'Perform an 8-bar dynamic wave (up then down) without speeding up or collapsing the groove while working on Dynamic Waves — Crescendo Strum. [Dynamic Waves — Crescendo Strum day 164]',
   },
   165: {
 
-    title: 'Odd Accent — 5/4 Taste (165)',
+    title: 'Odd Accent — 5/4 Taste day 165',
     durationMin: 30,
     goals: [
       'Count a simple 5/4 or 5-beat cycle without panic',
       'Loop a short riff that makes the odd meter feel natural',
-      'Return to 4/4 cleanly so 4/4 feels even more solid (Odd Accent — 5/4 Taste (165))'
+      'Return to 4/4 cleanly so 4/4 feels even more solid (Odd Accent — 5/4 Taste day 165)'
     ],
-    theoryBite: 'Odd meters train attention. Even a light 5/4 taste improves how securely you feel barlines in 4/4. Today\'s angle: Odd Accent — 5/4 Taste (165).',
+    theoryBite: 'Odd meters train attention. Even a light 5/4 taste improves how securely you feel barlines in 4/4. Today: Odd Accent — 5/4 Taste. Day 165.',
     drills: [
-      'Count 1-2-3-4-5 aloud with foot for 60 seconds — focus «Odd Accent — 5/4 Taste»',
+      'Count 1-2-3-4-5 aloud with foot for 60 seconds — keep it about Odd Accent — 5/4 Taste',
       'Muted hit on 1 and 4 only in a 5-beat cycle',
       'Two-chord idea in 5: bar of A, bar of G feeling',
-      'Play 8 bars of 4/4 afterward — notice the calm (Odd Accent — 5/4 Taste (165))'
+      'Play 8 bars of 4/4 afterward — notice the calm (Odd Accent — 5/4 Taste day 165)'
     ],
     libraryIds: [
       'pr-145',
       'rf-blues-sh'
     ],
-    masteryCheck: 'Loop 8 cycles of a 5-beat groove you can count aloud while playing — applied to «Odd Accent — 5/4 Taste». [Odd Accent — 5/4 Taste (165)]',
+    masteryCheck: 'Loop 8 cycles of a 5-beat groove you can count aloud while playing while working on Odd Accent — 5/4 Taste. [Odd Accent — 5/4 Taste day 165]',
   },
   166: {
 
-    title: 'Comp Patterns — Two Rights, One Left (166)',
+    title: 'Comp Patterns — Two Rights, One Left day 166',
     durationMin: 30,
     goals: [
       'Build a two-bar comp pattern you could hand to a singer',
       'Balance low thumps and higher scratches',
-      'Leave space for an imaginary vocal (Comp Patterns — Two Rights, One Left (166))'
+      'Leave space for an imaginary vocal (Comp Patterns — Two Rights, One Left day 166)'
     ],
-    theoryBite: 'Comp patterns are reusable right-hand sentences. Great accompanists repeat a clear idea more than they invent chaos. Today\'s angle: Comp Patterns — Two Rights, One Left (166).',
+    theoryBite: 'Comp patterns are reusable right-hand sentences. Great accompanists repeat a clear idea more than they invent chaos. Today: Comp Patterns — Two Rights, One Left. Day 166.',
     drills: [
-      'Design a 2-bar pattern on paper (D = down, U = up, . = rest) — focus «Comp Patterns — Two Rights, One Left»',
+      'Design a 2-bar pattern on paper (D = down, U = up, . = rest) — keep it about Comp Patterns — Two Rights, One Left',
       'Mute-perform it 8 times',
       'Add G and C, two bars each, pattern continuous',
-      'Sing nonsense syllables over it to test space (Comp Patterns — Two Rights, One Left (166))'
+      'Sing nonsense syllables over it to test space (Comp Patterns — Two Rights, One Left day 166)'
     ],
     libraryIds: [
       'pr-12bar',
       'rf-em-pentatonic-box-study'
     ],
-    masteryCheck: 'Loop your 2-bar comp for 16 bars with chord changes and still-recognizable pattern identity — applied to «Comp Patterns — Two Rights, One Left». [Comp Patterns — Two Rights, One Left (166)]',
+    masteryCheck: 'Loop your 2-bar comp for 16 bars with chord changes and still-recognizable pattern identity while working on Comp Patterns — Two Rights, One Left. [Comp Patterns — Two Rights, One Left day 166]',
   },
   167: {
 
-    title: 'Genre Day — Country Boom-Chuck Deepening (167)',
+    title: 'Genre Day — Country Boom-Chuck Deepening day 167',
     durationMin: 30,
     goals: [
       'Separate bass notes on beats 1 and 3 from higher chucks on 2 and 4',
       'Keep boom-chuck steady through chord changes',
-      'Smile test: it should feel like a train, not a scramble (Genre Day — Country Boom-Chuck Deepening (167))'
+      'Smile test: it should feel like a train, not a scramble (Genre Day — Country Boom-Chuck Deepening day 167)'
     ],
-    theoryBite: 'Boom-chuck is an American rhythm engine: bass / chord / bass / chord. Independence between thumb-side and strum-side is the skill. Today\'s angle: Genre Day — Country Boom-Chuck Deepening (167).',
+    theoryBite: 'Boom-chuck is an American rhythm engine: bass / chord / bass / chord. Independence between thumb-side and strum-side is the skill. Today: Genre Day — Country Boom-Chuck Deepening. Day 167.',
     drills: [
-      'Bass on open D/G strings beats 1 & 3 only for 60s — focus «Genre Day — Country Boom-Chuck Deepening»',
+      'Bass on open D/G strings beats 1 & 3 only for 60s — keep it about Genre Day — Country Boom-Chuck Deepening',
       'Add light chucks on 2 & 4 muted',
       'G–C–D boom-chuck at walking tempo',
-      'Remove chucks for 4 bars, bring back — pocket must stay (Genre Day — Country Boom-Chuck Deepening (167))'
+      'Remove chucks for 4 bars, bring back — pocket must stay (Genre Day — Country Boom-Chuck Deepening day 167)'
     ],
     libraryIds: [
       'rf-d-folk-pattern-study',
@@ -3558,155 +3558,155 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'ch-c',
       'ch-d'
     ],
-    masteryCheck: 'Play 16 bars of boom-chuck on a three-chord loop with clear bass vs chuck roles — applied to «Genre Day — Country Boom-Chuck Deepening». [Genre Day — Country Boom-Chuck Deepening (167)]',
+    masteryCheck: 'Play 16 bars of boom-chuck on a three-chord loop with clear bass vs chuck roles while working on Genre Day — Country Boom-Chuck Deepening. [Genre Day — Country Boom-Chuck Deepening day 167]',
   },
   168: {
 
-    title: 'Genre Day — Rock Eighth Drive (168)',
+    title: 'Genre Day — Rock Eighth Drive day 168',
     durationMin: 35,
     goals: [
       'Drive straight eighths with consistent down-up energy',
       'Lean on power shapes or open chords without tensing the fretting hand',
-      'Use palm mute as a chorus/verse texture switch (Genre Day — Rock Eighth Drive (168))'
+      'Use palm mute as a chorus/verse texture switch (Genre Day — Rock Eighth Drive day 168)'
     ],
-    theoryBite: 'Rock eighth drive is stamina plus evenness. The story is often density and mute color, not chord complexity. Today\'s angle: Genre Day — Rock Eighth Drive (168).',
+    theoryBite: 'Rock eighth drive is stamina plus evenness. The story is often density and mute color, not chord complexity. Today: Genre Day — Rock Eighth Drive. Day 168.',
     drills: [
-      'Straight eighth downs-ups muted 90 seconds — focus «Genre Day — Rock Eighth Drive»',
+      'Straight eighth downs-ups muted 90 seconds — keep it about Genre Day — Rock Eighth Drive',
       'Power-shape fretting with eighth drive 8 bars',
       'Verse mute / chorus open for a 16-bar form',
-      'Check shoulders at bar 12 — drop them if high (Genre Day — Rock Eighth Drive (168))'
+      'Check shoulders at bar 12 — drop them if high (Genre Day — Rock Eighth Drive day 168)'
     ],
     libraryIds: [
       'pr-andalu',
       'rf-funk-chicka-study'
     ],
-    masteryCheck: 'Perform a 16-bar verse/chorus mute story at steady eighths without rushing the chorus open — applied to «Genre Day — Rock Eighth Drive». [Genre Day — Rock Eighth Drive (168)]',
+    masteryCheck: 'Perform a 16-bar verse/chorus mute story at steady eighths without rushing the chorus open while working on Genre Day — Rock Eighth Drive. [Genre Day — Rock Eighth Drive day 168]',
   },
   169: {
 
-    title: 'Weekly Rhythm Checkpoint (169)',
+    title: 'Weekly Rhythm Checkpoint day 169',
     durationMin: 30,
     goals: [
       'Combine pocket, one subdivision skill, and dynamics in one take',
       'Record evidence rather than trusting memory',
-      'Name one keep and one fix afterward (Weekly Rhythm Checkpoint (169))'
+      'Name one keep and one fix afterward (Weekly Rhythm Checkpoint day 169)'
     ],
-    theoryBite: 'Checkpoints convert practice into proof. A short recorded take plus a kind note beats vague \'I practiced rhythm.\' Today\'s angle: Weekly Rhythm Checkpoint (169).',
+    theoryBite: 'Checkpoints convert practice into proof. A short recorded take plus a kind note beats vague \'I practiced rhythm.\' Today: Weekly Rhythm Checkpoint. Day 169.',
     drills: [
-      '60s pocket warm-up muted — focus «Weekly Rhythm Checkpoint»',
+      '60s pocket warm-up muted — keep it about Weekly Rhythm Checkpoint',
       '8 bars subdivision or accent focus',
       '8 bars dynamic wave on a progression',
-      'Record a 16-bar medley of those skills; write keep/fix (Weekly Rhythm Checkpoint (169))'
+      'Record a 16-bar medley of those skills; write keep/fix (Weekly Rhythm Checkpoint day 169)'
     ],
     libraryIds: [
       'pr-6251',
       'rf-am-arpeggio-cascade'
     ],
-    masteryCheck: 'Save one 16-bar take that shows steady time plus one expressive rhythm choice, with a written keep and fix — applied to «Weekly Rhythm Checkpoint». [Weekly Rhythm Checkpoint (169)]',
+    masteryCheck: 'Save one 16-bar take that shows steady time plus one expressive rhythm choice, with a written keep and fix while working on Weekly Rhythm Checkpoint. [Weekly Rhythm Checkpoint day 169]',
   },
   170: {
 
-    title: 'Click Trust — Play Behind/On/Ahead (170)',
+    title: 'Click Trust — Play Behind/On/Ahead day 170',
     durationMin: 30,
     goals: [
       'Play on top of, with, and slightly behind the click on command',
       'Hear the click as a collaborator, not an enemy',
-      'Return to \'with\' after exploring the edges (Click Trust — Play Behind/On/Ahead (170))'
+      'Return to \'with\' after exploring the edges (Click Trust — Play Behind/On/Ahead day 170)'
     ],
-    theoryBite: 'Time feel is a placement choice. Behind can feel heavier; ahead can feel urgent. Control requires a reference click. Today\'s angle: Click Trust — Play Behind/On/Ahead (170).',
+    theoryBite: 'Time feel is a placement choice. Behind can feel heavier; ahead can feel urgent. Control requires a reference click. Today: Click Trust — Play Behind/On/Ahead. Day 170.',
     drills: [
-      '8 bars dead on the click (muted) — focus «Click Trust — Play Behind/On/Ahead»',
+      '8 bars dead on the click (muted) — keep it about Click Trust — Play Behind/On/Ahead',
       '8 bars intentionally late (still even)',
       '8 bars intentionally early (still even)',
-      '8 bars back on center — notice body tension differences (Click Trust — Play Behind/On/Ahead (170))'
+      '8 bars back on center — notice body tension differences (Click Trust — Play Behind/On/Ahead day 170)'
     ],
     libraryIds: [
       'pr-145',
       'rf-natural-harmonics-study'
     ],
-    masteryCheck: 'Label and perform on / behind / ahead for 8 bars each without losing the form of a simple vamp — applied to «Click Trust — Play Behind/On/Ahead». [Click Trust — Play Behind/On/Ahead (170)]',
+    masteryCheck: 'Label and perform on / behind / ahead for 8 bars each without losing the form of a simple vamp while working on Click Trust — Play Behind/On/Ahead. [Click Trust — Play Behind/On/Ahead day 170]',
   },
   171: {
 
-    title: 'Dynamic Waves — Crescendo Strum (171)',
+    title: 'Dynamic Waves — Crescendo Strum day 171',
     durationMin: 30,
     goals: [
       'Crescendo and decrescendo across multi-bar phrases',
       'Keep tempo flat while volume moves',
-      'Use dynamics as storytelling inside one progression (Dynamic Waves — Crescendo Strum (171))'
+      'Use dynamics as storytelling inside one progression (Dynamic Waves — Crescendo Strum day 171)'
     ],
-    theoryBite: 'Separating dynamics from tempo is elite right-hand control. Most players get louder by getting faster — break that link. Today\'s angle: Dynamic Waves — Crescendo Strum (171).',
+    theoryBite: 'Separating dynamics from tempo is elite right-hand control. Most players get louder by getting faster — break that link. Today: Dynamic Waves — Crescendo Strum. Day 171.',
     drills: [
-      '4 bars soft→loud on muted strums with a click — focus «Dynamic Waves — Crescendo Strum»',
+      '4 bars soft→loud on muted strums with a click — keep it about Dynamic Waves — Crescendo Strum',
       '4 bars loud→soft immediately after',
       'Repeat with chords G–Em–C–D',
-      'Friend test: can someone hear the wave with eyes closed? (Dynamic Waves — Crescendo Strum (171))'
+      'Friend test: can someone hear the wave with eyes closed? (Dynamic Waves — Crescendo Strum day 171)'
     ],
     libraryIds: [
       'pr-12bar',
       'rf-open-am'
     ],
-    masteryCheck: 'Perform an 8-bar dynamic wave (up then down) without speeding up or collapsing the groove — applied to «Dynamic Waves — Crescendo Strum». [Dynamic Waves — Crescendo Strum (171)]',
+    masteryCheck: 'Perform an 8-bar dynamic wave (up then down) without speeding up or collapsing the groove while working on Dynamic Waves — Crescendo Strum. [Dynamic Waves — Crescendo Strum day 171]',
   },
   172: {
 
-    title: 'Odd Accent — 5/4 Taste (172)',
+    title: 'Odd Accent — 5/4 Taste day 172',
     durationMin: 30,
     goals: [
       'Count a simple 5/4 or 5-beat cycle without panic',
       'Loop a short riff that makes the odd meter feel natural',
-      'Return to 4/4 cleanly so 4/4 feels even more solid (Odd Accent — 5/4 Taste (172))'
+      'Return to 4/4 cleanly so 4/4 feels even more solid (Odd Accent — 5/4 Taste day 172)'
     ],
-    theoryBite: 'Odd meters train attention. Even a light 5/4 taste improves how securely you feel barlines in 4/4. Today\'s angle: Odd Accent — 5/4 Taste (172).',
+    theoryBite: 'Odd meters train attention. Even a light 5/4 taste improves how securely you feel barlines in 4/4. Today: Odd Accent — 5/4 Taste. Day 172.',
     drills: [
-      'Count 1-2-3-4-5 aloud with foot for 60 seconds — focus «Odd Accent — 5/4 Taste»',
+      'Count 1-2-3-4-5 aloud with foot for 60 seconds — keep it about Odd Accent — 5/4 Taste',
       'Muted hit on 1 and 4 only in a 5-beat cycle',
       'Two-chord idea in 5: bar of A, bar of G feeling',
-      'Play 8 bars of 4/4 afterward — notice the calm (Odd Accent — 5/4 Taste (172))'
+      'Play 8 bars of 4/4 afterward — notice the calm (Odd Accent — 5/4 Taste day 172)'
     ],
     libraryIds: [
       'pr-1645',
       'rf-caged-c'
     ],
-    masteryCheck: 'Loop 8 cycles of a 5-beat groove you can count aloud while playing — applied to «Odd Accent — 5/4 Taste». [Odd Accent — 5/4 Taste (172)]',
+    masteryCheck: 'Loop 8 cycles of a 5-beat groove you can count aloud while playing while working on Odd Accent — 5/4 Taste. [Odd Accent — 5/4 Taste day 172]',
   },
   173: {
 
-    title: 'Comp Patterns — Two Rights, One Left (173)',
+    title: 'Comp Patterns — Two Rights, One Left day 173',
     durationMin: 30,
     goals: [
       'Build a two-bar comp pattern you could hand to a singer',
       'Balance low thumps and higher scratches',
-      'Leave space for an imaginary vocal (Comp Patterns — Two Rights, One Left (173))'
+      'Leave space for an imaginary vocal (Comp Patterns — Two Rights, One Left day 173)'
     ],
-    theoryBite: 'Comp patterns are reusable right-hand sentences. Great accompanists repeat a clear idea more than they invent chaos. Today\'s angle: Comp Patterns — Two Rights, One Left (173).',
+    theoryBite: 'Comp patterns are reusable right-hand sentences. Great accompanists repeat a clear idea more than they invent chaos. Today: Comp Patterns — Two Rights, One Left. Day 173.',
     drills: [
-      'Design a 2-bar pattern on paper (D = down, U = up, . = rest) — focus «Comp Patterns — Two Rights, One Left»',
+      'Design a 2-bar pattern on paper (D = down, U = up, . = rest) — keep it about Comp Patterns — Two Rights, One Left',
       'Mute-perform it 8 times',
       'Add G and C, two bars each, pattern continuous',
-      'Sing nonsense syllables over it to test space (Comp Patterns — Two Rights, One Left (173))'
+      'Sing nonsense syllables over it to test space (Comp Patterns — Two Rights, One Left day 173)'
     ],
     libraryIds: [
       'pr-andalu',
       'rf-d-folk-pattern-study'
     ],
-    masteryCheck: 'Loop your 2-bar comp for 16 bars with chord changes and still-recognizable pattern identity — applied to «Comp Patterns — Two Rights, One Left». [Comp Patterns — Two Rights, One Left (173)]',
+    masteryCheck: 'Loop your 2-bar comp for 16 bars with chord changes and still-recognizable pattern identity while working on Comp Patterns — Two Rights, One Left. [Comp Patterns — Two Rights, One Left day 173]',
   },
   174: {
 
-    title: 'Genre Day — Country Boom-Chuck Deepening (174)',
+    title: 'Genre Day — Country Boom-Chuck Deepening day 174',
     durationMin: 30,
     goals: [
       'Separate bass notes on beats 1 and 3 from higher chucks on 2 and 4',
       'Keep boom-chuck steady through chord changes',
-      'Smile test: it should feel like a train, not a scramble (Genre Day — Country Boom-Chuck Deepening (174))'
+      'Smile test: it should feel like a train, not a scramble (Genre Day — Country Boom-Chuck Deepening day 174)'
     ],
-    theoryBite: 'Boom-chuck is an American rhythm engine: bass / chord / bass / chord. Independence between thumb-side and strum-side is the skill. Today\'s angle: Genre Day — Country Boom-Chuck Deepening (174).',
+    theoryBite: 'Boom-chuck is an American rhythm engine: bass / chord / bass / chord. Independence between thumb-side and strum-side is the skill. Today: Genre Day — Country Boom-Chuck Deepening. Day 174.',
     drills: [
-      'Bass on open D/G strings beats 1 & 3 only for 60s — focus «Genre Day — Country Boom-Chuck Deepening»',
+      'Bass on open D/G strings beats 1 & 3 only for 60s — keep it about Genre Day — Country Boom-Chuck Deepening',
       'Add light chucks on 2 & 4 muted',
       'G–C–D boom-chuck at walking tempo',
-      'Remove chucks for 4 bars, bring back — pocket must stay (Genre Day — Country Boom-Chuck Deepening (174))'
+      'Remove chucks for 4 bars, bring back — pocket must stay (Genre Day — Country Boom-Chuck Deepening day 174)'
     ],
     libraryIds: [
       'rf-d-folk-pattern-study',
@@ -3714,118 +3714,118 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'ch-c',
       'ch-d'
     ],
-    masteryCheck: 'Play 16 bars of boom-chuck on a three-chord loop with clear bass vs chuck roles — applied to «Genre Day — Country Boom-Chuck Deepening». [Genre Day — Country Boom-Chuck Deepening (174)]',
+    masteryCheck: 'Play 16 bars of boom-chuck on a three-chord loop with clear bass vs chuck roles while working on Genre Day — Country Boom-Chuck Deepening. [Genre Day — Country Boom-Chuck Deepening day 174]',
   },
   175: {
 
-    title: 'Genre Day — Rock Eighth Drive (175)',
+    title: 'Genre Day — Rock Eighth Drive day 175',
     durationMin: 35,
     goals: [
       'Drive straight eighths with consistent down-up energy',
       'Lean on power shapes or open chords without tensing the fretting hand',
-      'Use palm mute as a chorus/verse texture switch (Genre Day — Rock Eighth Drive (175))'
+      'Use palm mute as a chorus/verse texture switch (Genre Day — Rock Eighth Drive day 175)'
     ],
-    theoryBite: 'Rock eighth drive is stamina plus evenness. The story is often density and mute color, not chord complexity. Today\'s angle: Genre Day — Rock Eighth Drive (175).',
+    theoryBite: 'Rock eighth drive is stamina plus evenness. The story is often density and mute color, not chord complexity. Today: Genre Day — Rock Eighth Drive. Day 175.',
     drills: [
-      'Straight eighth downs-ups muted 90 seconds — focus «Genre Day — Rock Eighth Drive»',
+      'Straight eighth downs-ups muted 90 seconds — keep it about Genre Day — Rock Eighth Drive',
       'Power-shape fretting with eighth drive 8 bars',
       'Verse mute / chorus open for a 16-bar form',
-      'Check shoulders at bar 12 — drop them if high (Genre Day — Rock Eighth Drive (175))'
+      'Check shoulders at bar 12 — drop them if high (Genre Day — Rock Eighth Drive day 175)'
     ],
     libraryIds: [
       'pr-145',
       'rf-palm-mute-chug-study'
     ],
-    masteryCheck: 'Perform a 16-bar verse/chorus mute story at steady eighths without rushing the chorus open — applied to «Genre Day — Rock Eighth Drive». [Genre Day — Rock Eighth Drive (175)]',
+    masteryCheck: 'Perform a 16-bar verse/chorus mute story at steady eighths without rushing the chorus open while working on Genre Day — Rock Eighth Drive. [Genre Day — Rock Eighth Drive day 175]',
   },
   176: {
 
-    title: 'Weekly Rhythm Checkpoint (176)',
+    title: 'Weekly Rhythm Checkpoint day 176',
     durationMin: 30,
     goals: [
       'Combine pocket, one subdivision skill, and dynamics in one take',
       'Record evidence rather than trusting memory',
-      'Name one keep and one fix afterward (Weekly Rhythm Checkpoint (176))'
+      'Name one keep and one fix afterward (Weekly Rhythm Checkpoint day 176)'
     ],
-    theoryBite: 'Checkpoints convert practice into proof. A short recorded take plus a kind note beats vague \'I practiced rhythm.\' Today\'s angle: Weekly Rhythm Checkpoint (176).',
+    theoryBite: 'Checkpoints convert practice into proof. A short recorded take plus a kind note beats vague \'I practiced rhythm.\' Today: Weekly Rhythm Checkpoint. Day 176.',
     drills: [
-      '60s pocket warm-up muted — focus «Weekly Rhythm Checkpoint»',
+      '60s pocket warm-up muted — keep it about Weekly Rhythm Checkpoint',
       '8 bars subdivision or accent focus',
       '8 bars dynamic wave on a progression',
-      'Record a 16-bar medley of those skills; write keep/fix (Weekly Rhythm Checkpoint (176))'
+      'Record a 16-bar medley of those skills; write keep/fix (Weekly Rhythm Checkpoint day 176)'
     ],
     libraryIds: [
       'pr-12bar',
       'rf-drop-d-power-study'
     ],
-    masteryCheck: 'Save one 16-bar take that shows steady time plus one expressive rhythm choice, with a written keep and fix — applied to «Weekly Rhythm Checkpoint». [Weekly Rhythm Checkpoint (176)]',
+    masteryCheck: 'Save one 16-bar take that shows steady time plus one expressive rhythm choice, with a written keep and fix while working on Weekly Rhythm Checkpoint. [Weekly Rhythm Checkpoint day 176]',
   },
   177: {
 
-    title: 'Click Trust — Play Behind/On/Ahead (177)',
+    title: 'Click Trust — Play Behind/On/Ahead day 177',
     durationMin: 30,
     goals: [
       'Play on top of, with, and slightly behind the click on command',
       'Hear the click as a collaborator, not an enemy',
-      'Return to \'with\' after exploring the edges (Click Trust — Play Behind/On/Ahead (177))'
+      'Return to \'with\' after exploring the edges (Click Trust — Play Behind/On/Ahead day 177)'
     ],
-    theoryBite: 'Time feel is a placement choice. Behind can feel heavier; ahead can feel urgent. Control requires a reference click. Today\'s angle: Click Trust — Play Behind/On/Ahead (177).',
+    theoryBite: 'Time feel is a placement choice. Behind can feel heavier; ahead can feel urgent. Control requires a reference click. Today: Click Trust — Play Behind/On/Ahead. Day 177.',
     drills: [
-      '8 bars dead on the click (muted) — focus «Click Trust — Play Behind/On/Ahead»',
+      '8 bars dead on the click (muted) — keep it about Click Trust — Play Behind/On/Ahead',
       '8 bars intentionally late (still even)',
       '8 bars intentionally early (still even)',
-      '8 bars back on center — notice body tension differences (Click Trust — Play Behind/On/Ahead (177))'
+      '8 bars back on center — notice body tension differences (Click Trust — Play Behind/On/Ahead day 177)'
     ],
     libraryIds: [
       'pr-1645',
       'rf-minor-slide-lick-study'
     ],
-    masteryCheck: 'Label and perform on / behind / ahead for 8 bars each without losing the form of a simple vamp — applied to «Click Trust — Play Behind/On/Ahead». [Click Trust — Play Behind/On/Ahead (177)]',
+    masteryCheck: 'Label and perform on / behind / ahead for 8 bars each without losing the form of a simple vamp while working on Click Trust — Play Behind/On/Ahead. [Click Trust — Play Behind/On/Ahead day 177]',
   },
   178: {
 
-    title: 'Dynamic Waves — Crescendo Strum (178)',
+    title: 'Dynamic Waves — Crescendo Strum day 178',
     durationMin: 30,
     goals: [
       'Crescendo and decrescendo across multi-bar phrases',
       'Keep tempo flat while volume moves',
-      'Use dynamics as storytelling inside one progression (Dynamic Waves — Crescendo Strum (178))'
+      'Use dynamics as storytelling inside one progression (Dynamic Waves — Crescendo Strum day 178)'
     ],
-    theoryBite: 'Separating dynamics from tempo is elite right-hand control. Most players get louder by getting faster — break that link. Today\'s angle: Dynamic Waves — Crescendo Strum (178).',
+    theoryBite: 'Separating dynamics from tempo is elite right-hand control. Most players get louder by getting faster — break that link. Today: Dynamic Waves — Crescendo Strum. Day 178.',
     drills: [
-      '4 bars soft→loud on muted strums with a click — focus «Dynamic Waves — Crescendo Strum»',
+      '4 bars soft→loud on muted strums with a click — keep it about Dynamic Waves — Crescendo Strum',
       '4 bars loud→soft immediately after',
       'Repeat with chords G–Em–C–D',
-      'Friend test: can someone hear the wave with eyes closed? (Dynamic Waves — Crescendo Strum (178))'
+      'Friend test: can someone hear the wave with eyes closed? (Dynamic Waves — Crescendo Strum day 178)'
     ],
     libraryIds: [
       'pr-andalu',
       'ch-c',
       'rf-power'
     ],
-    masteryCheck: 'Perform an 8-bar dynamic wave (up then down) without speeding up or collapsing the groove — applied to «Dynamic Waves — Crescendo Strum». [Dynamic Waves — Crescendo Strum (178)]',
+    masteryCheck: 'Perform an 8-bar dynamic wave (up then down) without speeding up or collapsing the groove while working on Dynamic Waves — Crescendo Strum. [Dynamic Waves — Crescendo Strum day 178]',
   },
   179: {
 
-    title: 'Odd Accent — 5/4 Taste (179)',
+    title: 'Odd Accent — 5/4 Taste day 179',
     durationMin: 30,
     goals: [
       'Count a simple 5/4 or 5-beat cycle without panic',
       'Loop a short riff that makes the odd meter feel natural',
-      'Return to 4/4 cleanly so 4/4 feels even more solid (Odd Accent — 5/4 Taste (179))'
+      'Return to 4/4 cleanly so 4/4 feels even more solid (Odd Accent — 5/4 Taste day 179)'
     ],
-    theoryBite: 'Odd meters train attention. Even a light 5/4 taste improves how securely you feel barlines in 4/4. Today\'s angle: Odd Accent — 5/4 Taste (179).',
+    theoryBite: 'Odd meters train attention. Even a light 5/4 taste improves how securely you feel barlines in 4/4. Today: Odd Accent — 5/4 Taste. Day 179.',
     drills: [
-      'Count 1-2-3-4-5 aloud with foot for 60 seconds — focus «Odd Accent — 5/4 Taste»',
+      'Count 1-2-3-4-5 aloud with foot for 60 seconds — keep it about Odd Accent — 5/4 Taste',
       'Muted hit on 1 and 4 only in a 5-beat cycle',
       'Two-chord idea in 5: bar of A, bar of G feeling',
-      'Play 8 bars of 4/4 afterward — notice the calm (Odd Accent — 5/4 Taste (179))'
+      'Play 8 bars of 4/4 afterward — notice the calm (Odd Accent — 5/4 Taste day 179)'
     ],
     libraryIds: [
       'pr-6251',
       'rf-open-g-roll-study'
     ],
-    masteryCheck: 'Loop 8 cycles of a 5-beat groove you can count aloud while playing — applied to «Odd Accent — 5/4 Taste». [Odd Accent — 5/4 Taste (179)]',
+    masteryCheck: 'Loop 8 cycles of a 5-beat groove you can count aloud while playing while working on Odd Accent — 5/4 Taste. [Odd Accent — 5/4 Taste day 179]',
   },
   180: {
 
@@ -3838,7 +3838,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     ],
     theoryBite: 'The bridge from rhythm to lead is taste: fills should bless the groove. If the pocket dies when notes appear, simplify the fill.',
     drills: [
-      '8 bars pure groove — focus «Rhythm Checkpoint — Bridge Toward Lead»',
+      '8 bars pure groove — keep it about Rhythm Checkpoint — Bridge Toward Lead',
       '2-beat fill on beats 3–4 of bar 4, then back to groove',
       'Repeat every 4 bars for 16 bars total',
       'If rushes appear, shorten fill to one note'
@@ -3847,7 +3847,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'pr-145',
       'rf-a-blues-turnaround-study'
     ],
-    masteryCheck: 'Play 16 bars of groove with a short fill every fourth bar and no lasting tempo drift — applied to «Rhythm Checkpoint — Bridge Toward Lead».',
+    masteryCheck: 'Play 16 bars of groove with a short fill every fourth bar and no lasting tempo drift while working on Rhythm Checkpoint — Bridge Toward Lead.',
   },
   181: {
 
@@ -3870,7 +3870,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'rf-open-g-roll-study',
       'sg-arkansas-traveler'
     ],
-    masteryCheck: 'Perform eight motif/rest/answer cycles without filling every rest from panic — lens «Lead Phase Open — Say Something, Then Listen».',
+    masteryCheck: 'Perform eight motif/rest/answer cycles without filling every rest from panic — angle: Lead Phase Open — Say Something, Then Listen.',
   },
   182: {
 
@@ -3891,7 +3891,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     libraryIds: [
       'rf-minor-slide-lick-study'
     ],
-    masteryCheck: 'Land four consecutive whole-step bends on pitch (within a gentle ear tolerance) at slow tempo — lens «Bends 101 — Target Pitch».',
+    masteryCheck: 'Land four consecutive whole-step bends on pitch (within a gentle ear tolerance) at slow tempo — angle: Bends 101 — Target Pitch.',
   },
   183: {
 
@@ -3912,7 +3912,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     libraryIds: [
       'rf-em-pentatonic-box-study'
     ],
-    masteryCheck: 'Hold a 4-beat note with even vibrato that stays centered on the intended pitch — lens «Vibrato — Controlled Wave».',
+    masteryCheck: 'Hold a 4-beat note with even vibrato that stays centered on the intended pitch — angle: Vibrato — Controlled Wave.',
   },
   184: {
 
@@ -3933,7 +3933,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     libraryIds: [
       'rf-minor-slide-lick-study'
     ],
-    masteryCheck: 'Play an 8-bar phrase where every slide lands on a chosen beat and target fret — lens «Slides — Connect Positions Musically».',
+    masteryCheck: 'Play an 8-bar phrase where every slide lands on a chosen beat and target fret — angle: Slides — Connect Positions Musically.',
   },
   185: {
 
@@ -3955,7 +3955,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'rf-travis-pick-sketch-in-c',
       'sg-wild-mountain-thyme'
     ],
-    masteryCheck: 'Loop a pick-hammer-pull cell for 8 bars in time with audible evenness — lens «Hammer-ons & Pull-offs — Legato Seed».',
+    masteryCheck: 'Loop a pick-hammer-pull cell for 8 bars in time with audible evenness — angle: Hammer-ons & Pull-offs — Legato Seed.',
   },
   186: {
 
@@ -3976,7 +3976,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     libraryIds: [
       'rf-open-am'
     ],
-    masteryCheck: 'Perform an 8-bar idea that features at least four clean double-stop hits in rhythm — lens «Double Stops — Two-Note Harmony».',
+    masteryCheck: 'Perform an 8-bar idea that features at least four clean double-stop hits in rhythm — angle: Double Stops — Two-Note Harmony.',
   },
   187: {
 
@@ -3998,7 +3998,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'rf-blues-sh',
       'sg-house-of-the-rising-sun'
     ],
-    masteryCheck: 'Demonstrate one phrase you can both hum and play with matching rhythm — lens «Call From Vocals — Sing Then Solo».',
+    masteryCheck: 'Show one phrase you can both hum and play with matching rhythm — angle: Call From Vocals — Sing Then Solo.',
   },
   188: {
 
@@ -4020,7 +4020,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-joshua-fit-the-battle-of-jericho',
       'sg-buffalo-gals'
     ],
-    masteryCheck: 'Present one motif in three rhythms and one sequence without losing recognizability — lens «Motif Development — Same Notes New Rhythms».',
+    masteryCheck: 'Present one motif in three rhythms and one sequence without losing recognizability — angle: Motif Development — Same Notes New Rhythms.',
   },
   189: {
 
@@ -4042,7 +4042,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'rf-g-caged-run-study',
       'sg-auld-lang-syne'
     ],
-    masteryCheck: 'Over a 3-chord loop, end four consecutive phrases on a chord tone of the chord in force — lens «Targeting 3rds — Sweet Notes Over Chords».',
+    masteryCheck: 'Over a 3-chord loop, end four consecutive phrases on a chord tone of the chord in force — angle: Targeting 3rds — Sweet Notes Over Chords.',
   },
   190: {
 
@@ -4063,7 +4063,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     libraryIds: [
       'rf-caged-c'
     ],
-    masteryCheck: 'Play an 8-bar octave melody with clear muting and steady time — lens «Octave Melodies — Simple & Huge».',
+    masteryCheck: 'Play an 8-bar octave melody with clear muting and steady time — angle: Octave Melodies — Simple & Huge.',
   },
   191: {
 
@@ -4085,7 +4085,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'rf-am-arpeggio-cascade',
       'sg-sailor-s-hornpipe'
     ],
-    masteryCheck: 'Perform a 12-bar lead sketch with an obvious soft-loud-soft arc — lens «Dynamics in Lead — Whisper to Shout».',
+    masteryCheck: 'Perform a 12-bar lead sketch with an obvious soft-loud-soft arc — angle: Dynamics in Lead — Whisper to Shout.',
   },
   192: {
 
@@ -4107,7 +4107,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'rf-natural-harmonics-study',
       'sg-shenandoah'
     ],
-    masteryCheck: 'Deliver a 12-bar soloette that is roughly 50% silence and still feels intentional — lens «Space Solo Challenge — 50% Silence».',
+    masteryCheck: 'Deliver a 12-bar soloette that is roughly 50% silence and still feels intentional — angle: Space Solo Challenge — 50% Silence.',
   },
   193: {
 
@@ -4130,7 +4130,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'rf-blues-sh',
       'rf-a-blues-turnaround-study'
     ],
-    masteryCheck: 'Play one 12-bar chorus with two audible call-response pairs and clear IV/V awareness — lens «Blues Language — Call Licks Over 12-Bar».',
+    masteryCheck: 'Play one 12-bar chorus with two audible call-response pairs and clear IV/V awareness — angle: Blues Language — Call Licks Over 12-Bar.',
   },
   194: {
 
@@ -4152,7 +4152,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'rf-caged-c',
       'sg-down-by-the-riverside'
     ],
-    masteryCheck: 'Solo 8 bars in a clearly major color over a G progression without defaulting to blues box clichés the whole time — lens «Major Key Lead — Happy Notes Over G».',
+    masteryCheck: 'Solo 8 bars in a clearly major color over a G progression without defaulting to blues box clichés the whole time — angle: Major Key Lead — Happy Notes Over G.',
   },
   195: {
 
@@ -4174,7 +4174,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'rf-d-folk-pattern-study',
       'sg-the-parting-glass'
     ],
-    masteryCheck: 'Perform a 24-bar solo sketch with an obvious arc and a related ending motif — lens «Lead Capstone — 24-Bar Story Solo».',
+    masteryCheck: 'Perform a 24-bar solo sketch with an obvious arc and a related ending motif — angle: Lead Capstone — 24-Bar Story Solo.',
   },
   196: {
 
@@ -4196,7 +4196,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'rf-c-bass-walk-study',
       'sg-the-streets-of-laredo'
     ],
-    masteryCheck: 'Play a clear ascending sequence of a 4-note cell three times and resolve with a long tone — lens «Sequence Climb — Melodic Sequences Up».',
+    masteryCheck: 'Play a clear ascending sequence of a 4-note cell three times and resolve with a long tone — angle: Sequence Climb — Melodic Sequences Up.',
   },
   197: {
 
@@ -4219,7 +4219,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'rf-spanish-e-phrygian-study',
       'sc-phrygian'
     ],
-    masteryCheck: 'Solo one full Andalusian cycle that clearly changes color chord-to-chord, especially into E — lens «Question Harmony — Solo Over Andalusian».',
+    masteryCheck: 'Solo one full Andalusian cycle that clearly changes color chord-to-chord, especially into E — angle: Question Harmony — Solo Over Andalusian.',
   },
   198: {
 
@@ -4240,7 +4240,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     libraryIds: [
       'rf-g-caged-run-study'
     ],
-    masteryCheck: 'Play an 8-bar efficient-picking fragment cleanly at a tempo that stays relaxed — lens «Economy Picking Seed».',
+    masteryCheck: 'Play an 8-bar efficient-picking fragment cleanly at a tempo that stays relaxed — angle: Economy Picking Seed.',
   },
   199: {
 
@@ -4261,7 +4261,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     libraryIds: [
       'rf-travis-pick-sketch-in-c'
     ],
-    masteryCheck: 'Maintain an 8-bar hybrid pattern with steady bass/ pick and clear finger snags — lens «Hybrid Picking Taste».',
+    masteryCheck: 'Maintain an 8-bar hybrid pattern with steady bass/ pick and clear finger snags — angle: Hybrid Picking Taste.',
   },
   200: {
 
@@ -4283,7 +4283,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-careless-love',
       'sg-auld-lang-syne'
     ],
-    masteryCheck: 'Quote a PD motif once inside an 8-bar improvised phrase where the quote is recognizable — lens «Motif From a PD Song».',
+    masteryCheck: 'Quote a PD motif once inside an 8-bar improvised phrase where the quote is recognizable — angle: Motif From a PD Song.',
   },
   201: {
 
@@ -4305,7 +4305,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'rf-open-g-roll-study',
       'sg-greensleeves'
     ],
-    masteryCheck: 'Save one short lead take that shows space plus one expressive tool, with a written keep and fix — lens «Weekly Lead Checkpoint».',
+    masteryCheck: 'Save one short lead take that shows space plus one expressive tool, with a written keep and fix — angle: Weekly Lead Checkpoint.',
   },
   202: {
 
@@ -4316,7 +4316,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'Release bends as musically as you attack them',
       'Keep supporting fingers helping the bend without clamping the neck (Bend Vocabulary — Release & Pre-Bend)'
     ],
-    theoryBite: 'A bend is a portable slur to a chord tone. Target pitch accuracy matters more than bend distance bragging. Today\'s angle: Bend Vocabulary — Release & Pre-Bend.',
+    theoryBite: 'A bend is a portable slur to a chord tone. Target pitch accuracy matters more than bend distance bragging. Today: Bend Vocabulary — Release & Pre-Bend.',
     drills: [
       'Fret a target note, then bend from a whole step below into it — match sustain — today\'s lens: «Bend Vocabulary — Release & Pre-Bend»',
       'Pre-bend silently, then release into the lower pitch',
@@ -4326,1268 +4326,1268 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     libraryIds: [
       'rf-minor-slide-lick-study'
     ],
-    masteryCheck: 'Land four consecutive whole-step bends on pitch (within a gentle ear tolerance) at slow tempo — lens «Bend Vocabulary — Release & Pre-Bend».',
+    masteryCheck: 'Land four consecutive whole-step bends on pitch (within a gentle ear tolerance) at slow tempo — angle: Bend Vocabulary — Release & Pre-Bend.',
   },
   203: {
 
-    title: 'Sequence Climb — Melodic Sequences Up (203)',
+    title: 'Sequence Climb — Melodic Sequences Up day 203',
     durationMin: 35,
     goals: [
       'Move a melodic cell up or down the scale systematically',
       'Keep rhythm identical while pitch shifts',
-      'Stop sequencing before it becomes mechanical noise (Sequence Climb — Melodic Sequences Up (203))'
+      'Stop sequencing before it becomes mechanical noise (Sequence Climb — Melodic Sequences Up day 203)'
     ],
-    theoryBite: 'Sequences create forward motion listeners can predict and enjoy — then break the pattern for punctuation. Today\'s angle: Sequence Climb — Melodic Sequences Up (203).',
+    theoryBite: 'Sequences create forward motion listeners can predict and enjoy — then break the pattern for punctuation. Today: Sequence Climb — Melodic Sequences Up.',
     drills: [
       'Cell of 4 notes; sequence up diatonically 3 times — today\'s lens: «Sequence Climb — Melodic Sequences Up»',
       'Same 4-note cell descending diatonically 3 times, same tempo',
       'Break the fourth repeat with a long tone',
-      'Apply over a static chord then over a change (Sequence Climb — Melodic Sequences Up (203))'
+      'Apply over a static chord then over a change (Sequence Climb — Melodic Sequences Up day 203)'
     ],
     libraryIds: [
       'rf-spanish-e-phrygian-study',
       'sg-wayfaring-stranger'
     ],
-    masteryCheck: 'Play a clear ascending sequence of a 4-note cell three times and resolve with a long tone — lens «Sequence Climb — Melodic Sequences Up». [Sequence Climb — Melodic Sequences Up (203)]',
+    masteryCheck: 'Play a clear ascending sequence of a 4-note cell three times and resolve with a long tone — angle: Sequence Climb — Melodic Sequences Up. [Sequence Climb — Melodic Sequences Up day 203]',
   },
   204: {
 
-    title: 'Question Harmony — Solo Over Andalusian (204)',
+    title: 'Question Harmony — Solo Over Andalusian day 204',
     durationMin: 30,
     goals: [
       'Outline the Andalusian bass motion while soloing lightly',
       'Choose notes that respect each chord\'s color',
-      'Use Phrygian/Spanish flavor without rushing (Question Harmony — Solo Over Andalusian (204))'
+      'Use Phrygian/Spanish flavor without rushing (Question Harmony — Solo Over Andalusian day 204)'
     ],
-    theoryBite: 'The Andalusian cadence (e.g. Am–G–F–E) is a storytelling loop. Lead notes should acknowledge each step, especially the E major tension. Today\'s angle: Question Harmony — Solo Over Andalusian (204).',
+    theoryBite: 'The Andalusian cadence (e.g. Am–G–F–E) is a storytelling loop. Lead notes should acknowledge each step, especially the E major tension. Today: Question Harmony — Solo Over Andalusian.',
     drills: [
       'Comp the progression slowly, name each chord — today\'s lens: «Question Harmony — Solo Over Andalusian»',
       'Roots-only lead through one cycle',
       'Add neighbor tones into each root',
-      'One expressive cycle with space on the E chord (Question Harmony — Solo Over Andalusian (204))'
+      'One expressive cycle with space on the E chord (Question Harmony — Solo Over Andalusian day 204)'
     ],
     libraryIds: [
       'pr-andalu',
       'rf-spanish-e-phrygian-study',
       'sc-phrygian'
     ],
-    masteryCheck: 'Solo one full Andalusian cycle that clearly changes color chord-to-chord, especially into E — lens «Question Harmony — Solo Over Andalusian». [Question Harmony — Solo Over Andalusian (204)]',
+    masteryCheck: 'Solo one full Andalusian cycle that clearly changes color chord-to-chord, especially into E — angle: Question Harmony — Solo Over Andalusian. [Question Harmony — Solo Over Andalusian day 204]',
   },
   205: {
 
-    title: 'Economy Picking Seed (205)',
+    title: 'Economy Picking Seed day 205',
     durationMin: 30,
     goals: [
       'Reduce pick motion with economy/outside-inside awareness',
       'Stay relaxed at moderate speed before chasing velocity',
-      'Prefer accuracy of the grid over blur (Economy Picking Seed (205))'
+      'Prefer accuracy of the grid over blur (Economy Picking Seed day 205)'
     ],
-    theoryBite: 'Economy picking optimizes pick path across strings. Relaxation and evenness beat premature speed goals. Today\'s angle: Economy Picking Seed (205).',
+    theoryBite: 'Economy picking optimizes pick path across strings. Relaxation and evenness beat premature speed goals. Today: Economy Picking Seed.',
     drills: [
       'Two-string scale fragment focusing on efficient pick direction — today\'s lens: «Economy Picking Seed»',
       'Slow 16ths on a 3-note-per-string idea (or simple box)',
       'Stop at first tension in forearm — shake out',
-      '8 bars musical, not mechanical, using the efficient path (Economy Picking Seed (205))'
+      '8 bars musical, not mechanical, using the efficient path (Economy Picking Seed day 205)'
     ],
     libraryIds: [
       'rf-g-caged-run-study'
     ],
-    masteryCheck: 'Play an 8-bar efficient-picking fragment cleanly at a tempo that stays relaxed — lens «Economy Picking Seed». [Economy Picking Seed (205)]',
+    masteryCheck: 'Play an 8-bar efficient-picking fragment cleanly at a tempo that stays relaxed — angle: Economy Picking Seed. [Economy Picking Seed day 205]',
   },
   206: {
 
-    title: 'Hybrid Picking Taste (206)',
+    title: 'Hybrid Picking Taste day 206',
     durationMin: 30,
     goals: [
       'Combine pick bass notes with finger snags on higher strings',
       'Keep the pattern steady enough to be a texture',
-      'Use hybrid for country/funk color inside a simple progression (Hybrid Picking Taste (206))'
+      'Use hybrid for country/funk color inside a simple progression (Hybrid Picking Taste day 206)'
     ],
-    theoryBite: 'Hybrid picking expands articulation. Thumb/pick handles lows; middle/ring can pluck ups — independence is the practice. Today\'s angle: Hybrid Picking Taste (206).',
+    theoryBite: 'Hybrid picking expands articulation. Thumb/pick handles lows; middle/ring can pluck ups — independence is the practice. Today: Hybrid Picking Taste.',
     drills: [
       'Pick low root on beats 1 and 3 — today\'s lens: «Hybrid Picking Taste»',
       'Middle finger plucks a higher string on 2 and 4',
       'Combine into a rolling pattern on C or G shapes',
-      '8-bar progression with hybrid texture throughout (Hybrid Picking Taste (206))'
+      '8-bar progression with hybrid texture throughout (Hybrid Picking Taste day 206)'
     ],
     libraryIds: [
       'rf-travis-pick-sketch-in-c'
     ],
-    masteryCheck: 'Maintain an 8-bar hybrid pattern with steady bass/ pick and clear finger snags — lens «Hybrid Picking Taste». [Hybrid Picking Taste (206)]',
+    masteryCheck: 'Maintain an 8-bar hybrid pattern with steady bass/ pick and clear finger snags — angle: Hybrid Picking Taste. [Hybrid Picking Taste day 206]',
   },
   207: {
 
-    title: 'Motif From a PD Song (207)',
+    title: 'Motif From a PD Song day 207',
     durationMin: 30,
     goals: [
       'Steal a contour from a public-domain melody ethically as study',
       'Vary rhythm while keeping contour recognizable',
-      'Return the motif as a hook inside your own phrasing (Motif From a PD Song (207))'
+      'Return the motif as a hook inside your own phrasing (Motif From a PD Song day 207)'
     ],
-    theoryBite: 'Public-domain melodies are free teachers. Motif theft-as-study builds vocabulary without copyright issues. Today\'s angle: Motif From a PD Song (207).',
+    theoryBite: 'Public-domain melodies are free teachers. Motif theft-as-study builds vocabulary without copyright issues. Today: Motif From a PD Song.',
     drills: [
       'Learn 2 bars of a PD tune slowly from the library tab — today\'s lens: «Motif From a PD Song»',
       'Play it an octave away or in a new position',
       'Change only the rhythm, keep pitches',
-      'Improv 8 bars that quote the motif once (Motif From a PD Song (207))'
+      'Improv 8 bars that quote the motif once (Motif From a PD Song day 207)'
     ],
     libraryIds: [
       'sg-maple-leaf-rag-motif-joplin-publ',
       'sg-home-on-the-range'
     ],
-    masteryCheck: 'Quote a PD motif once inside an 8-bar improvised phrase where the quote is recognizable — lens «Motif From a PD Song». [Motif From a PD Song (207)]',
+    masteryCheck: 'Quote a PD motif once inside an 8-bar improvised phrase where the quote is recognizable — angle: Motif From a PD Song. [Motif From a PD Song day 207]',
   },
   208: {
 
-    title: 'Weekly Lead Checkpoint (208)',
+    title: 'Weekly Lead Checkpoint day 208',
     durationMin: 30,
     goals: [
       'Combine motif, space, and one expression tool (bend/vibrato/slide)',
       'Record a short take as evidence',
-      'Write one keep and one fix with kind wording (Weekly Lead Checkpoint (208))'
+      'Write one keep and one fix with kind wording (Weekly Lead Checkpoint day 208)'
     ],
-    theoryBite: 'Lead checkpoints prove taste under time. A short recorded soloette plus reflection beats hour-long noodling with no memory. Today\'s angle: Weekly Lead Checkpoint (208).',
+    theoryBite: 'Lead checkpoints prove taste under time. A short recorded soloette plus reflection beats hour-long noodling with no memory. Today: Weekly Lead Checkpoint.',
     drills: [
       'Warm-up long tones + light bends 2 minutes — today\'s lens: «Weekly Lead Checkpoint»',
       'Motif/rest practice 8 cycles',
       '12-bar or 16-bar soloette over a library vamp/progression',
-      'Listen once kindly, once with a pencil note (Weekly Lead Checkpoint (208))'
+      'Listen once kindly, once with a pencil note (Weekly Lead Checkpoint day 208)'
     ],
     libraryIds: [
       'rf-em-pentatonic-box-study',
       'sg-silent-night'
     ],
-    masteryCheck: 'Save one short lead take that shows space plus one expressive tool, with a written keep and fix — lens «Weekly Lead Checkpoint». [Weekly Lead Checkpoint (208)]',
+    masteryCheck: 'Save one short lead take that shows space plus one expressive tool, with a written keep and fix — angle: Weekly Lead Checkpoint. [Weekly Lead Checkpoint day 208]',
   },
   209: {
 
-    title: 'Bend Vocabulary — Release & Pre-Bend (209)',
+    title: 'Bend Vocabulary — Release & Pre-Bend day 209',
     durationMin: 30,
     goals: [
       'Bend to a target pitch you can name or match',
       'Release bends as musically as you attack them',
-      'Keep supporting fingers helping the bend without clamping the neck (Bend Vocabulary — Release & Pre-Bend (209))'
+      'Keep supporting fingers helping the bend without clamping the neck (Bend Vocabulary — Release & Pre-Bend day 209)'
     ],
-    theoryBite: 'A bend is a portable slur to a chord tone. Target pitch accuracy matters more than bend distance bragging. Today\'s angle: Bend Vocabulary — Release & Pre-Bend (209).',
+    theoryBite: 'A bend is a portable slur to a chord tone. Target pitch accuracy matters more than bend distance bragging. Today: Bend Vocabulary — Release & Pre-Bend. Day 209.',
     drills: [
       'Fret a target note, then bend from a whole step below into it — match sustain — today\'s lens: «Bend Vocabulary — Release & Pre-Bend»',
       'Pre-bend silently, then release into the lower pitch',
       'Bend-and-hold 2 beats in tune, then resolve down',
-      'Use bends only on phrase endings for 8 bars over a vamp (Bend Vocabulary — Release & Pre-Bend (209))'
+      'Use bends only on phrase endings for 8 bars over a vamp (Bend Vocabulary — Release & Pre-Bend day 209)'
     ],
     libraryIds: [
       'rf-minor-slide-lick-study'
     ],
-    masteryCheck: 'Land four consecutive whole-step bends on pitch (within a gentle ear tolerance) at slow tempo — lens «Bend Vocabulary — Release & Pre-Bend». [Bend Vocabulary — Release & Pre-Bend (209)]',
+    masteryCheck: 'Land four consecutive whole-step bends on pitch (within a gentle ear tolerance) at slow tempo — angle: Bend Vocabulary — Release & Pre-Bend. [Bend Vocabulary — Release & Pre-Bend day 209]',
   },
   210: {
 
-    title: 'Sequence Climb — Melodic Sequences Up (210)',
+    title: 'Sequence Climb — Melodic Sequences Up day 210',
     durationMin: 35,
     goals: [
       'Move a melodic cell up or down the scale systematically',
       'Keep rhythm identical while pitch shifts',
-      'Stop sequencing before it becomes mechanical noise (Sequence Climb — Melodic Sequences Up (210))'
+      'Stop sequencing before it becomes mechanical noise (Sequence Climb — Melodic Sequences Up day 210)'
     ],
-    theoryBite: 'Sequences create forward motion listeners can predict and enjoy — then break the pattern for punctuation. Today\'s angle: Sequence Climb — Melodic Sequences Up (210).',
+    theoryBite: 'Sequences create forward motion listeners can predict and enjoy — then break the pattern for punctuation. Today: Sequence Climb — Melodic Sequences Up. Day 210.',
     drills: [
       'Cell of 4 notes; sequence up diatonically 3 times — today\'s lens: «Sequence Climb — Melodic Sequences Up»',
       'Same 4-note cell descending diatonically 3 times, same tempo',
       'Break the fourth repeat with a long tone',
-      'Apply over a static chord then over a change (Sequence Climb — Melodic Sequences Up (210))'
+      'Apply over a static chord then over a change (Sequence Climb — Melodic Sequences Up day 210)'
     ],
     libraryIds: [
       'rf-funk-chicka-study',
       'sg-arkansas-traveler'
     ],
-    masteryCheck: 'Play a clear ascending sequence of a 4-note cell three times and resolve with a long tone — lens «Sequence Climb — Melodic Sequences Up». [Sequence Climb — Melodic Sequences Up (210)]',
+    masteryCheck: 'Play a clear ascending sequence of a 4-note cell three times and resolve with a long tone — angle: Sequence Climb — Melodic Sequences Up. [Sequence Climb — Melodic Sequences Up day 210]',
   },
   211: {
 
-    title: 'Question Harmony — Solo Over Andalusian (211)',
+    title: 'Question Harmony — Solo Over Andalusian day 211',
     durationMin: 30,
     goals: [
       'Outline the Andalusian bass motion while soloing lightly',
       'Choose notes that respect each chord\'s color',
-      'Use Phrygian/Spanish flavor without rushing (Question Harmony — Solo Over Andalusian (211))'
+      'Use Phrygian/Spanish flavor without rushing (Question Harmony — Solo Over Andalusian day 211)'
     ],
-    theoryBite: 'The Andalusian cadence (e.g. Am–G–F–E) is a storytelling loop. Lead notes should acknowledge each step, especially the E major tension. Today\'s angle: Question Harmony — Solo Over Andalusian (211).',
+    theoryBite: 'The Andalusian cadence (e.g. Am–G–F–E) is a storytelling loop. Lead notes should acknowledge each step, especially the E major tension. Today: Question Harmony — Solo Over Andalusian. Day 211.',
     drills: [
       'Comp the progression slowly, name each chord — today\'s lens: «Question Harmony — Solo Over Andalusian»',
       'Roots-only lead through one cycle',
       'Add neighbor tones into each root',
-      'One expressive cycle with space on the E chord (Question Harmony — Solo Over Andalusian (211))'
+      'One expressive cycle with space on the E chord (Question Harmony — Solo Over Andalusian day 211)'
     ],
     libraryIds: [
       'pr-andalu',
       'rf-spanish-e-phrygian-study',
       'sc-phrygian'
     ],
-    masteryCheck: 'Solo one full Andalusian cycle that clearly changes color chord-to-chord, especially into E — lens «Question Harmony — Solo Over Andalusian». [Question Harmony — Solo Over Andalusian (211)]',
+    masteryCheck: 'Solo one full Andalusian cycle that clearly changes color chord-to-chord, especially into E — angle: Question Harmony — Solo Over Andalusian. [Question Harmony — Solo Over Andalusian day 211]',
   },
   212: {
 
-    title: 'Economy Picking Seed (212)',
+    title: 'Economy Picking Seed day 212',
     durationMin: 30,
     goals: [
       'Reduce pick motion with economy/outside-inside awareness',
       'Stay relaxed at moderate speed before chasing velocity',
-      'Prefer accuracy of the grid over blur (Economy Picking Seed (212))'
+      'Prefer accuracy of the grid over blur (Economy Picking Seed day 212)'
     ],
-    theoryBite: 'Economy picking optimizes pick path across strings. Relaxation and evenness beat premature speed goals. Today\'s angle: Economy Picking Seed (212).',
+    theoryBite: 'Economy picking optimizes pick path across strings. Relaxation and evenness beat premature speed goals. Today: Economy Picking Seed. Day 212.',
     drills: [
       'Two-string scale fragment focusing on efficient pick direction — today\'s lens: «Economy Picking Seed»',
       'Slow 16ths on a 3-note-per-string idea (or simple box)',
       'Stop at first tension in forearm — shake out',
-      '8 bars musical, not mechanical, using the efficient path (Economy Picking Seed (212))'
+      '8 bars musical, not mechanical, using the efficient path (Economy Picking Seed day 212)'
     ],
     libraryIds: [
       'rf-g-caged-run-study'
     ],
-    masteryCheck: 'Play an 8-bar efficient-picking fragment cleanly at a tempo that stays relaxed — lens «Economy Picking Seed». [Economy Picking Seed (212)]',
+    masteryCheck: 'Play an 8-bar efficient-picking fragment cleanly at a tempo that stays relaxed — angle: Economy Picking Seed. [Economy Picking Seed day 212]',
   },
   213: {
 
-    title: 'Hybrid Picking Taste (213)',
+    title: 'Hybrid Picking Taste day 213',
     durationMin: 30,
     goals: [
       'Combine pick bass notes with finger snags on higher strings',
       'Keep the pattern steady enough to be a texture',
-      'Use hybrid for country/funk color inside a simple progression (Hybrid Picking Taste (213))'
+      'Use hybrid for country/funk color inside a simple progression (Hybrid Picking Taste day 213)'
     ],
-    theoryBite: 'Hybrid picking expands articulation. Thumb/pick handles lows; middle/ring can pluck ups — independence is the practice. Today\'s angle: Hybrid Picking Taste (213).',
+    theoryBite: 'Hybrid picking expands articulation. Thumb/pick handles lows; middle/ring can pluck ups — independence is the practice. Today: Hybrid Picking Taste. Day 213.',
     drills: [
       'Pick low root on beats 1 and 3 — today\'s lens: «Hybrid Picking Taste»',
       'Middle finger plucks a higher string on 2 and 4',
       'Combine into a rolling pattern on C or G shapes',
-      '8-bar progression with hybrid texture throughout (Hybrid Picking Taste (213))'
+      '8-bar progression with hybrid texture throughout (Hybrid Picking Taste day 213)'
     ],
     libraryIds: [
       'rf-travis-pick-sketch-in-c'
     ],
-    masteryCheck: 'Maintain an 8-bar hybrid pattern with steady bass/ pick and clear finger snags — lens «Hybrid Picking Taste». [Hybrid Picking Taste (213)]',
+    masteryCheck: 'Maintain an 8-bar hybrid pattern with steady bass/ pick and clear finger snags — angle: Hybrid Picking Taste. [Hybrid Picking Taste day 213]',
   },
   214: {
 
-    title: 'Motif From a PD Song (214)',
+    title: 'Motif From a PD Song day 214',
     durationMin: 30,
     goals: [
       'Steal a contour from a public-domain melody ethically as study',
       'Vary rhythm while keeping contour recognizable',
-      'Return the motif as a hook inside your own phrasing (Motif From a PD Song (214))'
+      'Return the motif as a hook inside your own phrasing (Motif From a PD Song day 214)'
     ],
-    theoryBite: 'Public-domain melodies are free teachers. Motif theft-as-study builds vocabulary without copyright issues. Today\'s angle: Motif From a PD Song (214).',
+    theoryBite: 'Public-domain melodies are free teachers. Motif theft-as-study builds vocabulary without copyright issues. Today: Motif From a PD Song. Day 214.',
     drills: [
       'Learn 2 bars of a PD tune slowly from the library tab — today\'s lens: «Motif From a PD Song»',
       'Play it an octave away or in a new position',
       'Change only the rhythm, keep pitches',
-      'Improv 8 bars that quote the motif once (Motif From a PD Song (214))'
+      'Improv 8 bars that quote the motif once (Motif From a PD Song day 214)'
     ],
     libraryIds: [
       'sg-joshua-fit-the-battle-of-jericho',
       'sg-buffalo-gals'
     ],
-    masteryCheck: 'Quote a PD motif once inside an 8-bar improvised phrase where the quote is recognizable — lens «Motif From a PD Song». [Motif From a PD Song (214)]',
+    masteryCheck: 'Quote a PD motif once inside an 8-bar improvised phrase where the quote is recognizable — angle: Motif From a PD Song. [Motif From a PD Song day 214]',
   },
   215: {
 
-    title: 'Weekly Lead Checkpoint (215)',
+    title: 'Weekly Lead Checkpoint day 215',
     durationMin: 30,
     goals: [
       'Combine motif, space, and one expression tool (bend/vibrato/slide)',
       'Record a short take as evidence',
-      'Write one keep and one fix with kind wording (Weekly Lead Checkpoint (215))'
+      'Write one keep and one fix with kind wording (Weekly Lead Checkpoint day 215)'
     ],
-    theoryBite: 'Lead checkpoints prove taste under time. A short recorded soloette plus reflection beats hour-long noodling with no memory. Today\'s angle: Weekly Lead Checkpoint (215).',
+    theoryBite: 'Lead checkpoints prove taste under time. A short recorded soloette plus reflection beats hour-long noodling with no memory. Today: Weekly Lead Checkpoint. Day 215.',
     drills: [
       'Warm-up long tones + light bends 2 minutes — today\'s lens: «Weekly Lead Checkpoint»',
       'Motif/rest practice 8 cycles',
       '12-bar or 16-bar soloette over a library vamp/progression',
-      'Listen once kindly, once with a pencil note (Weekly Lead Checkpoint (215))'
+      'Listen once kindly, once with a pencil note (Weekly Lead Checkpoint day 215)'
     ],
     libraryIds: [
       'rf-d-folk-pattern-study',
       'sg-drunken-sailor'
     ],
-    masteryCheck: 'Save one short lead take that shows space plus one expressive tool, with a written keep and fix — lens «Weekly Lead Checkpoint». [Weekly Lead Checkpoint (215)]',
+    masteryCheck: 'Save one short lead take that shows space plus one expressive tool, with a written keep and fix — angle: Weekly Lead Checkpoint. [Weekly Lead Checkpoint day 215]',
   },
   216: {
 
-    title: 'Bend Vocabulary — Release & Pre-Bend (216)',
+    title: 'Bend Vocabulary — Release & Pre-Bend day 216',
     durationMin: 30,
     goals: [
       'Bend to a target pitch you can name or match',
       'Release bends as musically as you attack them',
-      'Keep supporting fingers helping the bend without clamping the neck (Bend Vocabulary — Release & Pre-Bend (216))'
+      'Keep supporting fingers helping the bend without clamping the neck (Bend Vocabulary — Release & Pre-Bend day 216)'
     ],
-    theoryBite: 'A bend is a portable slur to a chord tone. Target pitch accuracy matters more than bend distance bragging. Today\'s angle: Bend Vocabulary — Release & Pre-Bend (216).',
+    theoryBite: 'A bend is a portable slur to a chord tone. Target pitch accuracy matters more than bend distance bragging. Today: Bend Vocabulary — Release & Pre-Bend. Day 216.',
     drills: [
       'Fret a target note, then bend from a whole step below into it — match sustain — today\'s lens: «Bend Vocabulary — Release & Pre-Bend»',
       'Pre-bend silently, then release into the lower pitch',
       'Bend-and-hold 2 beats in tune, then resolve down',
-      'Use bends only on phrase endings for 8 bars over a vamp (Bend Vocabulary — Release & Pre-Bend (216))'
+      'Use bends only on phrase endings for 8 bars over a vamp (Bend Vocabulary — Release & Pre-Bend day 216)'
     ],
     libraryIds: [
       'rf-minor-slide-lick-study'
     ],
-    masteryCheck: 'Land four consecutive whole-step bends on pitch (within a gentle ear tolerance) at slow tempo — lens «Bend Vocabulary — Release & Pre-Bend». [Bend Vocabulary — Release & Pre-Bend (216)]',
+    masteryCheck: 'Land four consecutive whole-step bends on pitch (within a gentle ear tolerance) at slow tempo — angle: Bend Vocabulary — Release & Pre-Bend. [Bend Vocabulary — Release & Pre-Bend day 216]',
   },
   217: {
 
-    title: 'Sequence Climb — Melodic Sequences Up (217)',
+    title: 'Sequence Climb — Melodic Sequences Up day 217',
     durationMin: 35,
     goals: [
       'Move a melodic cell up or down the scale systematically',
       'Keep rhythm identical while pitch shifts',
-      'Stop sequencing before it becomes mechanical noise (Sequence Climb — Melodic Sequences Up (217))'
+      'Stop sequencing before it becomes mechanical noise (Sequence Climb — Melodic Sequences Up day 217)'
     ],
-    theoryBite: 'Sequences create forward motion listeners can predict and enjoy — then break the pattern for punctuation. Today\'s angle: Sequence Climb — Melodic Sequences Up (217).',
+    theoryBite: 'Sequences create forward motion listeners can predict and enjoy — then break the pattern for punctuation. Today: Sequence Climb — Melodic Sequences Up. Day 217.',
     drills: [
       'Cell of 4 notes; sequence up diatonically 3 times — today\'s lens: «Sequence Climb — Melodic Sequences Up»',
       'Same 4-note cell descending diatonically 3 times, same tempo',
       'Break the fourth repeat with a long tone',
-      'Apply over a static chord then over a change (Sequence Climb — Melodic Sequences Up (217))'
+      'Apply over a static chord then over a change (Sequence Climb — Melodic Sequences Up day 217)'
     ],
     libraryIds: [
       'rf-palm-mute-chug-study',
       'sg-aura-lee'
     ],
-    masteryCheck: 'Play a clear ascending sequence of a 4-note cell three times and resolve with a long tone — lens «Sequence Climb — Melodic Sequences Up». [Sequence Climb — Melodic Sequences Up (217)]',
+    masteryCheck: 'Play a clear ascending sequence of a 4-note cell three times and resolve with a long tone — angle: Sequence Climb — Melodic Sequences Up. [Sequence Climb — Melodic Sequences Up day 217]',
   },
   218: {
 
-    title: 'Question Harmony — Solo Over Andalusian (218)',
+    title: 'Question Harmony — Solo Over Andalusian day 218',
     durationMin: 30,
     goals: [
       'Outline the Andalusian bass motion while soloing lightly',
       'Choose notes that respect each chord\'s color',
-      'Use Phrygian/Spanish flavor without rushing (Question Harmony — Solo Over Andalusian (218))'
+      'Use Phrygian/Spanish flavor without rushing (Question Harmony — Solo Over Andalusian day 218)'
     ],
-    theoryBite: 'The Andalusian cadence (e.g. Am–G–F–E) is a storytelling loop. Lead notes should acknowledge each step, especially the E major tension. Today\'s angle: Question Harmony — Solo Over Andalusian (218).',
+    theoryBite: 'The Andalusian cadence (e.g. Am–G–F–E) is a storytelling loop. Lead notes should acknowledge each step, especially the E major tension. Today: Question Harmony — Solo Over Andalusian. Day 218.',
     drills: [
       'Comp the progression slowly, name each chord — today\'s lens: «Question Harmony — Solo Over Andalusian»',
       'Roots-only lead through one cycle',
       'Add neighbor tones into each root',
-      'One expressive cycle with space on the E chord (Question Harmony — Solo Over Andalusian (218))'
+      'One expressive cycle with space on the E chord (Question Harmony — Solo Over Andalusian day 218)'
     ],
     libraryIds: [
       'pr-andalu',
       'rf-spanish-e-phrygian-study',
       'sc-phrygian'
     ],
-    masteryCheck: 'Solo one full Andalusian cycle that clearly changes color chord-to-chord, especially into E — lens «Question Harmony — Solo Over Andalusian». [Question Harmony — Solo Over Andalusian (218)]',
+    masteryCheck: 'Solo one full Andalusian cycle that clearly changes color chord-to-chord, especially into E — angle: Question Harmony — Solo Over Andalusian. [Question Harmony — Solo Over Andalusian day 218]',
   },
   219: {
 
-    title: 'Economy Picking Seed (219)',
+    title: 'Economy Picking Seed day 219',
     durationMin: 30,
     goals: [
       'Reduce pick motion with economy/outside-inside awareness',
       'Stay relaxed at moderate speed before chasing velocity',
-      'Prefer accuracy of the grid over blur (Economy Picking Seed (219))'
+      'Prefer accuracy of the grid over blur (Economy Picking Seed day 219)'
     ],
-    theoryBite: 'Economy picking optimizes pick path across strings. Relaxation and evenness beat premature speed goals. Today\'s angle: Economy Picking Seed (219).',
+    theoryBite: 'Economy picking optimizes pick path across strings. Relaxation and evenness beat premature speed goals. Today: Economy Picking Seed. Day 219.',
     drills: [
       'Two-string scale fragment focusing on efficient pick direction — today\'s lens: «Economy Picking Seed»',
       'Slow 16ths on a 3-note-per-string idea (or simple box)',
       'Stop at first tension in forearm — shake out',
-      '8 bars musical, not mechanical, using the efficient path (Economy Picking Seed (219))'
+      '8 bars musical, not mechanical, using the efficient path (Economy Picking Seed day 219)'
     ],
     libraryIds: [
       'rf-g-caged-run-study'
     ],
-    masteryCheck: 'Play an 8-bar efficient-picking fragment cleanly at a tempo that stays relaxed — lens «Economy Picking Seed». [Economy Picking Seed (219)]',
+    masteryCheck: 'Play an 8-bar efficient-picking fragment cleanly at a tempo that stays relaxed — angle: Economy Picking Seed. [Economy Picking Seed day 219]',
   },
   220: {
 
-    title: 'Hybrid Picking Taste (220)',
+    title: 'Hybrid Picking Taste day 220',
     durationMin: 30,
     goals: [
       'Combine pick bass notes with finger snags on higher strings',
       'Keep the pattern steady enough to be a texture',
-      'Use hybrid for country/funk color inside a simple progression (Hybrid Picking Taste (220))'
+      'Use hybrid for country/funk color inside a simple progression (Hybrid Picking Taste day 220)'
     ],
-    theoryBite: 'Hybrid picking expands articulation. Thumb/pick handles lows; middle/ring can pluck ups — independence is the practice. Today\'s angle: Hybrid Picking Taste (220).',
+    theoryBite: 'Hybrid picking expands articulation. Thumb/pick handles lows; middle/ring can pluck ups — independence is the practice. Today: Hybrid Picking Taste. Day 220.',
     drills: [
       'Pick low root on beats 1 and 3 — today\'s lens: «Hybrid Picking Taste»',
       'Middle finger plucks a higher string on 2 and 4',
       'Combine into a rolling pattern on C or G shapes',
-      '8-bar progression with hybrid texture throughout (Hybrid Picking Taste (220))'
+      '8-bar progression with hybrid texture throughout (Hybrid Picking Taste day 220)'
     ],
     libraryIds: [
       'rf-travis-pick-sketch-in-c'
     ],
-    masteryCheck: 'Maintain an 8-bar hybrid pattern with steady bass/ pick and clear finger snags — lens «Hybrid Picking Taste». [Hybrid Picking Taste (220)]',
+    masteryCheck: 'Maintain an 8-bar hybrid pattern with steady bass/ pick and clear finger snags — angle: Hybrid Picking Taste. [Hybrid Picking Taste day 220]',
   },
   221: {
 
-    title: 'Motif From a PD Song (221)',
+    title: 'Motif From a PD Song day 221',
     durationMin: 30,
     goals: [
       'Steal a contour from a public-domain melody ethically as study',
       'Vary rhythm while keeping contour recognizable',
-      'Return the motif as a hook inside your own phrasing (Motif From a PD Song (221))'
+      'Return the motif as a hook inside your own phrasing (Motif From a PD Song day 221)'
     ],
-    theoryBite: 'Public-domain melodies are free teachers. Motif theft-as-study builds vocabulary without copyright issues. Today\'s angle: Motif From a PD Song (221).',
+    theoryBite: 'Public-domain melodies are free teachers. Motif theft-as-study builds vocabulary without copyright issues. Today: Motif From a PD Song. Day 221.',
     drills: [
       'Learn 2 bars of a PD tune slowly from the library tab — today\'s lens: «Motif From a PD Song»',
       'Play it an octave away or in a new position',
       'Change only the rhythm, keep pitches',
-      'Improv 8 bars that quote the motif once (Motif From a PD Song (221))'
+      'Improv 8 bars that quote the motif once (Motif From a PD Song day 221)'
     ],
     libraryIds: [
       'sg-greensleeves',
       'sg-barbara-allen'
     ],
-    masteryCheck: 'Quote a PD motif once inside an 8-bar improvised phrase where the quote is recognizable — lens «Motif From a PD Song». [Motif From a PD Song (221)]',
+    masteryCheck: 'Quote a PD motif once inside an 8-bar improvised phrase where the quote is recognizable — angle: Motif From a PD Song. [Motif From a PD Song day 221]',
   },
   222: {
 
-    title: 'Weekly Lead Checkpoint (222)',
+    title: 'Weekly Lead Checkpoint day 222',
     durationMin: 30,
     goals: [
       'Combine motif, space, and one expression tool (bend/vibrato/slide)',
       'Record a short take as evidence',
-      'Write one keep and one fix with kind wording (Weekly Lead Checkpoint (222))'
+      'Write one keep and one fix with kind wording (Weekly Lead Checkpoint day 222)'
     ],
-    theoryBite: 'Lead checkpoints prove taste under time. A short recorded soloette plus reflection beats hour-long noodling with no memory. Today\'s angle: Weekly Lead Checkpoint (222).',
+    theoryBite: 'Lead checkpoints prove taste under time. A short recorded soloette plus reflection beats hour-long noodling with no memory. Today: Weekly Lead Checkpoint. Day 222.',
     drills: [
       'Warm-up long tones + light bends 2 minutes — today\'s lens: «Weekly Lead Checkpoint»',
       'Motif/rest practice 8 cycles',
       '12-bar or 16-bar soloette over a library vamp/progression',
-      'Listen once kindly, once with a pencil note (Weekly Lead Checkpoint (222))'
+      'Listen once kindly, once with a pencil note (Weekly Lead Checkpoint day 222)'
     ],
     libraryIds: [
       'rf-a-blues-turnaround-study',
       'sg-simple-gifts'
     ],
-    masteryCheck: 'Save one short lead take that shows space plus one expressive tool, with a written keep and fix — lens «Weekly Lead Checkpoint». [Weekly Lead Checkpoint (222)]',
+    masteryCheck: 'Save one short lead take that shows space plus one expressive tool, with a written keep and fix — angle: Weekly Lead Checkpoint. [Weekly Lead Checkpoint day 222]',
   },
   223: {
 
-    title: 'Bend Vocabulary — Release & Pre-Bend (223)',
+    title: 'Bend Vocabulary — Release & Pre-Bend day 223',
     durationMin: 30,
     goals: [
       'Bend to a target pitch you can name or match',
       'Release bends as musically as you attack them',
-      'Keep supporting fingers helping the bend without clamping the neck (Bend Vocabulary — Release & Pre-Bend (223))'
+      'Keep supporting fingers helping the bend without clamping the neck (Bend Vocabulary — Release & Pre-Bend day 223)'
     ],
-    theoryBite: 'A bend is a portable slur to a chord tone. Target pitch accuracy matters more than bend distance bragging. Today\'s angle: Bend Vocabulary — Release & Pre-Bend (223).',
+    theoryBite: 'A bend is a portable slur to a chord tone. Target pitch accuracy matters more than bend distance bragging. Today: Bend Vocabulary — Release & Pre-Bend. Day 223.',
     drills: [
       'Fret a target note, then bend from a whole step below into it — match sustain — today\'s lens: «Bend Vocabulary — Release & Pre-Bend»',
       'Pre-bend silently, then release into the lower pitch',
       'Bend-and-hold 2 beats in tune, then resolve down',
-      'Use bends only on phrase endings for 8 bars over a vamp (Bend Vocabulary — Release & Pre-Bend (223))'
+      'Use bends only on phrase endings for 8 bars over a vamp (Bend Vocabulary — Release & Pre-Bend day 223)'
     ],
     libraryIds: [
       'rf-minor-slide-lick-study'
     ],
-    masteryCheck: 'Land four consecutive whole-step bends on pitch (within a gentle ear tolerance) at slow tempo — lens «Bend Vocabulary — Release & Pre-Bend». [Bend Vocabulary — Release & Pre-Bend (223)]',
+    masteryCheck: 'Land four consecutive whole-step bends on pitch (within a gentle ear tolerance) at slow tempo — angle: Bend Vocabulary — Release & Pre-Bend. [Bend Vocabulary — Release & Pre-Bend day 223]',
   },
   224: {
 
-    title: 'Sequence Climb — Melodic Sequences Up (224)',
+    title: 'Sequence Climb — Melodic Sequences Up day 224',
     durationMin: 35,
     goals: [
       'Move a melodic cell up or down the scale systematically',
       'Keep rhythm identical while pitch shifts',
-      'Stop sequencing before it becomes mechanical noise (Sequence Climb — Melodic Sequences Up (224))'
+      'Stop sequencing before it becomes mechanical noise (Sequence Climb — Melodic Sequences Up day 224)'
     ],
-    theoryBite: 'Sequences create forward motion listeners can predict and enjoy — then break the pattern for punctuation. Today\'s angle: Sequence Climb — Melodic Sequences Up (224).',
+    theoryBite: 'Sequences create forward motion listeners can predict and enjoy — then break the pattern for punctuation. Today: Sequence Climb — Melodic Sequences Up. Day 224.',
     drills: [
       'Cell of 4 notes; sequence up diatonically 3 times — today\'s lens: «Sequence Climb — Melodic Sequences Up»',
       'Same 4-note cell descending diatonically 3 times, same tempo',
       'Break the fourth repeat with a long tone',
-      'Apply over a static chord then over a change (Sequence Climb — Melodic Sequences Up (224))'
+      'Apply over a static chord then over a change (Sequence Climb — Melodic Sequences Up day 224)'
     ],
     libraryIds: [
       'rf-jazz-chromatic-approach-study',
       'sg-the-parting-glass'
     ],
-    masteryCheck: 'Play a clear ascending sequence of a 4-note cell three times and resolve with a long tone — lens «Sequence Climb — Melodic Sequences Up». [Sequence Climb — Melodic Sequences Up (224)]',
+    masteryCheck: 'Play a clear ascending sequence of a 4-note cell three times and resolve with a long tone — angle: Sequence Climb — Melodic Sequences Up. [Sequence Climb — Melodic Sequences Up day 224]',
   },
   225: {
 
-    title: 'Question Harmony — Solo Over Andalusian (225)',
+    title: 'Question Harmony — Solo Over Andalusian day 225',
     durationMin: 30,
     goals: [
       'Outline the Andalusian bass motion while soloing lightly',
       'Choose notes that respect each chord\'s color',
-      'Use Phrygian/Spanish flavor without rushing (Question Harmony — Solo Over Andalusian (225))'
+      'Use Phrygian/Spanish flavor without rushing (Question Harmony — Solo Over Andalusian day 225)'
     ],
-    theoryBite: 'The Andalusian cadence (e.g. Am–G–F–E) is a storytelling loop. Lead notes should acknowledge each step, especially the E major tension. Today\'s angle: Question Harmony — Solo Over Andalusian (225).',
+    theoryBite: 'The Andalusian cadence (e.g. Am–G–F–E) is a storytelling loop. Lead notes should acknowledge each step, especially the E major tension. Today: Question Harmony — Solo Over Andalusian. Day 225.',
     drills: [
       'Comp the progression slowly, name each chord — today\'s lens: «Question Harmony — Solo Over Andalusian»',
       'Roots-only lead through one cycle',
       'Add neighbor tones into each root',
-      'One expressive cycle with space on the E chord (Question Harmony — Solo Over Andalusian (225))'
+      'One expressive cycle with space on the E chord (Question Harmony — Solo Over Andalusian day 225)'
     ],
     libraryIds: [
       'pr-andalu',
       'rf-spanish-e-phrygian-study',
       'sc-phrygian'
     ],
-    masteryCheck: 'Solo one full Andalusian cycle that clearly changes color chord-to-chord, especially into E — lens «Question Harmony — Solo Over Andalusian». [Question Harmony — Solo Over Andalusian (225)]',
+    masteryCheck: 'Solo one full Andalusian cycle that clearly changes color chord-to-chord, especially into E — angle: Question Harmony — Solo Over Andalusian. [Question Harmony — Solo Over Andalusian day 225]',
   },
   226: {
 
-    title: 'Economy Picking Seed (226)',
+    title: 'Economy Picking Seed day 226',
     durationMin: 30,
     goals: [
       'Reduce pick motion with economy/outside-inside awareness',
       'Stay relaxed at moderate speed before chasing velocity',
-      'Prefer accuracy of the grid over blur (Economy Picking Seed (226))'
+      'Prefer accuracy of the grid over blur (Economy Picking Seed day 226)'
     ],
-    theoryBite: 'Economy picking optimizes pick path across strings. Relaxation and evenness beat premature speed goals. Today\'s angle: Economy Picking Seed (226).',
+    theoryBite: 'Economy picking optimizes pick path across strings. Relaxation and evenness beat premature speed goals. Today: Economy Picking Seed. Day 226.',
     drills: [
       'Two-string scale fragment focusing on efficient pick direction — today\'s lens: «Economy Picking Seed»',
       'Slow 16ths on a 3-note-per-string idea (or simple box)',
       'Stop at first tension in forearm — shake out',
-      '8 bars musical, not mechanical, using the efficient path (Economy Picking Seed (226))'
+      '8 bars musical, not mechanical, using the efficient path (Economy Picking Seed day 226)'
     ],
     libraryIds: [
       'rf-g-caged-run-study'
     ],
-    masteryCheck: 'Play an 8-bar efficient-picking fragment cleanly at a tempo that stays relaxed — lens «Economy Picking Seed». [Economy Picking Seed (226)]',
+    masteryCheck: 'Play an 8-bar efficient-picking fragment cleanly at a tempo that stays relaxed — angle: Economy Picking Seed. [Economy Picking Seed day 226]',
   },
   227: {
 
-    title: 'Hybrid Picking Taste (227)',
+    title: 'Hybrid Picking Taste day 227',
     durationMin: 30,
     goals: [
       'Combine pick bass notes with finger snags on higher strings',
       'Keep the pattern steady enough to be a texture',
-      'Use hybrid for country/funk color inside a simple progression (Hybrid Picking Taste (227))'
+      'Use hybrid for country/funk color inside a simple progression (Hybrid Picking Taste day 227)'
     ],
-    theoryBite: 'Hybrid picking expands articulation. Thumb/pick handles lows; middle/ring can pluck ups — independence is the practice. Today\'s angle: Hybrid Picking Taste (227).',
+    theoryBite: 'Hybrid picking expands articulation. Thumb/pick handles lows; middle/ring can pluck ups — independence is the practice. Today: Hybrid Picking Taste. Day 227.',
     drills: [
       'Pick low root on beats 1 and 3 — today\'s lens: «Hybrid Picking Taste»',
       'Middle finger plucks a higher string on 2 and 4',
       'Combine into a rolling pattern on C or G shapes',
-      '8-bar progression with hybrid texture throughout (Hybrid Picking Taste (227))'
+      '8-bar progression with hybrid texture throughout (Hybrid Picking Taste day 227)'
     ],
     libraryIds: [
       'rf-travis-pick-sketch-in-c'
     ],
-    masteryCheck: 'Maintain an 8-bar hybrid pattern with steady bass/ pick and clear finger snags — lens «Hybrid Picking Taste». [Hybrid Picking Taste (227)]',
+    masteryCheck: 'Maintain an 8-bar hybrid pattern with steady bass/ pick and clear finger snags — angle: Hybrid Picking Taste. [Hybrid Picking Taste day 227]',
   },
   228: {
 
-    title: 'Motif From a PD Song (228)',
+    title: 'Motif From a PD Song day 228',
     durationMin: 30,
     goals: [
       'Steal a contour from a public-domain melody ethically as study',
       'Vary rhythm while keeping contour recognizable',
-      'Return the motif as a hook inside your own phrasing (Motif From a PD Song (228))'
+      'Return the motif as a hook inside your own phrasing (Motif From a PD Song day 228)'
     ],
-    theoryBite: 'Public-domain melodies are free teachers. Motif theft-as-study builds vocabulary without copyright issues. Today\'s angle: Motif From a PD Song (228).',
+    theoryBite: 'Public-domain melodies are free teachers. Motif theft-as-study builds vocabulary without copyright issues. Today: Motif From a PD Song. Day 228.',
     drills: [
       'Learn 2 bars of a PD tune slowly from the library tab — today\'s lens: «Motif From a PD Song»',
       'Play it an octave away or in a new position',
       'Change only the rhythm, keep pitches',
-      'Improv 8 bars that quote the motif once (Motif From a PD Song (228))'
+      'Improv 8 bars that quote the motif once (Motif From a PD Song day 228)'
     ],
     libraryIds: [
       'sg-silent-night',
       'sg-sailor-s-hornpipe'
     ],
-    masteryCheck: 'Quote a PD motif once inside an 8-bar improvised phrase where the quote is recognizable — lens «Motif From a PD Song». [Motif From a PD Song (228)]',
+    masteryCheck: 'Quote a PD motif once inside an 8-bar improvised phrase where the quote is recognizable — angle: Motif From a PD Song. [Motif From a PD Song day 228]',
   },
   229: {
 
-    title: 'Weekly Lead Checkpoint (229)',
+    title: 'Weekly Lead Checkpoint day 229',
     durationMin: 30,
     goals: [
       'Combine motif, space, and one expression tool (bend/vibrato/slide)',
       'Record a short take as evidence',
-      'Write one keep and one fix with kind wording (Weekly Lead Checkpoint (229))'
+      'Write one keep and one fix with kind wording (Weekly Lead Checkpoint day 229)'
     ],
-    theoryBite: 'Lead checkpoints prove taste under time. A short recorded soloette plus reflection beats hour-long noodling with no memory. Today\'s angle: Weekly Lead Checkpoint (229).',
+    theoryBite: 'Lead checkpoints prove taste under time. A short recorded soloette plus reflection beats hour-long noodling with no memory. Today: Weekly Lead Checkpoint. Day 229.',
     drills: [
       'Warm-up long tones + light bends 2 minutes — today\'s lens: «Weekly Lead Checkpoint»',
       'Motif/rest practice 8 cycles',
       '12-bar or 16-bar soloette over a library vamp/progression',
-      'Listen once kindly, once with a pencil note (Weekly Lead Checkpoint (229))'
+      'Listen once kindly, once with a pencil note (Weekly Lead Checkpoint day 229)'
     ],
     libraryIds: [
       'rf-g-caged-run-study',
       'sg-turkey-in-the-straw'
     ],
-    masteryCheck: 'Save one short lead take that shows space plus one expressive tool, with a written keep and fix — lens «Weekly Lead Checkpoint». [Weekly Lead Checkpoint (229)]',
+    masteryCheck: 'Save one short lead take that shows space plus one expressive tool, with a written keep and fix — angle: Weekly Lead Checkpoint. [Weekly Lead Checkpoint day 229]',
   },
   230: {
 
-    title: 'Bend Vocabulary — Release & Pre-Bend (230)',
+    title: 'Bend Vocabulary — Release & Pre-Bend day 230',
     durationMin: 30,
     goals: [
       'Bend to a target pitch you can name or match',
       'Release bends as musically as you attack them',
-      'Keep supporting fingers helping the bend without clamping the neck (Bend Vocabulary — Release & Pre-Bend (230))'
+      'Keep supporting fingers helping the bend without clamping the neck (Bend Vocabulary — Release & Pre-Bend day 230)'
     ],
-    theoryBite: 'A bend is a portable slur to a chord tone. Target pitch accuracy matters more than bend distance bragging. Today\'s angle: Bend Vocabulary — Release & Pre-Bend (230).',
+    theoryBite: 'A bend is a portable slur to a chord tone. Target pitch accuracy matters more than bend distance bragging. Today: Bend Vocabulary — Release & Pre-Bend. Day 230.',
     drills: [
       'Fret a target note, then bend from a whole step below into it — match sustain — today\'s lens: «Bend Vocabulary — Release & Pre-Bend»',
       'Pre-bend silently, then release into the lower pitch',
       'Bend-and-hold 2 beats in tune, then resolve down',
-      'Use bends only on phrase endings for 8 bars over a vamp (Bend Vocabulary — Release & Pre-Bend (230))'
+      'Use bends only on phrase endings for 8 bars over a vamp (Bend Vocabulary — Release & Pre-Bend day 230)'
     ],
     libraryIds: [
       'rf-minor-slide-lick-study'
     ],
-    masteryCheck: 'Land four consecutive whole-step bends on pitch (within a gentle ear tolerance) at slow tempo — lens «Bend Vocabulary — Release & Pre-Bend». [Bend Vocabulary — Release & Pre-Bend (230)]',
+    masteryCheck: 'Land four consecutive whole-step bends on pitch (within a gentle ear tolerance) at slow tempo — angle: Bend Vocabulary — Release & Pre-Bend. [Bend Vocabulary — Release & Pre-Bend day 230]',
   },
   231: {
 
-    title: 'Sequence Climb — Melodic Sequences Up (231)',
+    title: 'Sequence Climb — Melodic Sequences Up day 231',
     durationMin: 35,
     goals: [
       'Move a melodic cell up or down the scale systematically',
       'Keep rhythm identical while pitch shifts',
-      'Stop sequencing before it becomes mechanical noise (Sequence Climb — Melodic Sequences Up (231))'
+      'Stop sequencing before it becomes mechanical noise (Sequence Climb — Melodic Sequences Up day 231)'
     ],
-    theoryBite: 'Sequences create forward motion listeners can predict and enjoy — then break the pattern for punctuation. Today\'s angle: Sequence Climb — Melodic Sequences Up (231).',
+    theoryBite: 'Sequences create forward motion listeners can predict and enjoy — then break the pattern for punctuation. Today: Sequence Climb — Melodic Sequences Up. Day 231.',
     drills: [
       'Cell of 4 notes; sequence up diatonically 3 times — today\'s lens: «Sequence Climb — Melodic Sequences Up»',
       'Same 4-note cell descending diatonically 3 times, same tempo',
       'Break the fourth repeat with a long tone',
-      'Apply over a static chord then over a change (Sequence Climb — Melodic Sequences Up (231))'
+      'Apply over a static chord then over a change (Sequence Climb — Melodic Sequences Up day 231)'
     ],
     libraryIds: [
       'rf-am-arpeggio-cascade',
       'sg-red-river-valley'
     ],
-    masteryCheck: 'Play a clear ascending sequence of a 4-note cell three times and resolve with a long tone — lens «Sequence Climb — Melodic Sequences Up». [Sequence Climb — Melodic Sequences Up (231)]',
+    masteryCheck: 'Play a clear ascending sequence of a 4-note cell three times and resolve with a long tone — angle: Sequence Climb — Melodic Sequences Up. [Sequence Climb — Melodic Sequences Up day 231]',
   },
   232: {
 
-    title: 'Question Harmony — Solo Over Andalusian (232)',
+    title: 'Question Harmony — Solo Over Andalusian day 232',
     durationMin: 30,
     goals: [
       'Outline the Andalusian bass motion while soloing lightly',
       'Choose notes that respect each chord\'s color',
-      'Use Phrygian/Spanish flavor without rushing (Question Harmony — Solo Over Andalusian (232))'
+      'Use Phrygian/Spanish flavor without rushing (Question Harmony — Solo Over Andalusian day 232)'
     ],
-    theoryBite: 'The Andalusian cadence (e.g. Am–G–F–E) is a storytelling loop. Lead notes should acknowledge each step, especially the E major tension. Today\'s angle: Question Harmony — Solo Over Andalusian (232).',
+    theoryBite: 'The Andalusian cadence (e.g. Am–G–F–E) is a storytelling loop. Lead notes should acknowledge each step, especially the E major tension. Today: Question Harmony — Solo Over Andalusian. Day 232.',
     drills: [
       'Comp the progression slowly, name each chord — today\'s lens: «Question Harmony — Solo Over Andalusian»',
       'Roots-only lead through one cycle',
       'Add neighbor tones into each root',
-      'One expressive cycle with space on the E chord (Question Harmony — Solo Over Andalusian (232))'
+      'One expressive cycle with space on the E chord (Question Harmony — Solo Over Andalusian day 232)'
     ],
     libraryIds: [
       'pr-andalu',
       'rf-spanish-e-phrygian-study',
       'sc-phrygian'
     ],
-    masteryCheck: 'Solo one full Andalusian cycle that clearly changes color chord-to-chord, especially into E — lens «Question Harmony — Solo Over Andalusian». [Question Harmony — Solo Over Andalusian (232)]',
+    masteryCheck: 'Solo one full Andalusian cycle that clearly changes color chord-to-chord, especially into E — angle: Question Harmony — Solo Over Andalusian. [Question Harmony — Solo Over Andalusian day 232]',
   },
   233: {
 
-    title: 'Economy Picking Seed (233)',
+    title: 'Economy Picking Seed day 233',
     durationMin: 30,
     goals: [
       'Reduce pick motion with economy/outside-inside awareness',
       'Stay relaxed at moderate speed before chasing velocity',
-      'Prefer accuracy of the grid over blur (Economy Picking Seed (233))'
+      'Prefer accuracy of the grid over blur (Economy Picking Seed day 233)'
     ],
-    theoryBite: 'Economy picking optimizes pick path across strings. Relaxation and evenness beat premature speed goals. Today\'s angle: Economy Picking Seed (233).',
+    theoryBite: 'Economy picking optimizes pick path across strings. Relaxation and evenness beat premature speed goals. Today: Economy Picking Seed. Day 233.',
     drills: [
       'Two-string scale fragment focusing on efficient pick direction — today\'s lens: «Economy Picking Seed»',
       'Slow 16ths on a 3-note-per-string idea (or simple box)',
       'Stop at first tension in forearm — shake out',
-      '8 bars musical, not mechanical, using the efficient path (Economy Picking Seed (233))'
+      '8 bars musical, not mechanical, using the efficient path (Economy Picking Seed day 233)'
     ],
     libraryIds: [
       'rf-g-caged-run-study'
     ],
-    masteryCheck: 'Play an 8-bar efficient-picking fragment cleanly at a tempo that stays relaxed — lens «Economy Picking Seed». [Economy Picking Seed (233)]',
+    masteryCheck: 'Play an 8-bar efficient-picking fragment cleanly at a tempo that stays relaxed — angle: Economy Picking Seed. [Economy Picking Seed day 233]',
   },
   234: {
 
-    title: 'Hybrid Picking Taste (234)',
+    title: 'Hybrid Picking Taste day 234',
     durationMin: 30,
     goals: [
       'Combine pick bass notes with finger snags on higher strings',
       'Keep the pattern steady enough to be a texture',
-      'Use hybrid for country/funk color inside a simple progression (Hybrid Picking Taste (234))'
+      'Use hybrid for country/funk color inside a simple progression (Hybrid Picking Taste day 234)'
     ],
-    theoryBite: 'Hybrid picking expands articulation. Thumb/pick handles lows; middle/ring can pluck ups — independence is the practice. Today\'s angle: Hybrid Picking Taste (234).',
+    theoryBite: 'Hybrid picking expands articulation. Thumb/pick handles lows; middle/ring can pluck ups — independence is the practice. Today: Hybrid Picking Taste. Day 234.',
     drills: [
       'Pick low root on beats 1 and 3 — today\'s lens: «Hybrid Picking Taste»',
       'Middle finger plucks a higher string on 2 and 4',
       'Combine into a rolling pattern on C or G shapes',
-      '8-bar progression with hybrid texture throughout (Hybrid Picking Taste (234))'
+      '8-bar progression with hybrid texture throughout (Hybrid Picking Taste day 234)'
     ],
     libraryIds: [
       'rf-travis-pick-sketch-in-c'
     ],
-    masteryCheck: 'Maintain an 8-bar hybrid pattern with steady bass/ pick and clear finger snags — lens «Hybrid Picking Taste». [Hybrid Picking Taste (234)]',
+    masteryCheck: 'Maintain an 8-bar hybrid pattern with steady bass/ pick and clear finger snags — angle: Hybrid Picking Taste. [Hybrid Picking Taste day 234]',
   },
   235: {
 
-    title: 'Motif From a PD Song (235)',
+    title: 'Motif From a PD Song day 235',
     durationMin: 30,
     goals: [
       'Steal a contour from a public-domain melody ethically as study',
       'Vary rhythm while keeping contour recognizable',
-      'Return the motif as a hook inside your own phrasing (Motif From a PD Song (235))'
+      'Return the motif as a hook inside your own phrasing (Motif From a PD Song day 235)'
     ],
-    theoryBite: 'Public-domain melodies are free teachers. Motif theft-as-study builds vocabulary without copyright issues. Today\'s angle: Motif From a PD Song (235).',
+    theoryBite: 'Public-domain melodies are free teachers. Motif theft-as-study builds vocabulary without copyright issues. Today: Motif From a PD Song. Day 235.',
     drills: [
       'Learn 2 bars of a PD tune slowly from the library tab — today\'s lens: «Motif From a PD Song»',
       'Play it an octave away or in a new position',
       'Change only the rhythm, keep pitches',
-      'Improv 8 bars that quote the motif once (Motif From a PD Song (235))'
+      'Improv 8 bars that quote the motif once (Motif From a PD Song day 235)'
     ],
     libraryIds: [
       'sg-red-river-valley',
       'sg-wild-mountain-thyme'
     ],
-    masteryCheck: 'Quote a PD motif once inside an 8-bar improvised phrase where the quote is recognizable — lens «Motif From a PD Song». [Motif From a PD Song (235)]',
+    masteryCheck: 'Quote a PD motif once inside an 8-bar improvised phrase where the quote is recognizable — angle: Motif From a PD Song. [Motif From a PD Song day 235]',
   },
   236: {
 
-    title: 'Weekly Lead Checkpoint (236)',
+    title: 'Weekly Lead Checkpoint day 236',
     durationMin: 30,
     goals: [
       'Combine motif, space, and one expression tool (bend/vibrato/slide)',
       'Record a short take as evidence',
-      'Write one keep and one fix with kind wording (Weekly Lead Checkpoint (236))'
+      'Write one keep and one fix with kind wording (Weekly Lead Checkpoint day 236)'
     ],
-    theoryBite: 'Lead checkpoints prove taste under time. A short recorded soloette plus reflection beats hour-long noodling with no memory. Today\'s angle: Weekly Lead Checkpoint (236).',
+    theoryBite: 'Lead checkpoints prove taste under time. A short recorded soloette plus reflection beats hour-long noodling with no memory. Today: Weekly Lead Checkpoint. Day 236.',
     drills: [
       'Warm-up long tones + light bends 2 minutes — today\'s lens: «Weekly Lead Checkpoint»',
       'Motif/rest practice 8 cycles',
       '12-bar or 16-bar soloette over a library vamp/progression',
-      'Listen once kindly, once with a pencil note (Weekly Lead Checkpoint (236))'
+      'Listen once kindly, once with a pencil note (Weekly Lead Checkpoint day 236)'
     ],
     libraryIds: [
       'rf-c-bass-walk-study',
       'sg-joshua-fit-the-battle-of-jericho'
     ],
-    masteryCheck: 'Save one short lead take that shows space plus one expressive tool, with a written keep and fix — lens «Weekly Lead Checkpoint». [Weekly Lead Checkpoint (236)]',
+    masteryCheck: 'Save one short lead take that shows space plus one expressive tool, with a written keep and fix — angle: Weekly Lead Checkpoint. [Weekly Lead Checkpoint day 236]',
   },
   237: {
 
-    title: 'Bend Vocabulary — Release & Pre-Bend (237)',
+    title: 'Bend Vocabulary — Release & Pre-Bend day 237',
     durationMin: 30,
     goals: [
       'Bend to a target pitch you can name or match',
       'Release bends as musically as you attack them',
-      'Keep supporting fingers helping the bend without clamping the neck (Bend Vocabulary — Release & Pre-Bend (237))'
+      'Keep supporting fingers helping the bend without clamping the neck (Bend Vocabulary — Release & Pre-Bend day 237)'
     ],
-    theoryBite: 'A bend is a portable slur to a chord tone. Target pitch accuracy matters more than bend distance bragging. Today\'s angle: Bend Vocabulary — Release & Pre-Bend (237).',
+    theoryBite: 'A bend is a portable slur to a chord tone. Target pitch accuracy matters more than bend distance bragging. Today: Bend Vocabulary — Release & Pre-Bend. Day 237.',
     drills: [
       'Fret a target note, then bend from a whole step below into it — match sustain — today\'s lens: «Bend Vocabulary — Release & Pre-Bend»',
       'Pre-bend silently, then release into the lower pitch',
       'Bend-and-hold 2 beats in tune, then resolve down',
-      'Use bends only on phrase endings for 8 bars over a vamp (Bend Vocabulary — Release & Pre-Bend (237))'
+      'Use bends only on phrase endings for 8 bars over a vamp (Bend Vocabulary — Release & Pre-Bend day 237)'
     ],
     libraryIds: [
       'rf-minor-slide-lick-study'
     ],
-    masteryCheck: 'Land four consecutive whole-step bends on pitch (within a gentle ear tolerance) at slow tempo — lens «Bend Vocabulary — Release & Pre-Bend». [Bend Vocabulary — Release & Pre-Bend (237)]',
+    masteryCheck: 'Land four consecutive whole-step bends on pitch (within a gentle ear tolerance) at slow tempo — angle: Bend Vocabulary — Release & Pre-Bend. [Bend Vocabulary — Release & Pre-Bend day 237]',
   },
   238: {
 
-    title: 'Sequence Climb — Melodic Sequences Up (238)',
+    title: 'Sequence Climb — Melodic Sequences Up day 238',
     durationMin: 35,
     goals: [
       'Move a melodic cell up or down the scale systematically',
       'Keep rhythm identical while pitch shifts',
-      'Stop sequencing before it becomes mechanical noise (Sequence Climb — Melodic Sequences Up (238))'
+      'Stop sequencing before it becomes mechanical noise (Sequence Climb — Melodic Sequences Up day 238)'
     ],
-    theoryBite: 'Sequences create forward motion listeners can predict and enjoy — then break the pattern for punctuation. Today\'s angle: Sequence Climb — Melodic Sequences Up (238).',
+    theoryBite: 'Sequences create forward motion listeners can predict and enjoy — then break the pattern for punctuation. Today: Sequence Climb — Melodic Sequences Up. Day 238.',
     drills: [
       'Cell of 4 notes; sequence up diatonically 3 times — today\'s lens: «Sequence Climb — Melodic Sequences Up»',
       'Same 4-note cell descending diatonically 3 times, same tempo',
       'Break the fourth repeat with a long tone',
-      'Apply over a static chord then over a change (Sequence Climb — Melodic Sequences Up (238))'
+      'Apply over a static chord then over a change (Sequence Climb — Melodic Sequences Up day 238)'
     ],
     libraryIds: [
       'rf-drop-d-power-study',
       'sg-i-ve-been-working-on-the-railroa'
     ],
-    masteryCheck: 'Play a clear ascending sequence of a 4-note cell three times and resolve with a long tone — lens «Sequence Climb — Melodic Sequences Up». [Sequence Climb — Melodic Sequences Up (238)]',
+    masteryCheck: 'Play a clear ascending sequence of a 4-note cell three times and resolve with a long tone — angle: Sequence Climb — Melodic Sequences Up. [Sequence Climb — Melodic Sequences Up day 238]',
   },
   239: {
 
-    title: 'Question Harmony — Solo Over Andalusian (239)',
+    title: 'Question Harmony — Solo Over Andalusian day 239',
     durationMin: 30,
     goals: [
       'Outline the Andalusian bass motion while soloing lightly',
       'Choose notes that respect each chord\'s color',
-      'Use Phrygian/Spanish flavor without rushing (Question Harmony — Solo Over Andalusian (239))'
+      'Use Phrygian/Spanish flavor without rushing (Question Harmony — Solo Over Andalusian day 239)'
     ],
-    theoryBite: 'The Andalusian cadence (e.g. Am–G–F–E) is a storytelling loop. Lead notes should acknowledge each step, especially the E major tension. Today\'s angle: Question Harmony — Solo Over Andalusian (239).',
+    theoryBite: 'The Andalusian cadence (e.g. Am–G–F–E) is a storytelling loop. Lead notes should acknowledge each step, especially the E major tension. Today: Question Harmony — Solo Over Andalusian. Day 239.',
     drills: [
       'Comp the progression slowly, name each chord — today\'s lens: «Question Harmony — Solo Over Andalusian»',
       'Roots-only lead through one cycle',
       'Add neighbor tones into each root',
-      'One expressive cycle with space on the E chord (Question Harmony — Solo Over Andalusian (239))'
+      'One expressive cycle with space on the E chord (Question Harmony — Solo Over Andalusian day 239)'
     ],
     libraryIds: [
       'pr-andalu',
       'rf-spanish-e-phrygian-study',
       'sc-phrygian'
     ],
-    masteryCheck: 'Solo one full Andalusian cycle that clearly changes color chord-to-chord, especially into E — lens «Question Harmony — Solo Over Andalusian». [Question Harmony — Solo Over Andalusian (239)]',
+    masteryCheck: 'Solo one full Andalusian cycle that clearly changes color chord-to-chord, especially into E — angle: Question Harmony — Solo Over Andalusian. [Question Harmony — Solo Over Andalusian day 239]',
   },
   240: {
 
-    title: 'Economy Picking Seed (240)',
+    title: 'Economy Picking Seed day 240',
     durationMin: 30,
     goals: [
       'Reduce pick motion with economy/outside-inside awareness',
       'Stay relaxed at moderate speed before chasing velocity',
-      'Prefer accuracy of the grid over blur (Economy Picking Seed (240))'
+      'Prefer accuracy of the grid over blur (Economy Picking Seed day 240)'
     ],
-    theoryBite: 'Economy picking optimizes pick path across strings. Relaxation and evenness beat premature speed goals. Today\'s angle: Economy Picking Seed (240).',
+    theoryBite: 'Economy picking optimizes pick path across strings. Relaxation and evenness beat premature speed goals. Today: Economy Picking Seed. Day 240.',
     drills: [
       'Two-string scale fragment focusing on efficient pick direction — today\'s lens: «Economy Picking Seed»',
       'Slow 16ths on a 3-note-per-string idea (or simple box)',
       'Stop at first tension in forearm — shake out',
-      '8 bars musical, not mechanical, using the efficient path (Economy Picking Seed (240))'
+      '8 bars musical, not mechanical, using the efficient path (Economy Picking Seed day 240)'
     ],
     libraryIds: [
       'rf-g-caged-run-study'
     ],
-    masteryCheck: 'Play an 8-bar efficient-picking fragment cleanly at a tempo that stays relaxed — lens «Economy Picking Seed». [Economy Picking Seed (240)]',
+    masteryCheck: 'Play an 8-bar efficient-picking fragment cleanly at a tempo that stays relaxed — angle: Economy Picking Seed. [Economy Picking Seed day 240]',
   },
   241: {
 
-    title: 'Hybrid Picking Taste (241)',
+    title: 'Hybrid Picking Taste day 241',
     durationMin: 30,
     goals: [
       'Combine pick bass notes with finger snags on higher strings',
       'Keep the pattern steady enough to be a texture',
-      'Use hybrid for country/funk color inside a simple progression (Hybrid Picking Taste (241))'
+      'Use hybrid for country/funk color inside a simple progression (Hybrid Picking Taste day 241)'
     ],
-    theoryBite: 'Hybrid picking expands articulation. Thumb/pick handles lows; middle/ring can pluck ups — independence is the practice. Today\'s angle: Hybrid Picking Taste (241).',
+    theoryBite: 'Hybrid picking expands articulation. Thumb/pick handles lows; middle/ring can pluck ups — independence is the practice. Today: Hybrid Picking Taste. Day 241.',
     drills: [
       'Pick low root on beats 1 and 3 — today\'s lens: «Hybrid Picking Taste»',
       'Middle finger plucks a higher string on 2 and 4',
       'Combine into a rolling pattern on C or G shapes',
-      '8-bar progression with hybrid texture throughout (Hybrid Picking Taste (241))'
+      '8-bar progression with hybrid texture throughout (Hybrid Picking Taste day 241)'
     ],
     libraryIds: [
       'rf-travis-pick-sketch-in-c'
     ],
-    masteryCheck: 'Maintain an 8-bar hybrid pattern with steady bass/ pick and clear finger snags — lens «Hybrid Picking Taste». [Hybrid Picking Taste (241)]',
+    masteryCheck: 'Maintain an 8-bar hybrid pattern with steady bass/ pick and clear finger snags — angle: Hybrid Picking Taste. [Hybrid Picking Taste day 241]',
   },
   242: {
 
-    title: 'Motif From a PD Song (242)',
+    title: 'Motif From a PD Song day 242',
     durationMin: 30,
     goals: [
       'Steal a contour from a public-domain melody ethically as study',
       'Vary rhythm while keeping contour recognizable',
-      'Return the motif as a hook inside your own phrasing (Motif From a PD Song (242))'
+      'Return the motif as a hook inside your own phrasing (Motif From a PD Song day 242)'
     ],
-    theoryBite: 'Public-domain melodies are free teachers. Motif theft-as-study builds vocabulary without copyright issues. Today\'s angle: Motif From a PD Song (242).',
+    theoryBite: 'Public-domain melodies are free teachers. Motif theft-as-study builds vocabulary without copyright issues. Today: Motif From a PD Song. Day 242.',
     drills: [
       'Learn 2 bars of a PD tune slowly from the library tab — today\'s lens: «Motif From a PD Song»',
       'Play it an octave away or in a new position',
       'Change only the rhythm, keep pitches',
-      'Improv 8 bars that quote the motif once (Motif From a PD Song (242))'
+      'Improv 8 bars that quote the motif once (Motif From a PD Song day 242)'
     ],
     libraryIds: [
       'sg-i-ve-been-working-on-the-railroa',
       'sg-canon-in-d-pachelbel-theme-publi'
     ],
-    masteryCheck: 'Quote a PD motif once inside an 8-bar improvised phrase where the quote is recognizable — lens «Motif From a PD Song». [Motif From a PD Song (242)]',
+    masteryCheck: 'Quote a PD motif once inside an 8-bar improvised phrase where the quote is recognizable — angle: Motif From a PD Song. [Motif From a PD Song day 242]',
   },
   243: {
 
-    title: 'Weekly Lead Checkpoint (243)',
+    title: 'Weekly Lead Checkpoint day 243',
     durationMin: 30,
     goals: [
       'Combine motif, space, and one expression tool (bend/vibrato/slide)',
       'Record a short take as evidence',
-      'Write one keep and one fix with kind wording (Weekly Lead Checkpoint (243))'
+      'Write one keep and one fix with kind wording (Weekly Lead Checkpoint day 243)'
     ],
-    theoryBite: 'Lead checkpoints prove taste under time. A short recorded soloette plus reflection beats hour-long noodling with no memory. Today\'s angle: Weekly Lead Checkpoint (243).',
+    theoryBite: 'Lead checkpoints prove taste under time. A short recorded soloette plus reflection beats hour-long noodling with no memory. Today: Weekly Lead Checkpoint. Day 243.',
     drills: [
       'Warm-up long tones + light bends 2 minutes — today\'s lens: «Weekly Lead Checkpoint»',
       'Motif/rest practice 8 cycles',
       '12-bar or 16-bar soloette over a library vamp/progression',
-      'Listen once kindly, once with a pencil note (Weekly Lead Checkpoint (243))'
+      'Listen once kindly, once with a pencil note (Weekly Lead Checkpoint day 243)'
     ],
     libraryIds: [
       'rf-spanish-e-phrygian-study',
       'sg-wild-mountain-thyme'
     ],
-    masteryCheck: 'Save one short lead take that shows space plus one expressive tool, with a written keep and fix — lens «Weekly Lead Checkpoint». [Weekly Lead Checkpoint (243)]',
+    masteryCheck: 'Save one short lead take that shows space plus one expressive tool, with a written keep and fix — angle: Weekly Lead Checkpoint. [Weekly Lead Checkpoint day 243]',
   },
   244: {
 
-    title: 'Bend Vocabulary — Release & Pre-Bend (244)',
+    title: 'Bend Vocabulary — Release & Pre-Bend day 244',
     durationMin: 30,
     goals: [
       'Bend to a target pitch you can name or match',
       'Release bends as musically as you attack them',
-      'Keep supporting fingers helping the bend without clamping the neck (Bend Vocabulary — Release & Pre-Bend (244))'
+      'Keep supporting fingers helping the bend without clamping the neck (Bend Vocabulary — Release & Pre-Bend day 244)'
     ],
-    theoryBite: 'A bend is a portable slur to a chord tone. Target pitch accuracy matters more than bend distance bragging. Today\'s angle: Bend Vocabulary — Release & Pre-Bend (244).',
+    theoryBite: 'A bend is a portable slur to a chord tone. Target pitch accuracy matters more than bend distance bragging. Today: Bend Vocabulary — Release & Pre-Bend. Day 244.',
     drills: [
       'Fret a target note, then bend from a whole step below into it — match sustain — today\'s lens: «Bend Vocabulary — Release & Pre-Bend»',
       'Pre-bend silently, then release into the lower pitch',
       'Bend-and-hold 2 beats in tune, then resolve down',
-      'Use bends only on phrase endings for 8 bars over a vamp (Bend Vocabulary — Release & Pre-Bend (244))'
+      'Use bends only on phrase endings for 8 bars over a vamp (Bend Vocabulary — Release & Pre-Bend day 244)'
     ],
     libraryIds: [
       'rf-minor-slide-lick-study'
     ],
-    masteryCheck: 'Land four consecutive whole-step bends on pitch (within a gentle ear tolerance) at slow tempo — lens «Bend Vocabulary — Release & Pre-Bend». [Bend Vocabulary — Release & Pre-Bend (244)]',
+    masteryCheck: 'Land four consecutive whole-step bends on pitch (within a gentle ear tolerance) at slow tempo — angle: Bend Vocabulary — Release & Pre-Bend. [Bend Vocabulary — Release & Pre-Bend day 244]',
   },
   245: {
 
-    title: 'Sequence Climb — Melodic Sequences Up (245)',
+    title: 'Sequence Climb — Melodic Sequences Up day 245',
     durationMin: 35,
     goals: [
       'Move a melodic cell up or down the scale systematically',
       'Keep rhythm identical while pitch shifts',
-      'Stop sequencing before it becomes mechanical noise (Sequence Climb — Melodic Sequences Up (245))'
+      'Stop sequencing before it becomes mechanical noise (Sequence Climb — Melodic Sequences Up day 245)'
     ],
-    theoryBite: 'Sequences create forward motion listeners can predict and enjoy — then break the pattern for punctuation. Today\'s angle: Sequence Climb — Melodic Sequences Up (245).',
+    theoryBite: 'Sequences create forward motion listeners can predict and enjoy — then break the pattern for punctuation. Today: Sequence Climb — Melodic Sequences Up. Day 245.',
     drills: [
       'Cell of 4 notes; sequence up diatonically 3 times — today\'s lens: «Sequence Climb — Melodic Sequences Up»',
       'Same 4-note cell descending diatonically 3 times, same tempo',
       'Break the fourth repeat with a long tone',
-      'Apply over a static chord then over a change (Sequence Climb — Melodic Sequences Up (245))'
+      'Apply over a static chord then over a change (Sequence Climb — Melodic Sequences Up day 245)'
     ],
     libraryIds: [
       'rf-travis-pick-sketch-in-c',
       'sg-house-of-the-rising-sun'
     ],
-    masteryCheck: 'Play a clear ascending sequence of a 4-note cell three times and resolve with a long tone — lens «Sequence Climb — Melodic Sequences Up». [Sequence Climb — Melodic Sequences Up (245)]',
+    masteryCheck: 'Play a clear ascending sequence of a 4-note cell three times and resolve with a long tone — angle: Sequence Climb — Melodic Sequences Up. [Sequence Climb — Melodic Sequences Up day 245]',
   },
   246: {
 
-    title: 'Question Harmony — Solo Over Andalusian (246)',
+    title: 'Question Harmony — Solo Over Andalusian day 246',
     durationMin: 30,
     goals: [
       'Outline the Andalusian bass motion while soloing lightly',
       'Choose notes that respect each chord\'s color',
-      'Use Phrygian/Spanish flavor without rushing (Question Harmony — Solo Over Andalusian (246))'
+      'Use Phrygian/Spanish flavor without rushing (Question Harmony — Solo Over Andalusian day 246)'
     ],
-    theoryBite: 'The Andalusian cadence (e.g. Am–G–F–E) is a storytelling loop. Lead notes should acknowledge each step, especially the E major tension. Today\'s angle: Question Harmony — Solo Over Andalusian (246).',
+    theoryBite: 'The Andalusian cadence (e.g. Am–G–F–E) is a storytelling loop. Lead notes should acknowledge each step, especially the E major tension. Today: Question Harmony — Solo Over Andalusian. Day 246.',
     drills: [
       'Comp the progression slowly, name each chord — today\'s lens: «Question Harmony — Solo Over Andalusian»',
       'Roots-only lead through one cycle',
       'Add neighbor tones into each root',
-      'One expressive cycle with space on the E chord (Question Harmony — Solo Over Andalusian (246))'
+      'One expressive cycle with space on the E chord (Question Harmony — Solo Over Andalusian day 246)'
     ],
     libraryIds: [
       'pr-andalu',
       'rf-spanish-e-phrygian-study',
       'sc-phrygian'
     ],
-    masteryCheck: 'Solo one full Andalusian cycle that clearly changes color chord-to-chord, especially into E — lens «Question Harmony — Solo Over Andalusian». [Question Harmony — Solo Over Andalusian (246)]',
+    masteryCheck: 'Solo one full Andalusian cycle that clearly changes color chord-to-chord, especially into E — angle: Question Harmony — Solo Over Andalusian. [Question Harmony — Solo Over Andalusian day 246]',
   },
   247: {
 
-    title: 'Economy Picking Seed (247)',
+    title: 'Economy Picking Seed day 247',
     durationMin: 30,
     goals: [
       'Reduce pick motion with economy/outside-inside awareness',
       'Stay relaxed at moderate speed before chasing velocity',
-      'Prefer accuracy of the grid over blur (Economy Picking Seed (247))'
+      'Prefer accuracy of the grid over blur (Economy Picking Seed day 247)'
     ],
-    theoryBite: 'Economy picking optimizes pick path across strings. Relaxation and evenness beat premature speed goals. Today\'s angle: Economy Picking Seed (247).',
+    theoryBite: 'Economy picking optimizes pick path across strings. Relaxation and evenness beat premature speed goals. Today: Economy Picking Seed. Day 247.',
     drills: [
       'Two-string scale fragment focusing on efficient pick direction — today\'s lens: «Economy Picking Seed»',
       'Slow 16ths on a 3-note-per-string idea (or simple box)',
       'Stop at first tension in forearm — shake out',
-      '8 bars musical, not mechanical, using the efficient path (Economy Picking Seed (247))'
+      '8 bars musical, not mechanical, using the efficient path (Economy Picking Seed day 247)'
     ],
     libraryIds: [
       'rf-g-caged-run-study'
     ],
-    masteryCheck: 'Play an 8-bar efficient-picking fragment cleanly at a tempo that stays relaxed — lens «Economy Picking Seed». [Economy Picking Seed (247)]',
+    masteryCheck: 'Play an 8-bar efficient-picking fragment cleanly at a tempo that stays relaxed — angle: Economy Picking Seed. [Economy Picking Seed day 247]',
   },
   248: {
 
-    title: 'Hybrid Picking Taste (248)',
+    title: 'Hybrid Picking Taste day 248',
     durationMin: 30,
     goals: [
       'Combine pick bass notes with finger snags on higher strings',
       'Keep the pattern steady enough to be a texture',
-      'Use hybrid for country/funk color inside a simple progression (Hybrid Picking Taste (248))'
+      'Use hybrid for country/funk color inside a simple progression (Hybrid Picking Taste day 248)'
     ],
-    theoryBite: 'Hybrid picking expands articulation. Thumb/pick handles lows; middle/ring can pluck ups — independence is the practice. Today\'s angle: Hybrid Picking Taste (248).',
+    theoryBite: 'Hybrid picking expands articulation. Thumb/pick handles lows; middle/ring can pluck ups — independence is the practice. Today: Hybrid Picking Taste. Day 248.',
     drills: [
       'Pick low root on beats 1 and 3 — today\'s lens: «Hybrid Picking Taste»',
       'Middle finger plucks a higher string on 2 and 4',
       'Combine into a rolling pattern on C or G shapes',
-      '8-bar progression with hybrid texture throughout (Hybrid Picking Taste (248))'
+      '8-bar progression with hybrid texture throughout (Hybrid Picking Taste day 248)'
     ],
     libraryIds: [
       'rf-travis-pick-sketch-in-c'
     ],
-    masteryCheck: 'Maintain an 8-bar hybrid pattern with steady bass/ pick and clear finger snags — lens «Hybrid Picking Taste». [Hybrid Picking Taste (248)]',
+    masteryCheck: 'Maintain an 8-bar hybrid pattern with steady bass/ pick and clear finger snags — angle: Hybrid Picking Taste. [Hybrid Picking Taste day 248]',
   },
   249: {
 
-    title: 'Motif From a PD Song (249)',
+    title: 'Motif From a PD Song day 249',
     durationMin: 30,
     goals: [
       'Steal a contour from a public-domain melody ethically as study',
       'Vary rhythm while keeping contour recognizable',
-      'Return the motif as a hook inside your own phrasing (Motif From a PD Song (249))'
+      'Return the motif as a hook inside your own phrasing (Motif From a PD Song day 249)'
     ],
-    theoryBite: 'Public-domain melodies are free teachers. Motif theft-as-study builds vocabulary without copyright issues. Today\'s angle: Motif From a PD Song (249).',
+    theoryBite: 'Public-domain melodies are free teachers. Motif theft-as-study builds vocabulary without copyright issues. Today: Motif From a PD Song. Day 249.',
     drills: [
       'Learn 2 bars of a PD tune slowly from the library tab — today\'s lens: «Motif From a PD Song»',
       'Play it an octave away or in a new position',
       'Change only the rhythm, keep pitches',
-      'Improv 8 bars that quote the motif once (Motif From a PD Song (249))'
+      'Improv 8 bars that quote the motif once (Motif From a PD Song day 249)'
     ],
     libraryIds: [
       'sg-wayfaring-stranger',
       'sg-drunken-sailor'
     ],
-    masteryCheck: 'Quote a PD motif once inside an 8-bar improvised phrase where the quote is recognizable — lens «Motif From a PD Song». [Motif From a PD Song (249)]',
+    masteryCheck: 'Quote a PD motif once inside an 8-bar improvised phrase where the quote is recognizable — angle: Motif From a PD Song. [Motif From a PD Song day 249]',
   },
   250: {
 
-    title: 'Weekly Lead Checkpoint (250)',
+    title: 'Weekly Lead Checkpoint day 250',
     durationMin: 30,
     goals: [
       'Combine motif, space, and one expression tool (bend/vibrato/slide)',
       'Record a short take as evidence',
-      'Write one keep and one fix with kind wording (Weekly Lead Checkpoint (250))'
+      'Write one keep and one fix with kind wording (Weekly Lead Checkpoint day 250)'
     ],
-    theoryBite: 'Lead checkpoints prove taste under time. A short recorded soloette plus reflection beats hour-long noodling with no memory. Today\'s angle: Weekly Lead Checkpoint (250).',
+    theoryBite: 'Lead checkpoints prove taste under time. A short recorded soloette plus reflection beats hour-long noodling with no memory. Today: Weekly Lead Checkpoint. Day 250.',
     drills: [
       'Warm-up long tones + light bends 2 minutes — today\'s lens: «Weekly Lead Checkpoint»',
       'Motif/rest practice 8 cycles',
       '12-bar or 16-bar soloette over a library vamp/progression',
-      'Listen once kindly, once with a pencil note (Weekly Lead Checkpoint (250))'
+      'Listen once kindly, once with a pencil note (Weekly Lead Checkpoint day 250)'
     ],
     libraryIds: [
       'rf-funk-chicka-study',
       'sg-shenandoah'
     ],
-    masteryCheck: 'Save one short lead take that shows space plus one expressive tool, with a written keep and fix — lens «Weekly Lead Checkpoint». [Weekly Lead Checkpoint (250)]',
+    masteryCheck: 'Save one short lead take that shows space plus one expressive tool, with a written keep and fix — angle: Weekly Lead Checkpoint. [Weekly Lead Checkpoint day 250]',
   },
   251: {
 
-    title: 'Bend Vocabulary — Release & Pre-Bend (251)',
+    title: 'Bend Vocabulary — Release & Pre-Bend day 251',
     durationMin: 30,
     goals: [
       'Bend to a target pitch you can name or match',
       'Release bends as musically as you attack them',
-      'Keep supporting fingers helping the bend without clamping the neck (Bend Vocabulary — Release & Pre-Bend (251))'
+      'Keep supporting fingers helping the bend without clamping the neck (Bend Vocabulary — Release & Pre-Bend day 251)'
     ],
-    theoryBite: 'A bend is a portable slur to a chord tone. Target pitch accuracy matters more than bend distance bragging. Today\'s angle: Bend Vocabulary — Release & Pre-Bend (251).',
+    theoryBite: 'A bend is a portable slur to a chord tone. Target pitch accuracy matters more than bend distance bragging. Today: Bend Vocabulary — Release & Pre-Bend. Day 251.',
     drills: [
       'Fret a target note, then bend from a whole step below into it — match sustain — today\'s lens: «Bend Vocabulary — Release & Pre-Bend»',
       'Pre-bend silently, then release into the lower pitch',
       'Bend-and-hold 2 beats in tune, then resolve down',
-      'Use bends only on phrase endings for 8 bars over a vamp (Bend Vocabulary — Release & Pre-Bend (251))'
+      'Use bends only on phrase endings for 8 bars over a vamp (Bend Vocabulary — Release & Pre-Bend day 251)'
     ],
     libraryIds: [
       'rf-minor-slide-lick-study'
     ],
-    masteryCheck: 'Land four consecutive whole-step bends on pitch (within a gentle ear tolerance) at slow tempo — lens «Bend Vocabulary — Release & Pre-Bend». [Bend Vocabulary — Release & Pre-Bend (251)]',
+    masteryCheck: 'Land four consecutive whole-step bends on pitch (within a gentle ear tolerance) at slow tempo — angle: Bend Vocabulary — Release & Pre-Bend. [Bend Vocabulary — Release & Pre-Bend day 251]',
   },
   252: {
 
-    title: 'Sequence Climb — Melodic Sequences Up (252)',
+    title: 'Sequence Climb — Melodic Sequences Up day 252',
     durationMin: 35,
     goals: [
       'Move a melodic cell up or down the scale systematically',
       'Keep rhythm identical while pitch shifts',
-      'Stop sequencing before it becomes mechanical noise (Sequence Climb — Melodic Sequences Up (252))'
+      'Stop sequencing before it becomes mechanical noise (Sequence Climb — Melodic Sequences Up day 252)'
     ],
-    theoryBite: 'Sequences create forward motion listeners can predict and enjoy — then break the pattern for punctuation. Today\'s angle: Sequence Climb — Melodic Sequences Up (252).',
+    theoryBite: 'Sequences create forward motion listeners can predict and enjoy — then break the pattern for punctuation. Today: Sequence Climb — Melodic Sequences Up. Day 252.',
     drills: [
       'Cell of 4 notes; sequence up diatonically 3 times — today\'s lens: «Sequence Climb — Melodic Sequences Up»',
       'Same 4-note cell descending diatonically 3 times, same tempo',
       'Break the fourth repeat with a long tone',
-      'Apply over a static chord then over a change (Sequence Climb — Melodic Sequences Up (252))'
+      'Apply over a static chord then over a change (Sequence Climb — Melodic Sequences Up day 252)'
     ],
     libraryIds: [
       'rf-natural-harmonics-study',
       'sg-down-by-the-riverside'
     ],
-    masteryCheck: 'Play a clear ascending sequence of a 4-note cell three times and resolve with a long tone — lens «Sequence Climb — Melodic Sequences Up». [Sequence Climb — Melodic Sequences Up (252)]',
+    masteryCheck: 'Play a clear ascending sequence of a 4-note cell three times and resolve with a long tone — angle: Sequence Climb — Melodic Sequences Up. [Sequence Climb — Melodic Sequences Up day 252]',
   },
   253: {
 
-    title: 'Question Harmony — Solo Over Andalusian (253)',
+    title: 'Question Harmony — Solo Over Andalusian day 253',
     durationMin: 30,
     goals: [
       'Outline the Andalusian bass motion while soloing lightly',
       'Choose notes that respect each chord\'s color',
-      'Use Phrygian/Spanish flavor without rushing (Question Harmony — Solo Over Andalusian (253))'
+      'Use Phrygian/Spanish flavor without rushing (Question Harmony — Solo Over Andalusian day 253)'
     ],
-    theoryBite: 'The Andalusian cadence (e.g. Am–G–F–E) is a storytelling loop. Lead notes should acknowledge each step, especially the E major tension. Today\'s angle: Question Harmony — Solo Over Andalusian (253).',
+    theoryBite: 'The Andalusian cadence (e.g. Am–G–F–E) is a storytelling loop. Lead notes should acknowledge each step, especially the E major tension. Today: Question Harmony — Solo Over Andalusian. Day 253.',
     drills: [
       'Comp the progression slowly, name each chord — today\'s lens: «Question Harmony — Solo Over Andalusian»',
       'Roots-only lead through one cycle',
       'Add neighbor tones into each root',
-      'One expressive cycle with space on the E chord (Question Harmony — Solo Over Andalusian (253))'
+      'One expressive cycle with space on the E chord (Question Harmony — Solo Over Andalusian day 253)'
     ],
     libraryIds: [
       'pr-andalu',
       'rf-spanish-e-phrygian-study',
       'sc-phrygian'
     ],
-    masteryCheck: 'Solo one full Andalusian cycle that clearly changes color chord-to-chord, especially into E — lens «Question Harmony — Solo Over Andalusian». [Question Harmony — Solo Over Andalusian (253)]',
+    masteryCheck: 'Solo one full Andalusian cycle that clearly changes color chord-to-chord, especially into E — angle: Question Harmony — Solo Over Andalusian. [Question Harmony — Solo Over Andalusian day 253]',
   },
   254: {
 
-    title: 'Economy Picking Seed (254)',
+    title: 'Economy Picking Seed day 254',
     durationMin: 30,
     goals: [
       'Reduce pick motion with economy/outside-inside awareness',
       'Stay relaxed at moderate speed before chasing velocity',
-      'Prefer accuracy of the grid over blur (Economy Picking Seed (254))'
+      'Prefer accuracy of the grid over blur (Economy Picking Seed day 254)'
     ],
-    theoryBite: 'Economy picking optimizes pick path across strings. Relaxation and evenness beat premature speed goals. Today\'s angle: Economy Picking Seed (254).',
+    theoryBite: 'Economy picking optimizes pick path across strings. Relaxation and evenness beat premature speed goals. Today: Economy Picking Seed. Day 254.',
     drills: [
       'Two-string scale fragment focusing on efficient pick direction — today\'s lens: «Economy Picking Seed»',
       'Slow 16ths on a 3-note-per-string idea (or simple box)',
       'Stop at first tension in forearm — shake out',
-      '8 bars musical, not mechanical, using the efficient path (Economy Picking Seed (254))'
+      '8 bars musical, not mechanical, using the efficient path (Economy Picking Seed day 254)'
     ],
     libraryIds: [
       'rf-g-caged-run-study'
     ],
-    masteryCheck: 'Play an 8-bar efficient-picking fragment cleanly at a tempo that stays relaxed — lens «Economy Picking Seed». [Economy Picking Seed (254)]',
+    masteryCheck: 'Play an 8-bar efficient-picking fragment cleanly at a tempo that stays relaxed — angle: Economy Picking Seed. [Economy Picking Seed day 254]',
   },
   255: {
 
-    title: 'Hybrid Picking Taste (255)',
+    title: 'Hybrid Picking Taste day 255',
     durationMin: 30,
     goals: [
       'Combine pick bass notes with finger snags on higher strings',
       'Keep the pattern steady enough to be a texture',
-      'Use hybrid for country/funk color inside a simple progression (Hybrid Picking Taste (255))'
+      'Use hybrid for country/funk color inside a simple progression (Hybrid Picking Taste day 255)'
     ],
-    theoryBite: 'Hybrid picking expands articulation. Thumb/pick handles lows; middle/ring can pluck ups — independence is the practice. Today\'s angle: Hybrid Picking Taste (255).',
+    theoryBite: 'Hybrid picking expands articulation. Thumb/pick handles lows; middle/ring can pluck ups — independence is the practice. Today: Hybrid Picking Taste. Day 255.',
     drills: [
       'Pick low root on beats 1 and 3 — today\'s lens: «Hybrid Picking Taste»',
       'Middle finger plucks a higher string on 2 and 4',
       'Combine into a rolling pattern on C or G shapes',
-      '8-bar progression with hybrid texture throughout (Hybrid Picking Taste (255))'
+      '8-bar progression with hybrid texture throughout (Hybrid Picking Taste day 255)'
     ],
     libraryIds: [
       'rf-travis-pick-sketch-in-c'
     ],
-    masteryCheck: 'Maintain an 8-bar hybrid pattern with steady bass/ pick and clear finger snags — lens «Hybrid Picking Taste». [Hybrid Picking Taste (255)]',
+    masteryCheck: 'Maintain an 8-bar hybrid pattern with steady bass/ pick and clear finger snags — angle: Hybrid Picking Taste. [Hybrid Picking Taste day 255]',
   },
   256: {
 
-    title: 'Motif From a PD Song (256)',
+    title: 'Motif From a PD Song day 256',
     durationMin: 30,
     goals: [
       'Steal a contour from a public-domain melody ethically as study',
       'Vary rhythm while keeping contour recognizable',
-      'Return the motif as a hook inside your own phrasing (Motif From a PD Song (256))'
+      'Return the motif as a hook inside your own phrasing (Motif From a PD Song day 256)'
     ],
-    theoryBite: 'Public-domain melodies are free teachers. Motif theft-as-study builds vocabulary without copyright issues. Today\'s angle: Motif From a PD Song (256).',
+    theoryBite: 'Public-domain melodies are free teachers. Motif theft-as-study builds vocabulary without copyright issues. Today: Motif From a PD Song. Day 256.',
     drills: [
       'Learn 2 bars of a PD tune slowly from the library tab — today\'s lens: «Motif From a PD Song»',
       'Play it an octave away or in a new position',
       'Change only the rhythm, keep pitches',
-      'Improv 8 bars that quote the motif once (Motif From a PD Song (256))'
+      'Improv 8 bars that quote the motif once (Motif From a PD Song day 256)'
     ],
     libraryIds: [
       'sg-arkansas-traveler',
       'sg-william-tell-motif-rossini-publi'
     ],
-    masteryCheck: 'Quote a PD motif once inside an 8-bar improvised phrase where the quote is recognizable — lens «Motif From a PD Song». [Motif From a PD Song (256)]',
+    masteryCheck: 'Quote a PD motif once inside an 8-bar improvised phrase where the quote is recognizable — angle: Motif From a PD Song. [Motif From a PD Song day 256]',
   },
   257: {
 
-    title: 'Weekly Lead Checkpoint (257)',
+    title: 'Weekly Lead Checkpoint day 257',
     durationMin: 30,
     goals: [
       'Combine motif, space, and one expression tool (bend/vibrato/slide)',
       'Record a short take as evidence',
-      'Write one keep and one fix with kind wording (Weekly Lead Checkpoint (257))'
+      'Write one keep and one fix with kind wording (Weekly Lead Checkpoint day 257)'
     ],
-    theoryBite: 'Lead checkpoints prove taste under time. A short recorded soloette plus reflection beats hour-long noodling with no memory. Today\'s angle: Weekly Lead Checkpoint (257).',
+    theoryBite: 'Lead checkpoints prove taste under time. A short recorded soloette plus reflection beats hour-long noodling with no memory. Today: Weekly Lead Checkpoint. Day 257.',
     drills: [
       'Warm-up long tones + light bends 2 minutes — today\'s lens: «Weekly Lead Checkpoint»',
       'Motif/rest practice 8 cycles',
       '12-bar or 16-bar soloette over a library vamp/progression',
-      'Listen once kindly, once with a pencil note (Weekly Lead Checkpoint (257))'
+      'Listen once kindly, once with a pencil note (Weekly Lead Checkpoint day 257)'
     ],
     libraryIds: [
       'rf-palm-mute-chug-study',
       'sg-joy-to-the-world'
     ],
-    masteryCheck: 'Save one short lead take that shows space plus one expressive tool, with a written keep and fix — lens «Weekly Lead Checkpoint». [Weekly Lead Checkpoint (257)]',
+    masteryCheck: 'Save one short lead take that shows space plus one expressive tool, with a written keep and fix — angle: Weekly Lead Checkpoint. [Weekly Lead Checkpoint day 257]',
   },
   258: {
 
-    title: 'Bend Vocabulary — Release & Pre-Bend (258)',
+    title: 'Bend Vocabulary — Release & Pre-Bend day 258',
     durationMin: 30,
     goals: [
       'Bend to a target pitch you can name or match',
       'Release bends as musically as you attack them',
-      'Keep supporting fingers helping the bend without clamping the neck (Bend Vocabulary — Release & Pre-Bend (258))'
+      'Keep supporting fingers helping the bend without clamping the neck (Bend Vocabulary — Release & Pre-Bend day 258)'
     ],
-    theoryBite: 'A bend is a portable slur to a chord tone. Target pitch accuracy matters more than bend distance bragging. Today\'s angle: Bend Vocabulary — Release & Pre-Bend (258).',
+    theoryBite: 'A bend is a portable slur to a chord tone. Target pitch accuracy matters more than bend distance bragging. Today: Bend Vocabulary — Release & Pre-Bend. Day 258.',
     drills: [
       'Fret a target note, then bend from a whole step below into it — match sustain — today\'s lens: «Bend Vocabulary — Release & Pre-Bend»',
       'Pre-bend silently, then release into the lower pitch',
       'Bend-and-hold 2 beats in tune, then resolve down',
-      'Use bends only on phrase endings for 8 bars over a vamp (Bend Vocabulary — Release & Pre-Bend (258))'
+      'Use bends only on phrase endings for 8 bars over a vamp (Bend Vocabulary — Release & Pre-Bend day 258)'
     ],
     libraryIds: [
       'rf-minor-slide-lick-study'
     ],
-    masteryCheck: 'Land four consecutive whole-step bends on pitch (within a gentle ear tolerance) at slow tempo — lens «Bend Vocabulary — Release & Pre-Bend». [Bend Vocabulary — Release & Pre-Bend (258)]',
+    masteryCheck: 'Land four consecutive whole-step bends on pitch (within a gentle ear tolerance) at slow tempo — angle: Bend Vocabulary — Release & Pre-Bend. [Bend Vocabulary — Release & Pre-Bend day 258]',
   },
   259: {
 
-    title: 'Sequence Climb — Melodic Sequences Up (259)',
+    title: 'Sequence Climb — Melodic Sequences Up day 259',
     durationMin: 35,
     goals: [
       'Move a melodic cell up or down the scale systematically',
       'Keep rhythm identical while pitch shifts',
-      'Stop sequencing before it becomes mechanical noise (Sequence Climb — Melodic Sequences Up (259))'
+      'Stop sequencing before it becomes mechanical noise (Sequence Climb — Melodic Sequences Up day 259)'
     ],
-    theoryBite: 'Sequences create forward motion listeners can predict and enjoy — then break the pattern for punctuation. Today\'s angle: Sequence Climb — Melodic Sequences Up (259).',
+    theoryBite: 'Sequences create forward motion listeners can predict and enjoy — then break the pattern for punctuation. Today: Sequence Climb — Melodic Sequences Up. Day 259.',
     drills: [
       'Cell of 4 notes; sequence up diatonically 3 times — today\'s lens: «Sequence Climb — Melodic Sequences Up»',
       'Same 4-note cell descending diatonically 3 times, same tempo',
       'Break the fourth repeat with a long tone',
-      'Apply over a static chord then over a change (Sequence Climb — Melodic Sequences Up (259))'
+      'Apply over a static chord then over a change (Sequence Climb — Melodic Sequences Up day 259)'
     ],
     libraryIds: [
       'rf-minor-slide-lick-study',
       'sg-greensleeves'
     ],
-    masteryCheck: 'Play a clear ascending sequence of a 4-note cell three times and resolve with a long tone — lens «Sequence Climb — Melodic Sequences Up». [Sequence Climb — Melodic Sequences Up (259)]',
+    masteryCheck: 'Play a clear ascending sequence of a 4-note cell three times and resolve with a long tone — angle: Sequence Climb — Melodic Sequences Up. [Sequence Climb — Melodic Sequences Up day 259]',
   },
   260: {
 
-    title: 'Question Harmony — Solo Over Andalusian (260)',
+    title: 'Question Harmony — Solo Over Andalusian day 260',
     durationMin: 30,
     goals: [
       'Outline the Andalusian bass motion while soloing lightly',
       'Choose notes that respect each chord\'s color',
-      'Use Phrygian/Spanish flavor without rushing (Question Harmony — Solo Over Andalusian (260))'
+      'Use Phrygian/Spanish flavor without rushing (Question Harmony — Solo Over Andalusian day 260)'
     ],
-    theoryBite: 'The Andalusian cadence (e.g. Am–G–F–E) is a storytelling loop. Lead notes should acknowledge each step, especially the E major tension. Today\'s angle: Question Harmony — Solo Over Andalusian (260).',
+    theoryBite: 'The Andalusian cadence (e.g. Am–G–F–E) is a storytelling loop. Lead notes should acknowledge each step, especially the E major tension. Today: Question Harmony — Solo Over Andalusian. Day 260.',
     drills: [
       'Comp the progression slowly, name each chord — today\'s lens: «Question Harmony — Solo Over Andalusian»',
       'Roots-only lead through one cycle',
       'Add neighbor tones into each root',
-      'One expressive cycle with space on the E chord (Question Harmony — Solo Over Andalusian (260))'
+      'One expressive cycle with space on the E chord (Question Harmony — Solo Over Andalusian day 260)'
     ],
     libraryIds: [
       'pr-andalu',
       'rf-spanish-e-phrygian-study',
       'sc-phrygian'
     ],
-    masteryCheck: 'Solo one full Andalusian cycle that clearly changes color chord-to-chord, especially into E — lens «Question Harmony — Solo Over Andalusian». [Question Harmony — Solo Over Andalusian (260)]',
+    masteryCheck: 'Solo one full Andalusian cycle that clearly changes color chord-to-chord, especially into E — angle: Question Harmony — Solo Over Andalusian. [Question Harmony — Solo Over Andalusian day 260]',
   },
   261: {
 
@@ -5656,7 +5656,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-jingle-bells',
       'pr-andalu'
     ],
-    masteryCheck: 'Demonstrate «Intro Hook Design» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
+    masteryCheck: 'Show «Intro Hook Design» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
   },
   264: {
 
@@ -5679,7 +5679,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-row-row-row-your-boat',
       'pr-6251'
     ],
-    masteryCheck: 'Demonstrate «Verse Comp Texture» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
+    masteryCheck: 'Show «Verse Comp Texture» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
   },
   265: {
 
@@ -5702,7 +5702,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-this-old-man',
       'pr-145'
     ],
-    masteryCheck: 'Demonstrate «Chorus Lift» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
+    masteryCheck: 'Show «Chorus Lift» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
   },
   266: {
 
@@ -5725,7 +5725,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-she-ll-be-coming-round-the-mount',
       'pr-12bar'
     ],
-    masteryCheck: 'Demonstrate «Bridge or Middle Eight» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
+    masteryCheck: 'Show «Bridge or Middle Eight» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
   },
   267: {
 
@@ -5748,7 +5748,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-shenandoah',
       'pr-1645'
     ],
-    masteryCheck: 'Demonstrate «Ending and Button» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
+    masteryCheck: 'Show «Ending and Button» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
   },
   268: {
 
@@ -5771,7 +5771,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-simple-gifts',
       'pr-andalu'
     ],
-    masteryCheck: 'Demonstrate «Transition Glue» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
+    masteryCheck: 'Show «Transition Glue» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
   },
   269: {
 
@@ -5794,7 +5794,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-down-by-the-riverside',
       'pr-6251'
     ],
-    masteryCheck: 'Demonstrate «Tempo Honesty» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
+    masteryCheck: 'Show «Tempo Honesty» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
   },
   270: {
 
@@ -5817,7 +5817,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-the-parting-glass',
       'pr-145'
     ],
-    masteryCheck: 'Demonstrate «Dynamic Architecture» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
+    masteryCheck: 'Show «Dynamic Architecture» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
   },
   271: {
 
@@ -5840,7 +5840,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-the-streets-of-laredo',
       'pr-12bar'
     ],
-    masteryCheck: 'Demonstrate «Memory Without Panic» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
+    masteryCheck: 'Show «Memory Without Panic» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
   },
   272: {
 
@@ -5863,7 +5863,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-swing-low-sweet-chariot',
       'pr-1645'
     ],
-    masteryCheck: 'Demonstrate «Recovery Practice» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
+    masteryCheck: 'Show «Recovery Practice» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
   },
   273: {
 
@@ -5886,7 +5886,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-danny-boy-londonderry-air',
       'pr-andalu'
     ],
-    masteryCheck: 'Demonstrate «Chart Cleanliness» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
+    masteryCheck: 'Show «Chart Cleanliness» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
   },
   274: {
 
@@ -5909,7 +5909,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-joy-to-the-world',
       'pr-6251'
     ],
-    masteryCheck: 'Demonstrate «Tone and Arrangement» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
+    masteryCheck: 'Show «Tone and Arrangement» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
   },
   275: {
 
@@ -5932,7 +5932,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-turkey-in-the-straw',
       'pr-145'
     ],
-    masteryCheck: 'Demonstrate «Duet With a Recording» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
+    masteryCheck: 'Show «Duet With a Recording» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
   },
   276: {
 
@@ -5955,7 +5955,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-twinkle',
       'rf-travis-pick-sketch-in-c'
     ],
-    masteryCheck: 'Demonstrate «Fingerstyle Arrangement Pass» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
+    masteryCheck: 'Show «Fingerstyle Arrangement Pass» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
   },
   277: {
 
@@ -5978,7 +5978,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-amazing-grace',
       'pr-1645'
     ],
-    masteryCheck: 'Demonstrate «Strum Arrangement Pass» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
+    masteryCheck: 'Show «Strum Arrangement Pass» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
   },
   278: {
 
@@ -6001,7 +6001,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-when-the-saints-go-marching-in',
       'rf-minor-slide-lick-study'
     ],
-    masteryCheck: 'Demonstrate «Lead Break Writing» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
+    masteryCheck: 'Show «Lead Break Writing» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
   },
   279: {
 
@@ -6024,7 +6024,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-mary-had-a-little-lamb',
       'pr-6251'
     ],
-    masteryCheck: 'Demonstrate «Call and Response With Voice» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
+    masteryCheck: 'Show «Call and Response With Voice» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
   },
   280: {
 
@@ -6047,7 +6047,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-london-bridge',
       'pr-145'
     ],
-    masteryCheck: 'Demonstrate «Capo and Key Fit for Voice» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
+    masteryCheck: 'Show «Capo and Key Fit for Voice» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
   },
   281: {
 
@@ -6070,7 +6070,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-happy-birthday',
       'pr-12bar'
     ],
-    masteryCheck: 'Demonstrate «Setlist Flow Logic» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
+    masteryCheck: 'Show «Setlist Flow Logic» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
   },
   282: {
 
@@ -6093,7 +6093,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-scarborough-fair',
       'pr-1645'
     ],
-    masteryCheck: 'Demonstrate «Stamina Building» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
+    masteryCheck: 'Show «Stamina Building» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
   },
   283: {
 
@@ -6116,7 +6116,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-home-on-the-range',
       'pr-andalu'
     ],
-    masteryCheck: 'Demonstrate «Quiet Practice Day» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
+    masteryCheck: 'Show «Quiet Practice Day» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
   },
   284: {
 
@@ -6185,7 +6185,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-drunken-sailor',
       'pr-12bar'
     ],
-    masteryCheck: 'Demonstrate «Fix One Bar Only» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
+    masteryCheck: 'Show «Fix One Bar Only» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
   },
   287: {
 
@@ -6208,7 +6208,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-house-of-the-rising-sun',
       'pr-1645'
     ],
-    masteryCheck: 'Demonstrate «Performance Stance» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
+    masteryCheck: 'Show «Performance Stance» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
   },
   288: {
 
@@ -6231,7 +6231,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-aura-lee',
       'pr-andalu'
     ],
-    masteryCheck: 'Demonstrate «Start Strong Ritual» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
+    masteryCheck: 'Show «Start Strong Ritual» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
   },
   289: {
 
@@ -6254,7 +6254,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-auld-lang-syne',
       'pr-6251'
     ],
-    masteryCheck: 'Demonstrate «Finish Strong Ritual» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
+    masteryCheck: 'Show «Finish Strong Ritual» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
   },
   290: {
 
@@ -6277,7 +6277,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-buffalo-gals',
       'pr-145'
     ],
-    masteryCheck: 'Demonstrate «Medley Skills» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
+    masteryCheck: 'Show «Medley Skills» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
   },
   291: {
 
@@ -6300,7 +6300,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-sailor-s-hornpipe',
       'pr-12bar'
     ],
-    masteryCheck: 'Demonstrate «Style Transfer Day» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
+    masteryCheck: 'Show «Style Transfer Day» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
   },
   292: {
 
@@ -6323,7 +6323,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-drums',
       'pr-1645'
     ],
-    masteryCheck: 'Demonstrate «Acoustic Versus Amp Feel» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
+    masteryCheck: 'Show «Acoustic Versus Amp Feel» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
   },
   293: {
 
@@ -6347,7 +6347,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'rf-funk-chicka-study',
       'rf-palm-mute-chug-study'
     ],
-    masteryCheck: 'Demonstrate «Mute Noise Cleanup» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
+    masteryCheck: 'Show «Mute Noise Cleanup» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
   },
   294: {
 
@@ -6370,7 +6370,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-skip-to-my-lou',
       'pr-6251'
     ],
-    masteryCheck: 'Demonstrate «Lyric Cue Awareness» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
+    masteryCheck: 'Show «Lyric Cue Awareness» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
   },
   295: {
 
@@ -6393,7 +6393,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-fr-re-jacques',
       'rf-minor-slide-lick-study'
     ],
-    masteryCheck: 'Demonstrate «Count-In Leadership» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
+    masteryCheck: 'Show «Count-In Leadership» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
   },
   296: {
 
@@ -6416,7 +6416,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-go-tell-aunt-rhody',
       'pr-12bar'
     ],
-    masteryCheck: 'Demonstrate «Fermatas and Holds» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
+    masteryCheck: 'Show «Fermatas and Holds» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
   },
   297: {
 
@@ -6439,7 +6439,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-greensleeves',
       'pr-1645'
     ],
-    masteryCheck: 'Demonstrate «Rallentando Control» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
+    masteryCheck: 'Show «Rallentando Control» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
   },
   298: {
 
@@ -6462,7 +6462,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-red-river-valley',
       'pr-andalu'
     ],
-    masteryCheck: 'Demonstrate «Double-Time Taste» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
+    masteryCheck: 'Show «Double-Time Taste» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
   },
   299: {
 
@@ -6485,7 +6485,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-wayfaring-stranger',
       'pr-6251'
     ],
-    masteryCheck: 'Demonstrate «Half-Time Taste» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
+    masteryCheck: 'Show «Half-Time Taste» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
   },
   300: {
 
@@ -6508,7 +6508,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-black-is-the-color',
       'rf-natural-harmonics-study'
     ],
-    masteryCheck: 'Demonstrate «Harmonic Simplification» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
+    masteryCheck: 'Show «Harmonic Simplification» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
   },
   301: {
 
@@ -6531,7 +6531,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-molly-malone',
       'rf-natural-harmonics-study'
     ],
-    masteryCheck: 'Demonstrate «Harmonic Enrichment» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
+    masteryCheck: 'Show «Harmonic Enrichment» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
   },
   302: {
 
@@ -6554,7 +6554,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-careless-love',
       'pr-1645'
     ],
-    masteryCheck: 'Demonstrate «Bass Motion Arrange» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
+    masteryCheck: 'Show «Bass Motion Arrange» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
   },
   303: {
 
@@ -6578,7 +6578,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'rf-funk-chicka-study',
       'rf-palm-mute-chug-study'
     ],
-    masteryCheck: 'Demonstrate «Percussive Guitar» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
+    masteryCheck: 'Show «Percussive Guitar» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
   },
   304: {
 
@@ -6601,7 +6601,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-silent-night',
       'rf-natural-harmonics-study'
     ],
-    masteryCheck: 'Demonstrate «Open Tuning Taste (Optional)» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
+    masteryCheck: 'Show «Open Tuning Taste (Optional)» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
   },
   305: {
 
@@ -6625,7 +6625,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'rf-drop-d-power-study',
       'rf-power'
     ],
-    masteryCheck: 'Demonstrate «Drop D Power Color (Optional)» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
+    masteryCheck: 'Show «Drop D Power Color (Optional)» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
   },
   306: {
 
@@ -6648,7 +6648,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-arkansas-traveler',
       'rf-travis-pick-sketch-in-c'
     ],
-    masteryCheck: 'Demonstrate «Travis Pattern Song Pass» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
+    masteryCheck: 'Show «Travis Pattern Song Pass» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
   },
   307: {
 
@@ -6671,7 +6671,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-ode',
       'rf-d-folk-pattern-study'
     ],
-    masteryCheck: 'Demonstrate «Boom-Chuck Song Pass» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
+    masteryCheck: 'Show «Boom-Chuck Song Pass» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
   },
   308: {
 
@@ -6694,7 +6694,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-oh-susanna',
       'pr-andalu'
     ],
-    masteryCheck: 'Demonstrate «Ballad Vocal Space» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
+    masteryCheck: 'Show «Ballad Vocal Space» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
   },
   309: {
 
@@ -6717,7 +6717,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-jingle-bells',
       'pr-6251'
     ],
-    masteryCheck: 'Demonstrate «Up-Tempo Clarity» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
+    masteryCheck: 'Show «Up-Tempo Clarity» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
   },
   310: {
 
@@ -6741,7 +6741,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'pr-12bar',
       'rf-blues-sh'
     ],
-    masteryCheck: 'Demonstrate «Slow Blues Vehicle» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
+    masteryCheck: 'Show «Slow Blues Vehicle» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
   },
   311: {
 
@@ -6764,7 +6764,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-this-old-man',
       'pr-12bar'
     ],
-    masteryCheck: 'Demonstrate «Folk Storytelling Pace» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
+    masteryCheck: 'Show «Folk Storytelling Pace» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
   },
   312: {
 
@@ -6787,7 +6787,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-she-ll-be-coming-round-the-mount',
       'rf-d-folk-pattern-study'
     ],
-    masteryCheck: 'Demonstrate «Campfire Leadership» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
+    masteryCheck: 'Show «Campfire Leadership» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
   },
   313: {
 
@@ -6810,7 +6810,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-shenandoah',
       'rf-minor-slide-lick-study'
     ],
-    masteryCheck: 'Demonstrate «Solo Performance Shape» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
+    masteryCheck: 'Show «Solo Performance Shape» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
   },
   314: {
 
@@ -6833,7 +6833,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-simple-gifts',
       'pr-6251'
     ],
-    masteryCheck: 'Demonstrate «With-Metronome Polish» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
+    masteryCheck: 'Show «With-Metronome Polish» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
   },
   315: {
 
@@ -6856,7 +6856,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-down-by-the-riverside',
       'pr-145'
     ],
-    masteryCheck: 'Demonstrate «Off-Metronome Humanize» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
+    masteryCheck: 'Show «Off-Metronome Humanize» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
   },
   316: {
 
@@ -6879,7 +6879,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-the-parting-glass',
       'pr-12bar'
     ],
-    masteryCheck: 'Demonstrate «Nerves Simulation» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
+    masteryCheck: 'Show «Nerves Simulation» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
   },
   317: {
 
@@ -6902,7 +6902,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-the-streets-of-laredo',
       'pr-1645'
     ],
-    masteryCheck: 'Demonstrate «Second Song Start» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
+    masteryCheck: 'Show «Second Song Start» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
   },
   318: {
 
@@ -6925,7 +6925,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-swing-low-sweet-chariot',
       'pr-andalu'
     ],
-    masteryCheck: 'Demonstrate «Third Song Start» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
+    masteryCheck: 'Show «Third Song Start» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
   },
   319: {
 
@@ -6948,7 +6948,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-danny-boy-londonderry-air',
       'pr-6251'
     ],
-    masteryCheck: 'Demonstrate «Vehicle Swap Day» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
+    masteryCheck: 'Show «Vehicle Swap Day» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
   },
   320: {
 
@@ -6971,7 +6971,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-joy-to-the-world',
       'pr-145'
     ],
-    masteryCheck: 'Demonstrate «Old Song Revival» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
+    masteryCheck: 'Show «Old Song Revival» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
   },
   321: {
 
@@ -6994,7 +6994,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-turkey-in-the-straw',
       'pr-12bar'
     ],
-    masteryCheck: 'Demonstrate «New Song Intake Method» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
+    masteryCheck: 'Show «New Song Intake Method» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
   },
   322: {
 
@@ -7017,7 +7017,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-twinkle',
       'pr-1645'
     ],
-    masteryCheck: 'Demonstrate «Phrase-by-Phrase Learn» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
+    masteryCheck: 'Show «Phrase-by-Phrase Learn» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
   },
   323: {
 
@@ -7040,7 +7040,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-amazing-grace',
       'pr-andalu'
     ],
-    masteryCheck: 'Demonstrate «Chunk Boundary Practice» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
+    masteryCheck: 'Show «Chunk Boundary Practice» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
   },
   324: {
 
@@ -7063,7 +7063,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-when-the-saints-go-marching-in',
       'pr-6251'
     ],
-    masteryCheck: 'Demonstrate «Slow–Full–Fast Ladder» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
+    masteryCheck: 'Show «Slow–Full–Fast Ladder» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
   },
   325: {
 
@@ -7086,7 +7086,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-mary-had-a-little-lamb',
       'pr-145'
     ],
-    masteryCheck: 'Demonstrate «Hands Separate Practice» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
+    masteryCheck: 'Show «Hands Separate Practice» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
   },
   326: {
 
@@ -7109,7 +7109,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-london-bridge',
       'pr-12bar'
     ],
-    masteryCheck: 'Demonstrate «Mental Practice Away From Guitar» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
+    masteryCheck: 'Show «Mental Practice Away From Guitar» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
   },
   327: {
 
@@ -7132,7 +7132,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-happy-birthday',
       'pr-1645'
     ],
-    masteryCheck: 'Demonstrate «Video Self Review» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
+    masteryCheck: 'Show «Video Self Review» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
   },
   328: {
 
@@ -7155,7 +7155,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-scarborough-fair',
       'pr-andalu'
     ],
-    masteryCheck: 'Demonstrate «Audio Self Review» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
+    masteryCheck: 'Show «Audio Self Review» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
   },
   329: {
 
@@ -7178,7 +7178,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-home-on-the-range',
       'pr-6251'
     ],
-    masteryCheck: 'Demonstrate «Peer Share Optional» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
+    masteryCheck: 'Show «Peer Share Optional» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
   },
   330: {
 
@@ -7201,7 +7201,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-barbara-allen',
       'pr-145'
     ],
-    masteryCheck: 'Demonstrate «Teach a Section Aloud» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
+    masteryCheck: 'Show «Teach a Section Aloud» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
   },
   331: {
 
@@ -7224,7 +7224,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-wild-mountain-thyme',
       'pr-12bar'
     ],
-    masteryCheck: 'Demonstrate «Simplify for Consistency» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
+    masteryCheck: 'Show «Simplify for Consistency» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
   },
   332: {
 
@@ -7247,7 +7247,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-drunken-sailor',
       'pr-1645'
     ],
-    masteryCheck: 'Demonstrate «Ornament After Solid» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
+    masteryCheck: 'Show «Ornament After Solid» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
   },
   333: {
 
@@ -7270,7 +7270,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-house-of-the-rising-sun',
       'rf-minor-slide-lick-study'
     ],
-    masteryCheck: 'Demonstrate «Signature Lick Placement» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
+    masteryCheck: 'Show «Signature Lick Placement» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
   },
   334: {
 
@@ -7293,7 +7293,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-aura-lee',
       'pr-6251'
     ],
-    masteryCheck: 'Demonstrate «Silence Schedule in the Song» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
+    masteryCheck: 'Show «Silence Schedule in the Song» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
   },
   335: {
 
@@ -7316,7 +7316,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-auld-lang-syne',
       'pr-145'
     ],
-    masteryCheck: 'Demonstrate «Intro From Silence» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
+    masteryCheck: 'Show «Intro From Silence» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
   },
   336: {
 
@@ -7339,7 +7339,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-buffalo-gals',
       'pr-12bar'
     ],
-    masteryCheck: 'Demonstrate «Cold Ending Practice» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
+    masteryCheck: 'Show «Cold Ending Practice» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
   },
   337: {
 
@@ -7362,7 +7362,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-sailor-s-hornpipe',
       'pr-1645'
     ],
-    masteryCheck: 'Demonstrate «Tag Ending Practice» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
+    masteryCheck: 'Show «Tag Ending Practice» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
   },
   338: {
 
@@ -7385,7 +7385,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-drums',
       'pr-andalu'
     ],
-    masteryCheck: 'Demonstrate «Key Change Taste Optional» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
+    masteryCheck: 'Show «Key Change Taste Optional» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
   },
   339: {
 
@@ -7408,7 +7408,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-camptown-races',
       'pr-6251'
     ],
-    masteryCheck: 'Demonstrate «Modulation Walkup» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
+    masteryCheck: 'Show «Modulation Walkup» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
   },
   340: {
 
@@ -7432,7 +7432,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'pr-12bar',
       'rf-blues-sh'
     ],
-    masteryCheck: 'Demonstrate «Stop-Time Section» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
+    masteryCheck: 'Show «Stop-Time Section» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
   },
   341: {
 
@@ -7455,7 +7455,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-fr-re-jacques',
       'rf-minor-slide-lick-study'
     ],
-    masteryCheck: 'Demonstrate «Breakdown Section» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
+    masteryCheck: 'Show «Breakdown Section» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
   },
   342: {
 
@@ -7478,7 +7478,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-go-tell-aunt-rhody',
       'pr-1645'
     ],
-    masteryCheck: 'Demonstrate «Final Chorus Plus» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
+    masteryCheck: 'Show «Final Chorus Plus» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
   },
   343: {
 
@@ -7501,7 +7501,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-greensleeves',
       'pr-andalu'
     ],
-    masteryCheck: 'Demonstrate «False Ending Fun» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
+    masteryCheck: 'Show «False Ending Fun» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
   },
   344: {
 
@@ -7524,7 +7524,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-red-river-valley',
       'pr-6251'
     ],
-    masteryCheck: 'Demonstrate «Medley Bridge Writing» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
+    masteryCheck: 'Show «Medley Bridge Writing» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
   },
   345: {
 
@@ -7547,7 +7547,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-wayfaring-stranger',
       'pr-145'
     ],
-    masteryCheck: 'Demonstrate «Repertoire Journaling» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
+    masteryCheck: 'Show «Repertoire Journaling» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
   },
   346: {
 
@@ -7570,7 +7570,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-black-is-the-color',
       'pr-12bar'
     ],
-    masteryCheck: 'Demonstrate «Goal Tempo Decision» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
+    masteryCheck: 'Show «Goal Tempo Decision» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
   },
   347: {
 
@@ -7593,7 +7593,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-molly-malone',
       'pr-1645'
     ],
-    masteryCheck: 'Demonstrate «Practice Tempo Loyalty» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
+    masteryCheck: 'Show «Practice Tempo Loyalty» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
   },
   348: {
 
@@ -7616,7 +7616,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-careless-love',
       'pr-andalu'
     ],
-    masteryCheck: 'Demonstrate «Performance Tempo Courage» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
+    masteryCheck: 'Show «Performance Tempo Courage» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
   },
   349: {
 
@@ -7639,7 +7639,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-joshua-fit-the-battle-of-jericho',
       'pr-6251'
     ],
-    masteryCheck: 'Demonstrate «Error Budget Acceptance» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
+    masteryCheck: 'Show «Error Budget Acceptance» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
   },
   350: {
 
@@ -7662,7 +7662,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-silent-night',
       'pr-145'
     ],
-    masteryCheck: 'Demonstrate «Smile and Breathe Reset» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
+    masteryCheck: 'Show «Smile and Breathe Reset» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
   },
   351: {
 
@@ -7685,7 +7685,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-i-ve-been-working-on-the-railroa',
       'pr-12bar'
     ],
-    masteryCheck: 'Demonstrate «Stage Plot Minimal» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
+    masteryCheck: 'Show «Stage Plot Minimal» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
   },
   352: {
 
@@ -7708,7 +7708,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-arkansas-traveler',
       'pr-1645'
     ],
-    masteryCheck: 'Demonstrate «Gear Check Ritual» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
+    masteryCheck: 'Show «Gear Check Ritual» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
   },
   353: {
 
@@ -7731,7 +7731,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-ode',
       'pr-andalu'
     ],
-    masteryCheck: 'Demonstrate «Tuning Check Ritual» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
+    masteryCheck: 'Show «Tuning Check Ritual» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
   },
   354: {
 
@@ -7754,7 +7754,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-oh-susanna',
       'pr-6251'
     ],
-    masteryCheck: 'Demonstrate «Setlist Timing Math» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
+    masteryCheck: 'Show «Setlist Timing Math» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
   },
   355: {
 
@@ -7777,7 +7777,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-jingle-bells',
       'pr-145'
     ],
-    masteryCheck: 'Demonstrate «Encore Decision Logic» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
+    masteryCheck: 'Show «Encore Decision Logic» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
   },
   356: {
 
@@ -7846,7 +7846,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-she-ll-be-coming-round-the-mount',
       'pr-andalu'
     ],
-    masteryCheck: 'Demonstrate «Full Run With Notes» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
+    masteryCheck: 'Show «Full Run With Notes» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
   },
   359: {
 
@@ -7915,7 +7915,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-down-by-the-riverside',
       'pr-12bar'
     ],
-    masteryCheck: 'Demonstrate «Pre-Show Light Day» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
+    masteryCheck: 'Show «Pre-Show Light Day» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
   },
   362: {
 
@@ -7938,7 +7938,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-the-parting-glass',
       'pr-1645'
     ],
-    masteryCheck: 'Demonstrate «Capstone Rehearsal A — Sections» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
+    masteryCheck: 'Show «Capstone Rehearsal A — Sections» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
   },
   363: {
 
@@ -7961,7 +7961,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-the-streets-of-laredo',
       'pr-andalu'
     ],
-    masteryCheck: 'Demonstrate «Capstone Rehearsal B — Transitions» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
+    masteryCheck: 'Show «Capstone Rehearsal B — Transitions» on your vehicle song: finish the drill set, then one performance-shaped pass where the skill is audible.',
   },
   364: {
 

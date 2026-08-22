@@ -140,10 +140,13 @@ function ChordChart({
 }
 
 function ScaleBoard({ resolved }: { resolved: ResolvedLessonDiagram }) {
-  const rootName = (resolved.spec.root ?? 'A') as NoteName
-  const scaleId = resolved.spec.scaleId ?? 'minor_pentatonic'
+  const rootName = (resolved.spec.root ?? 'C') as NoteName
+  // Match lessonImagery: never default to minor pentatonic (beginner scare / wrong lesson).
+  const scaleId = resolved.spec.scaleId ?? 'major'
   const scale = useMemo(() => getScale(scaleId), [scaleId])
   const root = useMemo(() => noteToPc(rootName), [rootName])
+
+  if (!scale) return null
 
   return (
     <div className="rounded-xl border border-mint/20 bg-[var(--bg)]/50 p-2 md:p-3 overflow-x-auto">

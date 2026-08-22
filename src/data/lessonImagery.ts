@@ -376,8 +376,10 @@ export function resolveLessonDiagram(spec: LessonDiagramSpec): ResolvedLessonDia
       break
     }
     case 'scale_tones': {
-      const root = spec.root ?? 'A'
-      const scaleId = spec.scaleId ?? 'minor_pentatonic'
+      const root = spec.root ?? 'C'
+      // Never invent minor pentatonic — that scared Day-1 students when specs were incomplete.
+      // Prefer explicit scaleId; fall back to major (neutral teaching default).
+      const scaleId = spec.scaleId ?? 'major'
       const scale = getScale(scaleId)
       const pcs = scalePitchClasses(root, scaleId)
       claimedPcs = [...pcs].sort((a, b) => a - b)

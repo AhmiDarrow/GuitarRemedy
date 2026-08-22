@@ -98,17 +98,19 @@ describe('curriculum', () => {
   })
 
   it('strips mechanical Day-N chrome from learner-facing strings', () => {
+    const em = '\u2014'
+    const en = '\u2013'
     const chrome = [
       /day\s+\d+\s+step\s+\d+/i,
-      /Day\s+\d+\s+focus\s*—/i,
+      new RegExp(String.raw`Day\s+\d+\s+focus\s*` + em, 'i'),
       /^Day\s+\d+:\s*/m,
       /\(D\d+\.\d+\)/,
-      /—\s*Repertoire Day\b/i,
+      new RegExp(em + String.raw`\s*Repertoire Day\b`, 'i'),
       /Advance your vehicle song through:/i,
       /Keep one measurable win \(cleaner bar, stabler tempo, or clearer form\)/i,
       /End the session with a performance-shaped take, not only drills/i,
       /Motor learning favors slow accurate loops of the sticky bar/i,
-      /Section work aimed at .+\(5–8 focused minutes\)/i,
+      new RegExp(String.raw`Section work aimed at .+\(5` + en + String.raw`8 focused minutes\)`, 'i'),
       /do it slowly for 60 seconds/i,
       /restart if time slips/i,
     ]
@@ -124,6 +126,63 @@ describe('curriculum', () => {
         expect(re.test(blob), `day ${lesson.day} matched ${re}`).toBe(false)
       }
     }
+  })
+
+  it('bans AI title-paste chrome and stiff courseware openers', () => {
+    const guillemet = '\u00ab'
+    const bans = [
+      /Today'?s angle/i,
+      new RegExp(String.raw`lens\s*` + guillemet, 'i'),
+      new RegExp(String.raw`applied to\s*` + guillemet, 'i'),
+      new RegExp(String.raw`focus\s*` + guillemet, 'i'),
+      new RegExp(String.raw`Demonstrate\s*` + guillemet, 'i'),
+      /pedagogical/i,
+      /research shows/i,
+      /research on ensemble/i,
+      /motor learning favors/i,
+    ]
+    for (const lesson of CURRICULUM) {
+      const blob = [
+        lesson.title,
+        lesson.theoryBite,
+        lesson.masteryCheck,
+        ...lesson.goals,
+        ...lesson.drills,
+        lesson.privateLesson.hook,
+        lesson.privateLesson.teacherIntro,
+        lesson.privateLesson.winCondition,
+      ].join('\n')
+      for (const re of bans) {
+        expect(re.test(blob), `day ${lesson.day} matched voice ban ${re}`).toBe(false)
+      }
+      const body = [lesson.theoryBite, lesson.masteryCheck, ...lesson.goals, ...lesson.drills].join(
+        '\n',
+      )
+      expect(/\(\d{1,3}\)/.test(body), `day ${lesson.day} has parenthetical day numbers`).toBe(
+        false,
+      )
+    }
+  })
+
+  it('keeps Batch A days 1-30 in plain teacher voice', () => {
+    const em = '\u2014'
+    for (let day = 1; day <= 30; day++) {
+      const lesson = getLesson(day)!
+      expect(lesson.theoryBite.length).toBeGreaterThan(40)
+      expect(lesson.masteryCheck.length).toBeGreaterThan(20)
+      expect(lesson.masteryCheck).not.toMatch(/^Demonstrate\b/)
+      const titleStem = lesson.title.split(em)[0].trim()
+      if (titleStem.length >= 12) {
+        expect(lesson.theoryBite.startsWith(titleStem)).toBe(false)
+      }
+      expect(lesson.privateLesson.teacherIntro).not.toMatch(/Private lesson \u2014 Day \d+/i)
+    }
+    expect(getLesson(3)?.theoryBite).toMatch(/E\s*G\s*B/i)
+    expect(getLesson(4)?.theoryBite).toMatch(/G\s*B\s*D/i)
+    expect(getLesson(5)?.theoryBite).toMatch(/C\s*E\s*G/i)
+    expect(getLesson(6)?.theoryBite).toMatch(/D\s*F/i)
+    expect(getLesson(1)?.libraryIds).not.toContain('sc-pent-min')
+    expect(getLesson(11)?.libraryIds).toContain('sc-pent-min')
   })
 
   it('fattens rhythm and lead drills into observable multi-step actions', () => {

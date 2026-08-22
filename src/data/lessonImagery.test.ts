@@ -94,6 +94,25 @@ describe('lesson imagery — free license + accuracy', () => {
     }
   })
 
+  it('scale_tones without scaleId never invents minor pentatonic', () => {
+    const resolved = resolveLessonDiagram({
+      id: 'scale-missing-id',
+      kind: 'scale_tones',
+      title: 'Unspecified scale',
+      root: 'C',
+      frets: 5,
+    })
+    expect(resolved.spec.scaleId ?? 'major').not.toBe('minor_pentatonic')
+    // Default teaching fallback is major — not the rock box
+    const majorPcs = new Set(scalePitchClasses('C', 'major'))
+    for (const d of resolved.dots) {
+      if (d.muted) continue
+      const midi = STANDARD_TUNING[d.string] + d.fret
+      const pc = ((midi % 12) + 12) % 12
+      expect(majorPcs.has(pc)).toBe(true)
+    }
+  })
+
   it('scale tone diagrams only place in-scale tones and mark roots', () => {
     for (const [root, scaleId] of [
       ['A', 'minor_pentatonic'],
