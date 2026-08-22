@@ -193,7 +193,9 @@ describe('breakdown', () => {
   it('midiBytesToGuitarTabs honors explicit Drop D tuning over session', () => {
     setSessionTuning(TUNINGS.standard.midi)
     // Low D2 = 38 — only open on Drop D low string
-    const buf = buildSimpleMidi([{ pitch: 38, start: 0, duration: 480 }])
+    const buf = buildSimpleMidi([{ pitch: 38, start: 0, duration: 480 }], {
+      tempoBpm: 100,
+    })
     const drop = midiBytesToGuitarTabs(buf, 'drop-d.mid', {
       tuning: TUNINGS.drop_d.midi,
     })
@@ -205,5 +207,18 @@ describe('breakdown', () => {
     // opts.tuning also updates session for follow-up calls
     expect(getSessionTuning()).toEqual(TUNINGS.drop_d.midi)
     setSessionTuning(TUNINGS.standard.midi)
+  })
+
+  it('re-imports exported MIDI at the embedded tempo (not default 120)', () => {
+    const buf = buildSimpleMidi(
+      [
+        { pitch: 60, start: 0, duration: 480 },
+        { pitch: 64, start: 480, duration: 480 },
+      ],
+      { tempoBpm: 88, ticksPerQuarter: 480 },
+    )
+    const b = midiBytesToGuitarTabs(buf, 'tempo-truth.mid')
+    expect(b.tempoBpm).toBe(88)
+    expect(b.score.tempo).toBe(88)
   })
 })

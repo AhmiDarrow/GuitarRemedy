@@ -14,6 +14,7 @@ import { useUserTabsStore } from '../store/userTabsStore'
 import {
   downloadAsciiTab,
   downloadUserTabFile,
+  downloadUserTabMidi,
   parseImportedTabFile,
   userTabToLibraryItem,
 } from '../lib/userTabs'
@@ -327,6 +328,14 @@ export function LibraryPage() {
                         onClick={() => downloadAsciiTab(selectedUser)}
                       >
                         ASCII
+                      </button>
+                      <button
+                        type="button"
+                        className="btn-secondary text-xs"
+                        onClick={() => downloadUserTabMidi(selectedUser)}
+                        title="MIDI with embedded tempo (rebuilds from score if needed)"
+                      >
+                        MIDI
                       </button>
                       <button
                         type="button"

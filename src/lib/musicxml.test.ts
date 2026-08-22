@@ -85,6 +85,40 @@ describe('musicxml', () => {
     expect(parsed.timeSignature).toEqual({ numerator: 3, denominator: 4 })
   })
 
+  it('maps full circle-of-fifths (C# / Cb major)', async () => {
+    const sharp7 = `<?xml version="1.0"?>
+<score-partwise>
+  <work><work-title>C sharp</work-title></work>
+  <part id="P1">
+    <measure number="1">
+      <attributes>
+        <divisions>1</divisions>
+        <key><fifths>7</fifths><mode>major</mode></key>
+        <time><beats>4</beats><beat-type>4</beat-type></time>
+      </attributes>
+      <note><pitch><step>C</step><alter>1</alter><octave>4</octave></pitch><duration>1</duration><voice>1</voice></note>
+    </measure>
+  </part>
+</score-partwise>`
+    const flat7 = sharp7
+      .replace('C sharp', 'C flat')
+      .replace('<fifths>7</fifths>', '<fifths>-7</fifths>')
+      .replace('<alter>1</alter>', '<alter>-1</alter>')
+    const enc = (xml: string) => {
+      const bytes = new TextEncoder().encode(xml)
+      return {
+        name: 'k.musicxml',
+        arrayBuffer: async () =>
+          bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength),
+        text: async () => xml,
+      }
+    }
+    const cs = await breakdownFile(enc(sharp7))
+    expect(cs.key.root).toBe('C#')
+    const cb = await breakdownFile(enc(flat7))
+    expect(cb.key.root).toBe('Cb')
+  })
+
   it('keeps written key when pitch detect disagrees', async () => {
     // Written G major (1 sharp) but notes are mostly C major triad — must keep G.
     const xml = `<?xml version="1.0"?>

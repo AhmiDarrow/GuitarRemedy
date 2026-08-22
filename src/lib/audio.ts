@@ -118,9 +118,10 @@ export async function playFret(
   stringIndex: number,
   fret: number,
   tuning: number[] = [...STANDARD_TUNING],
+  opts?: { a4?: number },
 ) {
   const midi = (tuning[stringIndex] ?? STANDARD_TUNING[stringIndex]) + fret
-  await playMidiNote(midi, '8n')
+  await playMidiNote(midi, '8n', undefined, opts)
 }
 
 export async function playScale(

@@ -2,6 +2,7 @@
 
 import type { LibraryItem, TabMeasure, TabNote, TabSong } from '../data/library'
 import type { RemedyBreakdown, TabNote as ScoreNote, TabScore } from './breakdown'
+import { buildSimpleMidi } from './midi'
 
 export interface UserTab {
   id: string
@@ -275,6 +276,50 @@ export function downloadAsciiTab(tab: UserTab, filename?: string) {
   const base = (filename || tab.title || 'tab').replace(/[^\w\-]+/g, '_').slice(0, 48)
   a.href = url
   a.download = `${base}.txt`
+  a.click()
+  URL.revokeObjectURL(url)
+}
+
+const DEFAULT_EXPORT_TPQ = 480
+
+/**
+ * MIDI bytes for a user tab — prefers stored convert SMF, else rebuilds from score.
+ * Always embeds tempo (+ time sig when known) so re-import stays truthful.
+ */
+export function userTabToMidiBytes(tab: UserTab, tpq = DEFAULT_EXPORT_TPQ): ArrayBuffer {
+  if (tab.midiBase64) {
+    try {
+      return base64ToArrayBuffer(tab.midiBase64)
+    } catch {
+      /* fall through to rebuild */
+    }
+  }
+  const tempo = Math.max(20, Math.min(400, Math.round(tab.tempoBpm || tab.score?.tempo || 100)))
+  const timeSig: [number, number] | undefined =
+    tab.score?.timeSig?.length === 2
+      ? [tab.score.timeSig[0], tab.score.timeSig[1]]
+      : tab.tab?.timeSig?.length === 2
+        ? [tab.tab.timeSig[0], tab.tab.timeSig[1]]
+        : undefined
+  const notes = (tab.score?.notes || [])
+    .filter((n) => typeof n.midi === 'number' && n.midi > 0)
+    .map((n) => ({
+      pitch: Math.round(n.midi as number),
+      start: Math.max(0, Math.round((n.time || 0) * tpq)),
+      duration: Math.max(1, Math.round((n.duration || 1) * tpq)),
+      velocity: 80,
+    }))
+  return buildSimpleMidi(notes, { ticksPerQuarter: tpq, tempoBpm: tempo, timeSig })
+}
+
+export function downloadUserTabMidi(tab: UserTab, filename?: string) {
+  const bytes = userTabToMidiBytes(tab)
+  const blob = new Blob([bytes], { type: 'audio/midi' })
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  const base = (filename || tab.title || 'tab').replace(/[^\w\-]+/g, '_').slice(0, 48)
+  a.href = url
+  a.download = base.endsWith('.mid') ? base : `${base}.mid`
   a.click()
   URL.revokeObjectURL(url)
 }

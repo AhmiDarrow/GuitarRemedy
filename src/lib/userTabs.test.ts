@@ -10,8 +10,10 @@ import {
   upsertUserTab,
   userTabToAscii,
   userTabToExportPayload,
+  userTabToMidiBytes,
   type UserTab,
 } from './userTabs'
+import { parseMidi } from './midi'
 import type { RemedyBreakdown } from './breakdown'
 import { tabSongToScore } from './tabScore'
 import { theoryStringToDisplay } from './breakdown'
@@ -244,6 +246,21 @@ describe('userTabs', () => {
     expect(ascii).toMatch(/2/)
     expect(ascii).not.toContain('undefined')
     expect(ascii).not.toContain('token')
+  })
+
+  it('userTabToMidiBytes rebuilds SMF with embedded tempo from score', () => {
+    const tab = breakdownToUserTab(sampleBreakdown())!
+    tab.tempoBpm = 96
+    tab.score.tempo = 96
+    tab.score.timeSig = [3, 4]
+    delete tab.midiBase64
+    const bytes = userTabToMidiBytes(tab)
+    const parsed = parseMidi(bytes)
+    expect(parsed.tempoBpm).toBe(96)
+    expect(parsed.timeSignature.numerator).toBe(3)
+    expect(parsed.timeSignature.denominator).toBe(4)
+    expect(parsed.notes.length).toBeGreaterThanOrEqual(2)
+    expect(parsed.notes[0].pitch).toBe(64)
   })
 
   it('userTabToAscii preserves groove via start onsets (not left-packed)', () => {

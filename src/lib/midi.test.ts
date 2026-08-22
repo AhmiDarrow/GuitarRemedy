@@ -57,16 +57,21 @@ function buildMidiWithTempos(
 
 describe('midi', () => {
   it('round-trips a simple melody', () => {
-    // start/duration are in quarter-note beats for buildSimpleMidi
-    const bytes = buildSimpleMidi([
-      { pitch: 60, start: 0, duration: 1 },
-      { pitch: 64, start: 1, duration: 1 },
-      { pitch: 67, start: 2, duration: 2 },
-    ])
+    // start/duration are in **ticks** (ppq=480 → 480 = one quarter)
+    const bytes = buildSimpleMidi(
+      [
+        { pitch: 60, start: 0, duration: 480 },
+        { pitch: 64, start: 480, duration: 480 },
+        { pitch: 67, start: 960, duration: 960 },
+      ],
+      { tempoBpm: 100, ticksPerQuarter: 480 },
+    )
     const parsed = parseMidi(bytes)
     expect(parsed.notes.length).toBeGreaterThanOrEqual(3)
     expect(parsed.notes[0].pitch).toBe(60)
-    expect(parsed.ticksPerQuarter).toBeGreaterThan(0)
+    expect(parsed.notes[0].durationTicks).toBe(480)
+    expect(parsed.ticksPerQuarter).toBe(480)
+    expect(parsed.tempoBpm).toBe(100)
     expect(parsed.tempoMap.length).toBeGreaterThanOrEqual(1)
     expect(parsed.tempoMap[0].tick).toBe(0)
   })
@@ -75,6 +80,30 @@ describe('midi', () => {
     const bytes = buildSimpleMidi([])
     const parsed = parseMidi(bytes)
     expect(parsed.notes).toEqual([])
+  })
+
+  it('embeds tempo so re-import is not stuck at default 120', () => {
+    const bytes = buildSimpleMidi(
+      [
+        { pitch: 60, start: 0, duration: 480 },
+        { pitch: 64, start: 480, duration: 480 },
+      ],
+      { tempoBpm: 92, ticksPerQuarter: 480 },
+    )
+    const parsed = parseMidi(bytes)
+    expect(parsed.tempoBpm).toBe(92)
+    expect(parsed.tempoMap[0]?.bpm).toBe(92)
+    expect(parsed.notes).toHaveLength(2)
+  })
+
+  it('embeds time signature when provided', () => {
+    const bytes = buildSimpleMidi([{ pitch: 60, start: 0, duration: 480 }], {
+      tempoBpm: 100,
+      timeSig: [3, 4],
+    })
+    const parsed = parseMidi(bytes)
+    expect(parsed.timeSignature.numerator).toBe(3)
+    expect(parsed.timeSignature.denominator).toBe(4)
   })
 
   it('captures multi-tempo map and flags changes', () => {

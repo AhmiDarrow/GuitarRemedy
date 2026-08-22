@@ -8,6 +8,8 @@ import {
   frettingSequence,
   nameToMidi,
   noteToPc,
+  parseChordSymbol,
+  resolveChordId,
   scaleNoteNames,
   scalePitchClasses,
   smoothFrettingRun,
@@ -18,6 +20,8 @@ describe('theory', () => {
     expect(noteToPc('C')).toBe(0)
     expect(noteToPc('C#')).toBe(1)
     expect(noteToPc('Db')).toBe(1)
+    expect(noteToPc('Cb')).toBe(11) // enharmonic B
+    expect(noteToPc('Fb')).toBe(4) // enharmonic E
     expect(noteToPc(60)).toBe(0)
     expect(NOTE_NAMES).toHaveLength(12)
   })
@@ -56,6 +60,25 @@ describe('theory', () => {
     const cmaj = chordNotes('C', 'maj')
     expect(cmaj.map((m) => m % 12)).toEqual([0, 4, 7])
     expect(nameToMidi('A4')).toBe(69)
+    expect(chordNotes('A', 'm').map((m) => m % 12)).toEqual([9, 0, 4])
+    expect(chordNotes('G', '7').map((m) => m % 12)).toEqual([7, 11, 2, 5])
+    expect(chordNotes('B', 'm7b5').map((m) => m % 12)).toEqual([11, 2, 5, 9])
+  })
+
+  it('parses chord symbols to real ChordIds', () => {
+    expect(parseChordSymbol('C')?.chordId).toBe('maj')
+    expect(parseChordSymbol('Am')?.chordId).toBe('min')
+    expect(parseChordSymbol('G7')?.chordId).toBe('7')
+    expect(parseChordSymbol('Fmaj7')?.chordId).toBe('maj7')
+    expect(parseChordSymbol('Bm7b5')?.chordId).toBe('m7b5')
+    expect(parseChordSymbol('Dsus4')?.chordId).toBe('sus4')
+    expect(resolveChordId('dim7')).toBe('dim7')
+    expect(resolveChordId('add9')).toBe('add9')
+  })
+
+  it('labels melodic minor as ascending/jazz form', () => {
+    expect(SCALES.melodic_minor.name.toLowerCase()).toMatch(/jazz|ascending/)
+    expect(SCALES.melodic_minor.intervals).toEqual([0, 2, 3, 5, 7, 9, 11])
   })
 
   it('frettingSequence keeps hand continuity on a rising line', () => {

@@ -243,35 +243,88 @@ export function ticksToBeatsWarped(
   return seconds * (bpm / 60)
 }
 
-/** Build a minimal Type-0 MIDI file from note events (for tests / export demos) */
+function writeVarLen(n: number): number[] {
+  const out: number[] = []
+  let v = Math.max(0, Math.floor(n))
+  out.unshift(v & 0x7f)
+  v >>= 7
+  while (v > 0) {
+    out.unshift((v & 0x7f) | 0x80)
+    v >>= 7
+  }
+  return out.length ? out : [0]
+}
+
+export type BuildSimpleMidiOpts = {
+  /** PPQ / ticks per quarter (default 480). */
+  ticksPerQuarter?: number
+  /**
+   * Tempo written as SMF meta 0x51 at tick 0.
+   * Without this, many players (and our parser default) assume 120 BPM —
+   * so exported convert MIDI would re-import at the wrong speed.
+   */
+  tempoBpm?: number
+  /** Optional time signature meta 0x58 at tick 0. */
+  timeSig?: [number, number]
+}
+
+/**
+ * Build a minimal Type-0 MIDI file from note events.
+ * `start` / `duration` are in **ticks** (not beats).
+ */
 export function buildSimpleMidi(
   notes: Array<{ pitch: number; start: number; duration: number; velocity?: number }>,
-  ticksPerQuarter = 480,
+  ticksPerQuarterOrOpts: number | BuildSimpleMidiOpts = 480,
 ): ArrayBuffer {
-  const events: number[] = []
-  const sorted = [...notes].sort((a, b) => a.start - b.start)
+  const opts: BuildSimpleMidiOpts =
+    typeof ticksPerQuarterOrOpts === 'number'
+      ? { ticksPerQuarter: ticksPerQuarterOrOpts }
+      : ticksPerQuarterOrOpts ?? {}
+  const ticksPerQuarter = Math.max(1, Math.round(opts.ticksPerQuarter ?? 480))
+  const tempoBpm =
+    opts.tempoBpm != null && Number.isFinite(opts.tempoBpm)
+      ? Math.max(20, Math.min(400, Math.round(opts.tempoBpm)))
+      : undefined
+  const timeSig = opts.timeSig
+
   type Ev = { tick: number; bytes: number[] }
   const evs: Ev[] = []
-  for (const n of sorted) {
-    evs.push({ tick: n.start, bytes: [0x90, n.pitch, n.velocity ?? 80] })
-    evs.push({ tick: n.start + n.duration, bytes: [0x80, n.pitch, 0] })
+
+  if (tempoBpm != null) {
+    const us = Math.max(1, Math.round(60_000_000 / tempoBpm))
+    evs.push({
+      tick: 0,
+      bytes: [0xff, 0x51, 0x03, (us >> 16) & 0xff, (us >> 8) & 0xff, us & 0xff],
+    })
   }
-  evs.sort((a, b) => a.tick - b.tick)
+  if (timeSig && timeSig.length === 2) {
+    const num = Math.max(1, Math.min(32, Math.round(timeSig[0]) || 4))
+    const den = Math.max(1, Math.min(32, Math.round(timeSig[1]) || 4))
+    // SMF stores denominator as power-of-two exponent (1→0, 2→1, 4→2, 8→3, 16→4).
+    const denExp =
+      den === 1 ? 0 : den === 2 ? 1 : den === 4 ? 2 : den === 8 ? 3 : den === 16 ? 4 : 2
+    evs.push({
+      tick: 0,
+      bytes: [0xff, 0x58, 0x04, num, denExp, 24, 8],
+    })
+  }
+
+  const sorted = [...notes].sort((a, b) => a.start - b.start)
+  for (const n of sorted) {
+    const start = Math.max(0, Math.round(n.start))
+    const dur = Math.max(1, Math.round(n.duration))
+    const pitch = Math.max(0, Math.min(127, Math.round(n.pitch)))
+    const vel = Math.max(1, Math.min(127, Math.round(n.velocity ?? 80)))
+    evs.push({ tick: start, bytes: [0x90, pitch, vel] })
+    evs.push({ tick: start + dur, bytes: [0x80, pitch, 0] })
+  }
+  evs.sort((a, b) => a.tick - b.tick || a.bytes[0] - b.bytes[0])
+
+  const events: number[] = []
   let last = 0
   for (const e of evs) {
-    const delta = e.tick - last
+    events.push(...writeVarLen(e.tick - last))
     last = e.tick
-    // varlen
-    const vl: number[] = []
-    let v = delta
-    vl.unshift(v & 0x7f)
-    v >>= 7
-    while (v > 0) {
-      vl.unshift((v & 0x7f) | 0x80)
-      v >>= 7
-    }
-    if (delta === 0) events.push(0)
-    else events.push(...vl)
     events.push(...e.bytes)
   }
   events.push(0x00, 0xff, 0x2f, 0x00) // end of track
@@ -283,8 +336,8 @@ export function buildSimpleMidi(
   // header
   u8.set([0x4d, 0x54, 0x68, 0x64], 0)
   view.setUint32(4, 6)
-  view.setUint16(8, 0)
-  view.setUint16(10, 1)
+  view.setUint16(8, 0) // format 0
+  view.setUint16(10, 1) // one track
   view.setUint16(12, ticksPerQuarter)
   // track
   u8.set([0x4d, 0x54, 0x72, 0x6b], 14)

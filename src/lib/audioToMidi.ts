@@ -886,6 +886,7 @@ export function pcmToMidi(
   }
   onProgress?.(90, 'Writing MIDI…')
 
+  // Embed detected/override tempo in the SMF so download + re-import stay truthful.
   const midiBytes = buildSimpleMidi(
     notes.map((n) => ({
       pitch: n.pitch,
@@ -893,9 +894,9 @@ export function pcmToMidi(
       duration: Math.max(1, n.duration),
       velocity: n.velocity,
     })),
+    { ticksPerQuarter: DEFAULT_TPQ, tempoBpm },
   )
   const midi = parseMidi(midiBytes)
-  midi.tempoBpm = tempoBpm
   onProgress?.(100, 'Audio → MIDI done')
 
   return {

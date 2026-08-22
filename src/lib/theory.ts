@@ -3,12 +3,17 @@
 export const NOTE_NAMES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'] as const
 export type NoteName = (typeof NOTE_NAMES)[number]
 
+/** Enharmonic flats/sharps → sharp-side NoteName used by the pitch-class engine. */
 export const FLAT_TO_SHARP: Record<string, NoteName> = {
+  Cb: 'B',
   Db: 'C#',
   Eb: 'D#',
+  Fb: 'E',
   Gb: 'F#',
   Ab: 'G#',
   Bb: 'A#',
+  'E#': 'F',
+  'B#': 'C',
 }
 
 /** Canonical scale ids (snake_case). CamelCase aliases resolve via `resolveScaleId`. */
@@ -60,7 +65,14 @@ function def(
 const major = def('major', 'Major (Ionian)', [0, 2, 4, 5, 7, 9, 11], ['1', '2', '3', '4', '5', '6', '7'], 'scale')
 const natural_minor = def('natural_minor', 'Natural Minor (Aeolian)', [0, 2, 3, 5, 7, 8, 10], ['1', '2', 'b3', '4', '5', 'b6', 'b7'], 'scale')
 const harmonic_minor = def('harmonic_minor', 'Harmonic Minor', [0, 2, 3, 5, 7, 8, 11], ['1', '2', 'b3', '4', '5', 'b6', '7'], 'scale')
-const melodic_minor = def('melodic_minor', 'Melodic Minor', [0, 2, 3, 5, 7, 9, 11], ['1', '2', 'b3', '4', '5', '6', '7'], 'scale')
+// Jazz / ascending form only (raised 6 & 7 both ways). Classical descending = natural minor.
+const melodic_minor = def(
+  'melodic_minor',
+  'Melodic Minor (ascending / jazz)',
+  [0, 2, 3, 5, 7, 9, 11],
+  ['1', '2', 'b3', '4', '5', '6', '7'],
+  'scale',
+)
 const dorian = def('dorian', 'Dorian', [0, 2, 3, 5, 7, 9, 10], ['1', '2', 'b3', '4', '5', '6', 'b7'], 'mode')
 const phrygian = def('phrygian', 'Phrygian', [0, 1, 3, 5, 7, 8, 10], ['1', 'b2', 'b3', '4', '5', 'b6', 'b7'], 'mode')
 const lydian = def('lydian', 'Lydian', [0, 2, 4, 6, 7, 9, 11], ['1', '2', '3', '#4', '5', '6', '7'], 'mode')
@@ -261,23 +273,70 @@ export function chordPitchClasses(root: string | number, chordId: ChordId | stri
   return chord.intervals.map((i) => (rootPc + (i % 12)) % 12)
 }
 
-export function chordNotes(root: string, quality: string): number[] {
-  const q = quality === 'm' || quality === 'min' ? 'min' : quality === 'maj' || quality === '' ? 'maj' : quality
+/** Map chord-symbol quality text → ChordId (shared by chordNotes + parseChordSymbol). */
+export function resolveChordId(quality: string): ChordId {
+  const q = (quality || 'maj').trim().toLowerCase()
+  if (q === '' || q === 'maj' || q === 'major' || q === '△' || q === 'Δ') return 'maj'
+  if (q === 'm' || q === 'min' || q === 'minor' || q === '-') return 'min'
   const map: Record<string, ChordId> = {
-    maj: 'maj',
-    min: 'min',
-    m: 'min',
     '7': '7',
+    dom7: '7',
     maj7: 'maj7',
+    major7: 'maj7',
+    '△7': 'maj7',
+    'Δ7': 'maj7',
     m7: 'min7',
     min7: 'min7',
+    mi7: 'min7',
+    '-7': 'min7',
     dim: 'dim',
+    '°': 'dim',
+    o: 'dim',
+    dim7: 'dim7',
+    '°7': 'dim7',
+    o7: 'dim7',
+    m7b5: 'm7b5',
+    min7b5: 'm7b5',
+    'ø': 'm7b5',
+    'ø7': 'm7b5',
+    halfdim: 'm7b5',
     aug: 'aug',
+    '+': 'aug',
     sus2: 'sus2',
     sus4: 'sus4',
+    sus: 'sus4',
+    '9': '9',
+    dom9: '9',
+    add9: 'add9',
+    '6': '6',
+    maj6: '6',
+    min6: 'min6',
+    m6: 'min6',
     '5': '5',
+    power: '5',
   }
-  const id = map[q] ?? 'maj'
+  if (map[q]) return map[q]
+  // Prefix match for symbols like "maj7#11" → maj7, "m7b9" → min7
+  if (q.startsWith('maj7') || q.startsWith('major7')) return 'maj7'
+  if (q.startsWith('m7b5') || q.startsWith('min7b5') || q.startsWith('ø')) return 'm7b5'
+  if (q.startsWith('m7') || q.startsWith('min7') || q.startsWith('mi7') || q.startsWith('-7'))
+    return 'min7'
+  if (q.startsWith('dim7') || q.startsWith('°7') || q.startsWith('o7')) return 'dim7'
+  if (q.startsWith('dim') || q.startsWith('°')) return 'dim'
+  if (q.startsWith('aug') || q.startsWith('+')) return 'aug'
+  if (q.startsWith('sus2')) return 'sus2'
+  if (q.startsWith('sus')) return 'sus4'
+  if (q.startsWith('add9')) return 'add9'
+  if (q === '9' || q.startsWith('9')) return '9'
+  if (q.startsWith('m6') || q.startsWith('min6')) return 'min6'
+  if (q.startsWith('6')) return '6'
+  if (q.startsWith('7')) return '7'
+  if (q.startsWith('m') || q.startsWith('min') || q.startsWith('-')) return 'min'
+  return 'maj'
+}
+
+export function chordNotes(root: string, quality: string): number[] {
+  const id = resolveChordId(quality)
   const base = 60 + noteToPc(root)
   return CHORDS[id].intervals.map((i) => base + i)
 }
@@ -540,17 +599,24 @@ export function transposePc(pc: number, semitones: number): number {
   return (((pc + semitones) % 12) + 12) % 12
 }
 
-export function parseChordSymbol(symbol: string): { root: string; quality: string } | null {
-  const m = symbol.trim().match(/^([A-Ga-g][#b]?)(.*)$/)
+export function parseChordSymbol(
+  symbol: string,
+): { root: string; quality: string; chordId: ChordId } | null {
+  const m = symbol.trim().match(/^([A-Ga-g][#b♯♭]?)(.*)$/)
   if (!m) return null
-  const root = normalizeNoteName(m[1])
-  let quality = (m[2] || 'maj').trim()
-  if (quality === '') quality = 'maj'
-  if (quality === 'm') quality = 'm'
-  if (quality.startsWith('maj7')) quality = 'maj7'
-  else if (quality.startsWith('m7')) quality = 'm7'
-  else if (quality === '7') quality = '7'
-  return { root, quality }
+  let rootRaw = m[1].replace('♯', '#').replace('♭', 'b')
+  // Capitalize note letter
+  rootRaw = rootRaw.charAt(0).toUpperCase() + rootRaw.slice(1)
+  let root: string
+  try {
+    root = normalizeNoteName(rootRaw)
+  } catch {
+    return null
+  }
+  const rest = (m[2] || '').trim()
+  const chordId = resolveChordId(rest === '' ? 'maj' : rest)
+  const quality = rest === '' ? 'maj' : rest
+  return { root, quality, chordId }
 }
 
 export function cagedShapes(root: string, quality: 'major' | 'minor' = 'major') {

@@ -32,6 +32,7 @@ import { downloadMidiBytes } from '../lib/audioToMidi'
 import {
   downloadAsciiTab,
   downloadUserTabFile,
+  downloadUserTabMidi,
   type UserTab,
 } from '../lib/userTabs'
 import { TabView } from '../components/TabView'
@@ -206,9 +207,9 @@ export function UploadPage() {
       { pitch: 69, start: 1440, duration: 240 },
       { pitch: 67, start: 1680, duration: 480 },
     ]
-    const midiBytes = buildSimpleMidi(events)
+    const midiBytes = buildSimpleMidi(events, { tempoBpm: 100, ticksPerQuarter: 480 })
     const midis = events.map((e) => e.pitch)
-    const b = analyzeNotes(midis, 'Demo C major arpeggio')
+    const b = analyzeNotes(midis, 'Demo C major arpeggio', { tempoBpm: 100 })
     // score/tabNotes already in beats via analyzeNotes → eventsToNotes
     b.midiBytes = midiBytes
     b.statusMessage = 'Demo · MIDI → tabs'
@@ -229,8 +230,9 @@ export function UploadPage() {
         start: i * 240,
         duration: 220,
       })),
+      { tempoBpm: 100, ticksPerQuarter: 480 },
     )
-    const b = analyzeNotes(pitches, 'demo-melody.mp3')
+    const b = analyzeNotes(pitches, 'demo-melody.mp3', { tempoBpm: 100 })
     b.kind = 'audio'
     b.midiBytes = midiBytes
     // keep beat-based score from analyzeNotes (no *0.5 seconds hack)
@@ -239,6 +241,7 @@ export function UploadPage() {
     b.warnings = [
       'Demo of the MP3 → MIDI → tabs pipeline (synthetic pitches).',
       'Real uploads decode audio, pitch-track to MIDI, then fret tabs.',
+      'Exported .mid embeds tempo so re-import matches this sketch.',
     ]
     b.explanation = [
       '1) Decoded demo-melody.mp3 (synthetic).',
@@ -260,9 +263,14 @@ export function UploadPage() {
   }
 
   const onDownloadMidi = () => {
-    if (!breakdown?.midiBytes) return
-    const base = (breakdown.title || 'converted').replace(/[^\w\-]+/g, '_').slice(0, 48)
-    downloadMidiBytes(breakdown.midiBytes, `${base}.mid`)
+    if (breakdown?.midiBytes) {
+      const base = (breakdown.title || 'converted').replace(/[^\w\-]+/g, '_').slice(0, 48)
+      downloadMidiBytes(breakdown.midiBytes, `${base}.mid`)
+      return
+    }
+    // Rebuild from score with embedded tempo when SMF wasn't stored (e.g. after edit).
+    const tab = savedTab ?? (breakdown ? persistBreakdown(breakdown) : null)
+    if (tab) downloadUserTabMidi(tab)
   }
 
   const onExportTabFile = () => {
@@ -528,16 +536,15 @@ export function UploadPage() {
                     </p>
                   </div>
                   <div className="flex flex-wrap gap-2 shrink-0">
-                    {breakdown.midiBytes && (
-                      <button
-                        type="button"
-                        className="btn-secondary text-xs"
-                        onClick={onDownloadMidi}
-                      >
-                        <Download className="w-3.5 h-3.5" />
-                        MIDI
-                      </button>
-                    )}
+                    <button
+                      type="button"
+                      className="btn-secondary text-xs"
+                      onClick={onDownloadMidi}
+                      title="MIDI with embedded tempo for truthful re-import"
+                    >
+                      <Download className="w-3.5 h-3.5" />
+                      MIDI
+                    </button>
                     <button type="button" className="btn-secondary text-xs" onClick={onExportTabFile}>
                       <FileDown className="w-3.5 h-3.5" />
                       Export .grtab

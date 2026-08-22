@@ -94,6 +94,9 @@ describe('audioToMidi', () => {
     const head = new Uint8Array(result.midiBytes.slice(0, 4))
     expect(String.fromCharCode(...head)).toBe('MThd')
     expect(result.midi.notes.length).toBeGreaterThan(0)
+    // SMF must carry tempo — not rely on parser default 120 after download/re-import
+    expect(result.midi.tempoBpm).toBe(100)
+    expect(result.tempoBpm).toBe(100)
     expect(result.warnings.some((w) => /monophonic/i.test(w))).toBe(true)
     expect(result.durationSec).toBeGreaterThan(0.5)
   })

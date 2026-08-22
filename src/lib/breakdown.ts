@@ -152,14 +152,34 @@ function toScore(
   }
 }
 
+/**
+ * MusicXML/MIDI key signature fifths → concert root + major/minor.
+ * Full circle: −7 (Cb) … 0 (C) … +7 (C#). Values outside clamp.
+ */
 function fifthsToRoot(fifths: number, mode: string): { root: string; scaleId: ScaleId } {
-  const major = ['C', 'G', 'D', 'A', 'E', 'B', 'F#'][Math.min(Math.max(fifths, 0), 6)]
-  const flatMajor = ['C', 'F', 'Bb', 'Eb', 'Ab', 'Db', 'Gb'][Math.min(Math.max(-fifths, 0), 6)]
-  const root = fifths >= 0 ? major : flatMajor
+  const n = Math.max(-7, Math.min(7, Math.round(Number(fifths) || 0)))
+  // index 0 = C; +1 per sharp, −1 per flat along the circle of fifths
+  const SHARP_MAJOR = ['C', 'G', 'D', 'A', 'E', 'B', 'F#', 'C#'] as const
+  const FLAT_MAJOR = ['C', 'F', 'Bb', 'Eb', 'Ab', 'Db', 'Gb', 'Cb'] as const
+  const root = n >= 0 ? SHARP_MAJOR[n] : FLAT_MAJOR[-n]
   if (mode.toLowerCase().startsWith('min')) {
+    // Relative minor = major root − 3 semitones (by name on the circle)
     const minors: Record<string, string> = {
-      C: 'A', G: 'E', D: 'B', A: 'F#', E: 'C#', B: 'G#', 'F#': 'D#',
-      F: 'D', Bb: 'G', Eb: 'C', Ab: 'F', Db: 'Bb', Gb: 'Eb',
+      C: 'A',
+      G: 'E',
+      D: 'B',
+      A: 'F#',
+      E: 'C#',
+      B: 'G#',
+      'F#': 'D#',
+      'C#': 'A#',
+      F: 'D',
+      Bb: 'G',
+      Eb: 'C',
+      Ab: 'F',
+      Db: 'Bb',
+      Gb: 'Eb',
+      Cb: 'Ab',
     }
     return { root: minors[root] || 'A', scaleId: 'natural_minor' }
   }
