@@ -1,11 +1,13 @@
 /**
- * Lesson diagrams — plain data→ASCII (and optional simple UI), theory-backed.
+ * Lesson diagrams — theory-backed specs for Learn UI.
  *
  * Policy (hard):
  * - No stock photos, no freeform AI fretting art (too easy to mislabel frets/strings).
  * - Every diagram is generated from `src/lib/theory.ts` at resolve time.
  * - Accuracy is enforced by unit tests against the theory engine.
- * - UI shows simple monospace figures only — no license/verified chrome.
+ * - Learn UI only shows neck-quality kinds (chord chart + live Fretboard).
+ * - Text-only kinds (posture / rhythm_grid / caged_map / finger_numbers) stay in data
+ *   for tests but are filtered out of the gallery — better empty than ugly.
  */
 
 import {

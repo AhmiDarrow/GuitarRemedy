@@ -363,8 +363,8 @@ export function LearnPage() {
         {diagrams.length > 0 && (
           <LessonDiagramGallery
             diagrams={diagrams}
-            title="Diagrams"
-            subtitle="Simple fret/tab figures for this lesson."
+            title="Neck"
+            subtitle="Chord charts and the live fretboard — same theory engine as Practice."
           />
         )}
 

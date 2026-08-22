@@ -142,9 +142,17 @@ describe('lesson imagery — free license + accuracy', () => {
     }
   })
 
-  it('every curriculum day resolves accurate plain diagrams with ascii', () => {
+  it('every curriculum day resolves accurate diagrams; neck kinds cover most days', () => {
     expect(CURRICULUM).toHaveLength(365)
+    const neckKinds = new Set([
+      'chord_shape',
+      'open_strings',
+      'scale_tones',
+      'power_chord',
+      'interval',
+    ])
     let withArt = 0
+    let withNeck = 0
     for (let day = 1; day <= 365; day++) {
       const lesson = getLesson(day)!
       const list = diagramsForLesson({
@@ -157,16 +165,17 @@ describe('lesson imagery — free license + accuracy', () => {
         libraryIds: lesson.libraryIds,
       })
       for (const d of list) {
-        // UI must not depend on license chrome fields
         const resolved = resolveLessonDiagram(d)
-        expect(resolved.ascii.length).toBeGreaterThan(0)
         expect(resolved.ascii.toLowerCase()).not.toMatch(/\bverified\b|theory-engine/)
         const report = analyzeDiagramAccuracy(resolved)
         expect(report.ok, `day ${day} ${d.id}: ${report.issues.join('; ')}`).toBe(true)
       }
       if (list.length) withArt++
+      if (list.some((d) => neckKinds.has(d.kind))) withNeck++
     }
     expect(withArt).toBe(365)
+    // Learn only paints neck-quality kinds; empty is OK on text-only days
+    expect(withNeck).toBeGreaterThan(180)
   })
 
   it('day 1–7 include posture or open-string or Em chord art', () => {
