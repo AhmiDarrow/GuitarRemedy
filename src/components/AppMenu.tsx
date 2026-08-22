@@ -25,13 +25,13 @@ type MenuItem = {
 
 const MENU: MenuItem[] = [
   { to: '/practice', label: 'Metronome', hint: 'Keep time', icon: Gauge, state: { tool: 'metronome' } },
-  { to: '/practice', label: 'Tuner', hint: 'Chromatic + strobe', icon: AudioLines, state: { tool: 'tuner' } },
+  { to: '/practice', label: 'Tuner', hint: 'Standalone · own A4 & tuning', icon: AudioLines, state: { tool: 'tuner' } },
   { to: '/practice', label: 'Fretboard', hint: 'Scales lab', icon: Guitar, state: { tool: 'fretboard' } },
   { to: '/wiki', label: 'Wiki', hint: 'Theory & craft', icon: ScrollText },
   { to: '/learn', label: 'Lessons', hint: 'Day 1–365', icon: BookOpen },
   { to: '/library', label: 'Library', hint: 'Songs & riffs', icon: Library },
   { to: '/upload', label: 'Upload', hint: 'Song → tabs', icon: Upload },
-  { to: '/profile', label: 'Settings', hint: 'You · tuning · A4', icon: Settings2 },
+  { to: '/profile', label: 'Settings', hint: 'You · fretboard · BPM', icon: Settings2 },
   { to: '/profile', label: 'Profile', hint: 'Progress & prefs', icon: User },
   { to: '/about', label: 'About', hint: 'Ahmi · updates', icon: Info },
 ]

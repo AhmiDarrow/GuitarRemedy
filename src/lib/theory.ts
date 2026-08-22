@@ -188,7 +188,8 @@ export const TUNINGS: Record<string, { name: string; midi: number[] }> = {
   open_g: { name: 'Open G', midi: [38, 43, 50, 55, 59, 62] },
   open_d: { name: 'Open D', midi: [38, 45, 50, 54, 57, 62] },
   dadgad: { name: 'DADGAD', midi: [38, 45, 50, 55, 57, 62] },
-  // Placeholder — real MIDI comes from appStore.customTuning when tuningName === 'custom'.
+  // Placeholder — real MIDI comes from each store's customTuning when name === 'custom'
+  // (appStore = fretboard/convert; tunerStore = chromatic tuner only).
   custom: { name: 'Custom', midi: [...STANDARD_TUNING] },
 }
 

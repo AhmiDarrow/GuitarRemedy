@@ -17,7 +17,7 @@ export default function App() {
   const onboarded = useAppStore((s) => s.onboarded)
   const a4 = useAppStore((s) => s.a4)
 
-  // Keep Tone playback concert pitch in sync with Profile A4 (incl. rehydrate).
+  // Default Tone playback pitch from Profile (fretboard/scales/tabs). Tuner sets its own A4 while live.
   useEffect(() => {
     setPlaybackA4(a4)
   }, [a4])

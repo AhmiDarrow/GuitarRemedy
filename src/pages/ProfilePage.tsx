@@ -71,7 +71,11 @@ export function ProfilePage() {
       </div>
 
       <div className="card p-5 space-y-4">
-        <h2 className="font-display font-semibold">Instrument</h2>
+        <h2 className="font-display font-semibold">Instrument &amp; practice</h2>
+        <p className="text-[11px] text-[var(--text-muted)] -mt-2">
+          Fretboard, scales, and play-along. The chromatic tuner has its own Settings panel under
+          Practice → Tuner (separate A4 and open-string map).
+        </p>
         <label className="flex items-center gap-3 p-3 rounded-xl border border-[var(--border)] cursor-pointer">
           <input
             type="checkbox"
@@ -82,7 +86,7 @@ export function ProfilePage() {
           <span className="text-sm">Left-handed fretboard</span>
         </label>
         <label className="block text-xs text-[var(--text-muted)]">
-          Tuning
+          Fretboard tuning
           <select
             className="input mt-1"
             value={tuningName}
@@ -96,7 +100,7 @@ export function ProfilePage() {
         {tuningName === 'custom' ? (
           <div className="space-y-2">
             <p className="text-[11px] text-[var(--text-muted)]">
-              Custom open-string MIDI (low E → high e). Applied to fretboard &amp; play-along.
+              Custom open-string MIDI (low E → high e). Fretboard &amp; play-along only — not the tuner.
             </p>
             <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
               {['E', 'A', 'D', 'G', 'B', 'e'].map((label, i) => (
@@ -120,7 +124,7 @@ export function ProfilePage() {
           </div>
         ) : null}
         <label className="block text-xs text-[var(--text-muted)]">
-          A4 reference (Hz)
+          Play-along A4 (Hz)
           <input
             type="number"
             className="input mt-1"
@@ -129,6 +133,9 @@ export function ProfilePage() {
             value={a4}
             onChange={(e) => setA4(Number(e.target.value) || 440)}
           />
+          <span className="block text-[10px] mt-1 text-[var(--text-muted)]">
+            Scales, tabs, and tones. Tuner A4 is set inside the tuner.
+          </span>
         </label>
         <label className="flex items-center gap-3 p-3 rounded-xl border border-[var(--border)] cursor-pointer">
           <input
@@ -150,6 +157,13 @@ export function ProfilePage() {
             onChange={(e) => setBpm(Number(e.target.value) || 80)}
           />
         </label>
+        <Link
+          to="/practice"
+          state={{ tool: 'tuner' }}
+          className="btn-secondary inline-flex text-center text-sm px-4 py-2 rounded-xl"
+        >
+          Open tuner settings
+        </Link>
       </div>
 
       <div className="card p-5 text-sm text-[var(--text-muted)] leading-relaxed space-y-2">
