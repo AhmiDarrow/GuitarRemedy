@@ -6,8 +6,9 @@
  *
  * Quality pipeline (full-band):
  *   stereo mid (+ optional side) → auto stem race (lead/harmonic/mix/side via HPSS) →
- *   engine race: Basic Pitch (Apache-2.0) vs autocorrelation (score winner) →
- *   monophonic melody extract → tempo snap → quantize → ghost drop → MIDI.
+ *   engine race: Basic Pitch (Apache-2.0) vs autocorr+YIN fuse (score winner) →
+ *   monophonic melody extract → onset snap → tempo blend (energy×IOI) → quantize →
+ *   ghost drop → playable fretting (look-ahead) → MIDI.
  */
 
 import { buildSimpleMidi, parseMidi, type MidiNote, type MidiParseResult } from './midi'
@@ -65,9 +66,103 @@ export function midiToHz(midi: number, a4 = 440): number {
   return a4 * 2 ** ((midi - 69) / 12)
 }
 
+/** Parabolic peak refine (shared by autocorr + YIN). */
+function parabolicDelta(y0: number, y1: number, y2: number): number {
+  const denom = 2 * (2 * y1 - y2 - y0)
+  if (Math.abs(denom) < 1e-12) return 0
+  const delta = (y0 - y2) / denom
+  return Math.abs(delta) < 1 ? delta : 0
+}
+
+/**
+ * YIN pitch (de Cheveigné & Kawahara) — better octave stability than plain autocorr
+ * on bright guitar tones. Leaf helper (no tuner import — tuner already imports us).
+ */
+export function detectPitchYinConvert(
+  frame: Float32Array,
+  sampleRate: number,
+  opts?: { minHz?: number; maxHz?: number; threshold?: number; rmsGate?: number },
+): { hz: number; confidence: number } {
+  const minHz = opts?.minHz ?? 80
+  const maxHz = opts?.maxHz ?? 1200
+  const threshold = opts?.threshold ?? 0.15
+  const rmsGate = opts?.rmsGate ?? 0.01
+  const n = frame.length
+  if (n < 64 || sampleRate <= 0) return { hz: 0, confidence: 0 }
+
+  let rms = 0
+  for (let i = 0; i < n; i++) rms += frame[i] * frame[i]
+  rms = Math.sqrt(rms / n)
+  if (rms < rmsGate) return { hz: 0, confidence: 0 }
+
+  const tauMin = Math.max(2, Math.floor(sampleRate / maxHz))
+  const tauMax = Math.min(Math.floor(n / 2) - 2, Math.floor(sampleRate / minHz))
+  if (tauMax <= tauMin + 2) return { hz: 0, confidence: 0 }
+
+  const d = new Float32Array(tauMax + 1)
+  for (let tau = 1; tau <= tauMax; tau++) {
+    let sum = 0
+    const lim = n - tau
+    for (let i = 0; i < lim; i++) {
+      const delta = frame[i] - frame[i + tau]
+      sum += delta * delta
+    }
+    d[tau] = sum
+  }
+
+  const cmnd = new Float32Array(tauMax + 1)
+  cmnd[0] = 1
+  let running = 0
+  for (let tau = 1; tau <= tauMax; tau++) {
+    running += d[tau]
+    cmnd[tau] = running > 0 ? (d[tau] * tau) / running : 1
+  }
+
+  let tauEst = -1
+  for (let tau = tauMin; tau <= tauMax; tau++) {
+    if (cmnd[tau] < threshold) {
+      while (tau + 1 <= tauMax && cmnd[tau + 1] < cmnd[tau]) tau++
+      tauEst = tau
+      break
+    }
+  }
+  if (tauEst < 0) {
+    let best = tauMin
+    let bestV = cmnd[tauMin]
+    for (let tau = tauMin + 1; tau <= tauMax; tau++) {
+      if (cmnd[tau] < bestV) {
+        bestV = cmnd[tau]
+        best = tau
+      }
+    }
+    if (bestV > 0.5) return { hz: 0, confidence: Math.max(0, 1 - bestV) }
+    tauEst = best
+  }
+
+  let refined = tauEst + (tauEst > tauMin && tauEst < tauMax
+    ? parabolicDelta(cmnd[tauEst - 1], cmnd[tauEst], cmnd[tauEst + 1])
+    : 0)
+  let hz = sampleRate / refined
+  // Prefer fundamental when 2× period is almost as good
+  const tau2 = refined * 2
+  if (tau2 <= tauMax - 1 && tau2 >= tauMin) {
+    const i = Math.round(refined)
+    const j = Math.round(tau2)
+    if (j < cmnd.length && i < cmnd.length && cmnd[j] <= cmnd[i] * 1.1 && cmnd[j] < threshold + 0.1) {
+      hz = sampleRate / tau2
+      refined = tau2
+    }
+  }
+  if (hz < minHz || hz > maxHz) return { hz: 0, confidence: 0 }
+  const confAt = cmnd[Math.round(refined)] ?? cmnd[tauEst]
+  const confidence = Math.max(0, Math.min(1, 1 - confAt))
+  if (confidence < 0.32) return { hz: 0, confidence }
+  return { hz, confidence }
+}
+
 /**
  * Autocorrelation pitch estimate for one mono frame.
- * Returns hz + 0..1 confidence (normalized peak).
+ * Fuses with YIN when both lock — fewer octave flips on bright strings.
  */
 export function detectPitchHz(
   frame: Float32Array,
@@ -115,32 +210,46 @@ export function detectPitchHz(
     }
   }
 
-  const confidence = Math.max(0, Math.min(1, bestCorr / r0))
-  if (confidence < 0.25) return { hz: 0, confidence }
-
-  // Parabolic refine around peak
-  const lag = bestLag
-  const c = (lo: number) => {
-    let corr = 0
-    const lim = n - lo
-    for (let i = 0; i < lim; i++) corr += (frame[i] - mean) * (frame[i + lo] - mean)
-    return corr
-  }
-  let refined = lag
-  if (lag > minLag && lag < maxLag) {
-    const y0 = c(lag - 1)
-    const y1 = bestCorr
-    const y2 = c(lag + 1)
-    const denom = 2 * (2 * y1 - y2 - y0)
-    if (Math.abs(denom) > 1e-12) {
-      const delta = (y0 - y2) / denom
-      if (Math.abs(delta) < 1) refined = lag + delta
+  const acConf = Math.max(0, Math.min(1, bestCorr / r0))
+  let acHz = 0
+  if (acConf >= 0.25) {
+    const lag = bestLag
+    const c = (lo: number) => {
+      let corr = 0
+      const lim = n - lo
+      for (let i = 0; i < lim; i++) corr += (frame[i] - mean) * (frame[i + lo] - mean)
+      return corr
     }
+    let refined = lag
+    if (lag > minLag && lag < maxLag) {
+      refined = lag + parabolicDelta(c(lag - 1), bestCorr, c(lag + 1))
+    }
+    const hz = sampleRate / refined
+    if (hz >= minHz && hz <= maxHz) acHz = hz
   }
 
-  const hz = sampleRate / refined
-  if (hz < minHz || hz > maxHz) return { hz: 0, confidence }
-  return { hz, confidence }
+  const yin = detectPitchYinConvert(frame, sampleRate, { minHz, maxHz, rmsGate: 0.01 })
+  // Fuse: agreement → average; octave apart → fundamental; else higher confidence
+  if (acHz > 0 && yin.hz > 0) {
+    const ratio = acHz > yin.hz ? acHz / yin.hz : yin.hz / acHz
+    if (ratio < 1.03) {
+      const conf = Math.min(1, (acConf + yin.confidence) * 0.55)
+      return { hz: (acHz + yin.hz) / 2, confidence: conf }
+    }
+    if (ratio > 1.85 && ratio < 2.15) {
+      // Octave disagreement — prefer lower (fundamental)
+      const lo = Math.min(acHz, yin.hz)
+      const conf = Math.max(acConf, yin.confidence) * 0.92
+      return { hz: lo, confidence: conf }
+    }
+    return acConf >= yin.confidence
+      ? { hz: acHz, confidence: acConf }
+      : { hz: yin.hz, confidence: yin.confidence }
+  }
+  if (yin.hz > 0 && yin.confidence >= 0.4) return yin
+  if (acHz > 0) return { hz: acHz, confidence: acConf }
+  if (yin.hz > 0) return yin
+  return { hz: 0, confidence: Math.max(acConf, yin.confidence) }
 }
 
 /** Walk mono PCM and emit pitched frames. */
@@ -326,6 +435,131 @@ export function dropGhostNotes(
   const minDur = opts?.minDurationSec ?? 0.07
   const minVel = opts?.minVelocity ?? 42
   return notes.filter((n) => n.durationSec >= minDur && n.velocity >= minVel)
+}
+
+/**
+ * Estimate BPM from note onset intervals (median IOI → tempo).
+ * Complements energy-onset detectTempoBpm when the melody is clear.
+ */
+export function estimateTempoFromNotes(
+  notes: DetectedNote[],
+  opts?: { defaultBpm?: number; minBpm?: number; maxBpm?: number },
+): number {
+  const defaultBpm = opts?.defaultBpm ?? 100
+  const minBpm = opts?.minBpm ?? 60
+  const maxBpm = opts?.maxBpm ?? 180
+  if (!notes || notes.length < 4) return defaultBpm
+
+  const starts = [...notes]
+    .map((n) => n.timeSec)
+    .sort((a, b) => a - b)
+  const iois: number[] = []
+  for (let i = 1; i < starts.length; i++) {
+    const d = starts[i] - starts[i - 1]
+    if (d >= 0.12 && d <= 1.6) iois.push(d)
+  }
+  if (iois.length < 3) return defaultBpm
+  iois.sort((a, b) => a - b)
+  const med = iois[Math.floor(iois.length / 2)]
+  // Treat median IOI as an eighth or quarter depending on length
+  let bpm = 60 / med
+  if (bpm > maxBpm) bpm = 60 / (med * 2) // was likely 16ths
+  if (bpm < minBpm) bpm = 60 / (med / 2) // was likely half notes
+  // Try ½× / 2× into practice range
+  const cands = [bpm, bpm / 2, bpm * 2]
+    .map((b) => Math.round(b))
+    .filter((b) => b >= minBpm && b <= maxBpm)
+  if (!cands.length) return defaultBpm
+  // Prefer near 90–120
+  cands.sort((a, b) => Math.abs(a - 100) - Math.abs(b - 100))
+  return cands[0]
+}
+
+/**
+ * Soft-snap note onsets toward local energy peaks (onset flux).
+ * Keeps rhythmic feel when grid quantize alone drifts off the attack.
+ */
+export function snapNotesToOnsets(
+  notes: DetectedNote[],
+  samples: Float32Array,
+  sampleRate: number,
+  opts?: { searchSec?: number; strength?: number; tempoBpm?: number },
+): DetectedNote[] {
+  if (!notes.length || samples.length < sampleRate * 0.2 || sampleRate <= 0) {
+    return notes.map((n) => ({ ...n }))
+  }
+  const searchSec = opts?.searchSec ?? 0.055
+  const strength = opts?.strength ?? 0.65
+  const tempoBpm = opts?.tempoBpm ?? 100
+  const tpq = DEFAULT_TPQ
+  const hop = Math.max(32, Math.floor(sampleRate * 0.005)) // 5ms
+  const win = hop * 2
+
+  // Precompute onset strength envelope
+  const env: number[] = []
+  for (let i = hop; i + win < samples.length; i += hop) {
+    let e0 = 0
+    let e1 = 0
+    for (let j = 0; j < hop; j++) {
+      const a = samples[i - hop + j] ?? 0
+      const b = samples[i + j] ?? 0
+      e0 += a * a
+      e1 += b * b
+    }
+    const d = e1 / hop - e0 / hop
+    env.push(d > 0 ? d : 0)
+  }
+  if (env.length < 8) return notes.map((n) => ({ ...n }))
+
+  const secPerHop = hop / sampleRate
+  const searchHops = Math.max(1, Math.round(searchSec / secPerHop))
+
+  const tickToSec = (t: number) => (t * 60) / (tempoBpm * tpq)
+  const secToTick = (s: number) => Math.max(0, Math.round((s * tempoBpm * tpq) / 60))
+
+  return notes.map((n) => {
+    const center = Math.round(n.timeSec / secPerHop)
+    let bestIdx = center
+    let bestVal = -1
+    for (let k = center - searchHops; k <= center + searchHops; k++) {
+      if (k < 0 || k >= env.length) continue
+      if (env[k] > bestVal) {
+        bestVal = env[k]
+        bestIdx = k
+      }
+    }
+    if (bestVal <= 1e-12) return { ...n }
+    const peakSec = Math.max(0, bestIdx * secPerHop)
+    const blended = n.timeSec * (1 - strength) + peakSec * strength
+    const newStart = secToTick(blended)
+    // Preserve end time roughly
+    const endSec = n.timeSec + n.durationSec
+    const newDurSec = Math.max(0.06, endSec - blended)
+    return {
+      ...n,
+      start: newStart,
+      duration: Math.max(1, secToTick(newDurSec)),
+      timeSec: blended,
+      durationSec: newDurSec,
+    }
+  })
+}
+
+/**
+ * Re-quantize notes after a tempo change (keeps wall-clock times, rebuilds ticks).
+ */
+export function retempoDetectedNotes(
+  notes: DetectedNote[],
+  tempoBpm: number,
+  tpq = DEFAULT_TPQ,
+): DetectedNote[] {
+  const bpm = Math.max(30, Math.min(300, tempoBpm || 100))
+  const secToTick = (sec: number) => Math.max(0, Math.round((sec * bpm * tpq) / 60))
+  return notes.map((n) => ({
+    ...n,
+    start: secToTick(n.timeSec),
+    duration: Math.max(1, secToTick(n.durationSec)),
+  }))
 }
 
 /** Group stable pitch frames into note events (ticks @ tpq, tempo). */
@@ -846,7 +1080,15 @@ export function scoreNoteDraft(notes: DetectedNote[]): number {
 /** Post-process note list shared by autocorr + Basic Pitch winners. */
 export function refineDetectedNotes(
   notes: DetectedNote[],
-  opts?: { monophonic?: boolean },
+  opts?: {
+    monophonic?: boolean
+    /** Optional PCM for onset-attack snap */
+    samples?: Float32Array
+    sampleRate?: number
+    tempoBpm?: number
+    quantize?: boolean
+    gridDivisions?: number
+  },
 ): DetectedNote[] {
   let out = notes
   if (opts?.monophonic !== false) {
@@ -854,6 +1096,26 @@ export function refineDetectedNotes(
   }
   out = dropGhostNotes(out, { minDurationSec: 0.09, minVelocity: 45 })
   out = mergeAdjacentNotes(out, { ticksPerQuarter: DEFAULT_TPQ })
+
+  const tempoBpm = opts?.tempoBpm ?? 100
+  if (opts?.samples && opts.sampleRate && opts.samples.length > 0) {
+    out = snapNotesToOnsets(out, opts.samples, opts.sampleRate, {
+      tempoBpm,
+      strength: 0.6,
+      searchSec: 0.05,
+    })
+  }
+
+  if (opts?.quantize !== false) {
+    out = quantizeDetectedNotes(out, {
+      tempoBpm,
+      ticksPerQuarter: DEFAULT_TPQ,
+      gridDivisions: opts?.gridDivisions ?? 16,
+      strength: 0.88,
+    })
+    out = mergeAdjacentNotes(out, { ticksPerQuarter: DEFAULT_TPQ })
+  }
+
   if (out.length > 8) {
     const confSorted = [...out].sort((a, b) => (b.confidence ?? 0) - (a.confidence ?? 0))
     const floor = confSorted[Math.min(confSorted.length - 1, Math.floor(confSorted.length * 0.65))]
@@ -879,6 +1141,37 @@ export function refineDetectedNotes(
     if (kept.length >= 6 && kept.length < out.length) out = kept
   }
   return out
+}
+
+/**
+ * Blend energy-onset tempo with note-IOI tempo when they nearly agree.
+ * Avoids half-time / double-time traps on clear melodies.
+ */
+export function blendTempoEstimates(
+  energyBpm: number,
+  noteBpm: number,
+  opts?: { maxDelta?: number },
+): number {
+  const maxDelta = opts?.maxDelta ?? 12
+  const e = Math.round(energyBpm)
+  const n = Math.round(noteBpm)
+  if (!Number.isFinite(n) || n < 60 || n > 180) return e
+  if (!Number.isFinite(e) || e < 60) return n
+  if (Math.abs(e - n) <= maxDelta) {
+    return Math.round(e * 0.55 + n * 0.45)
+  }
+  // Octave-related disagreement: prefer the one in 70–140
+  const eIn = e >= 70 && e <= 140
+  const nIn = n >= 70 && n <= 140
+  if (nIn && !eIn) return n
+  if (eIn && !nIn) return e
+  // 2× relationship
+  if (Math.abs(e * 2 - n) <= maxDelta || Math.abs(n * 2 - e) <= maxDelta) {
+    const lo = Math.min(e, n)
+    const hi = Math.max(e, n)
+    return lo >= 70 && lo <= 140 ? lo : hi >= 70 && hi <= 140 ? hi : e
+  }
+  return e
 }
 
 /**
@@ -1110,7 +1403,7 @@ export function pcmToMidi(
       `Tempo snap ${rawTempo} → ${detectedTempo} BPM (½×/2× + onset grid check).`,
     )
   }
-  const tempoBpm = opts?.tempoBpm ?? detectedTempo
+  let tempoBpm = opts?.tempoBpm ?? detectedTempo
   if (opts?.tempoBpm == null) {
     warnings.push(`Estimated tempo ≈ ${detectedTempo} BPM from onset energy.`)
   } else {
@@ -1134,41 +1427,40 @@ export function pcmToMidi(
     tempoBpm,
     minDurationSec: 0.1,
     maxGapSec: 0.1,
+    quantize: false, // refineDetectedNotes quantizes after onset snap
+    gridDivisions: 16,
+  })
+  const beforeRefine = notes.length
+  notes = refineDetectedNotes(notes, {
+    monophonic: true,
+    samples: prepared,
+    sampleRate,
+    tempoBpm,
     quantize: true,
     gridDivisions: 16,
   })
-  notes = dropGhostNotes(notes, { minDurationSec: 0.09, minVelocity: 45 })
-  notes = mergeAdjacentNotes(notes, { ticksPerQuarter: DEFAULT_TPQ })
-
-  // Prefer fewer stable notes over a spray of ghosts on dense mixes
-  if (notes.length > 8) {
-    const confSorted = [...notes].sort((a, b) => (b.confidence ?? 0) - (a.confidence ?? 0))
-    const floor = confSorted[Math.min(confSorted.length - 1, Math.floor(confSorted.length * 0.65))]
-      ?.confidence
-    if (typeof floor === 'number' && floor > 0.3) {
-      const filtered = notes.filter((n) => (n.confidence ?? 0) >= floor * 0.92)
-      if (filtered.length >= Math.max(3, Math.floor(notes.length * 0.35))) {
-        notes = filtered.sort((a, b) => a.start - b.start)
-        warnings.push('Dropped lower-confidence ghost notes after full-band ranking.')
-      }
-    }
+  if (notes.length < beforeRefine) {
+    warnings.push('Refined draft: monophonic extract + ghost drop + onset snap + register keep.')
   }
 
-  // Prefer guitar-register notes when the track is dense (full-band spray)
-  if (notes.length > 12) {
-    const withReg = notes.map((n) => ({
-      n,
-      r: guitarRegisterScore(n.pitch) * (0.55 + 0.45 * (n.confidence ?? 0.5)),
-    }))
-    withReg.sort((a, b) => b.r - a.r)
-    const keepN = Math.max(8, Math.ceil(notes.length * 0.72))
-    const kept = withReg
-      .slice(0, keepN)
-      .map((x) => x.n)
-      .sort((a, b) => a.start - b.start)
-    if (kept.length >= 6 && kept.length < notes.length) {
-      notes = kept
-      warnings.push('Biased note keep toward guitar/lead register (full-band assist).')
+  // Melody IOI tempo blend (when user did not override)
+  if (opts?.tempoBpm == null && notes.length >= 4) {
+    const noteTempo = estimateTempoFromNotes(notes, { defaultBpm: detectedTempo })
+    const blended = blendTempoEstimates(detectedTempo, noteTempo)
+    if (blended !== tempoBpm && Math.abs(blended - tempoBpm) >= 2) {
+      const prev = tempoBpm
+      tempoBpm = blended
+      notes = retempoDetectedNotes(notes, blended)
+      notes = quantizeDetectedNotes(notes, {
+        tempoBpm: blended,
+        ticksPerQuarter: DEFAULT_TPQ,
+        gridDivisions: 16,
+        strength: 0.9,
+      })
+      notes = mergeAdjacentNotes(notes, { ticksPerQuarter: DEFAULT_TPQ })
+      warnings.push(
+        `Tempo refined ${prev} → ${blended} BPM (energy onset × note spacing).`,
+      )
     }
   }
 
@@ -1370,7 +1662,7 @@ export async function pcmToMidiAsync(
   if (detectedTempo !== rawTempo) {
     warnings.push(`Tempo snap ${rawTempo} → ${detectedTempo} BPM (½×/2× + onset grid check).`)
   }
-  const tempoBpm = opts?.tempoBpm ?? detectedTempo
+  let tempoBpm = opts?.tempoBpm ?? detectedTempo
   if (opts?.tempoBpm == null) {
     warnings.push(`Estimated tempo ≈ ${detectedTempo} BPM from onset energy.`)
   } else {
@@ -1482,9 +1774,34 @@ export async function pcmToMidiAsync(
 
   onProgress?.(78, 'Building notes…')
   const beforeRefine = notes.length
-  notes = refineDetectedNotes(notes)
+  notes = refineDetectedNotes(notes, {
+    monophonic: true,
+    samples: prepared,
+    sampleRate,
+    tempoBpm,
+    quantize: true,
+    gridDivisions: 16,
+  })
   if (notes.length < beforeRefine) {
-    warnings.push('Refined draft: ghost drop + register keep after engine race.')
+    warnings.push('Refined draft: monophonic extract + ghost drop + onset snap + register keep.')
+  }
+
+  if (opts?.tempoBpm == null && notes.length >= 4) {
+    const noteTempo = estimateTempoFromNotes(notes, { defaultBpm: detectedTempo })
+    const blended = blendTempoEstimates(detectedTempo, noteTempo)
+    if (blended !== tempoBpm && Math.abs(blended - tempoBpm) >= 2) {
+      const prev = tempoBpm
+      tempoBpm = blended
+      notes = retempoDetectedNotes(notes, blended)
+      notes = quantizeDetectedNotes(notes, {
+        tempoBpm: blended,
+        ticksPerQuarter: DEFAULT_TPQ,
+        gridDivisions: 16,
+        strength: 0.9,
+      })
+      notes = mergeAdjacentNotes(notes, { ticksPerQuarter: DEFAULT_TPQ })
+      warnings.push(`Tempo refined ${prev} → ${blended} BPM (energy onset × note spacing).`)
+    }
   }
 
   if (notes.length === 0) {

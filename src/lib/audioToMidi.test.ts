@@ -381,4 +381,81 @@ describe('audioToMidi', () => {
     expect(mid.midiBytes.byteLength).toBeGreaterThan(20)
     expect(mid.warnings.some((w) => /auto-stem|picked/i.test(w))).toBe(true)
   })
+
+  it('detectPitchYinConvert locks a clean A4 tone', async () => {
+    const { detectPitchYinConvert, synthesizeTonePcm } = await import('./audioToMidi')
+    const sr = 22050
+    const pcm = synthesizeTonePcm([{ hz: 440, startSec: 0, durationSec: 0.4 }], sr, 0.45)
+    const frame = pcm.subarray(Math.floor(sr * 0.05), Math.floor(sr * 0.05) + Math.floor(sr * 0.09))
+    const { hz, confidence } = detectPitchYinConvert(frame, sr)
+    expect(confidence).toBeGreaterThan(0.35)
+    expect(hz).toBeGreaterThan(420)
+    expect(hz).toBeLessThan(460)
+  })
+
+  it('estimateTempoFromNotes + blendTempoEstimates refine energy tempo', async () => {
+    const { estimateTempoFromNotes, blendTempoEstimates, retempoDetectedNotes } =
+      await import('./audioToMidi')
+    // 8 notes on quarter grid @ 120 BPM → IOI 0.5s
+    const notes = Array.from({ length: 8 }, (_, i) => ({
+      pitch: 60 + (i % 4),
+      start: i * 480,
+      duration: 400,
+      velocity: 90,
+      timeSec: i * 0.5,
+      durationSec: 0.4,
+      confidence: 0.8,
+    }))
+    const fromNotes = estimateTempoFromNotes(notes, { defaultBpm: 100 })
+    expect(fromNotes).toBeGreaterThanOrEqual(100)
+    expect(fromNotes).toBeLessThanOrEqual(140)
+    const blended = blendTempoEstimates(118, fromNotes)
+    expect(blended).toBeGreaterThanOrEqual(100)
+    expect(blended).toBeLessThanOrEqual(140)
+    const ret = retempoDetectedNotes(notes, 100)
+    expect(ret[1].start).not.toBe(notes[1].start) // ticks change with tempo
+    expect(ret[0].timeSec).toBe(notes[0].timeSec) // wall clock preserved
+  })
+
+  it('snapNotesToOnsets pulls starts toward energy peaks', async () => {
+    const { snapNotesToOnsets, synthesizeTonePcm } = await import('./audioToMidi')
+    const sr = 22050
+    // Tone starts at 0.2s — note claimed at 0.15s should move later
+    const pcm = synthesizeTonePcm([{ hz: 440, startSec: 0.2, durationSec: 0.35 }], sr, 0.7)
+    const notes = [
+      {
+        pitch: 69,
+        start: 120,
+        duration: 240,
+        velocity: 90,
+        timeSec: 0.15,
+        durationSec: 0.3,
+        confidence: 0.8,
+      },
+    ]
+    const snapped = snapNotesToOnsets(notes, pcm, sr, {
+      tempoBpm: 100,
+      strength: 1,
+      searchSec: 0.08,
+    })
+    expect(snapped[0].timeSec).toBeGreaterThan(notes[0].timeSec - 0.01)
+    expect(snapped[0].timeSec).toBeLessThan(0.28)
+  })
+
+  it('refineDetectedNotes monophonic + quantize path keeps a clean scale', async () => {
+    const { refineDetectedNotes } = await import('./audioToMidi')
+    const spray = [
+      { pitch: 60, start: 0, duration: 200, velocity: 90, timeSec: 0, durationSec: 0.25, confidence: 0.85 },
+      { pitch: 48, start: 10, duration: 80, velocity: 50, timeSec: 0.01, durationSec: 0.08, confidence: 0.3 },
+      { pitch: 62, start: 240, duration: 200, velocity: 88, timeSec: 0.3, durationSec: 0.25, confidence: 0.82 },
+      { pitch: 64, start: 480, duration: 200, velocity: 86, timeSec: 0.6, durationSec: 0.25, confidence: 0.8 },
+    ]
+    const out = refineDetectedNotes(spray, {
+      monophonic: true,
+      tempoBpm: 100,
+      quantize: true,
+    })
+    expect(out.length).toBeGreaterThanOrEqual(2)
+    expect(out.every((n) => n.pitch >= 55)).toBe(true) // bass grab dropped
+  })
 })

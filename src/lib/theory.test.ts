@@ -96,4 +96,14 @@ describe('theory', () => {
     expect(smoothed).toHaveLength(run.length)
     expect(smoothed.map((f) => f.midi)).toEqual(midis)
   })
+
+  it('frettingSequence look-ahead keeps midis exact after a leap', () => {
+    // small steps then leap up — frets must still match MIDI
+    const midis = [60, 62, 64, 72, 74]
+    const run = frettingSequence(midis)
+    expect(run.map((f) => f.midi)).toEqual(midis)
+    expect(run.every((f) => f.fret >= 0 && f.fret <= 17)).toBe(true)
+    const lastJump = Math.abs(run[3].string - run[2].string) + Math.abs(run[3].fret - run[2].fret)
+    expect(lastJump).toBeLessThan(20)
+  })
 })

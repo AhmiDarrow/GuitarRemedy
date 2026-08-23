@@ -483,6 +483,7 @@ export function frettingForMidi(
 /**
  * Map a melody line to playable frets with hand continuity
  * (prefer previous position / nearby string, smooth position shifts).
+ * Optional 1-note look-ahead reduces dead-end positions before big leaps.
  */
 export function frettingSequence(
   midis: number[],
@@ -492,8 +493,10 @@ export function frettingSequence(
   let preferFret = 5
   let preferString: number | undefined
   let positionCenter = 5
-  for (const midi of midis) {
-    const f =
+  for (let i = 0; i < midis.length; i++) {
+    const midi = midis[i]
+    const next = midis[i + 1]
+    const base =
       frettingForMidi(midi, tuning, preferFret, {
         preferString,
         positionCenter,
@@ -503,6 +506,37 @@ export function frettingSequence(
         fret: Math.max(0, Math.min(17, midi - tuning[0])),
         midi,
       }
+
+    // Look-ahead: if next note is far, prefer a fretting that keeps the hand ready
+    let f = base
+    if (next != null && Math.abs(next - midi) >= 3) {
+      let best = base
+      let bestCost = Infinity
+      for (let s = 0; s < tuning.length; s++) {
+        const fret = midi - tuning[s]
+        if (fret < 0 || fret > 17) continue
+        const here =
+          Math.abs(fret - preferFret) * 1.1 +
+          (preferString != null ? Math.abs(s - preferString) * 1.2 : 0) +
+          (Math.abs(fret - positionCenter) > 4 ? Math.abs(fret - positionCenter) * 0.5 : 0)
+        // Cost of reaching next from this candidate
+        let nextCost = 6
+        for (let ns = 0; ns < tuning.length; ns++) {
+          const nf = next - tuning[ns]
+          if (nf < 0 || nf > 17) continue
+          const c =
+            Math.abs(ns - s) * 1.3 + Math.abs(nf - fret) * 0.55 + (nf > 12 ? (nf - 12) * 0.15 : 0)
+          if (c < nextCost) nextCost = c
+        }
+        const cost = here * 0.65 + nextCost
+        if (cost < bestCost) {
+          bestCost = cost
+          best = { string: s, fret, midi }
+        }
+      }
+      f = best
+    }
+
     out.push(f)
     // Slow hand drift — don't teleport the position every note
     preferFret = Math.round(preferFret * 0.35 + f.fret * 0.65)
