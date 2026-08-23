@@ -1,7 +1,12 @@
 /** Pure helpers: edit timed tab scores before save / re-export */
 
 import type { TabNote, TabScore, RemedyBreakdown } from './breakdown'
-import { frettingSequence, smoothFrettingRun, STANDARD_TUNING } from './theory'
+import {
+  frettingSequence,
+  smoothFrettingRun,
+  STANDARD_TUNING,
+  type FretPositionPrefer,
+} from './theory'
 import {
   clampPracticeBpm,
   midiFromDisplayStringFret,
@@ -57,10 +62,100 @@ export function normalizeNote(n: TabNote): TabNote {
     time: Math.max(0, Number.isFinite(n.time) ? n.time : 0),
     duration: Math.max(0.05, Number.isFinite(n.duration) ? n.duration : 1),
     midi,
+    confidence:
+      typeof n.confidence === 'number' && Number.isFinite(n.confidence)
+        ? Math.max(0, Math.min(1, n.confidence))
+        : n.confidence,
+    articulation: n.articulation,
+    bendTarget: n.bendTarget,
   }
 }
 
-export type NotePatch = Partial<Pick<TabNote, 'string' | 'fret' | 'time' | 'duration' | 'midi'>>
+/** Drop notes below confidence floor (default 0.35). */
+export function dropLowConfidenceNotes(score: TabScore, minConf = 0.35): TabScore {
+  const notes = sortScoreNotes(score.notes).filter((n) => {
+    if (typeof n.confidence !== 'number') return true
+    return n.confidence >= minConf
+  })
+  return { ...score, notes }
+}
+
+/** Keep only the loudest / highest-confidence N bars (by beat span). */
+export function keepStrongestBars(score: TabScore, barCount = 8, beatsPerBar = 4): TabScore {
+  if (score.notes.length === 0) return score
+  const bpb = Math.max(1, beatsPerBar)
+  const bars = new Map<number, { conf: number; n: number }>()
+  for (const note of score.notes) {
+    const bar = Math.floor(note.time / bpb)
+    const c = note.confidence ?? 0.5
+    const prev = bars.get(bar) ?? { conf: 0, n: 0 }
+    bars.set(bar, { conf: prev.conf + c, n: prev.n + 1 })
+  }
+  const ranked = [...bars.entries()]
+    .map(([bar, v]) => ({ bar, avg: v.conf / Math.max(1, v.n) }))
+    .sort((a, b) => b.avg - a.avg)
+    .slice(0, Math.max(1, barCount))
+    .map((x) => x.bar)
+  const keep = new Set(ranked)
+  const notes = sortScoreNotes(score.notes.filter((n) => keep.has(Math.floor(n.time / bpb))))
+  return { ...score, notes }
+}
+
+/** Force monophonic lead: keep highest pitch (or conf) per onset cluster. */
+export function lockLeadMono(score: TabScore, clusterBeats = 0.08): TabScore {
+  const notes = sortScoreNotes(score.notes)
+  if (notes.length === 0) return score
+  const kept: TabNote[] = []
+  let cluster: TabNote[] = []
+  const flush = () => {
+    if (!cluster.length) return
+    cluster.sort(
+      (a, b) =>
+        (b.confidence ?? 0) - (a.confidence ?? 0) || (b.midi ?? 0) - (a.midi ?? 0),
+    )
+    kept.push(cluster[0])
+    cluster = []
+  }
+  for (const n of notes) {
+    const prev = cluster[cluster.length - 1]
+    if (!prev || Math.abs(n.time - prev.time) <= clusterBeats) cluster.push(n)
+    else {
+      flush()
+      cluster.push(n)
+    }
+  }
+  flush()
+  return { ...score, notes: sortScoreNotes(kept) }
+}
+
+/** Re-fret with open / mid / auto position preference. */
+export function reFretScore(
+  score: TabScore,
+  preferPosition: FretPositionPrefer = 'auto',
+): TabScore {
+  if (score.notes.length === 0) return score
+  const tuning = editorTuning.length === 6 ? editorTuning : [...STANDARD_TUNING]
+  const midis = score.notes.map((n) => n.midi ?? midiFromStringFret(n.string, n.fret, tuning))
+  const onsets = score.notes.map((n) => n.time)
+  const run = smoothFrettingRun(
+    frettingSequence(midis, tuning, { onsets, preferPosition }),
+    tuning,
+  )
+  const notes = score.notes.map((n, i) => {
+    const f = run[i]
+    return normalizeNote({
+      ...n,
+      string: clampString(5 - f.string),
+      fret: clampFret(f.fret),
+      midi: f.midi,
+    })
+  })
+  return { ...score, notes: sortScoreNotes(notes), preferPosition }
+}
+
+export type NotePatch = Partial<
+  Pick<TabNote, 'string' | 'fret' | 'time' | 'duration' | 'midi' | 'confidence' | 'articulation' | 'bendTarget'>
+>
 
 /** When string/fret change, recompute midi unless midi is explicitly patched alone. */
 export function applyNotePatch(note: TabNote, patch: NotePatch): TabNote {
@@ -172,6 +267,9 @@ export type CleanUpOptions = {
   reFret?: boolean
   /** Cap total notes (keeps earliest). Default unlimited */
   maxNotes?: number
+  preferPosition?: FretPositionPrefer
+  /** Drop notes under this confidence when present */
+  minConfidence?: number
 }
 
 /**
@@ -183,12 +281,17 @@ export function cleanUpScore(score: TabScore, opts?: CleanUpOptions): TabScore {
   const minDur = opts?.minDurationBeats ?? 0.12
   const mergeGap = opts?.mergeGapBeats ?? 0.12
   const reFret = opts?.reFret !== false
+  const preferPosition = opts?.preferPosition ?? score.preferPosition ?? 'auto'
+  const minConf = opts?.minConfidence
   const grid = 4 / gridDiv // in beats (quarter = 1)
 
   const snap = (t: number) => Math.max(0, Math.round(t / grid) * grid)
 
   let notes = sortScoreNotes(score.notes)
     .filter((n) => n.duration >= minDur * 0.85)
+    .filter((n) =>
+      minConf == null || typeof n.confidence !== 'number' ? true : n.confidence >= minConf,
+    )
     .map((n) =>
       normalizeNote({
         ...n,
@@ -223,7 +326,11 @@ export function cleanUpScore(score: TabScore, opts?: CleanUpOptions): TabScore {
   if (reFret && notes.length > 0) {
     const tuning = editorTuning.length === 6 ? editorTuning : [...STANDARD_TUNING]
     const midis = notes.map((n) => n.midi ?? midiFromStringFret(n.string, n.fret, tuning))
-    const run = smoothFrettingRun(frettingSequence(midis, tuning), tuning)
+    const onsets = notes.map((n) => n.time)
+    const run = smoothFrettingRun(
+      frettingSequence(midis, tuning, { onsets, preferPosition }),
+      tuning,
+    )
     notes = notes.map((n, i) => {
       const f = run[i]
       // theory string 0 = low E → display string 5
@@ -245,6 +352,7 @@ export function cleanUpScore(score: TabScore, opts?: CleanUpOptions): TabScore {
     ...score,
     notes: sortScoreNotes(notes),
     tempo: score.tempo ?? 100,
+    preferPosition,
   }
 }
 

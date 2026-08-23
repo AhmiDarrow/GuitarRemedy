@@ -6,10 +6,12 @@ import {
   frettingForPcs,
   frettingSequence,
   midiToName,
+  midiToNameInKey,
   SCALES,
   scaleNoteNames,
   smoothFrettingRun,
   STANDARD_TUNING,
+  type FretPositionPrefer,
   type ScaleId,
 } from './theory'
 import { clampImportBpm } from './tabScore'
@@ -45,6 +47,12 @@ export type TabNote = {
   time: number
   duration: number
   midi?: number
+  /** 0..1 pitch confidence when from audio convert */
+  confidence?: number
+  /** Assist articulation mark */
+  articulation?: 'none' | 'bend' | 'slide' | 'hammer' | 'pull'
+  /** Target MIDI for bend/slide */
+  bendTarget?: number
 }
 
 export type TabScore = {
@@ -55,6 +63,8 @@ export type TabScore = {
   /** Meter [numerator, denominator] when known (e.g. [3, 4]). */
   timeSig?: [number, number]
   notes: TabNote[]
+  /** Preferred fretting zone used on last convert/cleanup */
+  preferPosition?: FretPositionPrefer
 }
 
 export interface RemedyBreakdown {
@@ -251,16 +261,29 @@ export function assertDisplayString(s: number, label = 'string'): number {
   return n
 }
 
+/** Module-level fretting position preference (open / mid / auto). */
+let sessionPreferPosition: FretPositionPrefer = 'auto'
+
+export function setSessionPreferPosition(p: FretPositionPrefer | null | undefined): void {
+  sessionPreferPosition = p === 'open' || p === 'mid' ? p : 'auto'
+}
+
+export function getSessionPreferPosition(): FretPositionPrefer {
+  return sessionPreferPosition
+}
+
 function fretMelody(
   midis: number[],
   tuning?: number[],
   onsets?: number[],
+  preferPosition?: FretPositionPrefer,
 ): Array<{ string: number; fret: number; midi: number }> {
   const t = activeTuning(tuning)
+  const prefer = preferPosition ?? sessionPreferPosition
   const run =
     onsets && onsets.length === midis.length
-      ? frettingSequence(midis, t, { onsets })
-      : frettingSequence(midis, t)
+      ? frettingSequence(midis, t, { onsets, preferPosition: prefer })
+      : frettingSequence(midis, t, { preferPosition: prefer })
   // Smooth only monophonic runs — chord grips already assign unique strings
   if (onsets && onsets.length === midis.length) {
     let hasChord = false
@@ -292,7 +315,7 @@ export function analyzeNotes(
       midi,
       startBeat: i,
       durationBeats: 1,
-      noteName: midiToName(midi),
+      noteName: midiToNameInKey(midi, detected.root, detected.scaleId),
     }
   })
   const scaleNotes = scaleNoteNames(detected.root, detected.scaleId)
@@ -425,6 +448,8 @@ export function midiToBreakdown(
     tuning,
     raw.map((n) => n.startBeat),
   )
+  const pcsPreview = raw.map((n) => ((n.midi % 12) + 12) % 12)
+  const keyPreview = detectKeyFromPcs(pcsPreview)
   const notes = raw.map((n, i) => {
     const f = frets[i] || frettingForMidi(n.midi, tuning) || { string: 0, fret: 0, midi: n.midi }
     return {
@@ -433,7 +458,7 @@ export function midiToBreakdown(
       midi: n.midi,
       startBeat: n.startBeat,
       durationBeats: Math.max(0.125, n.durationBeats),
-      noteName: midiToName(n.midi),
+      noteName: midiToNameInKey(n.midi, keyPreview.root, keyPreview.scaleId),
     } as TabEvent
   })
   const pcs = notes.map((n) => n.midi % 12)
@@ -968,9 +993,10 @@ export function midiBytesToGuitarTabs(
 export function audioMidiToBreakdown(
   converted: AudioToMidiResult,
   fileName: string,
-  opts?: { tuning?: number[] },
+  opts?: { tuning?: number[]; preferPosition?: FretPositionPrefer },
 ): RemedyBreakdown {
   if (opts?.tuning) setSessionTuning(opts.tuning)
+  if (opts?.preferPosition) setSessionPreferPosition(opts.preferPosition)
   const title = fileName.replace(/\.\w+$/, '') || 'Audio convert'
   if (!converted.notes.length) {
     const empty = breakdownAudioAssist(fileName, [])
@@ -1020,6 +1046,47 @@ export function audioMidiToBreakdown(
   })
 
   const cleaned = cleanUpAfterConvert(tabs.score)
+
+  // Merge articulation + confidence from detected notes onto cleaned score (by time order)
+  const withMeta = {
+    ...cleaned,
+    preferPosition: opts?.preferPosition ?? getSessionPreferPosition(),
+    notes: cleaned.notes.map((n, i) => {
+      const src = converted.notes[i]
+      // Prefer nearest converted note by beat≈time when lengths differ after cleanup
+      let conf = confidences[i]
+      let art = src?.articulation
+      let bend = src?.bendTarget
+      if (!src && converted.notes.length) {
+        const beat = n.time
+        let best = converted.notes[0]
+        let bestD = Infinity
+        for (const c of converted.notes) {
+          const cBeat = (c.timeSec * (converted.tempoBpm || 100)) / 60
+          const d = Math.abs(cBeat - beat)
+          if (d < bestD) {
+            bestD = d
+            best = c
+          }
+        }
+        if (bestD < 0.35) {
+          conf = best.confidence ?? best.velocity / 127
+          art = best.articulation
+          bend = best.bendTarget
+        }
+      } else if (src) {
+        conf = src.confidence ?? src.velocity / 127
+        art = src.articulation
+        bend = src.bendTarget
+      }
+      return {
+        ...n,
+        confidence: typeof conf === 'number' ? conf : n.confidence,
+        articulation: art && art !== 'none' ? art : n.articulation,
+        bendTarget: bend,
+      }
+    }),
+  }
   const polished = applyScoreToBreakdown(
     {
       ...tabs,
@@ -1030,7 +1097,7 @@ export function audioMidiToBreakdown(
       analyzedSec: converted.analyzedSec ?? converted.durationSec,
       noteConfidences: confidences,
       confidence: estimateNoteConfidence(
-        cleaned.notes.map((n) => n.midi).filter((m): m is number => typeof m === 'number'),
+        withMeta.notes.map((n) => n.midi).filter((m): m is number => typeof m === 'number'),
         { avgFrameConf, source: 'audio' },
       ),
       editable: true,
@@ -1046,24 +1113,24 @@ export function audioMidiToBreakdown(
             : ''
         }).`,
         `2) Audio→MIDI locked ${converted.notes.length} notes @ ~${converted.tempoBpm} BPM (detected ≈ ${converted.detectedTempoBpm ?? converted.tempoBpm}; lead emphasis + octave repair).`,
-        `3) MIDI→tabs: ${cleaned.notes.length} notes after cleanup · key ≈ ${tabs.key.root} ${tabs.key.scaleName}.`,
+        `3) MIDI→tabs: ${withMeta.notes.length} notes after cleanup · key ≈ ${tabs.key.root} ${tabs.key.scaleName}.`,
         `Scale tones: ${tabs.scaleNotes.join(', ')}. Confirm the first phrase against the recording.`,
       ],
       practicePlan: [
-        'Play the recording and check the first 8 tab notes by ear.',
+        'Play the recording and check the first 8 tab notes by ear (A/B scrub in the editor).',
         `Loop sticky spots at ~${Math.round((converted.tempoBpm || 100) * 0.7)} BPM.`,
         'Use Edit tab → Clean up again, or fix frets by hand, then save to Your tabs.',
         'Download the MIDI if you want to edit further in a DAW.',
       ],
     },
-    cleaned,
+    withMeta,
   )
   polished.midiBytes = converted.midiBytes
   polished.detectedTempoBpm = converted.detectedTempoBpm ?? converted.tempoBpm
   polished.analyzedSec = converted.analyzedSec ?? converted.durationSec
   polished.noteConfidences = confidences
   polished.statusMessage =
-    tabs.statusMessage ?? `Audio → MIDI → tabs · ${cleaned.notes.length} notes`
+    tabs.statusMessage ?? `Audio → MIDI → tabs · ${withMeta.notes.length} notes`
   return polished
 }
 
@@ -1085,11 +1152,17 @@ export async function convertAudioToGuitarTabs(
     onProgress?: ConvertProgress
     /** Theory-order opens (0 = low E). Prefer over module sessionTuning. */
     tuning?: number[]
+    /** mono lock-lead / multi / auto */
+    voiceMode?: 'auto' | 'mono' | 'multi'
+    swing?: 'none' | 'light' | 'medium'
+    drumGate?: boolean
+    preferPosition?: FretPositionPrefer
   },
 ): Promise<RemedyBreakdown> {
   const name = file.name || 'audio.mp3'
   const onProgress = opts?.onProgress
   if (opts?.tuning) setSessionTuning(opts.tuning)
+  if (opts?.preferPosition) setSessionPreferPosition(opts.preferPosition)
   onProgress?.('decode', '1/3 Decoding audio…')
   try {
     const buf = await file.arrayBuffer()
@@ -1101,12 +1174,18 @@ export async function convertAudioToGuitarTabs(
       maxSec: opts?.maxSec,
       stem: opts?.stem ?? 'auto',
       skipHpss: opts?.skipHpss,
+      voiceMode: opts?.voiceMode ?? 'auto',
+      swing: opts?.swing ?? 'none',
+      drumGate: opts?.drumGate,
       onProgress: (pct, message) => {
         onProgress?.('audio_to_midi', `2/3 ${message} (${pct}%)`)
       },
     })
     onProgress?.('midi_to_tabs', '3/3 MIDI → guitar tabs…')
-    const result = audioMidiToBreakdown(converted, name, { tuning: opts?.tuning })
+    const result = audioMidiToBreakdown(converted, name, {
+      tuning: opts?.tuning,
+      preferPosition: opts?.preferPosition,
+    })
     onProgress?.('done', result.statusMessage ?? 'Done · audio → MIDI → tabs')
     return result
   } catch (err) {
@@ -1138,6 +1217,10 @@ export async function breakdownFile(
     skipHpss?: boolean
     /** Theory-order opens (0 = low E). Overrides session when set. */
     tuning?: number[]
+    voiceMode?: 'auto' | 'mono' | 'multi'
+    swing?: 'none' | 'light' | 'medium'
+    drumGate?: boolean
+    preferPosition?: FretPositionPrefer
   },
 ): Promise<RemedyBreakdown> {
   const name = file.name
@@ -1195,6 +1278,10 @@ export async function breakdownFile(
       stem: opts?.stem ?? 'auto',
       skipHpss: opts?.skipHpss,
       tuning: opts?.tuning,
+      voiceMode: opts?.voiceMode ?? 'auto',
+      swing: opts?.swing ?? 'none',
+      drumGate: opts?.drumGate,
+      preferPosition: opts?.preferPosition,
     })
   }
 

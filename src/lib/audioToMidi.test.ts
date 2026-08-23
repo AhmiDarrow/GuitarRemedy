@@ -1,11 +1,14 @@
 import { describe, expect, it } from 'vitest'
 import {
   audioBufferToMono,
+  buildBeatGrid,
+  detectArticulations,
   detectPitchHz,
   detectTempoBpm,
   emphasizeMelodyBand,
   filterLowConfidenceFrames,
   framesToNotes,
+  gateDrumTransients,
   guitarRegisterScore,
   hzToMidi,
   medianFilterMidiFrames,
@@ -475,5 +478,71 @@ describe('audioToMidi', () => {
     })
     const firstBeat = out.filter((n) => n.timeSec < 0.2)
     expect(firstBeat.length).toBeGreaterThanOrEqual(2)
+  })
+
+  it('gateDrumTransients attenuates sharp spikes vs sustained tone', () => {
+    const sr = 22050
+    const n = sr // 1s
+    const pcm = new Float32Array(n)
+    for (let i = 0; i < n; i++) {
+      pcm[i] = 0.15 * Math.sin((2 * Math.PI * 440 * i) / sr)
+    }
+    // Inject a click burst
+    const c0 = Math.floor(sr * 0.5)
+    for (let i = c0; i < c0 + 40; i++) {
+      pcm[i] = 0.95
+    }
+    const gated = gateDrumTransients(pcm, sr, { strength: 0.7 })
+    const peakOrig = Math.max(...pcm.slice(c0, c0 + 40).map(Math.abs))
+    const peakGate = Math.max(...gated.slice(c0, c0 + 40).map(Math.abs))
+    expect(peakGate).toBeLessThan(peakOrig * 0.95)
+    // Sustained region after envelope settles (not the attack of the sine)
+    let sustainEnergy = 0
+    for (let i = Math.floor(sr * 0.2); i < Math.floor(sr * 0.4); i++) {
+      sustainEnergy += Math.abs(gated[i])
+    }
+    expect(sustainEnergy).toBeGreaterThan(50)
+  })
+
+  it('quantizeDetectedNotes applies light swing to off-beat 8ths', () => {
+    const tpq = 480
+    const notes = [
+      { pitch: 60, start: 0, duration: 240, velocity: 80, timeSec: 0, durationSec: 0.25, confidence: 0.8 },
+      { pitch: 62, start: 240, duration: 240, velocity: 80, timeSec: 0.25, durationSec: 0.25, confidence: 0.8 },
+      { pitch: 64, start: 480, duration: 240, velocity: 80, timeSec: 0.5, durationSec: 0.25, confidence: 0.8 },
+    ]
+    const straight = quantizeDetectedNotes(notes, {
+      tempoBpm: 120,
+      ticksPerQuarter: tpq,
+      gridDivisions: 8,
+      strength: 1,
+      swing: 'none',
+    })
+    const swung = quantizeDetectedNotes(notes, {
+      tempoBpm: 120,
+      ticksPerQuarter: tpq,
+      gridDivisions: 8,
+      strength: 1,
+      swing: 'medium',
+    })
+    // Off-beat 8th (start 240) should move later under swing
+    expect(swung[1].start).toBeGreaterThan(straight[1].start)
+  })
+
+  it('detectArticulations marks hammer/slide between close notes', () => {
+    const notes = [
+      { pitch: 60, start: 0, duration: 200, velocity: 90, timeSec: 0, durationSec: 0.25, confidence: 0.9 },
+      { pitch: 62, start: 220, duration: 200, velocity: 88, timeSec: 0.27, durationSec: 0.25, confidence: 0.88 },
+      { pitch: 67, start: 480, duration: 200, velocity: 86, timeSec: 0.55, durationSec: 0.25, confidence: 0.85 },
+    ]
+    const out = detectArticulations(notes, { tempoBpm: 100 })
+    expect(out[0].articulation === 'hammer' || out[0].articulation === 'slide').toBe(true)
+  })
+
+  it('buildBeatGrid places barlines on meter', () => {
+    const g = buildBeatGrid(4, 120, { timeSig: [4, 4] })
+    expect(g.beats.length).toBeGreaterThan(4)
+    expect(g.barBeats[0]).toBe(0)
+    expect(g.tempoBpm).toBe(120)
   })
 })

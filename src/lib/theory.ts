@@ -272,6 +272,35 @@ export function midiToName(midi: number): string {
   return `${NOTE_NAMES[pc]}${octave}`
 }
 
+/**
+ * Key-aware MIDI spelling (prefer flats in flat keys, sharps in sharp keys).
+ * Root may be a note name ("Bb") or pitch-class 0–11; scaleId selects major/minor flavor.
+ */
+export function midiToNameInKey(
+  midi: number,
+  root: string | number = 'C',
+  scaleId: string = 'major',
+): string {
+  const pc = ((midi % 12) + 12) % 12
+  const octave = Math.floor(midi / 12) - 1
+  const rootPc = noteToPc(root)
+  const id = String(scaleId || 'major')
+    .replace(/([a-z])([A-Z])/g, '$1_$2')
+    .replace(/-/g, '_')
+    .toLowerCase()
+  // Prefer flats for flat-side keys / natural minor / dorian-ish; sharps otherwise.
+  const FLAT_NAMES = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B'] as const
+  const useFlats =
+    id.includes('minor') ||
+    id.includes('dorian') ||
+    id.includes('phrygian') ||
+    id.includes('locrian') ||
+    id.includes('blues') ||
+    [1, 3, 5, 8, 10].includes(rootPc) // Db, Eb, F, Ab, Bb roots
+  const name = useFlats ? FLAT_NAMES[pc] : NOTE_NAMES[pc]
+  return `${name}${octave}`
+}
+
 export const midiToNoteName = midiToName
 
 export function nameToMidi(note: string, defaultOctave = 4): number {
@@ -488,21 +517,29 @@ export function frettingForMidi(
  * When `onsets` is provided (same length as midis), notes that share an onset
  * are fretted as a chord: unique strings, compact fret span (playable grip).
  */
+export type FretPositionPrefer = 'auto' | 'open' | 'mid'
+
 export function frettingSequence(
   midis: number[],
   tuning: number[] = [...STANDARD_TUNING],
-  opts?: { onsets?: number[]; onsetEps?: number },
+  opts?: {
+    onsets?: number[]
+    onsetEps?: number
+    /** Prefer open position (0–5), mid neck (5–7), or continuity-only auto. */
+    preferPosition?: FretPositionPrefer
+  },
 ): Array<{ string: number; fret: number; midi: number }> {
   const onsets = opts?.onsets
   const onsetEps = opts?.onsetEps ?? 1e-3
+  const preferPosition: FretPositionPrefer = opts?.preferPosition ?? 'auto'
   if (onsets && onsets.length === midis.length && midis.length > 0) {
-    return frettingSequenceWithOnsets(midis, onsets, tuning, onsetEps)
+    return frettingSequenceWithOnsets(midis, onsets, tuning, onsetEps, preferPosition)
   }
 
   const out: Array<{ string: number; fret: number; midi: number }> = []
-  let preferFret = 5
+  let preferFret = preferPosition === 'open' ? 2 : preferPosition === 'mid' ? 7 : 5
   let preferString: number | undefined
-  let positionCenter = 5
+  let positionCenter = preferFret
   for (let i = 0; i < midis.length; i++) {
     const midi = midis[i]
     const next = midis[i + 1]
@@ -510,7 +547,7 @@ export function frettingSequence(
       frettingForMidi(midi, tuning, preferFret, {
         preferString,
         positionCenter,
-        maxFret: 17,
+        maxFret: preferPosition === 'open' ? 12 : 17,
       }) || {
         string: 0,
         fret: Math.max(0, Math.min(17, midi - tuning[0])),
@@ -628,11 +665,13 @@ function frettingSequenceWithOnsets(
   onsets: number[],
   tuning: number[],
   onsetEps: number,
+  preferPosition: FretPositionPrefer = 'auto',
 ): Array<{ string: number; fret: number; midi: number }> {
   const out: Array<{ string: number; fret: number; midi: number }> = new Array(midis.length)
-  let preferFret = 5
+  let preferFret = preferPosition === 'open' ? 2 : preferPosition === 'mid' ? 7 : 5
   let preferString: number | undefined
-  let positionCenter = 5
+  let positionCenter = preferFret
+  const maxFret = preferPosition === 'open' ? 12 : 17
   let i = 0
   while (i < midis.length) {
     const t0 = onsets[i]
@@ -650,10 +689,10 @@ function frettingSequenceWithOnsets(
         frettingForMidi(midi, tuning, preferFret, {
           preferString,
           positionCenter,
-          maxFret: 17,
+          maxFret,
         }) || {
           string: 0,
-          fret: Math.max(0, Math.min(17, midi - tuning[0])),
+          fret: Math.max(0, Math.min(maxFret, midi - tuning[0])),
           midi,
         }
       if (nextSolo != null && Math.abs(nextSolo - midi) >= 3) {

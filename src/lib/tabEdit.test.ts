@@ -7,8 +7,11 @@ import {
   cleanUpAfterConvert,
   cleanUpScore,
   deleteScoreNote,
+  dropLowConfidenceNotes,
   insertScoreNote,
+  lockLeadMono,
   midiFromStringFret,
+  reFretScore,
   setScoreTempo,
   updateScoreNote,
 } from './tabEdit'
@@ -110,5 +113,36 @@ describe('tabEdit', () => {
     const after = cleanUpAfterConvert(messy)
     expect(after.notes.length).toBeGreaterThan(0)
     expect(after.tempo).toBe(100)
+  })
+
+  it('dropLowConfidenceNotes and lockLeadMono', () => {
+    const score = {
+      title: 'C',
+      tempo: 100,
+      notes: [
+        { string: 0, fret: 0, time: 0, duration: 1, midi: 64, confidence: 0.9 },
+        { string: 1, fret: 0, time: 0.02, duration: 1, midi: 59, confidence: 0.2 },
+        { string: 0, fret: 3, time: 1, duration: 1, midi: 67, confidence: 0.8 },
+      ],
+    }
+    const dropped = dropLowConfidenceNotes(score, 0.35)
+    expect(dropped.notes.length).toBe(2)
+    const mono = lockLeadMono(score)
+    expect(mono.notes.length).toBe(2) // two onset clusters
+    expect(mono.notes[0].midi).toBe(64) // higher conf wins cluster
+  })
+
+  it('reFretScore open preference keeps frets playable', () => {
+    const score = {
+      title: 'R',
+      tempo: 100,
+      notes: [
+        { string: 0, fret: 12, time: 0, duration: 1, midi: 76 },
+        { string: 0, fret: 14, time: 1, duration: 1, midi: 78 },
+      ],
+    }
+    const open = reFretScore(score, 'open')
+    expect(open.notes.every((n) => n.fret >= 0 && n.fret <= 17)).toBe(true)
+    expect(open.preferPosition).toBe('open')
   })
 })

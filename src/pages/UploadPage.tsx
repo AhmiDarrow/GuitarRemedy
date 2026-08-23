@@ -20,6 +20,7 @@ import {
   AUDIO_FORMATS_LABEL,
   isAudioUpload,
   parseUploadedFile,
+  setSessionPreferPosition,
   setSessionTuning,
   UPLOAD_ACCEPT,
   type ConvertStage,
@@ -28,7 +29,7 @@ import {
 } from '../lib/breakdown'
 import { setEditorTuning } from '../lib/tabEdit'
 import { buildSimpleMidi } from '../lib/midi'
-import { downloadMidiBytes } from '../lib/audioToMidi'
+import { convertStemDrafts, downloadMidiBytes } from '../lib/audioToMidi'
 import {
   downloadAsciiTab,
   downloadUserTabFile,
@@ -89,7 +90,15 @@ export function UploadPage() {
   const [trimSec, setTrimSec] = useState(90)
   /** HPSS stem for full-band mixes — auto races lead/harmonic/mix */
   const [stem, setStem] = useState<'auto' | 'lead' | 'harmonic' | 'mix'>('auto')
+  /** mono = lock lead · multi = keep chords · auto = engine pick */
+  const [voiceMode, setVoiceMode] = useState<'auto' | 'mono' | 'multi'>('auto')
+  const [swing, setSwing] = useState<'none' | 'light' | 'medium'>('none')
+  const [preferPosition, setPreferPosition] = useState<'auto' | 'open' | 'mid'>('auto')
   const [sourceAudioUrl, setSourceAudioUrl] = useState<string | null>(null)
+  const [sourceArrayBuffer, setSourceArrayBuffer] = useState<ArrayBuffer | null>(null)
+  const [stemDrafts, setStemDrafts] = useState<
+    Array<{ stem: string; score: number; noteCount: number }>
+  >([])
   /** 0–100 while audio convert runs (from pcmToMidi onProgress). */
   const [progressPct, setProgressPct] = useState(0)
 
@@ -125,6 +134,8 @@ export function UploadPage() {
       setSavedTab(null)
       setEditing(false)
       setProgressPct(0)
+      setStemDrafts([])
+      setSourceArrayBuffer(null)
       if (sourceAudioUrl) {
         URL.revokeObjectURL(sourceAudioUrl)
         setSourceAudioUrl(null)
@@ -140,7 +151,21 @@ export function UploadPage() {
         const tuning = getTuning()
         setSessionTuning(tuning)
         setEditorTuning(tuning)
-        const b = await parseUploadedFile(file, {
+        setSessionPreferPosition(preferPosition)
+        // Snapshot bytes once (arrayBuffer is single-use on some browsers).
+        let audioBytes: ArrayBuffer | null = null
+        if (audio) {
+          audioBytes = await file.arrayBuffer()
+          setSourceArrayBuffer(audioBytes)
+        }
+        const parseSource =
+          audio && audioBytes
+            ? {
+                name: file.name,
+                arrayBuffer: async () => audioBytes!.slice(0),
+              }
+            : file
+        const b = await parseUploadedFile(parseSource, {
           onProgress: (s, message) => {
             setStage(s)
             setStatus(message)
@@ -155,11 +180,34 @@ export function UploadPage() {
           a4: audio ? a4 : undefined,
           maxSec: audio && trimSec > 0 ? trimSec : undefined,
           stem: audio ? stem : undefined,
+          voiceMode: audio ? voiceMode : undefined,
+          swing: audio ? swing : undefined,
+          preferPosition: audio ? preferPosition : undefined,
           // Explicit tuning on every path — not only module session side-effect.
           tuning,
         })
         setBreakdown(b)
         setStage(b.kind === 'unknown' ? 'error' : 'done')
+        if (audio && audioBytes) {
+          try {
+            const drafts = await convertStemDrafts(audioBytes.slice(0), {
+              a4,
+              maxSec: trimSec > 0 ? trimSec : undefined,
+              tempoBpm: tempoOverride > 0 ? tempoOverride : undefined,
+              voiceMode,
+              swing,
+            })
+            setStemDrafts(
+              drafts.map((d) => ({
+                stem: d.stem,
+                score: d.score,
+                noteCount: d.notes.length,
+              })),
+            )
+          } catch {
+            /* stem drafts optional */
+          }
+        }
         const saved = persistBreakdown(b, file.name)
         if (saved) {
           setStatus(
@@ -178,7 +226,18 @@ export function UploadPage() {
         setBusy(false)
       }
     },
-    [persistBreakdown, sourceAudioUrl, tempoOverride, trimSec, stem, getTuning, a4],
+    [
+      persistBreakdown,
+      sourceAudioUrl,
+      tempoOverride,
+      trimSec,
+      stem,
+      voiceMode,
+      swing,
+      preferPosition,
+      getTuning,
+      a4,
+    ],
   )
 
   const onInput = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -432,6 +491,46 @@ export function UploadPage() {
               Auto races lead / harmonic / mix (+ side on stereo) for the cleanest fretting draft
             </span>
           </label>
+          <label className="block text-xs text-[var(--text-muted)]">
+            Voices
+            <select
+              className="input mt-1"
+              value={voiceMode}
+              disabled={busy}
+              onChange={(e) => setVoiceMode(e.target.value as 'auto' | 'mono' | 'multi')}
+            >
+              <option value="auto">Auto (default)</option>
+              <option value="mono">Lock lead (mono)</option>
+              <option value="multi">Keep multipitch</option>
+            </select>
+            <span className="text-[10px] opacity-80">Mono when the mix is muddy</span>
+          </label>
+          <label className="block text-xs text-[var(--text-muted)]">
+            Swing feel
+            <select
+              className="input mt-1"
+              value={swing}
+              disabled={busy}
+              onChange={(e) => setSwing(e.target.value as 'none' | 'light' | 'medium')}
+            >
+              <option value="none">Straight</option>
+              <option value="light">Light swing</option>
+              <option value="medium">Medium swing</option>
+            </select>
+          </label>
+          <label className="block text-xs text-[var(--text-muted)]">
+            Fret position
+            <select
+              className="input mt-1"
+              value={preferPosition}
+              disabled={busy}
+              onChange={(e) => setPreferPosition(e.target.value as 'auto' | 'open' | 'mid')}
+            >
+              <option value="auto">Auto continuity</option>
+              <option value="open">Prefer open (0–5)</option>
+              <option value="mid">Prefer mid (5–7)</option>
+            </select>
+          </label>
         </div>
       </div>
 
@@ -622,11 +721,31 @@ export function UploadPage() {
                 </button>
               </div>
             </div>
+            {stemDrafts.length > 0 ? (
+              <div className="rounded-xl border border-[var(--border)] bg-[var(--bg-elevated)]/40 p-3 text-xs">
+                <p className="section-title mb-2">Per-stem drafts (compare)</p>
+                <ul className="space-y-1 text-[var(--text-muted)]">
+                  {stemDrafts.map((d) => (
+                    <li key={d.stem} className="flex justify-between gap-2 font-mono">
+                      <span className="text-mint">{d.stem}</span>
+                      <span>
+                        score {d.score.toFixed(1)} · {d.noteCount} notes
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+                <p className="text-[10px] mt-2 opacity-80">
+                  Main tab used the winning stem/engine race. Re-convert with a forced stem if another draft looks cleaner.
+                  {sourceArrayBuffer ? ' Source bytes kept for re-runs this session.' : ''}
+                </p>
+              </div>
+            ) : null}
             {editing ? (
               <TabEditor
                 key={`${breakdown.title}-${breakdown.tabNotes.length}-${savedTab?.id ?? 'new'}`}
                 score={toScore(breakdown)}
                 title={breakdown.title}
+                sourceAudioUrl={sourceAudioUrl}
                 onSave={onEditorSave}
                 onCancel={() => setEditing(false)}
               />

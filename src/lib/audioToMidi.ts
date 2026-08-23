@@ -30,6 +30,8 @@ export interface PitchFrame {
   confidence: number
 }
 
+export type ArticulationKind = 'none' | 'bend' | 'slide' | 'hammer' | 'pull'
+
 export interface DetectedNote {
   pitch: number
   start: number // ticks
@@ -39,7 +41,16 @@ export interface DetectedNote {
   durationSec: number
   /** 0..1 average frame confidence when available */
   confidence?: number
+  /** Guitar articulation hint (assist — always editable). */
+  articulation?: ArticulationKind
+  /** Bend target pitch (MIDI) when articulation is bend. */
+  bendTarget?: number
 }
+
+/** Convert options shared by sync/async PCM paths. */
+export type VoiceMode = 'auto' | 'mono' | 'multi'
+export type FretPrefer = 'auto' | 'open' | 'mid'
+export type SwingFeel = 'none' | 'light' | 'medium'
 
 export interface AudioToMidiResult {
   notes: DetectedNote[]
@@ -363,6 +374,7 @@ export function filterLowConfidenceFrames(
 
 /**
  * Snap note onsets/durations to a musical grid (default 16th notes).
+ * Optional swing delays off-beats (8th-note swing feel).
  */
 export function quantizeDetectedNotes(
   notes: DetectedNote[],
@@ -371,6 +383,8 @@ export function quantizeDetectedNotes(
     ticksPerQuarter?: number
     gridDivisions?: number // 4=quarter, 8=8th, 16=16th
     strength?: number // 0..1 blend toward grid
+    /** Swing feel on 8th off-beats (none/light/medium). */
+    swing?: SwingFeel
   },
 ): DetectedNote[] {
   if (notes.length === 0) return []
@@ -378,13 +392,25 @@ export function quantizeDetectedNotes(
   const tpq = opts?.ticksPerQuarter ?? DEFAULT_TPQ
   const div = opts?.gridDivisions ?? 16
   const strength = opts?.strength ?? 0.85
+  const swing = opts?.swing ?? 'none'
   const grid = Math.max(1, Math.round(tpq / (div / 4)))
   const tickToSec = (t: number) => (t * 60) / (tempoBpm * tpq)
+  // Swing ratio: delay odd 8ths toward the next beat (classic ~2:1 light / heavier medium)
+  const swingRatio = swing === 'medium' ? 0.28 : swing === 'light' ? 0.16 : 0
+  const eighth = Math.max(1, Math.round(tpq / 2))
 
   const snap = (ticks: number) => Math.max(0, Math.round(ticks / grid) * grid)
 
   return notes.map((n) => {
-    const qStart = snap(n.start)
+    let qStart = snap(n.start)
+    if (swingRatio > 0) {
+      // Which 8th-slot is this onset nearest?
+      const slot = Math.round(qStart / eighth)
+      if (slot % 2 === 1) {
+        // Off-beat 8th: push later by swingRatio of an 8th (do not re-snap — that undoes swing)
+        qStart = Math.round(qStart + eighth * swingRatio)
+      }
+    }
     const blendedStart = Math.round(n.start * (1 - strength) + qStart * strength)
     let qDur = snap(n.duration)
     if (qDur < grid) qDur = grid
@@ -397,6 +423,115 @@ export function quantizeDetectedNotes(
       durationSec: tickToSec(blendedDur),
     }
   })
+}
+
+/**
+ * Soften drum/transient spikes before pitch track (full-band assist).
+ * Compares |x| to a slow envelope; attenuates samples far above the envelope.
+ */
+export function gateDrumTransients(
+  samples: Float32Array,
+  sampleRate: number,
+  opts?: { strength?: number; shortMs?: number; longMs?: number },
+): Float32Array {
+  if (samples.length < 64 || sampleRate <= 0) return samples.slice()
+  const strength = Math.max(0, Math.min(1, opts?.strength ?? 0.55))
+  const longN = Math.max(32, Math.floor(((opts?.longMs ?? 50) / 1000) * sampleRate))
+  const out = new Float32Array(samples.length)
+  // Causal slow abs-envelope (lags behind clicks)
+  const alpha = 1 - Math.exp(-1 / longN)
+  let env = 0
+  for (let i = 0; i < samples.length; i++) {
+    const ax = Math.abs(samples[i])
+    // Update envelope toward ax, but lag so spikes stay above env briefly
+    env += alpha * (ax - env)
+    const ratio = ax / (env + 1e-6)
+    // Spike well above slow envelope → attenuate toward envelope level
+    if (ratio > 2.5 && env > 1e-5) {
+      const t = Math.min(1, (ratio - 2.5) / 4)
+      const gate = 1 - strength * t * 0.85
+      out[i] = samples[i] * Math.max(0.12, gate)
+    } else {
+      out[i] = samples[i]
+    }
+  }
+  return out
+}
+
+/**
+ * Infer bend / slide / hammer-on / pull-off between consecutive monophonic notes.
+ * Heuristic assist only — marks articulations for tab display/edit.
+ */
+export function detectArticulations(
+  notes: DetectedNote[],
+  opts?: { tempoBpm?: number },
+): DetectedNote[] {
+  if (notes.length < 2) return notes.map((n) => ({ ...n, articulation: n.articulation ?? 'none' }))
+  const tempoBpm = opts?.tempoBpm ?? 100
+  const sorted = [...notes].sort((a, b) => a.timeSec - b.timeSec || a.pitch - b.pitch)
+  const out = sorted.map((n) => ({ ...n, articulation: n.articulation ?? ('none' as ArticulationKind) }))
+
+  for (let i = 0; i < out.length - 1; i++) {
+    const a = out[i]
+    const b = out[i + 1]
+    // Skip if simultaneous chord tones
+    if (Math.abs(a.timeSec - b.timeSec) < 0.03) continue
+    const gap = b.timeSec - (a.timeSec + a.durationSec)
+    const semi = b.pitch - a.pitch
+    const absSemi = Math.abs(semi)
+    // Same string family: small pitch move + tiny gap → hammer/pull or slide
+    if (gap >= -0.02 && gap <= 0.09 && absSemi >= 1 && absSemi <= 5) {
+      if (absSemi === 1 || absSemi === 2) {
+        // Stepwise: hammer-on (up) / pull-off (down)
+        a.articulation = semi > 0 ? 'hammer' : 'pull'
+        a.bendTarget = b.pitch
+      } else if (absSemi >= 3) {
+        a.articulation = 'slide'
+        a.bendTarget = b.pitch
+      }
+    }
+    // Sustained note with micro pitch drift already collapsed — mark bend if
+    // next note is 1–2 semitones up and overlaps slightly (pre-bend release feel)
+    if (
+      a.durationSec >= 60 / tempoBpm * 0.4 &&
+      gap >= -0.05 &&
+      gap <= 0.04 &&
+      semi >= 1 &&
+      semi <= 2 &&
+      a.articulation === 'none'
+    ) {
+      a.articulation = 'bend'
+      a.bendTarget = b.pitch
+    }
+  }
+  return out
+}
+
+/**
+ * Build a simple beat grid from tempo + optional swing (barlines as beat indices).
+ */
+export function buildBeatGrid(
+  durationSec: number,
+  tempoBpm: number,
+  opts?: { timeSig?: [number, number]; swing?: SwingFeel },
+): { beats: number[]; barBeats: number[]; swing: SwingFeel; tempoBpm: number } {
+  const bpm = Math.max(30, Math.min(300, tempoBpm || 100))
+  const secPerBeat = 60 / bpm
+  const [num] = opts?.timeSig ?? [4, 4]
+  const beatsPerBar = Math.max(1, Math.min(16, num))
+  const swing = opts?.swing ?? 'none'
+  const beats: number[] = []
+  const barBeats: number[] = []
+  let t = 0
+  let i = 0
+  while (t <= durationSec + 1e-6) {
+    beats.push(Number(t.toFixed(6)))
+    if (i % beatsPerBar === 0) barBeats.push(Number(t.toFixed(6)))
+    t += secPerBeat
+    i++
+    if (i > 20000) break
+  }
+  return { beats, barBeats, swing, tempoBpm: bpm }
 }
 
 /** Merge overlapping / back-to-back same-pitch notes after quantize. */
@@ -1090,6 +1225,8 @@ export function refineDetectedNotes(
      *                      otherwise monophonic extract (autocorr / sparse BP).
      */
     monophonic?: boolean | 'auto'
+    /** Explicit voice mode (overrides monophonic when set). */
+    voiceMode?: VoiceMode
     maxVoices?: number
     /** Optional PCM for onset-attack snap */
     samples?: Float32Array
@@ -1097,22 +1234,27 @@ export function refineDetectedNotes(
     tempoBpm?: number
     quantize?: boolean
     gridDivisions?: number
+    swing?: SwingFeel
+    /** Detect bend/slide/hammer hints after refine. Default true. */
+    detectArticulations?: boolean
   },
 ): DetectedNote[] {
   let out = notes
-  const mode = opts?.monophonic ?? 'auto'
+  const voiceMode: VoiceMode =
+    opts?.voiceMode ??
+    (opts?.monophonic === true ? 'mono' : opts?.monophonic === false ? 'multi' : 'auto')
   const maxVoices = opts?.maxVoices ?? 4
 
-  if (mode === true) {
+  if (voiceMode === 'mono') {
     out = extractMonophonicMelody(out)
-  } else if (mode === 'auto') {
+  } else if (voiceMode === 'auto') {
     if (hasMultipitchContent(out)) {
       out = extractPlayableVoices(out, { maxVoices, clusterSec: 0.045, minConf: 0.22 })
     } else {
       out = extractMonophonicMelody(out)
     }
   } else {
-    // mode === false: light multipitch keep without mono collapse
+    // multi: light multipitch keep without mono collapse
     out = extractPlayableVoices(out, { maxVoices, clusterSec: 0.05, minConf: 0.18 })
   }
 
@@ -1135,6 +1277,7 @@ export function refineDetectedNotes(
       ticksPerQuarter: DEFAULT_TPQ,
       gridDivisions: opts?.gridDivisions ?? 16,
       strength: 0.88,
+      swing: opts?.swing ?? 'none',
     })
     out = mergeAdjacentNotes(out, { ticksPerQuarter: DEFAULT_TPQ })
   }
@@ -1164,6 +1307,10 @@ export function refineDetectedNotes(
       .map((x) => x.n)
       .sort((a, b) => a.start - b.start)
     if (kept.length >= 6 && kept.length < out.length) out = kept
+  }
+
+  if (opts?.detectArticulations !== false && out.length >= 2) {
+    out = detectArticulations(out, { tempoBpm })
   }
   return out
 }
@@ -1563,7 +1710,20 @@ export type AudioConvertOpts = {
    * - `autocorr` — force classic monophonic path
    */
   pitchEngine?: 'auto' | 'basic-pitch' | 'autocorr'
+  /** Force mono lead, multipitch, or auto (default). */
+  voiceMode?: VoiceMode
+  /** 8th-note swing feel after quantize. */
+  swing?: SwingFeel
+  /** Soften drum spikes before pitch (default on for full-band). */
+  drumGate?: boolean
   onProgress?: (pct: number, message: string) => void
+}
+
+export interface StemExportBundle {
+  stem: Exclude<StemKind, 'auto'>
+  notes: DetectedNote[]
+  midiBytes: ArrayBuffer
+  score: number
 }
 
 /** Decode an audio file (mp3/wav/ogg/m4a/…) via Web Audio, then convert to MIDI. */
@@ -1597,9 +1757,89 @@ export async function convertArrayBufferToMidi(
       stem: opts?.stem,
       maxSec: opts?.maxSec,
       pitchEngine: opts?.pitchEngine ?? 'auto',
+      voiceMode: opts?.voiceMode ?? 'auto',
+      swing: opts?.swing ?? 'none',
+      drumGate: opts?.drumGate,
       sidePcm: side,
       onProgress: opts?.onProgress,
     })
+  } finally {
+    if (close && typeof ctx.close === 'function') {
+      void ctx.close()
+    }
+  }
+}
+
+/**
+ * Per-stem drafts for merge/compare (lead / harmonic / mix / side when present).
+ * Each stem runs a fast autocorr path — not a full BP race per stem (keeps UI snappy).
+ */
+export async function convertStemDrafts(
+  arrayBuffer: ArrayBuffer,
+  opts?: Omit<AudioConvertOpts, 'stem' | 'pitchEngine'> & {
+    stems?: Array<Exclude<StemKind, 'auto' | 'percussive'>>
+  },
+): Promise<StemExportBundle[]> {
+  const { ctx, close } = getDecodeContext()
+  try {
+    const copy = arrayBuffer.slice(0)
+    const audio = await ctx.decodeAudioData(copy)
+    const { mid, side } = audioBufferToMidSide(audio)
+    const sampleRate = audio.sampleRate
+    const trimmed = trimSamples(mid, sampleRate, opts?.maxSec)
+    const work = trimmed.samples
+    const sideTrimmed =
+      side && side.length === mid.length
+        ? trimSamples(side, sampleRate, opts?.maxSec).samples
+        : undefined
+    const a4 = Number.isFinite(opts?.a4) && (opts!.a4 as number) > 0 ? (opts!.a4 as number) : 440
+    const tempoHint = opts?.tempoBpm
+    const list =
+      opts?.stems ??
+      (sideTrimmed
+        ? (['lead', 'harmonic', 'mix', 'side'] as const)
+        : (['lead', 'harmonic', 'mix'] as const))
+    const out: StemExportBundle[] = []
+    for (const stem of list) {
+      const pcm = selectStem(work, sampleRate, stem, { sidePcm: sideTrimmed, a4 })
+      const gated =
+        opts?.drumGate === false ? pcm : gateDrumTransients(pcm, sampleRate, { strength: 0.45 })
+      const prepared = opts?.skipMelodyBand
+        ? gated
+        : emphasizeMelodyBand(gated, sampleRate, { leadMode: true })
+      const result = pcmToMidi(prepared, sampleRate, {
+        tempoBpm: tempoHint,
+        a4,
+        skipMelodyBand: true,
+        skipHpss: true,
+        stem: 'mix',
+      })
+      let notes = refineDetectedNotes(result.notes, {
+        voiceMode: opts?.voiceMode ?? 'auto',
+        samples: prepared,
+        sampleRate,
+        tempoBpm: result.tempoBpm,
+        quantize: true,
+        swing: opts?.swing ?? 'none',
+      })
+      const midiBytes = buildSimpleMidi(
+        notes.map((n) => ({
+          pitch: n.pitch,
+          start: n.start,
+          duration: Math.max(1, n.duration),
+          velocity: n.velocity,
+        })),
+        { ticksPerQuarter: DEFAULT_TPQ, tempoBpm: result.tempoBpm, timeSig: [4, 4] },
+      )
+      out.push({
+        stem,
+        notes,
+        midiBytes,
+        score: scoreNoteDraft(notes),
+      })
+    }
+    out.sort((a, b) => b.score - a.score)
+    return out
   } finally {
     if (close && typeof ctx.close === 'function') {
       void ctx.close()
@@ -1620,6 +1860,9 @@ export async function pcmToMidiAsync(
     noteCap?: number
     maxSec?: number
     pitchEngine?: 'auto' | 'basic-pitch' | 'autocorr'
+    voiceMode?: VoiceMode
+    swing?: SwingFeel
+    drumGate?: boolean
     /** Optional stereo side (L−R) aligned with samples. */
     sidePcm?: Float32Array
     onProgress?: (pct: number, message: string) => void
@@ -1632,9 +1875,11 @@ export async function pcmToMidiAsync(
 
   const a4 = Number.isFinite(opts?.a4) && (opts!.a4 as number) > 0 ? (opts!.a4 as number) : 440
   const onProgress = opts?.onProgress
+  const voiceMode: VoiceMode = opts?.voiceMode ?? 'auto'
+  const swing: SwingFeel = opts?.swing ?? 'none'
   const fullDuration = samples.length / sampleRate
   const trimmed = trimSamples(samples, sampleRate, opts?.maxSec)
-  const work = trimmed.samples
+  let work = trimmed.samples
   const analyzedSec = trimmed.trimSec
   const sideTrimmed =
     opts?.sidePcm && opts.sidePcm.length === samples.length
@@ -1642,9 +1887,14 @@ export async function pcmToMidiAsync(
       : undefined
   const warnings: string[] = [
     'Audio→MIDI is lead-biased multipitch assist (up to ~4 fretted voices) — not studio multi-track tabs.',
-    'Full-band path: stereo mid (+ side) → HPSS stem race → engine race (Basic Pitch multipitch vs autocorr) → tempo snap → quantize.',
+    'Full-band path: stereo mid (+ side) → drum gate → HPSS stem race → engine race (Basic Pitch multipitch vs autocorr) → tempo snap → swing quantize.',
     'Edit or Clean up the candidate tab before practicing or saving.',
   ]
+  // Drum-transient gate before stem race (full-band default on)
+  if (opts?.drumGate !== false && !opts?.skipHpss) {
+    work = gateDrumTransients(work, sampleRate, { strength: 0.5 })
+    warnings.push('Applied drum-transient gate before stem race (softens kick/snare spikes).')
+  }
   if (opts?.maxSec && opts.maxSec > 0 && analyzedSec + 0.05 < fullDuration) {
     warnings.push(`Analyzed first ${analyzedSec.toFixed(0)}s of ${fullDuration.toFixed(0)}s (trim).`)
   }
@@ -1806,14 +2056,20 @@ export async function pcmToMidiAsync(
   onProgress?.(78, 'Building notes…')
   const beforeRefine = notes.length
   // BP winners often carry multipitch; autocorr stays mono via auto mode
+  // User voiceMode overrides: mono lock / multi force / auto
+  const refineMono: boolean | 'auto' =
+    voiceMode === 'mono' ? true : voiceMode === 'multi' ? false : winner?.engine === 'basic-pitch' ? false : 'auto'
   notes = refineDetectedNotes(notes, {
-    monophonic: winner?.engine === 'basic-pitch' ? false : 'auto',
-    maxVoices: 4,
+    monophonic: refineMono,
+    voiceMode,
+    maxVoices: voiceMode === 'mono' ? 1 : 4,
     samples: prepared,
     sampleRate,
     tempoBpm,
     quantize: true,
     gridDivisions: 16,
+    swing,
+    detectArticulations: true,
   })
   if (notes.length !== beforeRefine || hasMultipitchContent(notes)) {
     warnings.push(
@@ -1821,6 +2077,18 @@ export async function pcmToMidiAsync(
         ? 'Refined draft: multipitch keep (≤4 voices) + ghost drop + onset snap + quantize.'
         : 'Refined draft: melody extract + ghost drop + onset snap + register keep.',
     )
+  }
+  if (swing !== 'none') {
+    warnings.push(`Applied ${swing} 8th-note swing feel on the beat grid.`)
+  }
+  if (voiceMode === 'mono') {
+    warnings.push('Lock lead (mono): forced single melody line.')
+  } else if (voiceMode === 'multi') {
+    warnings.push('Multipitch mode: keeping playable chord voices when detected.')
+  }
+  const artCount = notes.filter((n) => n.articulation && n.articulation !== 'none').length
+  if (artCount > 0) {
+    warnings.push(`Marked ${artCount} bend/slide/hammer hints (assist — edit if wrong).`)
   }
 
   if (opts?.tempoBpm == null && notes.length >= 4) {
@@ -1835,6 +2103,7 @@ export async function pcmToMidiAsync(
         ticksPerQuarter: DEFAULT_TPQ,
         gridDivisions: 16,
         strength: 0.9,
+        swing,
       })
       notes = mergeAdjacentNotes(notes, { ticksPerQuarter: DEFAULT_TPQ })
       warnings.push(`Tempo refined ${prev} → ${blended} BPM (energy onset × note spacing).`)

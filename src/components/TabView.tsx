@@ -241,15 +241,40 @@ export function TabView({ score, className, title, stopToken, onPlayingChange }:
                 {columns.map((col, ci) => {
                   const note = col.find((n) => n.string === s)
                   const active = ci === cursor
+                  const conf = note?.confidence
+                  const weak = typeof conf === 'number' && conf < 0.4
+                  const art =
+                    note?.articulation && note.articulation !== 'none'
+                      ? note.articulation === 'bend'
+                        ? 'b'
+                        : note.articulation === 'slide'
+                          ? '/'
+                          : note.articulation === 'hammer'
+                            ? 'h'
+                            : note.articulation === 'pull'
+                              ? 'p'
+                              : ''
+                      : ''
                   return (
                     <span
                       key={ci}
                       className={clsx(
                         'inline-block w-8 text-center border-b border-[rgba(93,255,176,0.18)]',
                         active && 'bg-mint/20 text-mint rounded',
+                        weak && !active && 'text-[var(--danger)]/90 opacity-80',
                       )}
+                      title={
+                        note
+                          ? [
+                              typeof conf === 'number' ? `conf ${conf.toFixed(2)}` : null,
+                              art ? `art ${note.articulation}` : null,
+                            ]
+                              .filter(Boolean)
+                              .join(' · ') || undefined
+                          : undefined
+                      }
                     >
-                      {note ? note.fret : '—'}
+                      {note ? `${note.fret}${art}` : '—'}
                     </span>
                   )
                 })}

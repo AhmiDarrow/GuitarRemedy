@@ -7,6 +7,7 @@ import {
   degreeLabel,
   frettingSequence,
   fretChordVoices,
+  midiToNameInKey,
   nameToMidi,
   noteToPc,
   parseChordSymbol,
@@ -126,5 +127,19 @@ describe('theory', () => {
     const grip = fretChordVoices(midis)
     expect(grip.map((g) => g.midi)).toEqual(midis)
     expect(new Set(grip.map((g) => g.string)).size).toBe(grip.length)
+  })
+
+  it('midiToNameInKey prefers flats in flat keys', () => {
+    // MIDI 70 = Bb / A#
+    expect(midiToNameInKey(70, 'Bb', 'major')).toMatch(/^Bb/)
+    expect(midiToNameInKey(70, 'A', 'major')).toMatch(/^A#/)
+  })
+
+  it('frettingSequence preferPosition open stays lower frets', () => {
+    const midis = [64, 65, 67, 69, 71, 72]
+    const open = frettingSequence(midis, undefined, { preferPosition: 'open' })
+    const mid = frettingSequence(midis, undefined, { preferPosition: 'mid' })
+    const avg = (run: typeof open) => run.reduce((s, f) => s + f.fret, 0) / run.length
+    expect(avg(open)).toBeLessThanOrEqual(avg(mid) + 1.5)
   })
 })
