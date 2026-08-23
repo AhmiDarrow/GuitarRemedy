@@ -402,3 +402,24 @@ textarea {
 .fretboard-lab .fret-nut {
   box-shadow: inset -2px 0 0 rgba(232, 247, 238, 0.35);
 }
+
+/* Wiki encyclopedia — Dark Forest prose */
+.wiki-prose {
+  color: #b8d4c4;
+}
+
+.wiki-prose p {
+  color: #b8d4c4;
+}
+
+.wiki-prose strong {
+  color: #e8f7ee;
+}
+
+.wiki-prose code {
+  font-family: var(--font-mono);
+}
+
+.wiki-prose a {
+  color: #5dffb0;
+}

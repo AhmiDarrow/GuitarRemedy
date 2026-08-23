@@ -9,6 +9,7 @@ import {
   type WikiArticle,
   type WikiCategory,
 } from '../data/wiki'
+import { APP_NAME } from '../lib/brand'
 import clsx from 'clsx'
 
 function renderInline(text: string, keyBase: string): React.ReactNode[] {
@@ -19,7 +20,7 @@ function renderInline(text: string, keyBase: string): React.ReactNode[] {
       return (
         <code
           key={key}
-          className="px-1.5 py-0.5 rounded-md bg-[var(--bg-elevated)] text-[var(--accent)] text-[0.9em] border border-[var(--line)]"
+          className="px-1.5 py-0.5 rounded-md bg-[var(--bg-elevated)] text-mint text-[0.9em] border border-[var(--border)] font-mono"
         >
           {part.slice(1, -1)}
         </code>
@@ -39,12 +40,12 @@ function renderInline(text: string, keyBase: string): React.ReactNode[] {
 function WikiBody({ body }: { body: string }) {
   const blocks = body.trim().split(/\n\n+/)
   return (
-    <div className="wiki-prose space-y-4 text-[15px] leading-relaxed text-[var(--text-secondary)]">
+    <div className="wiki-prose space-y-4 text-[15px] leading-relaxed text-soft">
       {blocks.map((block, bi) => {
         const lines = block.split('\n')
         if (lines.every((l) => l.trim().startsWith('- '))) {
           return (
-            <ul key={bi} className="list-disc pl-5 space-y-1.5 marker:text-[var(--accent)]">
+            <ul key={bi} className="list-disc pl-5 space-y-1.5 marker:text-mint">
               {lines.map((l, li) => (
                 <li key={li}>{renderInline(l.replace(/^\s*-\s*/, ''), `l-${bi}-${li}`)}</li>
               ))}
@@ -53,7 +54,7 @@ function WikiBody({ body }: { body: string }) {
         }
         if (lines.every((l) => /^\d+\.\s/.test(l.trim()))) {
           return (
-            <ol key={bi} className="list-decimal pl-5 space-y-1.5 marker:text-[var(--accent)]">
+            <ol key={bi} className="list-decimal pl-5 space-y-1.5 marker:text-mint">
               {lines.map((l, li) => (
                 <li key={li}>{renderInline(l.replace(/^\s*\d+\.\s*/, ''), `o-${bi}-${li}`)}</li>
               ))}
@@ -65,7 +66,7 @@ function WikiBody({ body }: { body: string }) {
           return (
             <div
               key={bi}
-              className="overflow-x-auto rounded-xl border border-[var(--line)] shadow-[inset_0_1px_0_rgba(93,255,176,0.06)]"
+              className="overflow-x-auto rounded-xl border border-[var(--border)] shadow-[inset_0_1px_0_rgba(93,255,176,0.06)]"
             >
               <table className="w-full text-left text-xs md:text-sm">
                 <tbody>
@@ -82,14 +83,14 @@ function WikiBody({ body }: { body: string }) {
                           ri === 0
                             ? 'bg-[var(--bg-elevated)] text-[var(--text)]'
                             : ri % 2 === 0
-                              ? 'bg-[var(--bg-soft)]/40'
+                              ? 'bg-black/20'
                               : undefined
                         }
                       >
                         {cells.map((cell, ci) => (
                           <Tag
                             key={ci}
-                            className="px-3 py-2.5 border-t border-[var(--line)] align-top first:font-semibold"
+                            className="px-3 py-2.5 border-t border-[var(--border)] align-top first:font-semibold"
                           >
                             {renderInline(cell, `t-${bi}-${ri}-${ci}`)}
                           </Tag>
@@ -118,7 +119,7 @@ function WikiBody({ body }: { body: string }) {
           return (
             <h2
               key={bi}
-              className="font-display text-lg md:text-xl font-bold text-[var(--accent)] pt-3 border-t border-[var(--line)] first:border-0 first:pt-0"
+              className="font-display text-lg md:text-xl font-bold text-mint pt-3 border-t border-[var(--border)] first:border-0 first:pt-0"
             >
               {lines[0].replace(/^##\s+/, '')}
             </h2>
@@ -157,6 +158,15 @@ function sectionHeadings(body: string): string[] {
     .slice(0, 12)
 }
 
+function chipClass(active: boolean): string {
+  return clsx(
+    'inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold border transition-colors',
+    active
+      ? 'border-mint/40 bg-mint/15 text-mint'
+      : 'border-[var(--border)] bg-[var(--bg-elevated)]/50 text-[var(--text-muted)] hover:border-mint/30 hover:text-soft',
+  )
+}
+
 export function WikiPage() {
   const { slug } = useParams()
   const navigate = useNavigate()
@@ -183,45 +193,51 @@ export function WikiPage() {
       <div className="space-y-6 max-w-3xl mx-auto animate-fade-up pb-8">
         <button
           type="button"
-          className="btn sm inline-flex items-center gap-2"
+          className="btn-ghost text-sm"
           onClick={() => navigate('/wiki')}
         >
           <ArrowLeft className="w-4 h-4" />
           Encyclopedia home
         </button>
 
-        <header className="relative overflow-hidden rounded-2xl border border-[var(--line)] bg-[var(--panel)] p-5 md:p-7 shadow-[var(--shadow)]">
-          <div
-            className="pointer-events-none absolute -right-16 -top-20 h-48 w-48 rounded-full opacity-30 blur-3xl"
-            style={{ background: 'radial-gradient(circle, var(--accent), transparent 70%)' }}
+        <header className="relative overflow-hidden rounded-3xl border border-[var(--border)] bg-gradient-to-br from-[#06120c] via-[#030705] to-[#020403]">
+          <img
+            src="/assets/brand-mark.png"
+            alt=""
+            className="absolute right-0 top-0 h-full w-32 object-cover opacity-30 md:w-44"
+            draggable={false}
           />
-          <p className="text-xs uppercase tracking-[0.16em] text-[var(--accent)] font-semibold relative">
-            {catMeta?.label ?? article.category}
-          </p>
-          <h1 className="font-display text-3xl md:text-4xl font-bold tracking-tight mt-1 relative">
-            {article.title}
-          </h1>
-          <p className="text-[var(--text-secondary)] mt-2 max-w-2xl relative">{article.summary}</p>
-          <div className="flex flex-wrap gap-1.5 pt-3 relative">
-            {article.tags.map((t) => (
-              <span
-                key={t}
-                className="text-[10px] uppercase tracking-wide px-2 py-0.5 rounded-full border border-[var(--line)] text-[var(--muted)] bg-[var(--bg-elevated)]/60"
-              >
-                {t}
-              </span>
-            ))}
+          <div className="absolute inset-0 bg-gradient-to-r from-[#030705] via-[#030705]/90 to-transparent" />
+          <div className="absolute -left-8 -bottom-10 w-40 h-40 rounded-full bg-mint/10 blur-3xl" />
+          <div className="relative p-5 md:p-7 space-y-2">
+            <p className="text-xs uppercase tracking-widest text-mint/80 font-semibold">
+              {catMeta?.label ?? article.category}
+            </p>
+            <h1 className="font-display text-3xl md:text-4xl font-bold tracking-tight">
+              {article.title}
+            </h1>
+            <p className="text-sm md:text-base text-[var(--text-muted)] max-w-2xl leading-relaxed">
+              {article.summary}
+            </p>
+            <div className="flex flex-wrap gap-1.5 pt-2">
+              {article.tags.map((t) => (
+                <span
+                  key={t}
+                  className="text-[10px] uppercase tracking-wide px-2 py-0.5 rounded-full border border-mint/20 bg-mint/5 text-soft"
+                >
+                  {t}
+                </span>
+              ))}
+            </div>
           </div>
         </header>
 
         {heads.length > 2 && (
           <nav className="card p-4 md:p-5" aria-label="On this page">
-            <p className="text-[10px] uppercase tracking-wider text-[var(--accent)] font-semibold mb-2">
-              On this page
-            </p>
-            <ol className="grid sm:grid-cols-2 gap-x-4 gap-y-1 text-sm text-[var(--text-secondary)] list-decimal pl-5">
+            <p className="section-title mb-2">On this page</p>
+            <ol className="grid sm:grid-cols-2 gap-x-4 gap-y-1 text-sm text-soft list-decimal pl-5">
               {heads.map((h) => (
-                <li key={h} className="marker:text-[var(--muted)]">
+                <li key={h} className="marker:text-mint/70">
                   {h}
                 </li>
               ))}
@@ -235,18 +251,16 @@ export function WikiPage() {
 
         {related.length > 0 && (
           <section className="space-y-3">
-            <h2 className="font-display text-sm font-semibold text-[var(--text)] uppercase tracking-wider">
-              Keep reading
-            </h2>
+            <h2 className="section-title">Keep reading</h2>
             <ul className="grid sm:grid-cols-2 gap-2">
               {related.map((a) => (
                 <li key={a.id}>
                   <Link
                     to={`/wiki/${a.id}`}
-                    className="card p-3.5 block h-full hover:border-[var(--accent)]/40 transition-colors"
+                    className="card p-3.5 block h-full hover:border-mint/40 transition-colors"
                   >
                     <span className="font-medium text-[var(--text)] text-sm">{a.title}</span>
-                    <p className="text-xs text-[var(--muted)] mt-1 line-clamp-2">{a.summary}</p>
+                    <p className="text-xs text-[var(--text-muted)] mt-1 line-clamp-2">{a.summary}</p>
                   </Link>
                 </li>
               ))}
@@ -256,30 +270,30 @@ export function WikiPage() {
 
         <div className="flex flex-col sm:flex-row gap-2 sm:justify-between">
           {prev ? (
-            <Link to={`/wiki/${prev.id}`} className="btn sm text-left">
+            <Link to={`/wiki/${prev.id}`} className="btn-secondary text-sm text-left">
               ← {prev.title}
             </Link>
           ) : (
             <span />
           )}
           {next ? (
-            <Link to={`/wiki/${next.id}`} className="btn sm text-right sm:ml-auto">
+            <Link to={`/wiki/${next.id}`} className="btn-secondary text-sm text-right sm:ml-auto">
               {next.title} →
             </Link>
           ) : null}
         </div>
 
-        <p className="text-xs text-[var(--muted)] leading-relaxed">
-          Free MIT teaching text — original for GuitarRemedy, not scraped textbooks. Prefer drills?{' '}
-          <Link className="text-[var(--accent)] hover:underline" to="/learn">
+        <p className="text-xs text-[var(--text-muted)] leading-relaxed">
+          Free MIT teaching text — original for {APP_NAME}, not scraped textbooks. Prefer drills?{' '}
+          <Link className="text-mint hover:underline" to="/learn">
             Learn
           </Link>
           ,{' '}
-          <Link className="text-[var(--accent)] hover:underline" to="/practice">
+          <Link className="text-mint hover:underline" to="/practice">
             Practice
           </Link>
           , or{' '}
-          <Link className="text-[var(--accent)] hover:underline" to="/library">
+          <Link className="text-mint hover:underline" to="/library">
             Library
           </Link>
           .
@@ -290,40 +304,45 @@ export function WikiPage() {
 
   return (
     <div className="space-y-6 animate-fade-up pb-8">
-      <header className="relative overflow-hidden rounded-2xl border border-[var(--line)] bg-[var(--panel)] p-5 md:p-8 shadow-[var(--shadow)]">
-        <div
-          className="pointer-events-none absolute -left-10 top-0 h-40 w-40 rounded-full opacity-25 blur-3xl"
-          style={{ background: 'radial-gradient(circle, var(--accent-2), transparent 70%)' }}
+      <header className="relative overflow-hidden rounded-3xl border border-[var(--border)] bg-gradient-to-br from-[#06120c] via-[#030705] to-[#020403]">
+        <img
+          src="/assets/hero-dark-forest.png"
+          alt=""
+          className="absolute inset-0 h-full w-full object-cover opacity-30"
+          draggable={false}
         />
-        <div className="relative flex flex-col md:flex-row md:items-end gap-4 justify-between">
+        <div className="absolute inset-0 bg-gradient-to-r from-[#030705] via-[#030705]/90 to-[#030705]/45" />
+        <div className="absolute -right-10 -top-10 w-48 h-48 rounded-full bg-mint/10 blur-3xl" />
+        <div className="absolute left-1/3 bottom-0 w-40 h-32 rounded-full bg-lime/5 blur-3xl" />
+        <div className="relative p-5 md:p-8 flex flex-col md:flex-row md:items-end gap-5 justify-between">
           <div className="space-y-2 max-w-2xl">
-            <div className="flex items-center gap-2 text-[var(--accent)]">
+            <div className="flex items-center gap-2 text-mint">
               <BookMarked className="w-5 h-5" />
-              <span className="text-xs uppercase tracking-[0.16em] font-semibold">
+              <span className="text-xs uppercase tracking-widest font-semibold">
                 Free encyclopedia
               </span>
             </div>
             <h1 className="font-display text-3xl md:text-4xl font-bold tracking-tight">
-              GuitarRemedy Wiki
+              {APP_NAME} Wiki
             </h1>
-            <p className="text-[var(--text-secondary)] text-sm md:text-base leading-relaxed">
+            <p className="text-[var(--text-muted)] text-sm md:text-base leading-relaxed">
               One-stop theory, neck craft, practice habits, and app guides — textbook depth in plain
               English. Offline, searchable, MIT-licensed original teaching text. No paywall, no
               scraped books.
             </p>
-            <p className="text-xs text-[var(--muted)] flex items-center gap-1.5">
-              <Library className="w-3.5 h-3.5 text-[var(--accent)]" />
+            <p className="text-xs text-[var(--text-muted)] flex items-center gap-1.5 pt-1">
+              <Library className="w-3.5 h-3.5 text-mint" />
               {WIKI_ARTICLES.length} articles · {WIKI_CATEGORIES.length} chapters · free forever
             </p>
           </div>
           <div className="relative w-full md:w-80 shrink-0">
-            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-[var(--muted)]" />
+            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)]" />
             <input
               type="search"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Search modes, CAGED, upload…"
-              className="w-full pl-9 pr-3 py-2.5 rounded-xl bg-[var(--bg-elevated)] border border-[var(--line)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/35"
+              className="input w-full pl-9 pr-3 py-2.5"
               aria-label="Search wiki"
             />
           </div>
@@ -331,18 +350,14 @@ export function WikiPage() {
       </header>
 
       <div className="flex flex-wrap gap-2">
-        <button
-          type="button"
-          className={clsx('btn sm', cat === 'all' && 'primary')}
-          onClick={() => setCat('all')}
-        >
+        <button type="button" className={chipClass(cat === 'all')} onClick={() => setCat('all')}>
           All chapters
         </button>
         {WIKI_CATEGORIES.map((c) => (
           <button
             key={c.id}
             type="button"
-            className={clsx('btn sm', cat === c.id && 'primary')}
+            className={chipClass(cat === c.id)}
             onClick={() => setCat(c.id)}
           >
             {c.label}
@@ -359,13 +374,13 @@ export function WikiPage() {
                 key={c.id}
                 type="button"
                 onClick={() => setCat(c.id)}
-                className="card p-4 text-left hover:border-[var(--accent)]/40 transition-colors group"
+                className="card p-4 text-left hover:border-mint/40 transition-colors group"
               >
-                <h2 className="font-display font-semibold text-[var(--text)] group-hover:text-[var(--accent)] transition-colors">
+                <h2 className="font-display font-semibold text-[var(--text)] group-hover:text-mint transition-colors">
                   {c.label}
                 </h2>
-                <p className="text-xs text-[var(--muted)] mt-1 leading-relaxed">{c.blurb}</p>
-                <p className="text-[10px] text-[var(--accent)] mt-3 uppercase tracking-wider font-semibold">
+                <p className="text-xs text-[var(--text-muted)] mt-1 leading-relaxed">{c.blurb}</p>
+                <p className="text-[10px] text-mint mt-3 uppercase tracking-wider font-semibold">
                   {n} article{n === 1 ? '' : 's'}
                 </p>
               </button>
@@ -375,9 +390,13 @@ export function WikiPage() {
       )}
 
       <div className="space-y-2">
-        <p className="text-xs text-[var(--muted)]">
+        <p className="text-xs text-[var(--text-muted)]">
           {results.length} article{results.length === 1 ? '' : 's'}
-          {query ? ` matching “${query}”` : cat !== 'all' ? ` in ${WIKI_CATEGORIES.find((c) => c.id === cat)?.label}` : ''}
+          {query
+            ? ` matching “${query}”`
+            : cat !== 'all'
+              ? ` in ${WIKI_CATEGORIES.find((c) => c.id === cat)?.label}`
+              : ''}
         </p>
         <ul className="grid gap-2">
           {results.map((a) => {
@@ -386,25 +405,25 @@ export function WikiPage() {
               <li key={a.id}>
                 <Link
                   to={`/wiki/${a.id}`}
-                  className="card p-4 flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 hover:border-[var(--accent)]/35 transition-colors"
+                  className="card p-4 flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 hover:border-mint/35 transition-colors"
                 >
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-2">
                       <span className="font-semibold text-[var(--text)]">{a.title}</span>
-                      <span className="text-[10px] uppercase tracking-wider text-[var(--accent)]">
+                      <span className="text-[10px] uppercase tracking-wider text-mint">
                         {catMeta?.label}
                       </span>
                     </div>
-                    <p className="text-sm text-[var(--muted)] mt-0.5 line-clamp-2">{a.summary}</p>
+                    <p className="text-sm text-[var(--text-muted)] mt-0.5 line-clamp-2">{a.summary}</p>
                   </div>
-                  <span className="text-xs text-[var(--accent)] shrink-0">Read →</span>
+                  <span className="text-xs text-mint shrink-0 font-medium">Read →</span>
                 </Link>
               </li>
             )
           })}
         </ul>
         {results.length === 0 && (
-          <p className="text-sm text-[var(--muted)] py-8 text-center">
+          <p className="text-sm text-[var(--text-muted)] py-8 text-center">
             No articles matched. Try “scale”, “CAGED”, “capo”, or “practice”.
           </p>
         )}
