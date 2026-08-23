@@ -590,16 +590,18 @@ export function lessonTeachesOpenChord(symbol: string, lessonText: string): bool
       /(^|[^a-z])open em\b/.test(n) ||
       /(^|[^a-z])em chord\b/.test(n) ||
       /(^|[^a-z])em shape\b/.test(n) ||
-      /\bem\s*[|→>to,/-]+\s*(g|am|c|d|a|e)\b/.test(n) ||
-      /\b(g|am|c|d|a|e)\s*[|→>to,/-]+\s*em\b/.test(n) ||
+      /\bem\s*(?:[|→>,/-]+|\s+to\s+)\s*(g|am|c|d|a|e)\b/.test(n) ||
+      /\b(g|am|c|d|a|e)\s*(?:[|→>,/-]+|\s+to\s+)\s*em\b/.test(n) ||
       /\bform (a clear |an? )?em\b/.test(n) ||
       /\bbuild em\b/.test(n) ||
+      /\bfret em\b/.test(n) ||
+      /\brank em\b/.test(n) ||
       chordAppearsInChordList('em', n) ||
       // Chord symbol Em survives lowercasing as "em" — require neighbor chord/context
       (/(^|[^a-z])em\b/.test(n) &&
-        (/chord|shape|open|change|campfire|strum|progression|grip|fingers|rank|rescue|weak/.test(n) ||
-          /\bem\s*[|→>to,/-]/.test(n) ||
-          /[|→>to,/-]\s*em\b/.test(n)))
+        (/chord|shape|open|change|campfire|strum|progression|grip|rank/.test(n) ||
+          /\bem\s*(?:[|→>,/-]+|\s+to\s+)/.test(n) ||
+          /(?:[|→>,/-]+|\s+to\s+)\s*em\b/.test(n)))
     )
   }
   if (key === 'am') {
@@ -610,8 +612,8 @@ export function lessonTeachesOpenChord(symbol: string, lessonText: string): bool
       /(^|[^a-z])am chord\b/.test(n) ||
       /(^|[^a-z])am shape\b/.test(n) ||
       /\bam7\b/.test(n) ||
-      /\bam\s*[|→>to,/-]+\s*(g|f|e|dm|c|d|em|g7|e7)\b/.test(n) ||
-      /\b(g|f|e|dm|c|d|em)\s*[|→>to,/-]+\s*am\b/.test(n) ||
+      /\bam\s*(?:[|→>,/-]+|\s+to\s+)\s*(g|f|e|dm|c|d|em|g7|e7)\b/.test(n) ||
+      /\b(g|f|e|dm|c|d|em)\s*(?:[|→>,/-]+|\s+to\s+)\s*am\b/.test(n) ||
       /\bform (a clear |an? )?am\b/.test(n) ||
       /\bbuild am\b/.test(n) ||
       /\bandalusian\b/.test(n) ||
@@ -624,8 +626,8 @@ export function lessonTeachesOpenChord(symbol: string, lessonText: string): bool
       /(^|[^a-z])open dm\b/.test(n) ||
       /(^|[^a-z])dm chord\b/.test(n) ||
       /(^|[^a-z])dm shape\b/.test(n) ||
-      /\bdm\s*[|→>to,/-]+\s*(g|g7|c|am|a|e|em)\b/.test(n) ||
-      /\b(g|g7|c|am|a|e|em)\s*[|→>to,/-]+\s*dm\b/.test(n) ||
+      /\bdm\s*(?:[|→>,/-]+|\s+to\s+)\s*(g|g7|c|am|a|e|em)\b/.test(n) ||
+      /\b(g|g7|c|am|a|e|em)\s*(?:[|→>,/-]+|\s+to\s+)\s*dm\b/.test(n) ||
       /\bform (a clear |an? )?dm\b/.test(n) ||
       /\bbuild dm\b/.test(n) ||
       chordAppearsInChordList('dm', n) ||
@@ -647,13 +649,13 @@ export function lessonTeachesOpenChord(symbol: string, lessonText: string): bool
       /\be major\b/.test(n) ||
       /(^|[^a-z])open e\b/.test(n) ||
       /(^|[^a-z])e maj\b/.test(n) ||
-      /(^|[^a-z])e shape\b/.test(n) ||
+      /(?<![a-z0-9/#])e shape\b/.test(n) ||
       /(^|[^a-z])open e chord\b/.test(n) ||
       /(^|[^a-z])e major chord\b/.test(n) ||
       /\be\s*[|→>]+\s*[ad]\b/.test(n) ||
       /\b[ad]\s*[|→>]+\s*e\b/.test(n) ||
-      /\b(a|d|am|em)\s*[|→>to,/-]+\s*e\b/.test(n) ||
-      /\be\s*[|→>to,/-]+\s*(a|d|am|em)\b/.test(n) ||
+      /\b(a|d|am|em)\s*(?:[|→>,/-]+|\s+to\s+)\s*e\b/.test(n) ||
+      /\be\s*(?:[|→>,/-]+|\s+to\s+)\s*(a|d|am|em)\b/.test(n) ||
       /\bform (a clear |an? )?e\b/.test(n) ||
       /\bbuild open e\b/.test(n) ||
       chordAppearsInChordList('e', n)
@@ -664,7 +666,7 @@ export function lessonTeachesOpenChord(symbol: string, lessonText: string): bool
       /\ba major\b/.test(n) ||
       /(^|[^a-z])open a\b/.test(n) ||
       /(^|[^a-z])a maj\b/.test(n) ||
-      /(^|[^a-z])a shape\b/.test(n) ||
+      /(?<![a-z0-9/#])a shape\b/.test(n) ||
       /(^|[^a-z])open a chord\b/.test(n) ||
       /(^|[^a-z])a major chord\b/.test(n) ||
       /\ba-d-e\b/.test(n) ||
@@ -672,8 +674,8 @@ export function lessonTeachesOpenChord(symbol: string, lessonText: string): bool
       /(^|[^a-z])a\s*&\s*e\b/.test(n) ||
       /\ba\s*[|→>]+\s*[de]\b/.test(n) ||
       /\b[de]\s*[|→>]+\s*a\b/.test(n) ||
-      /\b(d|e|em|am|g)\s*[|→>to,/-]+\s*a\b/.test(n) ||
-      /\ba\s*[|→>to,/-]+\s*(d|e|em|am|g)\b/.test(n) ||
+      /\b(d|e|em|am|g)\s*(?:[|→>,/-]+|\s+to\s+)\s*a\b/.test(n) ||
+      /\ba\s*(?:[|→>,/-]+|\s+to\s+)\s*(d|e|em|am|g)\b/.test(n) ||
       /\bform (an? )?open a\b/.test(n) ||
       /\bbuild open a\b/.test(n) ||
       chordAppearsInChordList('a', n)
@@ -684,7 +686,7 @@ export function lessonTeachesOpenChord(symbol: string, lessonText: string): bool
       /\bd major\b/.test(n) ||
       /(^|[^a-z])open d\b/.test(n) ||
       /(^|[^a-z])d maj\b/.test(n) ||
-      /(^|[^a-z])d shape\b/.test(n) ||
+      /(?<![a-z0-9/#])d shape\b/.test(n) ||
       /(^|[^a-z])open d chord\b/.test(n) ||
       /(^|[^a-z])d major chord\b/.test(n) ||
       /\bd triangle\b/.test(n) ||
@@ -692,8 +694,8 @@ export function lessonTeachesOpenChord(symbol: string, lessonText: string): bool
       /(^|[^a-z])em g c d\b/.test(n) ||
       /\bg c d\b/.test(n) ||
       // campfire set mentions — not bare "c d" in prose
-      /\b(g|c|em|a)\s*[|→>to,/-]+\s*d\b/.test(n) ||
-      /\bd\s*[|→>to,/-]+\s*(em|g|c|a)\b/.test(n) ||
+      /\b(g|c|em|a)\s*(?:[|→>,/-]+|\s+to\s+)\s*d\b/.test(n) ||
+      /\bd\s*(?:[|→>,/-]+|\s+to\s+)\s*(em|g|c|a)\b/.test(n) ||
       /\bform (a clear |an? )?d\b/.test(n) ||
       /\bbuild open d\b/.test(n) ||
       chordAppearsInChordList('d', n)
@@ -704,18 +706,26 @@ export function lessonTeachesOpenChord(symbol: string, lessonText: string): bool
       /\bg major\b/.test(n) ||
       /(^|[^a-z])open g\b/.test(n) ||
       /(^|[^a-z])g maj\b/.test(n) ||
-      /(^|[^a-z])g shape\b/.test(n) ||
+      /(?<![a-z0-9/#])g shape\b/.test(n) ||
       /(^|[^a-z])open g chord\b/.test(n) ||
       /(^|[^a-z])g major chord\b/.test(n) ||
       // Real changes / campfire sets — not "notes E G B" or bare "g chord"
-      /\bem\s*[|→>to,/-]+\s*g\b/.test(n) ||
-      /\bg\s*[|→>to,/-]+\s*(em|c|d|am)\b/.test(n) ||
+      /\bem\s*(?:[|→>,/-]+|\s+to\s+)\s*g\b/.test(n) ||
+      /\bg\s*(?:[|→>,/-]+|\s+to\s+)\s*(em|c|d|am|e7|a7|d7)\b/.test(n) ||
       /(^|[^a-z])em g c d\b/.test(n) ||
       /\bg-c-d\b/.test(n) ||
       /\bg c d\b/.test(n) ||
       /\bform (a clear |an? )?g\b/.test(n) ||
       /\bbuild (open )?g\b/.test(n) ||
       /\bsecond chord[^\n.]{0,40}\bg\b/.test(n) ||
+      // Pair drills: "E7→G", "Focus E7/G", "E7 and G", "swap E7 and G"
+      /\be7\s*(?:→|->|\/|,)\s*g\b/.test(n) ||
+      /\bg\s*(?:→|->|\/|,)\s*e7\b/.test(n) ||
+      /\be7\s+and\s+g\b/.test(n) ||
+      /\bg\s+and\s+e7\b/.test(n) ||
+      /\bshape e7 and g\b/.test(n) ||
+      /\bswap e7 and g\b/.test(n) ||
+      /\bfocus e7\s*\/\s*g\b/.test(n) ||
       chordAppearsInChordList('g', n)
     )
   }
@@ -724,7 +734,7 @@ export function lessonTeachesOpenChord(symbol: string, lessonText: string): bool
       /\bc major\b/.test(n) ||
       /(^|[^a-z])open c\b/.test(n) ||
       /(^|[^a-z])c maj\b/.test(n) ||
-      /(^|[^a-z])c shape\b/.test(n) ||
+      /(?<![a-z0-9/#])c shape\b/.test(n) ||
       /(^|[^a-z])open c chord\b/.test(n) ||
       /(^|[^a-z])c major chord\b/.test(n) ||
       /\bg-c-d\b/.test(n) ||
@@ -732,8 +742,8 @@ export function lessonTeachesOpenChord(symbol: string, lessonText: string): bool
       /\bc-d\b/.test(n) ||
       /(^|[^a-z])em g c d\b/.test(n) ||
       /\bg c d\b/.test(n) ||
-      /\b(g|d|em|am|f)\s*[|→>to,/-]+\s*c\b/.test(n) ||
-      /\bc\s*[|→>to,/-]+\s*(g|d|em|am|f)\b/.test(n) ||
+      /\b(g|d|em|am|f)\s*(?:[|→>,/-]+|\s+to\s+)\s*c\b/.test(n) ||
+      /\bc\s*(?:[|→>,/-]+|\s+to\s+)\s*(g|d|em|am|f)\b/.test(n) ||
       /\bform (a clear |an? )?c\b/.test(n) ||
       /\bbuild (open )?c\b/.test(n) ||
       chordAppearsInChordList('c', n)
@@ -744,7 +754,7 @@ export function lessonTeachesOpenChord(symbol: string, lessonText: string): bool
       /\bf major\b/.test(n) ||
       /(^|[^a-z])open f\b/.test(n) ||
       /(^|[^a-z])f maj\b/.test(n) ||
-      /(^|[^a-z])f shape\b/.test(n) ||
+      /(?<![a-z0-9/#])f shape\b/.test(n) ||
       /(^|[^a-z])open f chord\b/.test(n) ||
       /(^|[^a-z])f major chord\b/.test(n) ||
       /mini.?barre f/.test(n) ||
