@@ -11,6 +11,6 @@ export const PATREON_URL = 'https://www.patreon.com/AhmiDarrow'
 
 export const ABOUT_HELLO = "Hi I'm Ahmi, hope this helps!"
 export const ABOUT_BLURB =
-  'Learn guitar with interactive scales, tabs, a free library, song upload → tabs, and a Day 1–365 path. Local-first on Windows and the web.'
+  'Interactive scales, full tabs, a free open library, song → tabs, and a Day 1–365 path — local-first on Windows and the web.'
 export const ABOUT_FOOTER_META =
-  'MIT · local-first · signed desktop updates via GitHub Releases'
+  'MIT · local-first · free-license content only · signed desktop updates via GitHub Releases'
