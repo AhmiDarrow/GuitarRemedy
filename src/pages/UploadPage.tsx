@@ -4,10 +4,8 @@ import {
   FileUp,
   AlertTriangle,
   Sparkles,
-  Music2,
   Download,
   Loader2,
-  AudioLines,
   Guitar,
   Save,
   Library,
@@ -16,7 +14,6 @@ import {
   Pencil,
 } from 'lucide-react'
 import {
-  analyzeNotes,
   AUDIO_FORMATS_LABEL,
   isAudioUpload,
   parseUploadedFile,
@@ -28,7 +25,6 @@ import {
   type TabScore,
 } from '../lib/breakdown'
 import { setEditorTuning } from '../lib/tabEdit'
-import { buildSimpleMidi } from '../lib/midi'
 import { convertStemDrafts, downloadMidiBytes } from '../lib/audioToMidi'
 import {
   downloadAsciiTab,
@@ -256,71 +252,6 @@ export function UploadPage() {
     }
   }, [runFile])
 
-  const demoMidi = () => {
-    const events = [
-      { pitch: 60, start: 0, duration: 240 },
-      { pitch: 64, start: 240, duration: 240 },
-      { pitch: 67, start: 480, duration: 240 },
-      { pitch: 72, start: 720, duration: 480 },
-      { pitch: 71, start: 1200, duration: 240 },
-      { pitch: 69, start: 1440, duration: 240 },
-      { pitch: 67, start: 1680, duration: 480 },
-    ]
-    const midiBytes = buildSimpleMidi(events, { tempoBpm: 100, ticksPerQuarter: 480 })
-    const midis = events.map((e) => e.pitch)
-    const b = analyzeNotes(midis, 'Demo C major arpeggio', { tempoBpm: 100 })
-    // score/tabNotes already in beats via analyzeNotes → eventsToNotes
-    b.midiBytes = midiBytes
-    b.statusMessage = 'Demo · MIDI → tabs'
-    b.kind = 'midi'
-    setError(null)
-    setStage('done')
-    setBreakdown(b)
-    const saved = persistBreakdown(b, 'demo-midi.mid')
-    setStatus(saved ? `${b.statusMessage} · saved to Your tabs` : b.statusMessage)
-  }
-
-  const demoMp3Pipeline = () => {
-    // Synthetic monophonic “recording” already as MIDI notes — shows full pipeline labels
-    const pitches = [57, 60, 62, 64, 67, 69, 72, 69, 67, 64, 62, 60]
-    const midiBytes = buildSimpleMidi(
-      pitches.map((pitch, i) => ({
-        pitch,
-        start: i * 240,
-        duration: 220,
-      })),
-      { tempoBpm: 100, ticksPerQuarter: 480 },
-    )
-    const b = analyzeNotes(pitches, 'demo-melody.mp3', { tempoBpm: 100 })
-    b.kind = 'audio'
-    b.midiBytes = midiBytes
-    // keep beat-based score from analyzeNotes (no *0.5 seconds hack)
-    b.confidence = 0.48
-    b.editable = true
-    b.warnings = [
-      'Demo of the MP3 → MIDI → tabs pipeline (synthetic pitches).',
-      'Real uploads decode audio, pitch-track to MIDI, then fret tabs.',
-      'Exported .mid embeds tempo so re-import matches this sketch.',
-    ]
-    b.explanation = [
-      '1) Decoded demo-melody.mp3 (synthetic).',
-      `2) MP3→MIDI locked ${pitches.length} monophonic notes → downloadable .mid.`,
-      '3) MIDI→tabs fretted in your Profile / session tuning (not always standard).',
-      'Upload a real monophonic or lead-forward MP3 for the live converter — full-band mixes stay drafts.',
-    ]
-    b.practicePlan = [
-      'Drop a clean single-note MP3 to run the real pitch tracker.',
-      'Download MIDI, edit in a DAW if needed, re-upload .mid for solid tabs.',
-      'Always confirm frets by ear before practicing.',
-    ]
-    b.statusMessage = `MP3 → MIDI → tabs · ${pitches.length} notes (demo)`
-    setError(null)
-    setStage('done')
-    setBreakdown(b)
-    const saved = persistBreakdown(b, 'demo-melody.mp3')
-    setStatus(saved ? `${b.statusMessage} · saved to Your tabs` : b.statusMessage)
-  }
-
   const onDownloadMidi = () => {
     if (breakdown?.midiBytes) {
       const base = (breakdown.title || 'converted').replace(/[^\w\-]+/g, '_').slice(0, 48)
@@ -437,7 +368,7 @@ export function UploadPage() {
           })}
         </ol>
         <p className="text-xs text-[var(--text-muted)] mt-3 leading-relaxed">
-          <AudioLines className="w-3.5 h-3.5 inline mr-1 text-mint" />
+          <Guitar className="w-3.5 h-3.5 inline mr-1 text-mint" />
           Best results: dry single-note or clear guitar lead. Full-band mixes use stereo mid
           (+ side when hard-panned), <strong className="text-[var(--text)]">Auto stem</strong> (HPSS
           lead / harmonic / mix / side), then a <strong className="text-[var(--text)]">pitch-engine race</strong>
@@ -584,19 +515,6 @@ export function UploadPage() {
             {status}
           </p>
         )}
-        <div className="flex flex-wrap justify-center gap-2 mt-4">
-          <button type="button" className="btn-secondary text-xs" onClick={demoMidi} disabled={busy}>
-            <Music2 className="w-3.5 h-3.5" /> Demo MIDI → tabs
-          </button>
-          <button
-            type="button"
-            className="btn-ghost text-xs"
-            onClick={demoMp3Pipeline}
-            disabled={busy}
-          >
-            <AudioLines className="w-3.5 h-3.5" /> Demo MP3 → MIDI → tabs
-          </button>
-        </div>
       </div>
 
       {error && (
