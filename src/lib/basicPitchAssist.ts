@@ -138,6 +138,144 @@ export function thinToGuitarLead(notes: DetectedNote[], maxSimul = 3): DetectedN
   return out.sort((a, b) => a.start - b.start)
 }
 
+/**
+ * Collapse multipitch spray into one playable monophonic lead line.
+ * Prefers guitar-register continuity over hopping to every simultaneous voice.
+ * Use after thinToGuitarLead when fretting a single melody tab.
+ */
+export function extractMonophonicMelody(
+  notes: DetectedNote[],
+  opts?: { maxJump?: number; minGapSec?: number },
+): DetectedNote[] {
+  if (notes.length === 0) return notes
+  const maxJump = opts?.maxJump ?? 7
+  const minGapSec = opts?.minGapSec ?? 0.04
+  const sorted = [...notes].sort(
+    (a, b) => a.timeSec - b.timeSec || b.pitch - a.pitch || (b.confidence ?? 0) - (a.confidence ?? 0),
+  )
+
+  const scorePick = (n: DetectedNote, prev: number | null): number => {
+    const reg = guitarRegisterScore(n.pitch)
+    const conf = n.confidence ?? 0.5
+    let s = reg * 2.2 + conf * 1.4 + Math.min(1.2, n.durationSec * 2)
+    if (prev != null) {
+      const jump = Math.abs(n.pitch - prev)
+      if (jump === 0) s += 0.35
+      else if (jump <= 2) s += 0.55
+      else if (jump <= 5) s += 0.15
+      else if (jump <= maxJump) s -= (jump - 5) * 0.12
+      else s -= (jump - maxJump) * 0.45 + 0.8
+      // Prefer staying in the same octave neighborhood on full-band spray
+      const oct = Math.abs(Math.round((n.pitch - prev) / 12))
+      if (oct >= 1) s -= oct * 0.55
+    }
+    return s
+  }
+
+  const melody: DetectedNote[] = []
+  let i = 0
+  while (i < sorted.length) {
+    const t0 = sorted[i].timeSec
+    // Cluster notes that start together (chord / multipitch frame)
+    const cluster: DetectedNote[] = []
+    while (i < sorted.length && sorted[i].timeSec <= t0 + minGapSec) {
+      cluster.push(sorted[i])
+      i++
+    }
+    const prev = melody.length ? melody[melody.length - 1].pitch : null
+    // If still overlapping previous sustain, only take a new note if it's a clear lead
+    if (melody.length) {
+      const last = melody[melody.length - 1]
+      const lastEnd = last.timeSec + last.durationSec
+      if (t0 < lastEnd - 0.02) {
+        const best = cluster.reduce((a, b) =>
+          scorePick(a, prev) >= scorePick(b, prev) ? a : b,
+        )
+        // Replace only if clearly better lead and not a bass grab
+        if (
+          scorePick(best, prev) > scorePick(last, melody.length > 1 ? melody[melody.length - 2].pitch : null) + 0.35 &&
+          guitarRegisterScore(best.pitch) >= guitarRegisterScore(last.pitch) - 0.15
+        ) {
+          // Shorten previous note to make room
+          const cut = Math.max(0.05, t0 - last.timeSec)
+          const secPerBeat =
+            last.durationSec > 0 && last.duration > 0
+              ? last.durationSec / (last.duration / 480)
+              : 0.5
+          melody[melody.length - 1] = {
+            ...last,
+            durationSec: cut,
+            duration: Math.max(1, Math.round((cut / Math.max(0.05, last.durationSec)) * last.duration)),
+          }
+          void secPerBeat
+          melody.push(best)
+        }
+        continue
+      }
+    }
+    const pick = cluster.reduce((a, b) => (scorePick(a, prev) >= scorePick(b, prev) ? a : b))
+    melody.push(pick)
+  }
+
+  // Merge immediate same-pitch neighbors
+  const merged: DetectedNote[] = []
+  for (const n of melody) {
+    const prev = merged[merged.length - 1]
+    if (
+      prev &&
+      prev.pitch === n.pitch &&
+      n.timeSec <= prev.timeSec + prev.durationSec + 0.08
+    ) {
+      const end = Math.max(prev.timeSec + prev.durationSec, n.timeSec + n.durationSec)
+      const durSec = end - prev.timeSec
+      const ratio = prev.durationSec > 0 ? durSec / prev.durationSec : 1
+      merged[merged.length - 1] = {
+        ...prev,
+        durationSec: durSec,
+        duration: Math.max(1, Math.round(prev.duration * ratio)),
+        confidence: Math.max(prev.confidence ?? 0, n.confidence ?? 0),
+        velocity: Math.max(prev.velocity, n.velocity),
+      }
+    } else {
+      merged.push({ ...n })
+    }
+  }
+  return merged
+}
+
+/** Quality score for ranking pitch engines / stems (higher = better monophonic draft). */
+export function scoreDetectedMelody(notes: DetectedNote[]): number {
+  if (!notes || notes.length < 2) return 0
+  let conf = 0
+  let reg = 0
+  let jumps = 0
+  let dur = 0
+  for (let i = 0; i < notes.length; i++) {
+    const n = notes[i]
+    conf += n.confidence ?? 0.5
+    reg += guitarRegisterScore(n.pitch)
+    dur += n.durationSec
+    if (i > 0) {
+      const d = Math.abs(n.pitch - notes[i - 1].pitch)
+      jumps += d > 7 ? d * 1.4 : d * 0.2
+    }
+  }
+  const n = notes.length
+  const span = Math.max(
+    0.5,
+    (notes[n - 1].timeSec + notes[n - 1].durationSec) - notes[0].timeSec,
+  )
+  const density = Math.min(1.4, n / Math.max(4, span * 2.5))
+  return (
+    (conf / n) * 90 +
+    (reg / n) * 40 +
+    Math.min(30, dur * 3) +
+    density * 18 -
+    jumps * 0.4 +
+    Math.min(20, n * 0.6)
+  )
+}
+
 /** Whether Basic Pitch output is worth using vs falling back. */
 export function preferBasicPitchNotes(notes: DetectedNote[]): boolean {
   if (!notes || notes.length < 3) return false
@@ -283,7 +421,9 @@ export async function notesFromBasicPitch(
     onProgress: opts?.onProgress,
   })
   let notes = basicPitchNotesToDetected(bpNotes, tempoBpm, DEFAULT_TPQ, a4)
-  notes = thinToGuitarLead(notes)
+  // Multipitch → thin poly → single frettable melody (full-band key step)
+  notes = thinToGuitarLead(notes, 2)
+  notes = extractMonophonicMelody(notes)
 
   const secPerBeat = 60 / Math.max(30, Math.min(300, tempoBpm))
   const grid = secPerBeat / 4

@@ -5,9 +5,9 @@
  * Still a monophonic / lead-biased draft for fretting — not multi-voice studio tabs.
  *
  * Quality pipeline (full-band):
- *   stereo mid (center) extract → auto stem race (lead/harmonic/mix via HPSS) →
- *   Basic Pitch (when model loads) or melody-band autocorrelation →
- *   tempo snap (½×/2×) → beat quantize → ghost drop → MIDI.
+ *   stereo mid (+ optional side) → auto stem race (lead/harmonic/mix/side via HPSS) →
+ *   engine race: Basic Pitch (Apache-2.0) vs autocorrelation (score winner) →
+ *   monophonic melody extract → tempo snap → quantize → ghost drop → MIDI.
  */
 
 import { buildSimpleMidi, parseMidi, type MidiNote, type MidiParseResult } from './midi'
@@ -16,6 +16,8 @@ import {
   notesFromBasicPitch,
   preferBasicPitchNotes,
   resampleMono,
+  scoreDetectedMelody,
+  extractMonophonicMelody,
 } from './basicPitchAssist'
 
 export interface PitchFrame {
@@ -453,6 +455,46 @@ export function audioBufferToMono(
 }
 
 /**
+ * Stereo mid (L+R)/2 + side (L−R)/2 for full-band stem race.
+ * Mono → mid only (no side).
+ */
+export function audioBufferToMidSide(buffer: {
+  numberOfChannels: number
+  length: number
+  getChannelData: (channel: number) => Float32Array
+}): { mid: Float32Array; side?: Float32Array } {
+  const mid = audioBufferToMono(buffer, { mode: 'mid' })
+  if (buffer.numberOfChannels < 2) return { mid }
+  const side = audioBufferToMono(buffer, { mode: 'side' })
+  // Only keep side if it has energy (hard-panned content)
+  let energy = 0
+  const step = Math.max(1, Math.floor(side.length / 2000))
+  for (let i = 0; i < side.length; i += step) energy += side[i] * side[i]
+  if (energy < 1e-8) return { mid }
+  return { mid, side }
+}
+
+/**
+ * Score-race two monophonic drafts (Basic Pitch vs autocorrelation).
+ * Prefer the higher melody score; tiny BP bias when nearly tied (multipitch assist).
+ */
+export function racePitchEngines(
+  candidates: Array<{ engine: 'basic-pitch' | 'autocorr'; notes: DetectedNote[] }>,
+): { engine: 'basic-pitch' | 'autocorr'; notes: DetectedNote[]; score: number } | null {
+  let best: { engine: 'basic-pitch' | 'autocorr'; notes: DetectedNote[]; score: number } | null =
+    null
+  for (const c of candidates) {
+    if (!c.notes || c.notes.length < 2) continue
+    let score = scoreNoteDraft(c.notes)
+    if (c.engine === 'basic-pitch') score += 2 // slight tie-break toward multipitch assist
+    if (!best || score > best.score) {
+      best = { engine: c.engine, notes: c.notes, score }
+    }
+  }
+  return best
+}
+
+/**
  * Guitar / lead register preference for monophonic scoring.
  * MIDI ~50–76 (D3–E5) is the sweet spot; bass thump and airy hiss score lower.
  */
@@ -584,7 +626,7 @@ export function harmonicEmphasis(
   return harm
 }
 
-export type StemKind = 'mix' | 'harmonic' | 'percussive' | 'lead' | 'auto'
+export type StemKind = 'mix' | 'harmonic' | 'percussive' | 'lead' | 'side' | 'auto'
 
 export interface HpssResult {
   harmonic: Float32Array
@@ -616,8 +658,9 @@ export function scorePitchFrames(frames: PitchFrame[]): number {
 }
 
 /**
- * Full-band assist: try lead / harmonic / mix stems and keep the cleanest pitch track.
+ * Full-band assist: try lead / harmonic / mix (/ side) stems and keep the cleanest pitch track.
  * Returns the chosen stem PCM + label for warnings/UI.
+ * Pass sidePcm (L−R) when stereo — hard-panned leads often win on side.
  */
 export function pickBestMelodyStem(
   samples: Float32Array,
@@ -626,9 +669,19 @@ export function pickBestMelodyStem(
     candidates?: Array<Exclude<StemKind, 'auto' | 'percussive'>>
     /** Concert A4 for pitch→MIDI during the race (Profile). */
     a4?: number
+    /** Optional stereo side channel (same length as samples). */
+    sidePcm?: Float32Array
   },
 ): { stem: Exclude<StemKind, 'auto'>; pcm: Float32Array; score: number } {
-  const candidates = opts?.candidates ?? (['lead', 'harmonic', 'mix'] as const)
+  const hasSide =
+    opts?.sidePcm &&
+    opts.sidePcm.length === samples.length &&
+    opts.sidePcm.length > 0
+  const candidates =
+    opts?.candidates ??
+    (hasSide
+      ? (['lead', 'harmonic', 'mix', 'side'] as const)
+      : (['lead', 'harmonic', 'mix'] as const))
   const a4 = Number.isFinite(opts?.a4) && (opts!.a4 as number) > 0 ? (opts!.a4 as number) : 440
   const sep = separateHpss(samples, sampleRate)
   let best: { stem: Exclude<StemKind, 'auto'>; pcm: Float32Array; score: number } = {
@@ -637,8 +690,15 @@ export function pickBestMelodyStem(
     score: -Infinity,
   }
   for (const kind of candidates) {
-    const pcm =
-      kind === 'mix' ? samples : kind === 'harmonic' ? sep.harmonic : kind === 'lead' ? sep.lead : sep.percussive
+    let pcm: Float32Array
+    if (kind === 'mix') pcm = samples
+    else if (kind === 'harmonic') pcm = sep.harmonic
+    else if (kind === 'lead') pcm = sep.lead
+    else if (kind === 'side') {
+      if (!hasSide) continue
+      pcm = opts!.sidePcm!
+    } else if (kind === 'percussive') pcm = sep.percussive
+    else continue
     const prepared = emphasizeMelodyBand(pcm, sampleRate, { leadMode: true })
     // Guitar lead band: slightly raise floor so kick/sub doesn't win the race
     const frames = trackPitchFrames(prepared, sampleRate, {
@@ -756,13 +816,69 @@ export function selectStem(
   samples: Float32Array,
   sampleRate: number,
   stem: StemKind = 'lead',
+  opts?: { sidePcm?: Float32Array; a4?: number },
 ): Float32Array {
   if (stem === 'mix') return samples
-  if (stem === 'auto') return pickBestMelodyStem(samples, sampleRate).pcm
+  if (stem === 'side') {
+    if (opts?.sidePcm && opts.sidePcm.length === samples.length) return opts.sidePcm
+    return samples
+  }
+  if (stem === 'auto') {
+    return pickBestMelodyStem(samples, sampleRate, {
+      sidePcm: opts?.sidePcm,
+      a4: opts?.a4,
+    }).pcm
+  }
   const sep = separateHpss(samples, sampleRate)
   if (stem === 'harmonic') return sep.harmonic
   if (stem === 'percussive') return sep.percussive
   return sep.lead
+}
+
+/**
+ * Score a DetectedNote list for engine race (wrapper around basicPitchAssist scorer).
+ * Higher = cleaner monophonic draft for fretting.
+ */
+export function scoreNoteDraft(notes: DetectedNote[]): number {
+  return scoreDetectedMelody(notes)
+}
+
+/** Post-process note list shared by autocorr + Basic Pitch winners. */
+export function refineDetectedNotes(
+  notes: DetectedNote[],
+  opts?: { monophonic?: boolean },
+): DetectedNote[] {
+  let out = notes
+  if (opts?.monophonic !== false) {
+    out = extractMonophonicMelody(out)
+  }
+  out = dropGhostNotes(out, { minDurationSec: 0.09, minVelocity: 45 })
+  out = mergeAdjacentNotes(out, { ticksPerQuarter: DEFAULT_TPQ })
+  if (out.length > 8) {
+    const confSorted = [...out].sort((a, b) => (b.confidence ?? 0) - (a.confidence ?? 0))
+    const floor = confSorted[Math.min(confSorted.length - 1, Math.floor(confSorted.length * 0.65))]
+      ?.confidence
+    if (typeof floor === 'number' && floor > 0.3) {
+      const filtered = out.filter((n) => (n.confidence ?? 0) >= floor * 0.92)
+      if (filtered.length >= Math.max(3, Math.floor(out.length * 0.35))) {
+        out = filtered.sort((a, b) => a.start - b.start)
+      }
+    }
+  }
+  if (out.length > 12) {
+    const withReg = out.map((n) => ({
+      n,
+      r: guitarRegisterScore(n.pitch) * (0.55 + 0.45 * (n.confidence ?? 0.5)),
+    }))
+    withReg.sort((a, b) => b.r - a.r)
+    const keepN = Math.max(8, Math.ceil(out.length * 0.72))
+    const kept = withReg
+      .slice(0, keepN)
+      .map((x) => x.n)
+      .sort((a, b) => a.start - b.start)
+    if (kept.length >= 6 && kept.length < out.length) out = kept
+  }
+  return out
 }
 
 /**
@@ -918,6 +1034,8 @@ export function pcmToMidi(
     noteCap?: number
     /** Analyze only the first N seconds (0 = full). */
     maxSec?: number
+    /** Optional stereo side (L−R) aligned with samples — hard-panned leads. */
+    sidePcm?: Float32Array
     onProgress?: (pct: number, message: string) => void
   },
 ): AudioToMidiResult {
@@ -934,6 +1052,10 @@ export function pcmToMidi(
   const work = trimmed.samples
   const durationSec = fullDuration
   const analyzedSec = trimmed.trimSec
+  const sideTrimmed =
+    opts?.sidePcm && opts.sidePcm.length === samples.length
+      ? trimSamples(opts.sidePcm, sampleRate, opts?.maxSec).samples
+      : undefined
   if (opts?.maxSec && opts.maxSec > 0 && analyzedSec + 0.05 < fullDuration) {
     warnings.push(`Analyzed first ${analyzedSec.toFixed(0)}s of ${fullDuration.toFixed(0)}s (trim).`)
   }
@@ -947,14 +1069,18 @@ export function pcmToMidi(
     onProgress?.(10, 'Comparing lead / harmonic / mix stems…')
     // Compete stems on a short window so full-band mixes stay interactive
     const probe = trimSamples(work, sampleRate, Math.min(12, analyzedSec || 12)).samples
-    const best = pickBestMelodyStem(probe, sampleRate, { a4 })
+    const sideProbe =
+      sideTrimmed && sideTrimmed.length === work.length
+        ? trimSamples(sideTrimmed, sampleRate, Math.min(12, analyzedSec || 12)).samples
+        : undefined
+    const best = pickBestMelodyStem(probe, sampleRate, { a4, sidePcm: sideProbe })
     chosenStemLabel = best.stem
-    stemPcm = selectStem(work, sampleRate, best.stem === 'mix' ? 'mix' : best.stem)
+    stemPcm = selectStem(work, sampleRate, best.stem, { sidePcm: sideTrimmed, a4 })
     warnings.push(
-      `Full-band auto-stem picked “${best.stem}” (score ${best.score.toFixed(1)}) — HPSS lead vs harmonic vs mix.`,
+      `Full-band auto-stem picked “${best.stem}” (score ${best.score.toFixed(1)}) — HPSS lead / harmonic / mix${sideProbe ? ' / side' : ''}.`,
     )
   } else if (!opts?.skipHpss && stemKind !== 'mix') {
-    stemPcm = selectStem(work, sampleRate, stemKind)
+    stemPcm = selectStem(work, sampleRate, stemKind, { sidePcm: sideTrimmed, a4 })
     chosenStemLabel = stemKind
     warnings.push(
       `Applied median HPSS → ${stemKind} stem to reduce drums/bass before pitch track.`,
@@ -1139,8 +1265,8 @@ export async function convertArrayBufferToMidi(
     opts?.onProgress?.(2, 'Decoding audio…')
     const copy = arrayBuffer.slice(0)
     const audio = await ctx.decodeAudioData(copy)
-    const mono = audioBufferToMono(audio)
-    return pcmToMidiAsync(mono, audio.sampleRate, {
+    const { mid, side } = audioBufferToMidSide(audio)
+    return pcmToMidiAsync(mid, audio.sampleRate, {
       tempoBpm: opts?.tempoBpm,
       a4: opts?.a4,
       skipMelodyBand: opts?.skipMelodyBand,
@@ -1148,6 +1274,7 @@ export async function convertArrayBufferToMidi(
       stem: opts?.stem,
       maxSec: opts?.maxSec,
       pitchEngine: opts?.pitchEngine ?? 'auto',
+      sidePcm: side,
       onProgress: opts?.onProgress,
     })
   } finally {
@@ -1157,7 +1284,7 @@ export async function convertArrayBufferToMidi(
   }
 }
 
-/** Async convert path: optional Basic Pitch + same stem/tempo post as pcmToMidi. */
+/** Async convert path: score-race Basic Pitch vs autocorrelation + same stem/tempo post. */
 export async function pcmToMidiAsync(
   samples: Float32Array,
   sampleRate: number,
@@ -1170,6 +1297,8 @@ export async function pcmToMidiAsync(
     noteCap?: number
     maxSec?: number
     pitchEngine?: 'auto' | 'basic-pitch' | 'autocorr'
+    /** Optional stereo side (L−R) aligned with samples. */
+    sidePcm?: Float32Array
     onProgress?: (pct: number, message: string) => void
   },
 ): Promise<AudioToMidiResult> {
@@ -1184,9 +1313,13 @@ export async function pcmToMidiAsync(
   const trimmed = trimSamples(samples, sampleRate, opts?.maxSec)
   const work = trimmed.samples
   const analyzedSec = trimmed.trimSec
+  const sideTrimmed =
+    opts?.sidePcm && opts.sidePcm.length === samples.length
+      ? trimSamples(opts.sidePcm, sampleRate, opts?.maxSec).samples
+      : undefined
   const warnings: string[] = [
     'Audio→MIDI is monophonic / lead-biased assist — not multi-voice studio transcription.',
-    'Full-band path: stereo mid → HPSS stem race → Basic Pitch (Apache-2.0) or autocorrelation → tempo snap → quantize.',
+    'Full-band path: stereo mid (+ side) → HPSS stem race → engine race (Basic Pitch vs autocorr) → tempo snap → quantize.',
     'Edit or Clean up the candidate tab before practicing or saving.',
   ]
   if (opts?.maxSec && opts.maxSec > 0 && analyzedSec + 0.05 < fullDuration) {
@@ -1201,14 +1334,18 @@ export async function pcmToMidiAsync(
   if (!opts?.skipHpss && stemKind === 'auto') {
     onProgress?.(10, 'Comparing lead / harmonic / mix stems…')
     const probe = trimSamples(work, sampleRate, Math.min(12, analyzedSec || 12)).samples
-    const best = pickBestMelodyStem(probe, sampleRate, { a4 })
+    const sideProbe =
+      sideTrimmed && sideTrimmed.length === work.length
+        ? trimSamples(sideTrimmed, sampleRate, Math.min(12, analyzedSec || 12)).samples
+        : undefined
+    const best = pickBestMelodyStem(probe, sampleRate, { a4, sidePcm: sideProbe })
     chosenStemLabel = best.stem
-    stemPcm = selectStem(work, sampleRate, best.stem === 'mix' ? 'mix' : best.stem)
+    stemPcm = selectStem(work, sampleRate, best.stem, { sidePcm: sideTrimmed, a4 })
     warnings.push(
-      `Full-band auto-stem picked “${best.stem}” (score ${best.score.toFixed(1)}) — HPSS lead vs harmonic vs mix.`,
+      `Full-band auto-stem picked “${best.stem}” (score ${best.score.toFixed(1)}) — HPSS lead / harmonic / mix${sideProbe ? ' / side' : ''}.`,
     )
   } else if (!opts?.skipHpss && stemKind !== 'mix') {
-    stemPcm = selectStem(work, sampleRate, stemKind)
+    stemPcm = selectStem(work, sampleRate, stemKind, { sidePcm: sideTrimmed, a4 })
     chosenStemLabel = stemKind
     warnings.push(
       `Applied median HPSS → ${stemKind} stem to reduce drums/bass before pitch track.`,
@@ -1240,8 +1377,27 @@ export async function pcmToMidiAsync(
     warnings.push(`Using your tempo override: ${tempoBpm} BPM (detected ≈ ${detectedTempo}).`)
   }
 
-  // --- Basic Pitch attempt (free Apache-2.0 model) ---
-  let notes: DetectedNote[] | null = null
+  // --- Engine race: Basic Pitch (when available) vs autocorrelation ---
+  type RaceCand = { engine: 'basic-pitch' | 'autocorr'; notes: DetectedNote[] }
+  const racePool: RaceCand[] = []
+
+  const runAutocorr = (): DetectedNote[] => {
+    onProgress?.(engine === 'basic-pitch' ? 70 : 42, 'Tracking pitch (autocorrelation)…')
+    const classic = pcmToMidi(prepared, sampleRate, {
+      tempoBpm,
+      a4,
+      skipMelodyBand: true,
+      skipHpss: true,
+      stem: 'mix',
+      noteCap: opts?.noteCap,
+      onProgress: (pct, message) => {
+        const mapped = 42 + Math.round(pct * 0.35)
+        onProgress?.(mapped, message)
+      },
+    })
+    return classic.notes
+  }
+
   const tryBp = engine === 'basic-pitch' || engine === 'auto'
   if (tryBp) {
     onProgress?.(32, 'Loading Basic Pitch model (free Apache-2.0)…')
@@ -1254,24 +1410,21 @@ export async function pcmToMidiAsync(
           tempoBpm,
           a4,
           onProgress: (pct) => {
-            const mapped = 40 + Math.round(pct * 0.35)
+            const mapped = 40 + Math.round(pct * 0.28)
             onProgress?.(mapped, `Basic Pitch… ${pct}%`)
           },
         })
         if (preferBasicPitchNotes(bpNotes)) {
-          notes = bpNotes
-          warnings.push(
-            'Pitch engine: Spotify Basic Pitch (Apache-2.0) multipitch assist → monophonic fretting draft.',
-          )
+          racePool.push({ engine: 'basic-pitch', notes: bpNotes })
           if (a4 !== 440) {
             warnings.push(`Using Profile A4 = ${a4} Hz for Basic Pitch pitch shift.`)
           }
         } else {
-          warnings.push('Basic Pitch returned too few notes — falling back to autocorrelation.')
+          warnings.push('Basic Pitch returned too few notes — not entered in engine race.')
         }
       } catch (err) {
         const msg = err instanceof Error ? err.message : String(err)
-        warnings.push(`Basic Pitch failed (${msg}) — falling back to autocorrelation.`)
+        warnings.push(`Basic Pitch failed (${msg}) — autocorrelation only.`)
       }
     } else if (engine === 'basic-pitch') {
       warnings.push(
@@ -1280,9 +1433,32 @@ export async function pcmToMidiAsync(
     }
   }
 
-  if (!notes) {
+  // Include autocorr in auto race, or whenever BP produced nothing usable.
+  // (engine === 'autocorr' already returned early above.)
+  if (engine === 'auto' || racePool.length === 0) {
+    const acNotes = runAutocorr()
+    if (acNotes.length >= 2) racePool.push({ engine: 'autocorr', notes: acNotes })
+  }
+
+  const winner = racePitchEngines(racePool)
+  let notes: DetectedNote[] = winner?.notes ?? []
+
+  if (winner) {
+    if (winner.engine === 'basic-pitch') {
+      warnings.push(
+        `Pitch engine race winner: Basic Pitch (Apache-2.0) · score ${winner.score.toFixed(1)} → monophonic fretting draft.`,
+      )
+    } else {
+      warnings.push(
+        racePool.some((c) => c.engine === 'basic-pitch')
+          ? `Pitch engine race winner: autocorrelation · score ${winner.score.toFixed(1)} (beat Basic Pitch on this clip).`
+          : `Pitch engine: autocorrelation · score ${winner.score.toFixed(1)}.`,
+      )
+    }
+  }
+
+  if (!notes.length) {
     onProgress?.(40, 'Tracking pitch (autocorrelation)…')
-    // Reuse classic path on already-prepared stem (skip second HPSS)
     const classic = pcmToMidi(prepared, sampleRate, {
       tempoBpm,
       a4,
@@ -1295,7 +1471,6 @@ export async function pcmToMidiAsync(
         onProgress?.(mapped, message)
       },
     })
-    // Preserve outer trim/duration metadata + stem warnings
     return {
       ...classic,
       durationSec: fullDuration,
@@ -1306,37 +1481,10 @@ export async function pcmToMidiAsync(
   }
 
   onProgress?.(78, 'Building notes…')
-  notes = dropGhostNotes(notes, { minDurationSec: 0.09, minVelocity: 45 })
-  notes = mergeAdjacentNotes(notes, { ticksPerQuarter: DEFAULT_TPQ })
-
-  if (notes.length > 8) {
-    const confSorted = [...notes].sort((a, b) => (b.confidence ?? 0) - (a.confidence ?? 0))
-    const floor = confSorted[Math.min(confSorted.length - 1, Math.floor(confSorted.length * 0.65))]
-      ?.confidence
-    if (typeof floor === 'number' && floor > 0.3) {
-      const filtered = notes.filter((n) => (n.confidence ?? 0) >= floor * 0.92)
-      if (filtered.length >= Math.max(3, Math.floor(notes.length * 0.35))) {
-        notes = filtered.sort((a, b) => a.start - b.start)
-        warnings.push('Dropped lower-confidence ghost notes after multipitch ranking.')
-      }
-    }
-  }
-
-  if (notes.length > 12) {
-    const withReg = notes.map((n) => ({
-      n,
-      r: guitarRegisterScore(n.pitch) * (0.55 + 0.45 * (n.confidence ?? 0.5)),
-    }))
-    withReg.sort((a, b) => b.r - a.r)
-    const keepN = Math.max(8, Math.ceil(notes.length * 0.72))
-    const kept = withReg
-      .slice(0, keepN)
-      .map((x) => x.n)
-      .sort((a, b) => a.start - b.start)
-    if (kept.length >= 6 && kept.length < notes.length) {
-      notes = kept
-      warnings.push('Biased note keep toward guitar/lead register (full-band assist).')
-    }
+  const beforeRefine = notes.length
+  notes = refineDetectedNotes(notes)
+  if (notes.length < beforeRefine) {
+    warnings.push('Refined draft: ghost drop + register keep after engine race.')
   }
 
   if (notes.length === 0) {

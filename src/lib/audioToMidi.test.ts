@@ -46,6 +46,56 @@ describe('audioToMidi', () => {
     expect(asyncPath.midiBytes.byteLength).toBeGreaterThan(20)
   })
 
+  it('racePitchEngines picks the higher-scoring monophonic draft', async () => {
+    const { racePitchEngines } = await import('./audioToMidi')
+    const solid = [
+      { pitch: 69, start: 0, duration: 240, velocity: 90, timeSec: 0, durationSec: 0.3, confidence: 0.85 },
+      { pitch: 71, start: 240, duration: 240, velocity: 88, timeSec: 0.3, durationSec: 0.3, confidence: 0.82 },
+      { pitch: 72, start: 480, duration: 240, velocity: 86, timeSec: 0.6, durationSec: 0.3, confidence: 0.8 },
+      { pitch: 74, start: 720, duration: 240, velocity: 84, timeSec: 0.9, durationSec: 0.3, confidence: 0.78 },
+    ]
+    const jumpy = [
+      { pitch: 40, start: 0, duration: 120, velocity: 60, timeSec: 0, durationSec: 0.15, confidence: 0.35 },
+      { pitch: 88, start: 200, duration: 80, velocity: 50, timeSec: 0.25, durationSec: 0.1, confidence: 0.3 },
+      { pitch: 45, start: 400, duration: 100, velocity: 55, timeSec: 0.5, durationSec: 0.12, confidence: 0.32 },
+    ]
+    const win = racePitchEngines([
+      { engine: 'autocorr', notes: jumpy },
+      { engine: 'basic-pitch', notes: solid },
+    ])
+    expect(win).not.toBeNull()
+    expect(win!.engine).toBe('basic-pitch')
+    expect(win!.notes.length).toBe(4)
+  })
+
+  it('audioBufferToMidSide returns side only for stereo with energy', async () => {
+    const { audioBufferToMidSide } = await import('./audioToMidi')
+    const n = 512
+    const L = new Float32Array(n)
+    const R = new Float32Array(n)
+    for (let i = 0; i < n; i++) {
+      L[i] = 0.4
+      R[i] = -0.2 // strong side energy
+    }
+    const stereo = {
+      numberOfChannels: 2,
+      length: n,
+      getChannelData: (c: number) => (c === 0 ? L : R),
+    }
+    const { mid, side } = audioBufferToMidSide(stereo)
+    expect(mid.length).toBe(n)
+    expect(side).toBeDefined()
+    expect(side!.length).toBe(n)
+
+    const mono = {
+      numberOfChannels: 1,
+      length: n,
+      getChannelData: () => L,
+    }
+    const m = audioBufferToMidSide(mono)
+    expect(m.side).toBeUndefined()
+  })
+
   it('converts hz ↔ midi around A4', () => {
     expect(hzToMidi(440)).toBe(69)
     expect(Math.round(midiToHz(69))).toBe(440)
