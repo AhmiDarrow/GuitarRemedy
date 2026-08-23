@@ -1,29 +1,46 @@
-# GuitarRemedy wiki (source of truth)
+# GuitarRemedy Wiki (encyclopedia)
 
-In-app wiki lives at **`src/data/wiki.ts`** and renders at **`/wiki`** (and `/wiki/:slug`).
+**Source of truth:** `src/data/wiki.ts` (in-app at `/wiki` and `/wiki/:slug`).
 
-This folder is the human-readable mirror for GitHub browsing. Prefer editing `src/data/wiki.ts` so the app and tests stay in sync; then refresh any exported markdown here if you keep dual copies.
+This folder is a human-readable map for GitHub browsing. Edit the TypeScript catalog so the app and tests stay in sync.
+
+## What it is
+
+A free, offline **textbook/encyclopedia** for players getting started and leveling up:
+
+- Music theory in plain English  
+- Guitar craft (neck, CAGED, technique, gear)  
+- Practice habits and the Day 1–365 path  
+- How GuitarRemedy features work (honest upload limits included)  
+- History, care, glossary, free-music ethics  
+
+**License:** original teaching text ships **MIT** with the app. Not scraped from commercial method books. Built-in **songs/tabs** remain public-domain / traditional / original studies only.
 
 ## Categories
 
-| Id | Topic |
-|----|--------|
-| `fundamentals` | Pitch, rhythm, intervals, keys |
-| `scales-modes` | Major/minor, modes, pentatonics, blues |
-| `chords-harmony` | Triads, sevenths, progressions, CAGED harmony |
-| `fretboard` | Tunings, CAGED, positions, lefty |
-| `technique` | Hands, picking, bends, vibrato |
-| `practice` | Habits, metronome, ear, 365 path |
-| `tabs-gear` | Reading tab, song upload, gear basics |
-| `app` | How GuitarRemedy features map to theory |
+| Id | Label | Topics |
+|----|--------|--------|
+| `start` | Start here | Welcome, conventions, first week, free-content rules |
+| `music` | Music theory | Notes, intervals, scales, modes, harmony, rhythm, ear, form |
+| `guitar` | Guitar craft | Anatomy, tuning, CAGED, hands, bends, tab, gear, capo |
+| `practice` | Practice & learning | Habits, metronome, songs, plateaus, 365 path |
+| `app` | Using GuitarRemedy | Home, Learn, Practice, Library, Upload, editor, desktop |
+| `facts` | Guitar facts | History, players, myths, care, styles, glossary, ethics |
 
 ## In the app
 
-- Nav: **Wiki**
-- Search + category chips
-- Related links between articles
-- Offline — bundled with the build (no network)
+- Nav / logo menu → **Wiki**
+- Search + chapter chips
+- Article view: on-this-page outline, related reads, prev/next in chapter
+- Bundled offline (no network)
 
-## License note
+## Quality bar
 
-Theory explanations are original teaching text for GuitarRemedy. Song examples in the app library remain public-domain / traditional / original studies only.
+- Articles are multi-section (`##` headings), not stubs  
+- Easy vernacular; tables where they help  
+- Points into Learn / Practice / Library when useful  
+- Tests in `src/data/wiki.test.ts` enforce depth, coverage, and MIT posture  
+
+## Regenerating (optional)
+
+If you use the helper under `.remedy-build/tmp/gen_wiki.py`, re-run it only when intentionally bulk-rewriting the catalog — then run `npm test`.
