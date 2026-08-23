@@ -154,7 +154,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     theoryBite: 'C major is C E G. Open C frets A3, D2, B1. Leaving the low E out is normal — not a mistake.',
     drills: [
       'Place C, then pluck strings 5 down to 1 one at a time',
-      'G–C–G–C at a walking tempo',
+      'G–C–G–C at a walking tempo until both shapes ring clean',
       'Thumb mid-neck — don’t strangle the top of the neck'
     ],
     libraryIds: [
@@ -175,7 +175,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     theoryBite: 'D major is D F# A. It’s a top-four-string chord — missing the low strings is correct.',
     drills: [
       'Freeze the D triangle cleanly for ten full seconds',
-      'G–C–D–G loop four times; keep it slow and clean',
+      'G–C–D–G loop four times — only bump tempo after every change rings',
       'Soft down-up strums on D only'
     ],
     libraryIds: [
@@ -220,7 +220,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     theoryBite: 'Am is the relative minor of C. Shared shape families mean less to memorize — your hand already knows half the job.',
     drills: [
       'See Am as Em slid toward the floor',
-      'Am–E changes at 60 BPM; keep it slow and clean',
+      'Am–E changes at 60 BPM until both shapes land without a scramble',
       'Loop C–Am–E–Am four times and notice the mood shift'
     ],
     libraryIds: [
@@ -241,7 +241,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     theoryBite: 'Count 1 & 2 & 3 & 4 &. Your right hand is the drummer; the fretting hand just changes costumes.',
     drills: [
       'Muted D-D-D-D for 60 seconds',
-      'D-DU-D-DU on G for 8 bars',
+      'D-DU-D-DU on G for 8 bars with the foot locked to the pulse',
       'Ghost strums: miss the strings on purpose for groove'
     ],
     libraryIds: [
@@ -262,7 +262,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     theoryBite: 'A major is A C# E. It’s a gateway to blues and rock in A. Often one finger is all that separates major from minor color.',
     drills: [
       'Freeze A and audit string by string',
-      'A–D–E–A twice slowly; keep it slow and clean',
+      'A–D–E–A twice at a walking pace — mute the open strings you do not want',
       'A vs Am toggle on a steady beat'
     ],
     libraryIds: [
@@ -324,7 +324,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     ],
     theoryBite: 'Independence is coordination, not strength. Slow spiders wire clean fretting for every chord you’ll learn later.',
     drills: [
-      'Spider on B and high E only',
+      'Spider on B and high E only — even volume, no flying fingers',
       'Add the G string when it’s even',
       'Stop at the first real tension; shake out ten seconds'
     ],
@@ -406,8 +406,8 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     theoryBite: 'Listeners feel time before they notice fancy chords. Pocket means your notes agree with the pulse.',
     drills: [
       'Foot-only quarters for 30 seconds',
-      'Muted groove for one minute',
-      'G–C–D with the foot locked'
+      'Muted groove for one minute — right hand stays in time, left hand mutes',
+      'G–C–D with the foot locked; restart the bar if the foot rushes'
     ],
     libraryIds: [
       'ch-d',
@@ -427,7 +427,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     theoryBite: 'Minor lowers the third — F instead of F# in D. Your ear learns faster when you A/B the colors on purpose.',
     drills: [
       'Pluck Dm string-by-string and fix dead notes',
-      'D | Dm | D | Dm slow; keep it slow and clean',
+      'D | Dm | D | Dm — feel the one-finger shift, no rush between colors',
       'Loop Dm–C–G–G four times with even strums'
     ],
     libraryIds: [
@@ -490,7 +490,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     drills: [
       'One-finger barre chirps, ten times',
       'Fmaj7 (easy version) as an alternate win',
-      'Shake out every 30 seconds'
+      'Shake out both hands every 30 seconds before tension sneaks in'
     ],
     libraryIds: [
       'sg-this-old-man'
@@ -569,7 +569,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     theoryBite: 'Making something tiny of your own locks skills better than drills alone. Small songs beat perfect exercises.',
     drills: [
       'Build a cell on the high strings',
-      'Cell | Em | cell | G; keep it slow and clean',
+      'Cell | Em | cell | G — leave a breath before each chord so the cell stays clear',
       'Say the sketch’s name out loud — silly names welcome'
     ],
     libraryIds: [
@@ -589,9 +589,9 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     ],
     theoryBite: 'A metronome tells the truth kindly. Landing late or early is just data for the next rep.',
     drills: [
-      'Chord hits on beat 1 only',
-      'Hits on 1 and 3 for 8 bars',
-      'Full quarters at 65 BPM; keep it slow and clean'
+      'Chord hits on beat 1 only for 8 bars — silence is part of the groove',
+      'Hits on 1 and 3 for 8 bars; keep 2 and 4 empty on purpose',
+      'Full quarters at 65 BPM with the click — every downstroke the same weight'
     ],
     libraryIds: [
       'sg-fr-re-jacques'
@@ -714,7 +714,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     theoryBite: 'Shared notes and pivot fingers make G–C a high-ROI change. Practice the change as its own song: two chords, honest time.',
     drills: [
       'Freeze G shape and strum eight even downstrokes',
-      'G→C in half notes ×16; keep it slow and clean',
+      'G→C in half notes ×16 — fretting hand arrives early, strum stays lazy',
       'Four-bar groove using only G and C'
     ],
     libraryIds: [
@@ -736,7 +736,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     theoryBite: 'C to D teaches top-string accuracy and intentional muting of lows. Practice the change as its own song: two chords, honest time.',
     drills: [
       'Freeze C shape and strum eight even downstrokes',
-      'C→D in half notes ×16; keep it slow and clean',
+      'C→D in half notes ×16 — watch the fretting fingers, not the pick',
       'Four-bar groove using only C and D'
     ],
     libraryIds: [
@@ -757,7 +757,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     theoryBite: 'Major to relative-side minor motion — pop ballad fuel. Practice the change as its own song: two chords, honest time.',
     drills: [
       'Freeze D shape and strum eight even downstrokes',
-      'D→Em in half notes ×16; keep it slow and clean',
+      'D→Em in half notes ×16 until the switch is boringly reliable',
       'Four-bar groove using only D and Em'
     ],
     libraryIds: [
@@ -778,7 +778,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     theoryBite: 'Two-finger family; great for minor mood without new pain. Practice the change as its own song: two chords, honest time.',
     drills: [
       'Freeze Em shape and strum eight even downstrokes',
-      'Em→Am in half notes ×16; keep it slow and clean',
+      'Em→Am in half notes ×16 — keep the shared fingers planted when you can',
       'Four-bar groove using only Em and Am'
     ],
     libraryIds: [
@@ -799,7 +799,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     theoryBite: 'Classic tension pair in Am songs and Andalusian cousins. Practice the change as its own song: two chords, honest time.',
     drills: [
       'Freeze Am shape and strum eight even downstrokes',
-      'Am→E in half notes ×16; keep it slow and clean',
+      'Am→E in half notes ×16 — plant the E shape before you strike',
       'Four-bar groove using only Am and E'
     ],
     libraryIds: [
@@ -820,7 +820,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     theoryBite: 'Open-position rock/blues pillars on the circle of fourths. Practice the change as its own song: two chords, honest time.',
     drills: [
       'Freeze E shape and strum eight even downstrokes',
-      'E→A in half notes ×16; keep it slow and clean',
+      'E→A in half notes ×16 — big shapes, small motion',
       'Four-bar groove using only E and A'
     ],
     libraryIds: [
@@ -841,7 +841,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     theoryBite: 'I–IV color in A; keep D on four strings only. Practice the change as its own song: two chords, honest time.',
     drills: [
       'Freeze A shape and strum eight even downstrokes',
-      'A→D in half notes ×16; keep it slow and clean',
+      'A→D in half notes ×16 — do not lift the whole hand if one finger can pivot',
       'Four-bar groove using only A and D'
     ],
     libraryIds: [
@@ -862,7 +862,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     theoryBite: 'I–vi motion — instant emotional turn without new shapes. Practice the change as its own song: two chords, honest time.',
     drills: [
       'Freeze G shape and strum eight even downstrokes',
-      'G→Em in half notes ×16; keep it slow and clean',
+      'G→Em in half notes ×16 — pinky/index story, no panic lift',
       'Four-bar groove using only G and Em'
     ],
     libraryIds: [
@@ -883,7 +883,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     theoryBite: 'Relative major/minor toggle trains ears and fingers together. Practice the change as its own song: two chords, honest time.',
     drills: [
       'Freeze C shape and strum eight even downstrokes',
-      'C→Am in half notes ×16; keep it slow and clean',
+      'C→Am in half notes ×16 — two fingers stay, one moves',
       'Four-bar groove using only C and Am'
     ],
     libraryIds: [
@@ -904,7 +904,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     theoryBite: 'I–V without IV; huge for two-chord songs and drones. Practice the change as its own song: two chords, honest time.',
     drills: [
       'Freeze G shape and strum eight even downstrokes',
-      'G→D in half notes ×16; keep it slow and clean',
+      'G→D in half notes ×16 until you can chat through the change',
       'Four-bar groove using only G and D'
     ],
     libraryIds: [
@@ -925,8 +925,8 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     theoryBite: 'Fmaj7 gives ‘F function’ with less compression than full barre — successive approximation in action.',
     drills: [
       'String-audit Fmaj7 until every note rings clearly',
-      'C–Fmaj7 slow changes; keep it slow and clean',
-      'Pop loop C–Am–Fmaj7–G; keep it slow and clean'
+      'C–Fmaj7 slow changes — hear the maj7 color land before you leave',
+      'Pop loop C–Am–Fmaj7–G at ballad tempo, four bars each chord first'
     ],
     libraryIds: [
       'ch-am'
@@ -944,7 +944,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     ],
     theoryBite: 'Barre strength is tissue adaptation over weeks. Clarity on two strings beats six muffled strings.',
     drills: [
-      'Barre chirps 1 minute; keep it slow and clean',
+      'Barre chirps 1 minute — light pressure, release before the hand burns',
       'F for 4 strums, rest, repeat',
       'Swap Fmaj7 when form collapses'
     ],
@@ -965,8 +965,8 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     theoryBite: 'Movable minor shapes unlock the neck. Bm is the classic first barre minor after F struggles.',
     drills: [
       'Air-shape Am then slide idea to fret 2',
-      'Bm string audit low to high',
-      'Bm–G–D–A half-time groove'
+      'Bm string audit low to high — fix the first dead string before moving on',
+      'Bm–G–D–A half-time groove until the barre stops choking the low strings'
     ],
     libraryIds: [
       'ch-am'
@@ -984,8 +984,8 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     ],
     theoryBite: 'CAGED maps five chord shapes up the neck.',
     drills: [
-      'Open C arpeggio slow; keep it slow and clean',
-      'Library CAGED C riff once',
+      'Open C arpeggio — one note at a time until every string speaks',
+      'Library CAGED C riff once slow, then once at song tempo',
       'Chord-tone ending on every phrase'
     ],
     libraryIds: [
@@ -1025,7 +1025,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     theoryBite: 'Form memory is musicianship. 12-bar blues is a reusable story: home, away, home, turnaround.',
     drills: [
       'Air-count 12 bars of form before you touch strings',
-      'One chorus chords only; keep it slow and clean',
+      'One chorus chords only — no fills, just even time and clear shapes',
       'Turnaround spotlight last 4 bars'
     ],
     libraryIds: [
@@ -1068,9 +1068,9 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     ],
     theoryBite: 'Ii–V–I is the backbone of countless standards. Small vocabulary, huge repertoire unlock.',
     drills: [
-      'Dm–G7–C ballad tempo; keep it slow and clean',
+      'Dm–G7–C at ballad tempo — let G7 pull toward C',
       'Loop Am–Dm–G7–C four times with steady time',
-      'Light swing optional; keep it slow and clean'
+      'Light swing optional — if it rushes, go straight eighths instead'
     ],
     libraryIds: [
       'ch-am',
@@ -1091,7 +1091,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     drills: [
       'G with low B emphasis if fretted',
       'C with low E drone experiments carefully',
-      'Record bass-heavy take; keep it slow and clean'
+      'Record a bass-heavy take — low strings clear, high strings polite'
     ],
     libraryIds: [
       'pr-andalu'
@@ -1129,7 +1129,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     ],
     theoryBite: 'Boom-chuck separates bass and chord — instant style without new harmony.',
     drills: [
-      'Open-G boom-chuck 1 minute',
+      'Open-G boom-chuck for 1 minute — bass note clear, chuck light',
       'Add C and D chords into the loop with clean changes',
       'Keep arm loose like a soft drum'
     ],
@@ -1149,7 +1149,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     ],
     theoryBite: 'Space defines reggae guitar. Hitting less is the skill — upstrokes and mutes do the dance.',
     drills: [
-      'Muted & chops 1 minute; keep it slow and clean',
+      'Muted & chops 1 minute — left hand mutes, right hand stays in time',
       'Loop C–G skank rhythm for 8 bars with muted chucks',
       'Foot still on quarters while hands play offs'
     ],
@@ -1253,7 +1253,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     drills: [
       'Identify stickiest two chords',
       'Isolate the sticky bar for two focused minutes',
-      '4-bar context insert; keep it slow and clean'
+      'Drop the lick into a 4-bar chord bed — stop if the pocket wobbles'
     ],
     libraryIds: [
       'pr-12bar'
@@ -1500,7 +1500,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     theoryBite: 'Tension migrates: hand, shoulder, jaw, breath. Softening any of them helps all of them.',
     drills: [
       'Play A7 while checking your jaw and shoulders',
-      'Exhale on beat 1 for 8 bars',
+      'Exhale on beat 1 for 8 bars so the downbeat stays soft and steady',
       'Shake out your fretting hand, then play the same line',
       'Compare the sound before and after releasing',
     ],
@@ -1542,7 +1542,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     ],
     theoryBite: 'One sticky change fixed is a full week\'s win. Slow it, loop it, then put it back in the song.',
     drills: [
-      'D7–Dm loop, slow and even',
+      'D7–Dm loop, slow and even — hear the color flip each bar',
       'Isolate the hardest change and loop it 20 times',
       'Play the full progression at 60 BPM',
       'Record before and after to hear the jump',
@@ -1625,8 +1625,8 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     theoryBite: 'Scales aren\'t homework — they\'re GPS for riffs. Space and target notes turn boxes into actual music.',
     drills: [
       'A minor pent up/down with a rest every 4 notes',
-      'End every phrase on A; keep it slow and clean',
-      'One-minute 3-note story; keep it slow and clean'
+      'End every phrase on A — hold it long enough to mean it',
+      'One-minute 3-note story — space between notes counts as music'
     ],
     libraryIds: [
       'rf-palm-mute-chug-study'
@@ -1644,8 +1644,8 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     ],
     theoryBite: 'Evenness > speed. Recording yourself exposes hidden accents that fight the groove.',
     drills: [
-      'Slow box with metronome; keep it slow and clean',
-      'Accent only beat 1 roots',
+      'Box shape with the metronome — one position, no racing the click',
+      'Accent only beat 1 roots; ghost everything else for one minute',
       'Quiet the notes that pop too hard'
     ],
     libraryIds: [
@@ -1665,8 +1665,8 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     ],
     theoryBite: 'Sequences teach your hands common melodic ‘rhythms of pitch’ used in real solos.',
     drills: [
-      '123 234 345 pattern slow',
-      '1234 2345 pattern slow; keep it slow and clean',
+      '123 234 345 pattern slow until each finger lands without a slap',
+      '1234 2345 finger pattern — even volume, no hammered leftovers',
       'Resolve to root after each pass'
     ],
     libraryIds: [
@@ -1708,9 +1708,9 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     ],
     theoryBite: 'Relative major/minor pentatonics share notes; the home note decides the story.',
     drills: [
-      'G major pent up/down; keep it slow and clean',
-      'Same notes resolving to E',
-      'Call dark, answer bright'
+      'G major pent up and down — name a target note before each run',
+      'Same notes resolving to E — hold the resolve long enough to mean it',
+      'Call dark, answer bright — two bars each, leave a breath between'
     ],
     libraryIds: [
       'sc-pent-maj',
@@ -1771,7 +1771,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     theoryBite: 'Major scale degrees explain why melodies feel finished (1,3,5) or yearn (2,4,6,7).',
     drills: [
       'Play one octave of the scale slowly with even fingers',
-      'Degrees on the way up; keep it slow and clean',
+      'Say scale degrees on the way up — stop if the names fall behind the hands',
       'Melody doodle using only 1 2 3 5'
     ],
     libraryIds: [
@@ -1792,7 +1792,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     theoryBite: 'Natural minor adds degrees pentatonics omit — more pathos, more stepwise melody options.',
     drills: [
       'Play A natural minor one octave slowly with even tone',
-      'Remove to pent and compare',
+      'Remove notes down to pent and compare — which version sings more?',
       'Phrase using b6 on purpose once'
     ],
     libraryIds: [
@@ -1856,7 +1856,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     drills: [
       'Play an E Phrygian fragment resolving to E or Am',
       'Practice b2 neighbor licks resolving to the root',
-      'Resolve phrases to E; keep it slow and clean'
+      'Resolve phrases to E — the last note is the point, not the run-up'
     ],
     libraryIds: [
       'rf-caged-c'
@@ -1874,7 +1874,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     ],
     theoryBite: 'Lydian’s raised 4 floats above major — filmic, floating, not ‘wrong’ if resolved with taste.',
     drills: [
-      'C or F lydian fragment; keep it slow and clean',
+      'C or F lydian fragment — hear the #4, then resolve so it feels like home',
       'Hold a long tone on the raised 4 and resolve down',
       'Resolve the line downward into a chord tone'
     ],
@@ -1896,7 +1896,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     drills: [
       'Play a two-bar question phrase, then leave space',
       'Rest one full bar, then re-enter cleanly on beat 1',
-      'Answer 2 bars — 4 cycles'
+      'Answer in 2 bars for 4 cycles — copy the rhythm, change the notes'
     ],
     libraryIds: [
       'rf-em-pentatonic-box-study'
@@ -1916,7 +1916,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     drills: [
       'Roots only through progression',
       'Play roots and thirds only through the progression',
-      'Add pent connector notes'
+      'Add pent connector notes between chord tones — keep the line singable'
     ],
     libraryIds: [
       'rf-am-arpeggio-cascade'
@@ -1934,7 +1934,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     ],
     theoryBite: 'Intervals create melody contour. Stepwise is speech; leaps are exclamation points.',
     drills: [
-      '3rd pattern through pent',
+      '3rd pattern through the pent box — stop if the sequence rushes the click',
       'Practice fourth leaps carefully with a slow click',
       'Build a motif from one leap, then fill with steps'
     ],
@@ -2016,7 +2016,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     drills: [
       'Sketch form on paper 1-2-3-4 sections',
       'Play a full 16 bars without stopping to fix mistakes',
-      'Second take with more space'
+      'Second take with more space — cut half the notes on purpose'
     ],
     libraryIds: [
       'rf-em-pentatonic-box-study'
@@ -2079,7 +2079,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     drills: [
       'Learn a 4-note library motif note-for-note',
       'Play it with twice the rests',
-      'Move it to a new string set',
+      'Move the same phrase to a new string set without changing the rhythm',
       'End with your own rhythm version',
     ],
     libraryIds: [
@@ -2121,7 +2121,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     drills: [
       'Play a short phrase in the first mode',
       'Repeat it in the second mode, same notes',
-      'Name each mood out loud',
+      'Name each mood out loud before you play the matching phrase',
       'Decide which fits the vamp better',
     ],
     libraryIds: [
@@ -2142,7 +2142,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     drills: [
       'Improvise over the vamp for 1 minute',
       'Circle the one bar that felt like something',
-      'Repeat it 8 times exactly',
+      'Repeat the motif 8 times exactly — only the dynamics may change',
       'Add a tiny variation on the repeat',
     ],
     libraryIds: [
@@ -2290,7 +2290,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'Loop your existing riff 4 times',
       'Add a one-note ending that leads back in',
       'Play it as: riff, riff, riff, ending',
-      'Record the full cycle twice',
+      'Record the full cycle twice; keep the take with steadier time',
     ],
     libraryIds: [
       'rf-g-caged-run-study'
@@ -5690,7 +5690,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-jingle-bells',
       'pr-andalu'
     ],
-    masteryCheck: 'On your song, On your song, land the intro hook twice clean, then one take worth keeping..',
+    masteryCheck: 'Land the intro hook twice clean, then record one take you would keep.',
   },
   264: {
 
@@ -5713,7 +5713,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-row-row-row-your-boat',
       'pr-6251'
     ],
-    masteryCheck: 'On your song, On your song, keep the verse comp steady through a full run, then one take worth keeping..',
+    masteryCheck: 'Keep the verse comp steady through a full run, then record one take you would keep.',
   },
   265: {
 
@@ -5736,7 +5736,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-this-old-man',
       'pr-145'
     ],
-    masteryCheck: 'On your song, On your song, make the chorus clearly lift, then one take worth keeping..',
+    masteryCheck: 'Make the chorus clearly lift, then record one take you would keep.',
   },
   266: {
 
@@ -5759,7 +5759,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-she-ll-be-coming-round-the-mount',
       'pr-12bar'
     ],
-    masteryCheck: 'On your song, On your song, play the bridge eight times clean, then one take worth keeping..',
+    masteryCheck: 'Play the bridge eight times clean, then record one take you would keep.',
   },
   267: {
 
@@ -5782,7 +5782,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-shenandoah',
       'pr-1645'
     ],
-    masteryCheck: 'On your song, On your song, nail the ending button, then one take worth keeping..',
+    masteryCheck: 'Nail the ending button, then record one take you would keep.',
   },
   268: {
 
@@ -5805,7 +5805,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-simple-gifts',
       'pr-andalu'
     ],
-    masteryCheck: 'On your song, On your song, make every transition glue, then one take worth keeping..',
+    masteryCheck: 'Make every transition glue, then record one take you would keep.',
   },
   269: {
 
@@ -5828,7 +5828,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-down-by-the-riverside',
       'pr-6251'
     ],
-    masteryCheck: 'On your song, On your song, hold an honest tempo start to finish, then one take worth keeping..',
+    masteryCheck: 'Hold an honest tempo start to finish, then record one take you would keep.',
   },
   270: {
 
@@ -5851,7 +5851,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-the-parting-glass',
       'pr-145'
     ],
-    masteryCheck: 'On your song, On your song, play the dynamics map, then one take worth keeping..',
+    masteryCheck: 'Play the dynamics map, then record one take you would keep.',
   },
   271: {
 
@@ -5874,7 +5874,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-the-streets-of-laredo',
       'pr-12bar'
     ],
-    masteryCheck: 'On your song, On your song, play the whole form from memory without stopping, then one take worth keeping..',
+    masteryCheck: 'Play the whole form from memory without stopping, then record one take you would keep.',
   },
   272: {
 
@@ -5897,7 +5897,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-swing-low-sweet-chariot',
       'pr-1645'
     ],
-    masteryCheck: 'On your song, On your song, practice recovering from a slip mid-song, then one take worth keeping..',
+    masteryCheck: 'Practice recovering from a slip mid-song, then record one take you would keep.',
   },
   273: {
 
@@ -5920,7 +5920,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-danny-boy-londonderry-air',
       'pr-andalu'
     ],
-    masteryCheck: 'On your song, On your song, play from a clean chart, then one take worth keeping..',
+    masteryCheck: 'Play from a clean chart, then record one take you would keep.',
   },
   274: {
 
@@ -5943,7 +5943,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-joy-to-the-world',
       'pr-6251'
     ],
-    masteryCheck: 'On your song, On your song, set the tone and arrangement, then one take worth keeping..',
+    masteryCheck: 'Set the tone and arrangement, then record one take you would keep.',
   },
   275: {
 
@@ -5966,7 +5966,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-turkey-in-the-straw',
       'pr-145'
     ],
-    masteryCheck: 'On your song, On your song, duet with the recording in time, then one take worth keeping..',
+    masteryCheck: 'Duet with the recording in time, then record one take you would keep.',
   },
   276: {
 
@@ -5989,7 +5989,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-twinkle',
       'rf-travis-pick-sketch-in-c'
     ],
-    masteryCheck: 'On your song, On your song, play the fingerstyle pass, then one take worth keeping..',
+    masteryCheck: 'Play the fingerstyle pass, then record one take you would keep.',
   },
   277: {
 
@@ -6012,7 +6012,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-amazing-grace',
       'pr-1645'
     ],
-    masteryCheck: 'On your song, On your song, play the strum pass, then one take worth keeping..',
+    masteryCheck: 'Play the strum pass, then record one take you would keep.',
   },
   278: {
 
@@ -6035,7 +6035,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-when-the-saints-go-marching-in',
       'rf-minor-slide-lick-study'
     ],
-    masteryCheck: 'On your song, On your song, write and play the lead break, then one take worth keeping..',
+    masteryCheck: 'Write and play the lead break, then record one take you would keep.',
   },
   279: {
 
@@ -6058,7 +6058,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-mary-had-a-little-lamb',
       'pr-6251'
     ],
-    masteryCheck: 'On your song, On your song, trade call and response with your voice, then one take worth keeping..',
+    masteryCheck: 'Trade call and response with your voice, then record one take you would keep.',
   },
   280: {
 
@@ -6081,7 +6081,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-london-bridge',
       'pr-145'
     ],
-    masteryCheck: 'On your song, On your song, set the capo and key for your voice, then one take worth keeping..',
+    masteryCheck: 'Set the capo and key for your voice, then record one take you would keep.',
   },
   281: {
 
@@ -6104,7 +6104,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-happy-birthday',
       'pr-12bar'
     ],
-    masteryCheck: 'On your song, On your song, order your setlist with flow logic, then one take worth keeping..',
+    masteryCheck: 'Order your setlist with flow logic, then record one take you would keep.',
   },
   282: {
 
@@ -6127,7 +6127,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-scarborough-fair',
       'pr-1645'
     ],
-    masteryCheck: 'On your song, On your song, play the full set without dropping, then one take worth keeping..',
+    masteryCheck: 'Play the full set without dropping, then record one take you would keep.',
   },
   283: {
 
@@ -6150,7 +6150,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-home-on-the-range',
       'pr-andalu'
     ],
-    masteryCheck: 'On your song, On your song, play a quiet practice pass, then one take worth keeping..',
+    masteryCheck: 'Play a quiet practice pass, then record one take you would keep.',
   },
   284: {
 
@@ -6219,7 +6219,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-drunken-sailor',
       'pr-12bar'
     ],
-    masteryCheck: 'On your song, On your song, fix just one bar, then one take worth keeping..',
+    masteryCheck: 'Fix just one bar, then record one take you would keep.',
   },
   287: {
 
@@ -6242,7 +6242,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-house-of-the-rising-sun',
       'pr-1645'
     ],
-    masteryCheck: 'On your song, On your song, play with performance stance, then one take worth keeping..',
+    masteryCheck: 'Play with performance stance, then record one take you would keep.',
   },
   288: {
 
@@ -6265,7 +6265,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-aura-lee',
       'pr-andalu'
     ],
-    masteryCheck: 'On your song, On your song, use your start-strong ritual, then one take worth keeping..',
+    masteryCheck: 'Use your start-strong ritual, then record one take you would keep.',
   },
   289: {
 
@@ -6288,7 +6288,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-auld-lang-syne',
       'pr-6251'
     ],
-    masteryCheck: 'On your song, On your song, use your finish-strong ritual, then one take worth keeping..',
+    masteryCheck: 'Use your finish-strong ritual, then record one take you would keep.',
   },
   290: {
 
@@ -6311,7 +6311,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-buffalo-gals',
       'pr-145'
     ],
-    masteryCheck: 'On your song, On your song, stitch the medley cleanly, then one take worth keeping..',
+    masteryCheck: 'Stitch the medley cleanly, then record one take you would keep.',
   },
   291: {
 
@@ -6334,7 +6334,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-sailor-s-hornpipe',
       'pr-12bar'
     ],
-    masteryCheck: 'On your song, On your song, play it in the new style, then one take worth keeping..',
+    masteryCheck: 'Play it in the new style, then record one take you would keep.',
   },
   292: {
 
@@ -6357,7 +6357,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-drums',
       'pr-1645'
     ],
-    masteryCheck: 'On your song, On your song, play acoustic vs amp feel, then one take worth keeping..',
+    masteryCheck: 'Play acoustic vs amp feel, then record one take you would keep.',
   },
   293: {
 
@@ -6381,7 +6381,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'rf-funk-chicka-study',
       'rf-palm-mute-chug-study'
     ],
-    masteryCheck: 'On your song, On your song, clean up the mute noise, then one take worth keeping..',
+    masteryCheck: 'Clean up the mute noise, then record one take you would keep.',
   },
   294: {
 
@@ -6404,7 +6404,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-skip-to-my-lou',
       'pr-6251'
     ],
-    masteryCheck: 'On your song, On your song, hit the lyric cues, then one take worth keeping..',
+    masteryCheck: 'Hit the lyric cues, then record one take you would keep.',
   },
   295: {
 
@@ -6427,7 +6427,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-fr-re-jacques',
       'rf-minor-slide-lick-study'
     ],
-    masteryCheck: 'On your song, On your song, lead with a count-in, then one take worth keeping..',
+    masteryCheck: 'Lead with a count-in, then record one take you would keep.',
   },
   296: {
 
@@ -6450,7 +6450,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-go-tell-aunt-rhody',
       'pr-12bar'
     ],
-    masteryCheck: 'On your song, On your song, place the fermatas and holds, then one take worth keeping..',
+    masteryCheck: 'Place the fermatas and holds, then record one take you would keep.',
   },
   297: {
 
@@ -6473,7 +6473,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-greensleeves',
       'pr-1645'
     ],
-    masteryCheck: 'On your song, On your song, control the rallentando, then one take worth keeping..',
+    masteryCheck: 'Control the rallentando, then record one take you would keep.',
   },
   298: {
 
@@ -6496,7 +6496,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-red-river-valley',
       'pr-andalu'
     ],
-    masteryCheck: 'On your song, On your song, try the double-time feel, then one take worth keeping..',
+    masteryCheck: 'Try the double-time feel, then record one take you would keep.',
   },
   299: {
 
@@ -6519,7 +6519,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-wayfaring-stranger',
       'pr-6251'
     ],
-    masteryCheck: 'On your song, On your song, try the half-time feel, then one take worth keeping..',
+    masteryCheck: 'Try the half-time feel, then record one take you would keep.',
   },
   300: {
 
@@ -6542,7 +6542,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-black-is-the-color',
       'rf-natural-harmonics-study'
     ],
-    masteryCheck: 'On your song, On your song, play the simplified harmony, then one take worth keeping..',
+    masteryCheck: 'Play the simplified harmony, then record one take you would keep.',
   },
   301: {
 
@@ -6565,7 +6565,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-molly-malone',
       'rf-natural-harmonics-study'
     ],
-    masteryCheck: 'On your song, On your song, play the enriched harmony, then one take worth keeping..',
+    masteryCheck: 'Play the enriched harmony, then record one take you would keep.',
   },
   302: {
 
@@ -6588,7 +6588,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-careless-love',
       'pr-1645'
     ],
-    masteryCheck: 'On your song, On your song, play the bass motion arrangement, then one take worth keeping..',
+    masteryCheck: 'Play the bass motion arrangement, then record one take you would keep.',
   },
   303: {
 
@@ -6612,7 +6612,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'rf-funk-chicka-study',
       'rf-palm-mute-chug-study'
     ],
-    masteryCheck: 'On your song, On your song, add the percussion colors, then one take worth keeping..',
+    masteryCheck: 'Add the percussion colors, then record one take you would keep.',
   },
   304: {
 
@@ -6635,7 +6635,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-silent-night',
       'rf-natural-harmonics-study'
     ],
-    masteryCheck: 'On your song, On your song, try the open tuning taste, then one take worth keeping..',
+    masteryCheck: 'Try the open tuning taste, then record one take you would keep.',
   },
   305: {
 
@@ -6659,7 +6659,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'rf-drop-d-power-study',
       'rf-power'
     ],
-    masteryCheck: 'On your song, On your song, try the drop D power color, then one take worth keeping..',
+    masteryCheck: 'Try the drop D power color, then record one take you would keep.',
   },
   306: {
 
@@ -6682,7 +6682,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-arkansas-traveler',
       'rf-travis-pick-sketch-in-c'
     ],
-    masteryCheck: 'On your song, On your song, play the Travis pattern pass, then one take worth keeping..',
+    masteryCheck: 'Play the Travis pattern pass, then record one take you would keep.',
   },
   307: {
 
@@ -6705,7 +6705,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-ode',
       'rf-d-folk-pattern-study'
     ],
-    masteryCheck: 'On your song, On your song, play the boom-chuck pass, then one take worth keeping..',
+    masteryCheck: 'Play the boom-chuck pass, then record one take you would keep.',
   },
   308: {
 
@@ -6728,7 +6728,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-oh-susanna',
       'pr-andalu'
     ],
-    masteryCheck: 'On your song, On your song, leave the ballad vocal space, then one take worth keeping..',
+    masteryCheck: 'Leave the ballad vocal space, then record one take you would keep.',
   },
   309: {
 
@@ -6751,7 +6751,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-jingle-bells',
       'pr-6251'
     ],
-    masteryCheck: 'On your song, On your song, keep up-tempo clarity, then one take worth keeping..',
+    masteryCheck: 'Keep up-tempo clarity, then record one take you would keep.',
   },
   310: {
 
@@ -6775,7 +6775,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'pr-12bar',
       'rf-blues-sh'
     ],
-    masteryCheck: 'On your song, On your song, play the slow blues vehicle, then one take worth keeping..',
+    masteryCheck: 'Play the slow blues vehicle, then record one take you would keep.',
   },
   311: {
 
@@ -6798,7 +6798,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-this-old-man',
       'pr-12bar'
     ],
-    masteryCheck: 'On your song, On your song, play at folk storytelling pace, then one take worth keeping..',
+    masteryCheck: 'Play at folk storytelling pace, then record one take you would keep.',
   },
   312: {
 
@@ -6821,7 +6821,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-she-ll-be-coming-round-the-mount',
       'rf-d-folk-pattern-study'
     ],
-    masteryCheck: 'On your song, On your song, lead the campfire loop, then one take worth keeping..',
+    masteryCheck: 'Lead the campfire loop, then record one take you would keep.',
   },
   313: {
 
@@ -6836,7 +6836,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     drills: [
       'Write a 3-song or 3-section energy arc on paper',
       'Practice speaking one sentence between sections',
-      'Time the arc roughly; keep it slow and clean',
+      'Time the arc roughly with a phone clock — know where the lift lives',
       'Run once with performance rules'
     ],
     libraryIds: [
@@ -6844,7 +6844,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-shenandoah',
       'rf-minor-slide-lick-study'
     ],
-    masteryCheck: 'On your song, On your song, play the solo performance shape, then one take worth keeping..',
+    masteryCheck: 'Play the solo performance shape, then record one take you would keep.',
   },
   314: {
 
@@ -6867,7 +6867,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-simple-gifts',
       'pr-6251'
     ],
-    masteryCheck: 'On your song, On your song, play the metronome-polished pass, then one take worth keeping..',
+    masteryCheck: 'Play the metronome-polished pass, then record one take you would keep.',
   },
   315: {
 
@@ -6883,14 +6883,14 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'Immediately after click work, play without click',
       'Record and compare length of section to click version',
       'If form stretches, lightly tap foot more honestly',
-      'Aim human, not sloppy; keep it slow and clean'
+      'Aim human, not sloppy — small timing lean is fine; rushing is not'
     ],
     libraryIds: [
       'sg-home-on-the-range',
       'sg-down-by-the-riverside',
       'pr-145'
     ],
-    masteryCheck: 'On your song, On your song, play the humanized pass off the metronome, then one take worth keeping..',
+    masteryCheck: 'Play the humanized pass off the metronome, then record one take you would keep.',
   },
   316: {
 
@@ -6913,7 +6913,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-the-parting-glass',
       'pr-12bar'
     ],
-    masteryCheck: 'On your song, On your song, run the nerves simulation, then one take worth keeping..',
+    masteryCheck: 'Run the nerves simulation, then record one take you would keep.',
   },
   317: {
 
@@ -6936,7 +6936,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-the-streets-of-laredo',
       'pr-1645'
     ],
-    masteryCheck: 'On your song, On your song, start the second song cleanly, then one take worth keeping..',
+    masteryCheck: 'Start the second song cleanly, then record one take you would keep.',
   },
   318: {
 
@@ -6959,7 +6959,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-swing-low-sweet-chariot',
       'pr-andalu'
     ],
-    masteryCheck: 'On your song, On your song, start the third song cleanly, then one take worth keeping..',
+    masteryCheck: 'Start the third song cleanly, then record one take you would keep.',
   },
   319: {
 
@@ -6982,7 +6982,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-danny-boy-londonderry-air',
       'pr-6251'
     ],
-    masteryCheck: 'On your song, On your song, swap vehicles, then one take worth keeping..',
+    masteryCheck: 'Swap vehicles, then record one take you would keep.',
   },
   320: {
 
@@ -7005,7 +7005,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-joy-to-the-world',
       'pr-145'
     ],
-    masteryCheck: 'On your song, On your song, revive the old song, then one take worth keeping..',
+    masteryCheck: 'Revive the old song, then record one take you would keep.',
   },
   321: {
 
@@ -7028,7 +7028,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-turkey-in-the-straw',
       'pr-12bar'
     ],
-    masteryCheck: 'On your song, On your song, use the new-song intake method, then one take worth keeping..',
+    masteryCheck: 'Use the new-song intake method, then record one take you would keep.',
   },
   322: {
 
@@ -7051,7 +7051,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-twinkle',
       'pr-1645'
     ],
-    masteryCheck: 'On your song, On your song, learn phrase by phrase, then one take worth keeping..',
+    masteryCheck: 'Learn phrase by phrase, then record one take you would keep.',
   },
   323: {
 
@@ -7074,7 +7074,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-amazing-grace',
       'pr-andalu'
     ],
-    masteryCheck: 'On your song, On your song, practice the chunk boundaries, then one take worth keeping..',
+    masteryCheck: 'Practice the chunk boundaries, then record one take you would keep.',
   },
   324: {
 
@@ -7097,7 +7097,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-when-the-saints-go-marching-in',
       'pr-6251'
     ],
-    masteryCheck: 'On your song, On your song, climb the slow–full–fast ladder, then one take worth keeping..',
+    masteryCheck: 'Climb the slow–full–fast ladder, then record one take you would keep.',
   },
   325: {
 
@@ -7112,7 +7112,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     drills: [
       'Right hand pattern on open strings or muted',
       'Left hand fretting silent movie (no strum) through changes',
-      'Combine at 80% speed; keep it slow and clean',
+      'Combine sections at 80% speed — only full tempo after two clean links',
       'Identify which hand caused yesterday\'s errors'
     ],
     libraryIds: [
@@ -7120,7 +7120,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-mary-had-a-little-lamb',
       'pr-145'
     ],
-    masteryCheck: 'On your song, On your song, practice hands separately, then one take worth keeping..',
+    masteryCheck: 'Practice hands separately, then record one take you would keep.',
   },
   326: {
 
@@ -7143,7 +7143,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-london-bridge',
       'pr-12bar'
     ],
-    masteryCheck: 'On your song, On your song, do the mental practice, then one take worth keeping..',
+    masteryCheck: 'Do the mental practice, then record one take you would keep.',
   },
   327: {
 
@@ -7166,7 +7166,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-happy-birthday',
       'pr-1645'
     ],
-    masteryCheck: 'On your song, On your song, review the video take, then one take worth keeping..',
+    masteryCheck: 'Review the video take, then record one take you would keep.',
   },
   328: {
 
@@ -7189,7 +7189,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-scarborough-fair',
       'pr-andalu'
     ],
-    masteryCheck: 'On your song, On your song, review the audio take, then one take worth keeping..',
+    masteryCheck: 'Review the audio take, then record one take you would keep.',
   },
   329: {
 
@@ -7212,7 +7212,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-home-on-the-range',
       'pr-6251'
     ],
-    masteryCheck: 'On your song, On your song, share with a peer if you like, then one take worth keeping..',
+    masteryCheck: 'Share with a peer if you like, then record one take you would keep.',
   },
   330: {
 
@@ -7235,7 +7235,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-barbara-allen',
       'pr-145'
     ],
-    masteryCheck: 'On your song, On your song, teach a section aloud, then one take worth keeping..',
+    masteryCheck: 'Teach a section aloud, then record one take you would keep.',
   },
   331: {
 
@@ -7258,7 +7258,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-wild-mountain-thyme',
       'pr-12bar'
     ],
-    masteryCheck: 'On your song, On your song, play the simplified version 5 clean times, then one take worth keeping..',
+    masteryCheck: 'Play the simplified version 5 clean times, then record one take you would keep.',
   },
   332: {
 
@@ -7281,7 +7281,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-drunken-sailor',
       'pr-1645'
     ],
-    masteryCheck: 'On your song, On your song, add ornaments after the solid skeleton, then one take worth keeping..',
+    masteryCheck: 'Add ornaments after the solid skeleton, then record one take you would keep.',
   },
   333: {
 
@@ -7304,7 +7304,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-house-of-the-rising-sun',
       'rf-minor-slide-lick-study'
     ],
-    masteryCheck: 'On your song, On your song, place the signature lick, then one take worth keeping..',
+    masteryCheck: 'Place the signature lick, then record one take you would keep.',
   },
   334: {
 
@@ -7327,7 +7327,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-aura-lee',
       'pr-6251'
     ],
-    masteryCheck: 'On your song, On your song, play the silence schedule, then one take worth keeping..',
+    masteryCheck: 'Play the silence schedule, then record one take you would keep.',
   },
   335: {
 
@@ -7350,7 +7350,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-auld-lang-syne',
       'pr-145'
     ],
-    masteryCheck: 'On your song, On your song, start from silence, then one take worth keeping..',
+    masteryCheck: 'Start from silence, then record one take you would keep.',
   },
   336: {
 
@@ -7365,7 +7365,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     drills: [
       'Final hit + mute + still body',
       'No string noise after cutoff',
-      'Fifteen cold endings; keep it slow and clean',
+      'Fifteen cold endings in a row — button the last hit every time',
       'Video the stillness once'
     ],
     libraryIds: [
@@ -7373,7 +7373,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-buffalo-gals',
       'pr-12bar'
     ],
-    masteryCheck: 'On your song, On your song, practice the cold ending, then one take worth keeping..',
+    masteryCheck: 'Practice the cold ending, then record one take you would keep.',
   },
   337: {
 
@@ -7396,7 +7396,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-sailor-s-hornpipe',
       'pr-1645'
     ],
-    masteryCheck: 'On your song, On your song, practice the tag ending, then one take worth keeping..',
+    masteryCheck: 'Practice the tag ending, then record one take you would keep.',
   },
   338: {
 
@@ -7419,7 +7419,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-drums',
       'pr-andalu'
     ],
-    masteryCheck: 'On your song, On your song, try the key change, then one take worth keeping..',
+    masteryCheck: 'Try the key change, then record one take you would keep.',
   },
   339: {
 
@@ -7442,7 +7442,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-camptown-races',
       'pr-6251'
     ],
-    masteryCheck: 'On your song, On your song, play the modulation walkup, then one take worth keeping..',
+    masteryCheck: 'Play the modulation walkup, then record one take you would keep.',
   },
   340: {
 
@@ -7466,7 +7466,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'pr-12bar',
       'rf-blues-sh'
     ],
-    masteryCheck: 'On your song, On your song, play the stop-time section, then one take worth keeping..',
+    masteryCheck: 'Play the stop-time section, then record one take you would keep.',
   },
   341: {
 
@@ -7480,7 +7480,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     theoryBite: 'Breakdowns strip texture. Practice the sparse version so rebuilds feel huge.',
     drills: [
       'Strip section to skeleton (roots or light chops)',
-      'Loop breakdown 8 bars; keep it slow and clean',
+      'Loop the sticky 8 bars until the hitch disappears twice in a row',
       'Rebuild to full texture over 4 bars',
       'Contrast should feel obvious'
     ],
@@ -7489,7 +7489,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-fr-re-jacques',
       'rf-minor-slide-lick-study'
     ],
-    masteryCheck: 'On your song, On your song, play the breakdown section, then one take worth keeping..',
+    masteryCheck: 'Play the breakdown section, then record one take you would keep.',
   },
   342: {
 
@@ -7505,14 +7505,14 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'Final chorus adds one lift element only',
       'Practice penultimate vs final chorus back-to-back',
       'Keep form length identical',
-      'Ending still prepared; keep it slow and clean'
+      'Practice the ending cold — last chord held, no fade-out shrug'
     ],
     libraryIds: [
       'sg-minuet-in-g-bach-public-domain',
       'sg-go-tell-aunt-rhody',
       'pr-1645'
     ],
-    masteryCheck: 'On your song, On your song, play the final chorus plus, then one take worth keeping..',
+    masteryCheck: 'Play the final chorus plus, then record one take you would keep.',
   },
   343: {
 
@@ -7535,7 +7535,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-greensleeves',
       'pr-andalu'
     ],
-    masteryCheck: 'On your song, On your song, try the false ending, then one take worth keeping..',
+    masteryCheck: 'Try the false ending, then record one take you would keep.',
   },
   344: {
 
@@ -7558,7 +7558,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-red-river-valley',
       'pr-6251'
     ],
-    masteryCheck: 'On your song, On your song, write the medley bridge, then one take worth keeping..',
+    masteryCheck: 'Write the medley bridge, then record one take you would keep.',
   },
   345: {
 
@@ -7581,7 +7581,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-wayfaring-stranger',
       'pr-145'
     ],
-    masteryCheck: 'On your song, On your song, journal the repertoire wins, then one take worth keeping..',
+    masteryCheck: 'Journal the repertoire wins, then record one take you would keep.',
   },
   346: {
 
@@ -7604,7 +7604,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-black-is-the-color',
       'pr-12bar'
     ],
-    masteryCheck: 'On your song, On your song, decide the goal tempo, then one take worth keeping..',
+    masteryCheck: 'Decide the goal tempo, then record one take you would keep.',
   },
   347: {
 
@@ -7627,7 +7627,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-molly-malone',
       'pr-1645'
     ],
-    masteryCheck: 'On your song, On your song, stay loyal to the practice tempo, then one take worth keeping..',
+    masteryCheck: 'Stay loyal to the practice tempo, then record one take you would keep.',
   },
   348: {
 
@@ -7641,7 +7641,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     theoryBite: 'On take day, pick a courageous-but-kind tempo and commit without mid-song renegotiation.',
     drills: [
       'Choose performance BPM before the take',
-      'Count-in at that BPM; keep it slow and clean',
+      'Count-in at that BPM out loud, then play — no mystery starts',
       'No mid-song tempo arguments with yourself',
       'Post-take note if it felt kind'
     ],
@@ -7650,7 +7650,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-careless-love',
       'pr-andalu'
     ],
-    masteryCheck: 'On your song, On your song, try the performance tempo with courage, then one take worth keeping..',
+    masteryCheck: 'Try the performance tempo with courage, then record one take you would keep.',
   },
   349: {
 
@@ -7673,7 +7673,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-joshua-fit-the-battle-of-jericho',
       'pr-6251'
     ],
-    masteryCheck: 'On your song, On your song, accept the error budget, then one take worth keeping..',
+    masteryCheck: 'Accept the error budget, then record one take you would keep.',
   },
   350: {
 
@@ -7696,7 +7696,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-silent-night',
       'pr-145'
     ],
-    masteryCheck: 'On your song, On your song, use the smile-and-breathe reset, then one take worth keeping..',
+    masteryCheck: 'Use the smile-and-breathe reset, then record one take you would keep.',
   },
   351: {
 
@@ -7712,14 +7712,14 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'Place chart, pick, water in consistent spots',
       'Rehearse grabbing pick without looking',
       'Remove trip hazards in practice space',
-      'Photo your minimal plot; keep it slow and clean'
+      'Photo your minimal form plot — verse/chorus labels you can read at a glance'
     ],
     libraryIds: [
       'sg-greensleeves',
       'sg-i-ve-been-working-on-the-railroa',
       'pr-12bar'
     ],
-    masteryCheck: 'On your song, On your song, play the minimal stage plot, then one take worth keeping..',
+    masteryCheck: 'Play the minimal stage plot, then record one take you would keep.',
   },
   352: {
 
@@ -7742,7 +7742,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-arkansas-traveler',
       'pr-1645'
     ],
-    masteryCheck: 'On your song, On your song, run the gear check ritual, then one take worth keeping..',
+    masteryCheck: 'Run the gear check ritual, then record one take you would keep.',
   },
   353: {
 
@@ -7765,7 +7765,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-ode',
       'pr-andalu'
     ],
-    masteryCheck: 'On your song, On your song, run the tuning check ritual, then one take worth keeping..',
+    masteryCheck: 'Run the tuning check ritual, then record one take you would keep.',
   },
   354: {
 
@@ -7788,7 +7788,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-oh-susanna',
       'pr-6251'
     ],
-    masteryCheck: 'On your song, On your song, check the setlist timing math, then one take worth keeping..',
+    masteryCheck: 'Check the setlist timing math, then record one take you would keep.',
   },
   355: {
 
@@ -7811,7 +7811,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-jingle-bells',
       'pr-145'
     ],
-    masteryCheck: 'On your song, On your song, apply the encore decision logic, then one take worth keeping..',
+    masteryCheck: 'Apply the encore decision logic, then record one take you would keep.',
   },
   356: {
 
@@ -7848,7 +7848,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     theoryBite: 'Three songs reveal stamina and set arc. Keep one easy landing pad song.',
     drills: [
       'Run three songs with short resets',
-      'Watch stamina on song 3; keep it slow and clean',
+      'Watch stamina on song 3 — if the hand dies, simplify the part, do not push through trash',
       'If song 3 collapses, simplify it',
       'Log total focused minutes for this session'
     ],
@@ -7880,7 +7880,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-she-ll-be-coming-round-the-mount',
       'pr-andalu'
     ],
-    masteryCheck: 'On your song, On your song, play a full run with notes, then one take worth keeping..',
+    masteryCheck: 'Play a full run with notes, then record one take you would keep.',
   },
   359: {
 
@@ -7917,7 +7917,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     theoryBite: 'Limited stops, full recovery, real tempo.',
     drills: [
       'Performance clothing optional; performance rules mandatory',
-      'One primary full take; keep it slow and clean',
+      'One primary full take — start to end, no stopping to fix mid-song',
       'Limited second take only if technical failure',
       'Celebrate finishing energy'
     ],
@@ -7949,7 +7949,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-down-by-the-riverside',
       'pr-12bar'
     ],
-    masteryCheck: 'On your song, On your song, do the pre-show light pass, then one take worth keeping..',
+    masteryCheck: 'Do the pre-show light pass, then record one take you would keep.',
   },
   362: {
 
@@ -7972,7 +7972,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-the-parting-glass',
       'pr-1645'
     ],
-    masteryCheck: 'On your song, On your song, play the sections cleanly, then one take worth keeping..',
+    masteryCheck: 'Play the sections cleanly, then record one take you would keep.',
   },
   363: {
 
@@ -7995,7 +7995,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'sg-the-streets-of-laredo',
       'pr-andalu'
     ],
-    masteryCheck: 'On your song, On your song, play the transitions cleanly, then one take worth keeping..',
+    masteryCheck: 'Play the transitions cleanly, then record one take you would keep.',
   },
   364: {
 
@@ -8010,7 +8010,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     drills: [
       'Full story run with recovery rules',
       'Record the take if possible and keep the best one',
-      'Kind pencil notes after; keep it slow and clean',
+      'After the take, three kind pencil notes — one keep, one fix, one try tomorrow',
       'Protect hands after — you\'re close to capstone'
     ],
     libraryIds: [

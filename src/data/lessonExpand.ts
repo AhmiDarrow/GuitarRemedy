@@ -516,6 +516,300 @@ const GOLD: Partial<Record<number, Partial<PrivateLessonFields> & { teachExtra?:
       'Bring a short idea, a bend with a target, and some silence. That beats a hundred rushed scale runs.',
     encouragement: 'Your voice on the instrument is forming. Protect it with rests.',
   },
+  // Weekly checkpoints + phase gates — hand hooks so coach voice isn't 26 islands.
+  35: {
+    hook: 'Em–Am is family — small move, big song fuel.',
+    teacherIntro:
+      'Two minor shapes that share DNA. We will change between them until it feels like walking, not jumping.',
+    encouragement: 'Kinship between chords is how songs get easy.',
+  },
+  40: {
+    hook: 'C and Am — the relative pair every pop song loves.',
+    teacherIntro:
+      'Same neighborhood on the neck. Hear how Am sighs and C opens — then make the change boringly clean.',
+  },
+  50: {
+    hook: 'Slash ideas — bass motion without new shapes.',
+    teacherIntro:
+      'Today is ear candy with old chords. Keep the top shape steady and let the bass note tell a tiny story.',
+  },
+  60: {
+    hook: 'Speed ladder week — only as fast as clean.',
+    teacherIntro:
+      'We climb tempo like stairs, not an elevator. Miss a step? Stay on that floor until it rings.',
+  },
+  70: {
+    hook: 'Soft hands day — tension is the enemy of tone.',
+    teacherIntro:
+      'Audit your grip. If the fretting hand is strangling the neck, everything else fights uphill. Lighten first.',
+    encouragement: 'Soft hands are a skill, not a personality trait.',
+  },
+  77: {
+    hook: 'Pent box 1 mastery — even tone, no heroics.',
+    teacherIntro:
+      'Same box you met early on. Today we make every note speak the same volume and land on time.',
+  },
+  80: {
+    hook: 'Major pentatonic — the bright twin.',
+    teacherIntro:
+      'Same family as minor pent, sunnier color. Find the bright box and play something that smiles.',
+  },
+  90: {
+    hook: 'Target triads over G–C–D — solo with purpose.',
+    teacherIntro:
+      'Stop running the box on autopilot. Aim chord tones so the solo sounds like it knows the song.',
+  },
+  98: {
+    hook: 'Phrase gym — copy, then make it yours.',
+    teacherIntro:
+      'Steal one short idea cleanly, change one thing, then own the result. That is how vocabulary grows.',
+  },
+  105: {
+    hook: 'Phrase gym round two — smaller changes, clearer voice.',
+    teacherIntro:
+      'Same gym, sharper ears. Copy less, vary more, keep the pocket honest.',
+  },
+  110: {
+    hook: 'Weekly scales checkpoint — map, not marathon.',
+    teacherIntro:
+      'Show the shapes you own this week. Slow, named roots, one musical sentence at the end.',
+  },
+  112: {
+    hook: 'Phrase gym — leave space on purpose.',
+    teacherIntro:
+      'Rests are part of the lick. If you cannot hear the silence, you are still sprinting.',
+  },
+  119: {
+    hook: 'Phrase gym — finish the thought.',
+    teacherIntro:
+      'Every phrase needs a landing. Play less, resolve more, smile when the last note sits.',
+  },
+  126: {
+    hook: 'Rest as a weapon — play less, mean more.',
+    teacherIntro:
+      'Groove gets cooler when you subtract. We will mute, wait, and hit only what counts.',
+  },
+  130: {
+    hook: 'Funk chicka — tiny scratches, big pocket.',
+    teacherIntro:
+      'Sixteenth speckles with a soft left hand. If it is loud and stiff, lighten until it dances.',
+  },
+  133: {
+    hook: '3 against 2 — feel both grids without panic.',
+    teacherIntro:
+      'Polyrhythm taste test. Count out loud, go slow, and celebrate when both layers click.',
+  },
+  140: {
+    hook: 'Rock eighth drive — simple right hand, solid time.',
+    teacherIntro:
+      'Down-down energy with a locked foot. No fancy fills until the eighths feel automatic.',
+  },
+  147: {
+    hook: 'Rock drive deepening — same engine, cleaner fuel.',
+    teacherIntro:
+      'Keep the eighth motor, fix the weak beat, and record eight bars you would loop.',
+  },
+  154: {
+    hook: 'Rock drive — dynamics inside the chug.',
+    teacherIntro:
+      'Loud and soft still live in rock time. Whisper the verse energy, lean the chorus — without rushing.',
+  },
+  160: {
+    hook: 'Country boom-chuck — thumb story, chord snap.',
+    teacherIntro:
+      'Bass on the boom, chord on the chuck. If the thumb rushes, everything sounds nervous.',
+  },
+  161: {
+    hook: 'Genre day — commit to the feel for a full minute.',
+    teacherIntro:
+      'Pick the pocket and stay married to it. Switching feels mid-take is how grooves die.',
+  },
+  168: {
+    hook: 'Genre pocket — fewer notes, clearer identity.',
+    teacherIntro:
+      'Today we subtract until the style is obvious from eight bars alone.',
+  },
+  170: {
+    hook: 'Click trust — behind, on, and ahead on purpose.',
+    teacherIntro:
+      'The metronome is a friend. We lean around it deliberately so “human” does not mean “sloppy.”',
+  },
+  175: {
+    hook: 'Genre day — lock it, then leave it alone.',
+    teacherIntro:
+      'Once the feel sits, stop decorating. Repetition is the teacher today.',
+  },
+  182: {
+    hook: 'Bends 101 — pitch is the whole point.',
+    teacherIntro:
+      'Bend to a target you can sing. If the pitch is vague, slow down and hold the top longer.',
+    encouragement: 'A beautiful bend beats a fast run you cannot hear.',
+  },
+  189: {
+    hook: 'Target 3rds — the sweet notes over chords.',
+    teacherIntro:
+      'Thirds make solos sound “in.” Find them, sit on them, and let the chord bloom underneath.',
+  },
+  190: {
+    hook: 'Octave melodies — simple and huge.',
+    teacherIntro:
+      'Same note in two places. Keep them in tune with each other and the line will sound expensive.',
+  },
+  196: {
+    hook: 'Sequence climb — patterns that still sing.',
+    teacherIntro:
+      'Sequences are ladders, not machines. Shape the top of each cell so it feels like a melody.',
+  },
+  203: {
+    hook: 'Sequences round two — cleaner cells.',
+    teacherIntro:
+      'Same idea, less smear between notes. If one cell is dirty, loop only that cell.',
+  },
+  210: {
+    hook: 'Sequences — connect without panic shifts.',
+    teacherIntro:
+      'Position changes are part of the music. Plan the shift on a weak beat and land calm.',
+  },
+  217: {
+    hook: 'Sequences — leave air between ideas.',
+    teacherIntro:
+      'Two cells and a breath beats six cells in a blur. Play like you are talking.',
+  },
+  220: {
+    hook: 'Hybrid picking taste — pick plus fingers.',
+    teacherIntro:
+      'One pick stroke, one finger pluck. Keep the volume matched so it feels like one hand.',
+  },
+  224: {
+    hook: 'Sequences — musical, not athletic.',
+    teacherIntro:
+      'If it only impresses you at full speed, it is not ready. Half tempo with shape wins.',
+  },
+  231: {
+    hook: 'Sequences — target the chord change.',
+    teacherIntro:
+      'Aim the top of the sequence at a chord tone when the harmony moves. Instant “I meant that.”',
+  },
+  238: {
+    hook: 'Sequences — stop on a good note.',
+    teacherIntro:
+      'Endings teach taste. Practice finishing as hard as you practice climbing.',
+  },
+  240: {
+    hook: 'Economy picking seed — less motion, more line.',
+    teacherIntro:
+      'When two notes live on neighbor strings, let the pick continue its path. Smooth, not forced.',
+  },
+  245: {
+    hook: 'Sequences — record and keep the best eight bars.',
+    teacherIntro:
+      'One honest take. Circle what worked. That is your vocabulary homework for the week.',
+  },
+  252: {
+    hook: 'Sequences — mix with space and bends.',
+    teacherIntro:
+      'Pattern alone gets old. Interrupt it with a held note or a bend so it sounds human.',
+  },
+  259: {
+    hook: 'Lead week wrap — talk in full sentences.',
+    teacherIntro:
+      'Bring one motif, one bend target, and silence. That is a complete lead day.',
+  },
+  266: {
+    hook: 'Bridge day — the middle eight has a job.',
+    teacherIntro:
+      'Bridges contrast. Change texture, range, or rhythm so the chorus feels like home again.',
+  },
+  270: {
+    hook: 'Dynamic architecture — soft and loud on purpose.',
+    teacherIntro:
+      'Map the volume of your song like a skyline. Play the shape, not just the chords.',
+  },
+  273: {
+    hook: 'Chart cleanliness — future-you should read this.',
+    teacherIntro:
+      'Form labels, repeats, endings. Messy charts create messy takes. Five neat minutes now saves the set.',
+  },
+  280: {
+    hook: 'Capo and key fit — serve the voice.',
+    teacherIntro:
+      'If the melody strains, move the key. Capo is a tool, not a cheat code.',
+  },
+  287: {
+    hook: 'Performance stance — body is part of time.',
+    teacherIntro:
+      'Feet, shoulders, breath. We practice looking like we meant to start — because we did.',
+  },
+  290: {
+    hook: 'Medley skills — glue without panic.',
+    teacherIntro:
+      'Two songs, one breath between. Plan the transition chord and tempo before you roll.',
+  },
+  294: {
+    hook: 'Lyric cues — let words drive the guitar.',
+    teacherIntro:
+      'If there is a lyric, hit with the story. Guitar follows the sentence, not the other way around.',
+  },
+  301: {
+    hook: 'Harmonic enrichment — add color without clutter.',
+    teacherIntro:
+      'One tasteful extension beats a jazz textbook dump. Hear it, then keep it only if the song smiles.',
+  },
+  308: {
+    hook: 'Ballad space — leave room for the vocal.',
+    teacherIntro:
+      'Soft attack, fewer strums, longer rings. If you would not whisper there, do not fill it.',
+  },
+  310: {
+    hook: 'Slow blues vehicle — feel over flash.',
+    teacherIntro:
+      'Long phrases, honest bends, patient time. Blues at this tempo tells on every fake note.',
+  },
+  315: {
+    hook: 'Humanize off the click — after you can lock it.',
+    teacherIntro:
+      'Only lean once the pocket is trustworthy. We earn rubato; we do not start there.',
+  },
+  322: {
+    hook: 'Phrase-by-phrase learning — no hero full-run yet.',
+    teacherIntro:
+      'Chunk the hard section. Link only after each chunk is boringly solid.',
+  },
+  329: {
+    hook: 'Optional peer share — play for one kind human.',
+    teacherIntro:
+      'Nerves are normal. One short take for a friend teaches more than ten alone in the bedroom.',
+  },
+  336: {
+    hook: 'Cold endings — button the last hit.',
+    teacherIntro:
+      'Endings are memorable. Practice stopping together with an imaginary band — clean, still, done.',
+  },
+  340: {
+    hook: 'Stop-time section — hit, then silence.',
+    teacherIntro:
+      'Accent the hits, own the rests. Silence is the dramatic part.',
+  },
+  343: {
+    hook: 'False ending fun — smile, then finish for real.',
+    teacherIntro:
+      'Fake the end once, catch the audience (even if it is you), then land the true button.',
+  },
+  357: {
+    hook: 'Three-song mini set — stamina with taste.',
+    teacherIntro:
+      'Order the set so your hands and ears survive. Song two is where focus usually dips — watch it.',
+  },
+  360: {
+    hook: 'Dress rehearsal energy — pretend it counts.',
+    teacherIntro:
+      'Full pre-show pass: tune, breath, count-in, play, finish. No mid-song do-overs.',
+  },
+  364: {
+    hook: 'Capstone rehearsal — full story, kind notes after.',
+    teacherIntro:
+      'Run the arc top to bottom. Recover in character. Write three notes after — then rest.',
+  },
   365: {
     hook: 'Day 365 — play a set that sounds like you.',
     teacherIntro:
@@ -550,7 +844,7 @@ export function expandPrivateLesson(
     `${pick(PHASE_HOOKS[phase], day)} ${seed.title.includes('—') ? seed.title.split('—').slice(1).join('—').trim() : seed.title}.`
   const teacherIntro =
     gold?.teacherIntro ??
-    `Next ${durationMin} minutes: warm up, one clear idea, small reps, then something that feels like music. Start with: ${seed.goals[0] ?? 'stay relaxed and in time'}.`
+    `About ${durationMin} minutes together. Warm up, learn one clear thing, then play something that feels like music. First win: ${seed.goals[0] ?? 'stay relaxed and in time'}.`
 
   const segments: LessonSegment[] = [
     {

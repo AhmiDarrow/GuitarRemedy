@@ -68,6 +68,29 @@ describe('curriculum', () => {
     // no late-year stencil mastery
     expect(mastery.some((m) => /tangible repertoire outcome today/i.test(m))).toBe(false)
     expect(mastery.some((m) => /tangible outcome:\s*a cleaner target section/i.test(m))).toBe(false)
+    // review rework: doubled prefix / double period / autofill drill tail
+    expect(mastery.some((m) => /On your song,\s*On your song/i.test(m))).toBe(false)
+    expect(mastery.some((m) => /keeping\.\./i.test(m))).toBe(false)
+    expect(mastery.some((m) => /^On your song,/i.test(m))).toBe(false)
+  })
+
+  it('bans bare keep-it-slow-and-clean drill tails', () => {
+    for (const lesson of CURRICULUM) {
+      for (const d of lesson.drills) {
+        expect(d, `day ${lesson.day} drill`).not.toMatch(/keep it slow and clean/i)
+      }
+    }
+  })
+
+  it('expands private-lesson GOLD hooks across the year', () => {
+    const hooks = CURRICULUM.map((l) => l.privateLesson.hook.trim())
+    expect(new Set(hooks).size).toBeGreaterThan(80)
+    // weekly checkpoints should not all share one phase template line
+    const weekly = [7, 35, 70, 98, 140, 182, 266, 322, 357].map((d) => getLesson(d)!)
+    const weeklyHooks = new Set(weekly.map((l) => l.privateLesson.hook))
+    expect(weeklyHooks.size).toBe(weekly.length)
+    expect(getLesson(263)?.masteryCheck).not.toMatch(/On your song/i)
+    expect(getLesson(6)?.drills.join(' ')).not.toMatch(/keep it slow and clean/i)
   })
 
   it('resolves every libraryIds reference', () => {
@@ -119,7 +142,7 @@ describe('curriculum', () => {
       /finish the drills for /i,
       /\([^()]*day\s+\d+\)/i,
       /\(Week\s+\d+\)/i,
-      /\(([A-Za-z0-9 .&–—·→/'"]+)\)\s*\(\1\s*day\s+\d+\)/i,
+      new RegExp(String.raw`\(([^)]+)\)\s*\(\1\s*day\s+\d+\)`, 'i'),
     ]
     for (const lesson of CURRICULUM) {
       const blob = [
