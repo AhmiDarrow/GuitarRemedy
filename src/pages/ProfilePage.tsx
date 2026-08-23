@@ -1,7 +1,35 @@
+import { useEffect, useMemo } from 'react'
 import { Link } from 'react-router-dom'
+import {
+  AudioLines,
+  BookOpen,
+  Flame,
+  Gauge,
+  Guitar,
+  Heart,
+  Info,
+  Library,
+  ScrollText,
+  Upload,
+} from 'lucide-react'
 import { useAppStore } from '../store/appStore'
+import { useUserTabsStore } from '../store/userTabsStore'
 import { TUNINGS, type TuningName } from '../lib/theory'
-import { CURRICULUM } from '../data/curriculum'
+import { CURRICULUM, getLesson } from '../data/curriculum'
+import {
+  ABOUT_HELLO,
+  APP_NAME,
+  APP_VERSION_FALLBACK,
+} from '../lib/brand'
+
+const PHASE_LABEL: Record<string, string> = {
+  basics: 'Basics',
+  chords: 'Chords',
+  scales: 'Scales',
+  rhythm: 'Rhythm',
+  lead: 'Lead',
+  repertoire: 'Repertoire',
+}
 
 export function ProfilePage() {
   const displayName = useAppStore((s) => s.displayName)
@@ -23,40 +51,161 @@ export function ProfilePage() {
   const completed = useAppStore((s) => s.completedLessons)
   const currentDay = useAppStore((s) => s.currentDay)
   const favorites = useAppStore((s) => s.favorites)
+  const lastPracticeDate = useAppStore((s) => s.lastPracticeDate)
 
+  const hydrateTabs = useUserTabsStore((s) => s.hydrate)
+  const userTabs = useUserTabsStore((s) => s.tabs)
+
+  useEffect(() => {
+    hydrateTabs()
+  }, [hydrateTabs])
+
+  const lesson = useMemo(
+    () => getLesson(currentDay) ?? getLesson(1) ?? CURRICULUM[0],
+    [currentDay],
+  )
   const pct = Math.round((completed.length / CURRICULUM.length) * 100)
+  const tuningLabel =
+    tuningName === 'custom'
+      ? 'Custom'
+      : (TUNINGS[tuningName]?.name ?? tuningName)
+  const phaseLabel = PHASE_LABEL[lesson?.phase ?? ''] ?? lesson?.phase ?? 'Path'
 
   return (
     <div className="space-y-6 max-w-xl animate-fade-up">
-      <div className="relative overflow-hidden rounded-3xl border border-[var(--border)]">
+      {/* Hero */}
+      <div className="relative overflow-hidden rounded-3xl border border-[var(--border)] bg-gradient-to-br from-[#06120c] via-[#030705] to-[#020403]">
         <img
           src="/assets/brand-mark.png"
           alt=""
-          className="absolute right-0 top-0 h-full w-40 object-cover opacity-40 md:w-52"
+          className="absolute right-0 top-0 h-full w-36 object-cover opacity-35 md:w-48"
+          draggable={false}
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-[var(--bg-card)] via-[var(--bg-card)]/95 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-r from-[#030705] via-[#030705]/92 to-transparent" />
         <div className="relative p-5 md:p-6">
           <p className="text-xs uppercase tracking-widest text-mint/80 font-semibold">You</p>
-          <h1 className="font-display text-3xl font-bold mt-1">Profile & settings</h1>
-          <p className="text-sm text-[var(--text-muted)] mt-1">Local-only. Nothing leaves this device.</p>
+          <h1 className="font-display text-3xl font-bold mt-1 tracking-tight">
+            {displayName?.trim() || 'Player'}
+          </h1>
+          <p className="text-sm text-[var(--text-muted)] mt-1 max-w-sm">
+            Progress, fretboard prefs, and shortcuts. Everything stays on this device.
+          </p>
+          <p className="text-[11px] text-[var(--text-muted)] mt-3">
+            {APP_NAME} · v{APP_VERSION_FALLBACK} · local-first
+          </p>
         </div>
       </div>
 
-      <div className="card p-5 grid grid-cols-3 gap-3 text-center">
-        <div>
-          <div className="text-2xl font-display font-bold text-mint">{streak}</div>
-          <div className="text-[11px] text-[var(--text-muted)]">Streak</div>
+      {/* Stats */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        {[
+          { label: 'Streak', value: `${streak}d`, icon: Flame, tone: 'text-mint' },
+          { label: 'Day', value: String(currentDay), icon: BookOpen, tone: 'text-lime' },
+          { label: 'Done', value: String(completed.length), icon: Library, tone: 'text-teal' },
+          { label: 'Path', value: `${pct}%`, icon: Guitar, tone: 'text-soft' },
+        ].map(({ label, value, icon: Icon, tone }) => (
+          <div key={label} className="card p-4">
+            <div className="flex items-center justify-between gap-2">
+              <span className="text-[10px] uppercase tracking-wide text-[var(--text-muted)]">
+                {label}
+              </span>
+              <Icon className={`w-3.5 h-3.5 shrink-0 ${tone}`} />
+            </div>
+            <div className="font-display text-2xl font-bold mt-1.5 tabular-nums">{value}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* Path progress + today */}
+      <div className="card p-5 space-y-4">
+        <div className="flex items-start justify-between gap-3">
+          <div className="min-w-0">
+            <h2 className="font-display font-semibold">365-day path</h2>
+            <p className="text-xs text-[var(--text-muted)] mt-0.5">
+              {completed.length} of {CURRICULUM.length} lessons · {phaseLabel}
+              {lastPracticeDate ? ` · last practice ${lastPracticeDate}` : ''}
+            </p>
+          </div>
+          <span className="text-sm font-display font-bold text-mint tabular-nums shrink-0">
+            {pct}%
+          </span>
         </div>
-        <div>
-          <div className="text-2xl font-display font-bold">{completed.length}</div>
-          <div className="text-[11px] text-[var(--text-muted)]">Lessons</div>
+        <div
+          className="h-2 rounded-full bg-black/40 border border-[var(--border)] overflow-hidden"
+          role="progressbar"
+          aria-valuenow={pct}
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-label="Lesson path progress"
+        >
+          <div
+            className="h-full rounded-full bg-gradient-to-r from-mint/80 to-lime/70 transition-[width] duration-500"
+            style={{ width: `${Math.min(100, Math.max(0, pct))}%` }}
+          />
         </div>
-        <div>
-          <div className="text-2xl font-display font-bold">{pct}%</div>
-          <div className="text-[11px] text-[var(--text-muted)]">Path</div>
+        {lesson ? (
+          <div className="rounded-xl border border-[var(--border)] bg-[var(--bg-elevated)]/60 px-4 py-3">
+            <p className="text-[10px] uppercase tracking-widest text-mint/80 font-semibold">
+              Up next · Day {lesson.day}
+            </p>
+            <p className="text-sm font-medium mt-1 leading-snug">{lesson.title}</p>
+            <p className="text-xs text-[var(--text-muted)] mt-1 line-clamp-2">{lesson.theoryBite}</p>
+            <Link
+              to={`/learn/${lesson.day}`}
+              className="btn-primary mt-3 inline-flex text-sm px-4 py-2 rounded-xl"
+            >
+              Open lesson
+            </Link>
+          </div>
+        ) : null}
+        <div className="flex flex-wrap gap-2 text-xs text-[var(--text-muted)]">
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-[var(--border)] px-2.5 py-1">
+            <Heart className="w-3 h-3 text-mint" />
+            {favorites.length} favorite{favorites.length === 1 ? '' : 's'}
+          </span>
+          <Link
+            to="/library?mine=1"
+            className="inline-flex items-center gap-1.5 rounded-full border border-[var(--border)] px-2.5 py-1 hover:border-mint/40 hover:text-mint transition-colors"
+          >
+            <Library className="w-3 h-3 text-mint" />
+            {userTabs.length} saved tab{userTabs.length === 1 ? '' : 's'}
+          </Link>
         </div>
       </div>
 
+      {/* Quick tools */}
+      <div className="card p-5 space-y-3">
+        <h2 className="font-display font-semibold">Shortcuts</h2>
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+          {(
+            [
+              { to: '/practice', state: { tool: 'metronome' }, label: 'Metronome', icon: Gauge },
+              { to: '/practice', state: { tool: 'tuner' }, label: 'Tuner', icon: AudioLines },
+              { to: '/practice', state: { tool: 'fretboard' }, label: 'Fretboard', icon: Guitar },
+              { to: '/library', label: 'Library', icon: Library },
+              { to: '/upload', label: 'Upload', icon: Upload },
+              { to: '/wiki', label: 'Wiki', icon: ScrollText },
+            ] as const
+          ).map((item) => {
+            const Icon = item.icon
+            return (
+              <Link
+                key={item.label}
+                to={item.to}
+                state={'state' in item ? item.state : undefined}
+                className="flex items-center gap-2.5 rounded-xl border border-[var(--border)] bg-[var(--bg-elevated)]/50 px-3 py-2.5 text-sm hover:border-mint/40 hover:bg-mint/5 transition-colors"
+              >
+                <span className="w-8 h-8 rounded-lg bg-mint/10 border border-mint/20 flex items-center justify-center shrink-0">
+                  <Icon className="w-4 h-4 text-mint" />
+                </span>
+                <span className="font-medium truncate">{item.label}</span>
+              </Link>
+            )
+          })}
+        </div>
+      </div>
+
+      {/* Player */}
       <div className="card p-5 space-y-4">
         <h2 className="font-display font-semibold">Player</h2>
         <label className="block text-xs text-[var(--text-muted)]">
@@ -65,18 +214,23 @@ export function ProfilePage() {
             className="input mt-1"
             value={displayName}
             onChange={(e) => setDisplayName(e.target.value)}
+            placeholder="Your name"
+            autoComplete="nickname"
           />
         </label>
-        <p className="text-xs text-[var(--text-muted)]">Current day on path: {currentDay} · Favorites: {favorites.length}</p>
       </div>
 
+      {/* Instrument — fretboard / play-along only */}
       <div className="card p-5 space-y-4">
-        <h2 className="font-display font-semibold">Instrument &amp; practice</h2>
-        <p className="text-[11px] text-[var(--text-muted)] -mt-2">
-          Fretboard, scales, and play-along. The chromatic tuner has its own Settings panel under
-          Practice → Tuner (separate A4 and open-string map).
-        </p>
-        <label className="flex items-center gap-3 p-3 rounded-xl border border-[var(--border)] cursor-pointer">
+        <div>
+          <h2 className="font-display font-semibold">Fretboard &amp; play-along</h2>
+          <p className="text-[11px] text-[var(--text-muted)] mt-1">
+            Scales, tabs, and Library tones. The chromatic tuner keeps its own A4 and open-string map
+            under Practice → Tuner.
+          </p>
+        </div>
+
+        <label className="flex items-center gap-3 p-3 rounded-xl border border-[var(--border)] cursor-pointer hover:border-mint/30 transition-colors">
           <input
             type="checkbox"
             checked={lefty}
@@ -85,22 +239,29 @@ export function ProfilePage() {
           />
           <span className="text-sm">Left-handed fretboard</span>
         </label>
+
         <label className="block text-xs text-[var(--text-muted)]">
-          Fretboard tuning
+          Tuning
           <select
             className="input mt-1"
             value={tuningName}
             onChange={(e) => setTuningName(e.target.value as TuningName)}
           >
             {Object.entries(TUNINGS).map(([id, t]) => (
-              <option key={id} value={id}>{t.name}</option>
+              <option key={id} value={id}>
+                {t.name}
+              </option>
             ))}
           </select>
+          <span className="block text-[10px] mt-1 text-[var(--text-muted)]">
+            Active: {tuningLabel}
+          </span>
         </label>
+
         {tuningName === 'custom' ? (
           <div className="space-y-2">
             <p className="text-[11px] text-[var(--text-muted)]">
-              Custom open-string MIDI (low E → high e). Fretboard &amp; play-along only — not the tuner.
+              Custom open-string MIDI (low E → high e). Fretboard and play-along only — not the tuner.
             </p>
             <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
               {['E', 'A', 'D', 'G', 'B', 'e'].map((label, i) => (
@@ -123,6 +284,7 @@ export function ProfilePage() {
             </div>
           </div>
         ) : null}
+
         <label className="block text-xs text-[var(--text-muted)]">
           Play-along A4 (Hz)
           <input
@@ -137,7 +299,8 @@ export function ProfilePage() {
             Scales, tabs, and tones. Tuner A4 is set inside the tuner.
           </span>
         </label>
-        <label className="flex items-center gap-3 p-3 rounded-xl border border-[var(--border)] cursor-pointer">
+
+        <label className="flex items-center gap-3 p-3 rounded-xl border border-[var(--border)] cursor-pointer hover:border-mint/30 transition-colors">
           <input
             type="checkbox"
             checked={showDegrees}
@@ -146,6 +309,7 @@ export function ProfilePage() {
           />
           <span className="text-sm">Show scale degrees on fretboard</span>
         </label>
+
         <label className="block text-xs text-[var(--text-muted)]">
           Default BPM
           <input
@@ -156,46 +320,69 @@ export function ProfilePage() {
             value={bpm}
             onChange={(e) => setBpm(Number(e.target.value) || 80)}
           />
+          <span className="block text-[10px] mt-1 text-[var(--text-muted)]">
+            Shared by metronome, scale play, and tab playback (30–300).
+          </span>
         </label>
-        <Link
-          to="/practice"
-          state={{ tool: 'tuner' }}
-          className="btn-secondary inline-flex text-center text-sm px-4 py-2 rounded-xl"
-        >
-          Open tuner settings
-        </Link>
+
+        <div className="flex flex-wrap gap-2 pt-1">
+          <Link
+            to="/practice"
+            state={{ tool: 'tuner' }}
+            className="btn-secondary inline-flex text-center text-sm px-4 py-2 rounded-xl"
+          >
+            Open tuner
+          </Link>
+          <Link
+            to="/practice"
+            state={{ tool: 'metronome' }}
+            className="btn-secondary inline-flex text-center text-sm px-4 py-2 rounded-xl"
+          >
+            Open metronome
+          </Link>
+        </div>
       </div>
 
+      {/* Honest convert summary — short; full detail on About */}
       <div className="card p-5 text-sm text-[var(--text-muted)] leading-relaxed space-y-2">
-        <h2 className="font-display font-semibold text-[var(--text)] mb-2">How song breakdown works</h2>
+        <h2 className="font-display font-semibold text-[var(--text)]">Song → tabs</h2>
         <p>
-          <strong className="text-[var(--text)]">Solid path:</strong> MIDI and MusicXML → deterministic
-          tabs + key/scale analysis + practice plan. Guitar Pro is best-effort (GPIF/zip often
-          works; classic binary may be a placeholder that never auto-saves — export MIDI/MusicXML).
-        </p>
-        <p>
-          <strong className="text-[var(--text)]">Audio path:</strong> MP3/WAV and friends → lead-oriented
-          pitch track → MIDI → guitar tabs. Monophonic assist — always editable; not multi-voice studio
-          transcription. Use tempo override, trim length, Clean up, and the tab editor to finish by ear.
+          <strong className="text-[var(--text)]">MIDI / MusicXML</strong> land as solid tabs.
+          Audio is a lead-biased assist you always edit by ear. Guitar Pro is best-effort and never
+          auto-saves placeholders.
         </p>
         <p className="text-xs">
-          Your tabs stay on this device. Export .grtab.json, ASCII, or MIDI anytime.
+          Your tabs stay on this device — export .grtab.json, ASCII, or MIDI anytime.
         </p>
+        <div className="flex flex-wrap gap-2 pt-1">
+          <Link to="/upload" className="btn-secondary text-sm px-4 py-2 rounded-xl">
+            Upload a song
+          </Link>
+          <Link to="/library?mine=1" className="btn-secondary text-sm px-4 py-2 rounded-xl">
+            Your tabs
+          </Link>
+        </div>
       </div>
 
-      <div className="card p-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-        <div>
-          <h2 className="font-display font-semibold">About, wiki & updates</h2>
-          <p className="text-xs text-[var(--text-muted)] mt-1">
-            Hi I&apos;m Ahmi — theory wiki, links, version, and Check for updates (desktop).
-          </p>
+      {/* About — single clear exit, no self-link clutter */}
+      <div className="card p-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div className="min-w-0 flex gap-3 items-start">
+          <span className="w-10 h-10 rounded-xl bg-mint/10 border border-mint/25 flex items-center justify-center shrink-0">
+            <Info className="w-5 h-5 text-mint" />
+          </span>
+          <div>
+            <h2 className="font-display font-semibold">About {APP_NAME}</h2>
+            <p className="text-xs text-[var(--text-muted)] mt-1 leading-relaxed">
+              {ABOUT_HELLO} Version, links, wiki, and desktop updates live on the About page.
+            </p>
+          </div>
         </div>
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-2 shrink-0">
           <Link to="/wiki" className="btn-secondary text-center text-sm px-4 py-2 rounded-xl">
-            Open wiki
+            Wiki
           </Link>
           <Link to="/about" className="btn-primary text-center text-sm px-4 py-2 rounded-xl">
-            Open About
+            About
           </Link>
         </div>
       </div>
