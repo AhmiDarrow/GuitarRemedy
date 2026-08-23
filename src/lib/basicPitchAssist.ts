@@ -95,7 +95,7 @@ export function basicPitchNotesToDetected(
 }
 
 /** Prefer frettable guitar-register notes when Basic Pitch returns a dense poly spray. */
-export function thinToGuitarLead(notes: DetectedNote[], maxSimul = 3): DetectedNote[] {
+export function thinToGuitarLead(notes: DetectedNote[], maxSimul = 4): DetectedNote[] {
   if (notes.length === 0) return notes
   // Score + soft drop only when dense; always enforce simultaneous voice cap.
   let kept = notes
@@ -136,6 +136,118 @@ export function thinToGuitarLead(notes: DetectedNote[], maxSimul = 3): DetectedN
     out.push(n)
   }
   return out.sort((a, b) => a.start - b.start)
+}
+
+/**
+ * Keep playable multipitch (up to maxVoices simultaneous) instead of collapsing to one line.
+ * Clusters near-simultaneous onsets into guitar-register chords; drops bass thump / ghosts.
+ * This is the quality jump past pure monophonic extract for Basic Pitch drafts.
+ */
+export function extractPlayableVoices(
+  notes: DetectedNote[],
+  opts?: { maxVoices?: number; clusterSec?: number; minConf?: number },
+): DetectedNote[] {
+  if (notes.length === 0) return notes
+  const maxVoices = Math.max(1, Math.min(6, opts?.maxVoices ?? 4))
+  const clusterSec = opts?.clusterSec ?? 0.045
+  const minConf = opts?.minConf ?? 0.22
+
+  const sorted = [...notes]
+    .filter((n) => (n.confidence ?? 0.5) >= minConf * 0.7)
+    .sort(
+      (a, b) =>
+        a.timeSec - b.timeSec ||
+        b.pitch - a.pitch ||
+        (b.confidence ?? 0) - (a.confidence ?? 0),
+    )
+  if (sorted.length === 0) return []
+
+  const scoreVoice = (n: DetectedNote): number =>
+    guitarRegisterScore(n.pitch) * 2.1 +
+    (n.confidence ?? 0.5) * 1.5 +
+    Math.min(1.0, n.durationSec * 1.8)
+
+  const out: DetectedNote[] = []
+  let i = 0
+  while (i < sorted.length) {
+    const t0 = sorted[i].timeSec
+    const cluster: DetectedNote[] = []
+    while (i < sorted.length && sorted[i].timeSec <= t0 + clusterSec) {
+      cluster.push(sorted[i])
+      i++
+    }
+    // Unique pitches in cluster (keep strongest per pitch)
+    const byPitch = new Map<number, DetectedNote>()
+    for (const n of cluster) {
+      const prev = byPitch.get(n.pitch)
+      if (!prev || scoreVoice(n) > scoreVoice(prev)) byPitch.set(n.pitch, n)
+    }
+    let voices = [...byPitch.values()].sort((a, b) => scoreVoice(b) - scoreVoice(a))
+    // Drop low-register thump when stronger guitar-register voices exist
+    if (voices.length > 1) {
+      const top = voices[0]
+      voices = voices.filter(
+        (v) =>
+          v === top ||
+          guitarRegisterScore(v.pitch) >= 0.55 ||
+          scoreVoice(v) >= scoreVoice(top) * 0.55,
+      )
+    }
+    voices = voices.slice(0, maxVoices).sort((a, b) => a.pitch - b.pitch)
+    // Align chord onsets to the cluster start for clean fretting/MIDI
+    const startSec = Math.min(...voices.map((v) => v.timeSec))
+    const maxEnd = Math.max(...voices.map((v) => v.timeSec + v.durationSec))
+    const durSec = Math.max(0.06, maxEnd - startSec)
+    for (const v of voices) {
+      const conf = v.confidence ?? 0.5
+      if (conf < minConf && voices.length > 1 && scoreVoice(v) < scoreVoice(voices[voices.length - 1]) * 0.9) {
+        continue
+      }
+      const ratio =
+        v.durationSec > 0 && v.duration > 0 ? v.duration / v.durationSec : 480 / 0.5
+      out.push({
+        ...v,
+        timeSec: startSec,
+        durationSec: Math.max(0.06, Math.min(v.durationSec + 0.02, durSec)),
+        start: Math.max(0, Math.round(v.start + ((startSec - v.timeSec) * ratio))),
+        duration: Math.max(1, Math.round(Math.max(0.06, Math.min(v.durationSec + 0.02, durSec)) * ratio)),
+      })
+    }
+  }
+
+  // Drop exact pitch duplicates that fully overlap after align
+  const cleaned: DetectedNote[] = []
+  for (const n of out.sort((a, b) => a.timeSec - b.timeSec || a.pitch - b.pitch)) {
+    const dup = cleaned.find(
+      (c) =>
+        c.pitch === n.pitch &&
+        Math.abs(c.timeSec - n.timeSec) < clusterSec &&
+        c.timeSec + c.durationSec > n.timeSec,
+    )
+    if (dup) {
+      if ((n.confidence ?? 0) > (dup.confidence ?? 0)) {
+        cleaned[cleaned.indexOf(dup)] = n
+      }
+      continue
+    }
+    cleaned.push(n)
+  }
+  return cleaned
+}
+
+/** True when a draft has simultaneous fretted voices worth keeping. */
+export function hasMultipitchContent(notes: DetectedNote[], clusterSec = 0.05): boolean {
+  if (notes.length < 2) return false
+  const sorted = [...notes].sort((a, b) => a.timeSec - b.timeSec)
+  for (let i = 0; i < sorted.length; i++) {
+    let simul = 1
+    for (let j = i + 1; j < sorted.length; j++) {
+      if (sorted[j].timeSec - sorted[i].timeSec > clusterSec) break
+      if (sorted[j].pitch !== sorted[i].pitch) simul++
+      if (simul >= 2) return true
+    }
+  }
+  return false
 }
 
 /**
@@ -243,36 +355,53 @@ export function extractMonophonicMelody(
   return merged
 }
 
-/** Quality score for ranking pitch engines / stems (higher = better monophonic draft). */
+/** Quality score for ranking pitch engines / stems (higher = better fretting draft). */
 export function scoreDetectedMelody(notes: DetectedNote[]): number {
   if (!notes || notes.length < 2) return 0
+  const sorted = [...notes].sort((a, b) => a.timeSec - b.timeSec || a.pitch - b.pitch)
   let conf = 0
   let reg = 0
   let jumps = 0
   let dur = 0
-  for (let i = 0; i < notes.length; i++) {
-    const n = notes[i]
+  let chordBonus = 0
+  let lastMelody: DetectedNote | null = null
+  for (let i = 0; i < sorted.length; i++) {
+    const n = sorted[i]
     conf += n.confidence ?? 0.5
     reg += guitarRegisterScore(n.pitch)
     dur += n.durationSec
-    if (i > 0) {
-      const d = Math.abs(n.pitch - notes[i - 1].pitch)
-      jumps += d > 7 ? d * 1.4 : d * 0.2
+    if (lastMelody) {
+      const dt = n.timeSec - lastMelody.timeSec
+      if (dt <= 0.05) {
+        // Same chord cluster — reward playable multipitch, don't jump-penalize
+        chordBonus += 0.35
+      } else {
+        const d = Math.abs(n.pitch - lastMelody.pitch)
+        jumps += d > 7 ? d * 1.4 : d * 0.2
+        lastMelody = n
+      }
+    } else {
+      lastMelody = n
+    }
+    // Track highest note in cluster as melody continuity anchor
+    if (lastMelody && Math.abs(n.timeSec - lastMelody.timeSec) <= 0.05 && n.pitch > lastMelody.pitch) {
+      lastMelody = n
     }
   }
-  const n = notes.length
+  const n = sorted.length
   const span = Math.max(
     0.5,
-    (notes[n - 1].timeSec + notes[n - 1].durationSec) - notes[0].timeSec,
+    sorted[n - 1].timeSec + sorted[n - 1].durationSec - sorted[0].timeSec,
   )
-  const density = Math.min(1.4, n / Math.max(4, span * 2.5))
+  const density = Math.min(1.6, n / Math.max(4, span * 2.2))
   return (
     (conf / n) * 90 +
     (reg / n) * 40 +
     Math.min(30, dur * 3) +
     density * 18 -
     jumps * 0.4 +
-    Math.min(20, n * 0.6)
+    Math.min(20, n * 0.55) +
+    Math.min(12, chordBonus * 2.5)
   )
 }
 
@@ -421,9 +550,9 @@ export async function notesFromBasicPitch(
     onProgress: opts?.onProgress,
   })
   let notes = basicPitchNotesToDetected(bpNotes, tempoBpm, DEFAULT_TPQ, a4)
-  // Multipitch → thin poly → single frettable melody (full-band key step)
-  notes = thinToGuitarLead(notes, 2)
-  notes = extractMonophonicMelody(notes)
+  // Multipitch → thin spray → keep up to 4 playable simultaneous voices (not mono collapse)
+  notes = thinToGuitarLead(notes, 4)
+  notes = extractPlayableVoices(notes, { maxVoices: 4, clusterSec: 0.045, minConf: 0.2 })
 
   const secPerBeat = 60 / Math.max(30, Math.min(300, tempoBpm))
   const grid = secPerBeat / 4

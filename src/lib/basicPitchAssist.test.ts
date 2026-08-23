@@ -2,6 +2,8 @@ import { describe, expect, it } from 'vitest'
 import {
   basicPitchAvailable,
   basicPitchNotesToDetected,
+  extractPlayableVoices,
+  hasMultipitchContent,
   preferBasicPitchNotes,
   resampleMono,
   thinToGuitarLead,
@@ -81,6 +83,33 @@ describe('basicPitchAssist (free Apache-2.0 helpers)', () => {
     }))
     const out = thinToGuitarLead(chord, 3)
     expect(out.length).toBeLessThanOrEqual(3)
+  })
+
+  it('extractPlayableVoices keeps a frettable chord (not mono collapse)', () => {
+    const chord: DetectedNote[] = [
+      { pitch: 48, start: 0, duration: 480, velocity: 70, timeSec: 0, durationSec: 0.5, confidence: 0.4 },
+      { pitch: 55, start: 0, duration: 480, velocity: 80, timeSec: 0.01, durationSec: 0.5, confidence: 0.7 },
+      { pitch: 59, start: 0, duration: 480, velocity: 85, timeSec: 0.02, durationSec: 0.5, confidence: 0.75 },
+      { pitch: 62, start: 0, duration: 480, velocity: 88, timeSec: 0.015, durationSec: 0.5, confidence: 0.8 },
+    ]
+    const out = extractPlayableVoices(chord, { maxVoices: 4 })
+    expect(out.length).toBeGreaterThanOrEqual(3)
+    expect(out.length).toBeLessThanOrEqual(4)
+    expect(hasMultipitchContent(out)).toBe(true)
+    // Aligned onset
+    const t0 = out[0].timeSec
+    expect(out.every((n) => Math.abs(n.timeSec - t0) < 0.001)).toBe(true)
+  })
+
+  it('extractPlayableVoices drops weak bass thump under a lead', () => {
+    const spray: DetectedNote[] = [
+      { pitch: 36, start: 0, duration: 200, velocity: 50, timeSec: 0, durationSec: 0.2, confidence: 0.25 },
+      { pitch: 64, start: 0, duration: 400, velocity: 90, timeSec: 0.01, durationSec: 0.4, confidence: 0.85 },
+      { pitch: 67, start: 0, duration: 400, velocity: 88, timeSec: 0.012, durationSec: 0.4, confidence: 0.82 },
+    ]
+    const out = extractPlayableVoices(spray, { maxVoices: 3, minConf: 0.22 })
+    expect(out.some((n) => n.pitch >= 60)).toBe(true)
+    expect(out.every((n) => n.pitch !== 36 || (n.confidence ?? 0) > 0.5)).toBe(true)
   })
 
   it('basicPitchAvailable returns boolean without throwing', async () => {

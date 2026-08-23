@@ -254,9 +254,25 @@ export function assertDisplayString(s: number, label = 'string'): number {
 function fretMelody(
   midis: number[],
   tuning?: number[],
+  onsets?: number[],
 ): Array<{ string: number; fret: number; midi: number }> {
   const t = activeTuning(tuning)
-  return smoothFrettingRun(frettingSequence(midis, t), t)
+  const run =
+    onsets && onsets.length === midis.length
+      ? frettingSequence(midis, t, { onsets })
+      : frettingSequence(midis, t)
+  // Smooth only monophonic runs — chord grips already assign unique strings
+  if (onsets && onsets.length === midis.length) {
+    let hasChord = false
+    for (let i = 1; i < onsets.length; i++) {
+      if (Math.abs(onsets[i] - onsets[i - 1]) < 1e-6) {
+        hasChord = true
+        break
+      }
+    }
+    if (hasChord) return run
+  }
+  return smoothFrettingRun(run, t)
 }
 
 export function analyzeNotes(
@@ -403,7 +419,12 @@ export function midiToBreakdown(
       return { midi, startBeat, durationBeats }
     },
   )
-  const frets = fretMelody(raw.map((n) => n.midi), tuning)
+  // Chord-aware fretting: shared startBeat → unique strings / compact grip
+  const frets = fretMelody(
+    raw.map((n) => n.midi),
+    tuning,
+    raw.map((n) => n.startBeat),
+  )
   const notes = raw.map((n, i) => {
     const f = frets[i] || frettingForMidi(n.midi, tuning) || { string: 0, fret: 0, midi: n.midi }
     return {
@@ -451,7 +472,7 @@ export function midiToBreakdown(
       `Imported MIDI with ${notes.length} notes.`,
       `Detected ≈ ${detected.root} ${SCALES[detected.scaleId as ScaleId]?.name || detected.scaleId}.`,
       `Scale tones: ${scaleNotes.join(', ')}.`,
-      'Fretting uses hand-continuity mapping (always editable).',
+      'Fretting uses hand-continuity mapping with chord grips on shared onsets (always editable).',
       parsed.hasTempoChanges
         ? `Opening tempo ${tempoBpm} BPM — mid-song tempo changes warped into beat positions.`
         : `Tempo ${tempoBpm} BPM.`,
@@ -806,7 +827,7 @@ export function breakdownAudioAssist(
     confidence: pitchHints.length ? 0.45 : 0.25,
     editable: true,
     warnings: [
-      'Audio path is light-assisted monophonic pitch-track — not multi-voice auto-tab.',
+      'Audio path is lead-biased multipitch assist (up to ~4 fretted voices) — not studio multi-track tabs.',
       'Always edit candidate fretting before saving to your library.',
     ],
     explanation: [
@@ -961,7 +982,7 @@ export function audioMidiToBreakdown(
       confidence: 0.15,
       warnings: [
         ...converted.warnings,
-        'No pitches locked — try a cleaner monophonic clip or paste MIDI instead.',
+        'No pitches locked — try a cleaner lead clip (or MIDI/MusicXML) instead.',
       ],
       explanation: [
         `1) Decoded “${fileName}” (${converted.durationSec.toFixed(1)}s).`,
@@ -993,7 +1014,7 @@ export function audioMidiToBreakdown(
     tuning: opts?.tuning,
     warnings: [
       ...converted.warnings,
-      'Converted via monophonic pitch-track — use Clean up / Edit tab if anything is off.',
+      'Converted via multipitch assist — use Clean up / Edit tab if anything is off.',
     ],
     statusMessage: `Audio → MIDI → tabs · ${converted.notes.length} notes (cleaned)`,
   })
@@ -1016,7 +1037,7 @@ export function audioMidiToBreakdown(
       warnings: [
         ...converted.warnings,
         'Pipeline: audio → MIDI → tabs → auto clean (quantize + playable frets).',
-        'Still monophonic assist — full-band mixes need ear checks.',
+        'Still an assist draft — full-band mixes need ear checks; chords keep up to 4 voices when detected.',
       ],
       explanation: [
         `1) Decoded “${fileName}” (${converted.durationSec.toFixed(1)}s @ ${converted.sampleRate} Hz${

@@ -211,7 +211,7 @@ describe('audioToMidi', () => {
     // SMF must carry tempo — not rely on parser default 120 after download/re-import
     expect(result.midi.tempoBpm).toBe(100)
     expect(result.tempoBpm).toBe(100)
-    expect(result.warnings.some((w) => /monophonic/i.test(w))).toBe(true)
+    expect(result.warnings.some((w) => /multipitch|lead-biased|assist/i.test(w))).toBe(true)
     expect(result.durationSec).toBeGreaterThan(0.5)
   })
 
@@ -457,5 +457,23 @@ describe('audioToMidi', () => {
     })
     expect(out.length).toBeGreaterThanOrEqual(2)
     expect(out.every((n) => n.pitch >= 55)).toBe(true) // bass grab dropped
+  })
+
+  it('refineDetectedNotes auto keeps multipitch chord voices', async () => {
+    const { refineDetectedNotes } = await import('./audioToMidi')
+    const chord = [
+      { pitch: 55, start: 0, duration: 400, velocity: 80, timeSec: 0, durationSec: 0.4, confidence: 0.75 },
+      { pitch: 59, start: 0, duration: 400, velocity: 82, timeSec: 0.01, durationSec: 0.4, confidence: 0.78 },
+      { pitch: 62, start: 0, duration: 400, velocity: 85, timeSec: 0.015, durationSec: 0.4, confidence: 0.8 },
+      { pitch: 67, start: 480, duration: 400, velocity: 84, timeSec: 0.5, durationSec: 0.4, confidence: 0.8 },
+    ]
+    const out = refineDetectedNotes(chord, {
+      monophonic: 'auto',
+      maxVoices: 4,
+      tempoBpm: 100,
+      quantize: true,
+    })
+    const firstBeat = out.filter((n) => n.timeSec < 0.2)
+    expect(firstBeat.length).toBeGreaterThanOrEqual(2)
   })
 })

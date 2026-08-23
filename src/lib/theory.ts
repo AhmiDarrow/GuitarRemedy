@@ -484,11 +484,21 @@ export function frettingForMidi(
  * Map a melody line to playable frets with hand continuity
  * (prefer previous position / nearby string, smooth position shifts).
  * Optional 1-note look-ahead reduces dead-end positions before big leaps.
+ *
+ * When `onsets` is provided (same length as midis), notes that share an onset
+ * are fretted as a chord: unique strings, compact fret span (playable grip).
  */
 export function frettingSequence(
   midis: number[],
   tuning: number[] = [...STANDARD_TUNING],
+  opts?: { onsets?: number[]; onsetEps?: number },
 ): Array<{ string: number; fret: number; midi: number }> {
+  const onsets = opts?.onsets
+  const onsetEps = opts?.onsetEps ?? 1e-3
+  if (onsets && onsets.length === midis.length && midis.length > 0) {
+    return frettingSequenceWithOnsets(midis, onsets, tuning, onsetEps)
+  }
+
   const out: Array<{ string: number; fret: number; midi: number }> = []
   let preferFret = 5
   let preferString: number | undefined
@@ -544,6 +554,151 @@ export function frettingSequence(
     if (f.fret > 0) {
       positionCenter = Math.round(positionCenter * 0.55 + f.fret * 0.45)
     }
+  }
+  return out
+}
+
+/**
+ * Fret a simultaneous chord: one string per pitch, compact hand shape.
+ * Greedy assign from low pitch → high, preferring unused strings near positionCenter.
+ */
+export function fretChordVoices(
+  midis: number[],
+  tuning: number[] = [...STANDARD_TUNING],
+  opts?: { positionCenter?: number; maxFret?: number },
+): Array<{ string: number; fret: number; midi: number }> {
+  const maxFret = opts?.maxFret ?? 17
+  const positionCenter = opts?.positionCenter ?? 5
+  const order = midis
+    .map((midi, idx) => ({ midi, idx }))
+    .sort((a, b) => a.midi - b.midi || a.idx - b.idx)
+
+  const used = new Set<number>()
+  const placed: Array<{ string: number; fret: number; midi: number; idx: number }> = []
+
+  for (const { midi, idx } of order) {
+    let best: { string: number; fret: number; midi: number; score: number } | null = null
+    for (let s = 0; s < tuning.length; s++) {
+      if (used.has(s)) continue
+      const fret = midi - tuning[s]
+      if (fret < 0 || fret > maxFret) continue
+      const spanPenalty =
+        placed.length > 0
+          ? Math.max(
+              0,
+              ...placed.map((p) => Math.abs(fret - p.fret)),
+            ) > 4
+            ? Math.max(...placed.map((p) => Math.abs(fret - p.fret))) * 0.7
+            : 0
+          : 0
+      const score =
+        Math.abs(fret - positionCenter) * 1.1 +
+        spanPenalty +
+        (fret > 12 ? (fret - 12) * 0.12 : 0) +
+        fret * 0.02
+      if (!best || score < best.score) best = { string: s, fret, midi, score }
+    }
+    // Fallback: allow string reuse only if no free string works (rare)
+    if (!best) {
+      for (let s = 0; s < tuning.length; s++) {
+        const fret = midi - tuning[s]
+        if (fret < 0 || fret > maxFret) continue
+        const score = Math.abs(fret - positionCenter) + (used.has(s) ? 8 : 0)
+        if (!best || score < best.score) best = { string: s, fret, midi, score }
+      }
+    }
+    if (!best) {
+      best = {
+        string: 0,
+        fret: Math.max(0, Math.min(maxFret, midi - tuning[0])),
+        midi,
+        score: 99,
+      }
+    }
+    used.add(best.string)
+    placed.push({ string: best.string, fret: best.fret, midi, idx })
+  }
+
+  placed.sort((a, b) => a.idx - b.idx)
+  return placed.map(({ string, fret, midi }) => ({ string, fret, midi }))
+}
+
+function frettingSequenceWithOnsets(
+  midis: number[],
+  onsets: number[],
+  tuning: number[],
+  onsetEps: number,
+): Array<{ string: number; fret: number; midi: number }> {
+  const out: Array<{ string: number; fret: number; midi: number }> = new Array(midis.length)
+  let preferFret = 5
+  let preferString: number | undefined
+  let positionCenter = 5
+  let i = 0
+  while (i < midis.length) {
+    const t0 = onsets[i]
+    const groupIdx: number[] = [i]
+    let j = i + 1
+    while (j < midis.length && Math.abs(onsets[j] - t0) <= onsetEps) {
+      groupIdx.push(j)
+      j++
+    }
+
+    if (groupIdx.length === 1) {
+      const midi = midis[i]
+      const nextSolo = j < midis.length && Math.abs(onsets[j] - t0) > onsetEps ? midis[j] : undefined
+      let f =
+        frettingForMidi(midi, tuning, preferFret, {
+          preferString,
+          positionCenter,
+          maxFret: 17,
+        }) || {
+          string: 0,
+          fret: Math.max(0, Math.min(17, midi - tuning[0])),
+          midi,
+        }
+      if (nextSolo != null && Math.abs(nextSolo - midi) >= 3) {
+        let best = f
+        let bestCost = Infinity
+        for (let s = 0; s < tuning.length; s++) {
+          const fret = midi - tuning[s]
+          if (fret < 0 || fret > 17) continue
+          const here =
+            Math.abs(fret - preferFret) * 1.1 +
+            (preferString != null ? Math.abs(s - preferString) * 1.2 : 0)
+          let nextCost = 6
+          for (let ns = 0; ns < tuning.length; ns++) {
+            const nf = nextSolo - tuning[ns]
+            if (nf < 0 || nf > 17) continue
+            const c = Math.abs(ns - s) * 1.3 + Math.abs(nf - fret) * 0.55
+            if (c < nextCost) nextCost = c
+          }
+          const cost = here * 0.65 + nextCost
+          if (cost < bestCost) {
+            bestCost = cost
+            best = { string: s, fret, midi }
+          }
+        }
+        f = best
+      }
+      out[i] = f
+      preferFret = Math.round(preferFret * 0.35 + f.fret * 0.65)
+      preferString = f.string
+      if (f.fret > 0) positionCenter = Math.round(positionCenter * 0.55 + f.fret * 0.45)
+    } else {
+      const chordMidis = groupIdx.map((k) => midis[k])
+      const grip = fretChordVoices(chordMidis, tuning, { positionCenter })
+      for (let g = 0; g < groupIdx.length; g++) {
+        out[groupIdx[g]] = grip[g]
+      }
+      const frets = grip.map((x) => x.fret).filter((f) => f > 0)
+      if (frets.length) {
+        const avg = frets.reduce((a, b) => a + b, 0) / frets.length
+        preferFret = Math.round(preferFret * 0.3 + avg * 0.7)
+        positionCenter = Math.round(positionCenter * 0.45 + avg * 0.55)
+      }
+      preferString = grip[Math.floor(grip.length / 2)]?.string
+    }
+    i = j
   }
   return out
 }

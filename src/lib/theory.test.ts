@@ -6,6 +6,7 @@ import {
   chordNotes,
   degreeLabel,
   frettingSequence,
+  fretChordVoices,
   nameToMidi,
   noteToPc,
   parseChordSymbol,
@@ -105,5 +106,25 @@ describe('theory', () => {
     expect(run.every((f) => f.fret >= 0 && f.fret <= 17)).toBe(true)
     const lastJump = Math.abs(run[3].string - run[2].string) + Math.abs(run[3].fret - run[2].fret)
     expect(lastJump).toBeLessThan(20)
+  })
+
+  it('frettingSequence with shared onsets frets a chord on unique strings', () => {
+    // Open-ish C major-ish: C3 E3 G3 C4 at same beat
+    const midis = [48, 52, 55, 60]
+    const onsets = [0, 0, 0, 0]
+    const run = frettingSequence(midis, undefined, { onsets })
+    expect(run.map((f) => f.midi)).toEqual(midis)
+    const strings = run.map((f) => f.string)
+    expect(new Set(strings).size).toBe(strings.length) // no double-stop same string
+    const frets = run.map((f) => f.fret)
+    const span = Math.max(...frets) - Math.min(...frets.filter((f) => f > 0).concat([Math.max(...frets)]))
+    expect(span).toBeLessThanOrEqual(5)
+  })
+
+  it('fretChordVoices keeps midis and unique strings', () => {
+    const midis = [40, 47, 52, 56] // power-ish shape
+    const grip = fretChordVoices(midis)
+    expect(grip.map((g) => g.midi)).toEqual(midis)
+    expect(new Set(grip.map((g) => g.string)).size).toBe(grip.length)
   })
 })

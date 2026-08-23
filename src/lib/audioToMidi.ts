@@ -2,13 +2,13 @@
  * MP3/WAV/OGG → MIDI converter (light assist).
  * Browser Web Audio decode → optional Spotify Basic Pitch (Apache-2.0) multipitch
  * assist, with autocorrelation fallback → SMF MIDI.
- * Still a monophonic / lead-biased draft for fretting — not multi-voice studio tabs.
+ * Lead-biased multipitch assist (up to ~4 fretted voices) — not studio multi-track tabs.
  *
  * Quality pipeline (full-band):
  *   stereo mid (+ optional side) → auto stem race (lead/harmonic/mix/side via HPSS) →
- *   engine race: Basic Pitch (Apache-2.0) vs autocorr+YIN fuse (score winner) →
- *   monophonic melody extract → onset snap → tempo blend (energy×IOI) → quantize →
- *   ghost drop → playable fretting (look-ahead) → MIDI.
+ *   engine race: Basic Pitch (Apache-2.0 multipitch) vs autocorr+YIN fuse (score winner) →
+ *   playable multipitch keep (or mono when sparse) → onset snap → tempo blend → quantize →
+ *   ghost drop → chord-aware fretting (look-ahead) → MIDI.
  */
 
 import { buildSimpleMidi, parseMidi, type MidiNote, type MidiParseResult } from './midi'
@@ -19,6 +19,8 @@ import {
   resampleMono,
   scoreDetectedMelody,
   extractMonophonicMelody,
+  extractPlayableVoices,
+  hasMultipitchContent,
 } from './basicPitchAssist'
 
 export interface PitchFrame {
@@ -1081,7 +1083,14 @@ export function scoreNoteDraft(notes: DetectedNote[]): number {
 export function refineDetectedNotes(
   notes: DetectedNote[],
   opts?: {
-    monophonic?: boolean
+    /**
+     * `true` — force single melody line.
+     * `false` — keep multipitch as-is (after light ghost drop).
+     * `'auto'` (default) — keep up to 4 playable voices when multipitch is present;
+     *                      otherwise monophonic extract (autocorr / sparse BP).
+     */
+    monophonic?: boolean | 'auto'
+    maxVoices?: number
     /** Optional PCM for onset-attack snap */
     samples?: Float32Array
     sampleRate?: number
@@ -1091,10 +1100,24 @@ export function refineDetectedNotes(
   },
 ): DetectedNote[] {
   let out = notes
-  if (opts?.monophonic !== false) {
+  const mode = opts?.monophonic ?? 'auto'
+  const maxVoices = opts?.maxVoices ?? 4
+
+  if (mode === true) {
     out = extractMonophonicMelody(out)
+  } else if (mode === 'auto') {
+    if (hasMultipitchContent(out)) {
+      out = extractPlayableVoices(out, { maxVoices, clusterSec: 0.045, minConf: 0.22 })
+    } else {
+      out = extractMonophonicMelody(out)
+    }
+  } else {
+    // mode === false: light multipitch keep without mono collapse
+    out = extractPlayableVoices(out, { maxVoices, clusterSec: 0.05, minConf: 0.18 })
   }
+
   out = dropGhostNotes(out, { minDurationSec: 0.09, minVelocity: 45 })
+  // Only merge same-pitch neighbors — multipitch chords must not collapse
   out = mergeAdjacentNotes(out, { ticksPerQuarter: DEFAULT_TPQ })
 
   const tempoBpm = opts?.tempoBpm ?? 100
@@ -1116,24 +1139,26 @@ export function refineDetectedNotes(
     out = mergeAdjacentNotes(out, { ticksPerQuarter: DEFAULT_TPQ })
   }
 
-  if (out.length > 8) {
+  // Confidence floor — keep enough notes for chords (don't strip to melody-only)
+  if (out.length > 10) {
     const confSorted = [...out].sort((a, b) => (b.confidence ?? 0) - (a.confidence ?? 0))
-    const floor = confSorted[Math.min(confSorted.length - 1, Math.floor(confSorted.length * 0.65))]
+    const floor = confSorted[Math.min(confSorted.length - 1, Math.floor(confSorted.length * 0.7))]
       ?.confidence
-    if (typeof floor === 'number' && floor > 0.3) {
-      const filtered = out.filter((n) => (n.confidence ?? 0) >= floor * 0.92)
-      if (filtered.length >= Math.max(3, Math.floor(out.length * 0.35))) {
-        out = filtered.sort((a, b) => a.start - b.start)
+    if (typeof floor === 'number' && floor > 0.28) {
+      const filtered = out.filter((n) => (n.confidence ?? 0) >= floor * 0.88)
+      if (filtered.length >= Math.max(4, Math.floor(out.length * 0.4))) {
+        out = filtered.sort((a, b) => a.start - b.start || a.pitch - b.pitch)
       }
     }
   }
-  if (out.length > 12) {
+  // Register keep is gentler when multipitch (don't delete chord tones)
+  if (out.length > 16 && !hasMultipitchContent(out)) {
     const withReg = out.map((n) => ({
       n,
       r: guitarRegisterScore(n.pitch) * (0.55 + 0.45 * (n.confidence ?? 0.5)),
     }))
     withReg.sort((a, b) => b.r - a.r)
-    const keepN = Math.max(8, Math.ceil(out.length * 0.72))
+    const keepN = Math.max(10, Math.ceil(out.length * 0.78))
     const kept = withReg
       .slice(0, keepN)
       .map((x) => x.n)
@@ -1334,7 +1359,7 @@ export function pcmToMidi(
 ): AudioToMidiResult {
   const a4 = Number.isFinite(opts?.a4) && (opts!.a4 as number) > 0 ? (opts!.a4 as number) : 440
   const warnings: string[] = [
-    'Audio→MIDI is monophonic pitch-track assist — not multi-voice transcription.',
+    'Audio→MIDI is lead-biased multipitch assist (up to ~4 fretted voices) — not studio multi-track tabs.',
     'Full-band path: stereo mid → HPSS stem race → melody band → guitar-register score → tempo snap → quantize.',
     'Edit or Clean up the candidate tab before practicing or saving.',
   ]
@@ -1431,16 +1456,22 @@ export function pcmToMidi(
     gridDivisions: 16,
   })
   const beforeRefine = notes.length
+  // Autocorr frames are monophonic; still run auto refine for ghost/onset/quantize
   notes = refineDetectedNotes(notes, {
-    monophonic: true,
+    monophonic: 'auto',
+    maxVoices: 4,
     samples: prepared,
     sampleRate,
     tempoBpm,
     quantize: true,
     gridDivisions: 16,
   })
-  if (notes.length < beforeRefine) {
-    warnings.push('Refined draft: monophonic extract + ghost drop + onset snap + register keep.')
+  if (notes.length !== beforeRefine) {
+    warnings.push(
+      hasMultipitchContent(notes)
+        ? 'Refined draft: multipitch keep + ghost drop + onset snap.'
+        : 'Refined draft: melody extract + ghost drop + onset snap + register keep.',
+    )
   }
 
   // Melody IOI tempo blend (when user did not override)
@@ -1610,8 +1641,8 @@ export async function pcmToMidiAsync(
       ? trimSamples(opts.sidePcm, sampleRate, opts?.maxSec).samples
       : undefined
   const warnings: string[] = [
-    'Audio→MIDI is monophonic / lead-biased assist — not multi-voice studio transcription.',
-    'Full-band path: stereo mid (+ side) → HPSS stem race → engine race (Basic Pitch vs autocorr) → tempo snap → quantize.',
+    'Audio→MIDI is lead-biased multipitch assist (up to ~4 fretted voices) — not studio multi-track tabs.',
+    'Full-band path: stereo mid (+ side) → HPSS stem race → engine race (Basic Pitch multipitch vs autocorr) → tempo snap → quantize.',
     'Edit or Clean up the candidate tab before practicing or saving.',
   ]
   if (opts?.maxSec && opts.maxSec > 0 && analyzedSec + 0.05 < fullDuration) {
@@ -1738,7 +1769,7 @@ export async function pcmToMidiAsync(
   if (winner) {
     if (winner.engine === 'basic-pitch') {
       warnings.push(
-        `Pitch engine race winner: Basic Pitch (Apache-2.0) · score ${winner.score.toFixed(1)} → monophonic fretting draft.`,
+        `Pitch engine race winner: Basic Pitch (Apache-2.0 multipitch) · score ${winner.score.toFixed(1)} → playable fretting draft (up to 4 voices).`,
       )
     } else {
       warnings.push(
@@ -1774,16 +1805,22 @@ export async function pcmToMidiAsync(
 
   onProgress?.(78, 'Building notes…')
   const beforeRefine = notes.length
+  // BP winners often carry multipitch; autocorr stays mono via auto mode
   notes = refineDetectedNotes(notes, {
-    monophonic: true,
+    monophonic: winner?.engine === 'basic-pitch' ? false : 'auto',
+    maxVoices: 4,
     samples: prepared,
     sampleRate,
     tempoBpm,
     quantize: true,
     gridDivisions: 16,
   })
-  if (notes.length < beforeRefine) {
-    warnings.push('Refined draft: monophonic extract + ghost drop + onset snap + register keep.')
+  if (notes.length !== beforeRefine || hasMultipitchContent(notes)) {
+    warnings.push(
+      hasMultipitchContent(notes)
+        ? 'Refined draft: multipitch keep (≤4 voices) + ghost drop + onset snap + quantize.'
+        : 'Refined draft: melody extract + ghost drop + onset snap + register keep.',
+    )
   }
 
   if (opts?.tempoBpm == null && notes.length >= 4) {

@@ -337,8 +337,8 @@ export function UploadPage() {
             <span className="text-[var(--text)]">audio to MIDI</span> →{' '}
             <span className="text-[var(--text)]">MIDI to guitar tabs</span>. MIDI and MusicXML are
             the solid structured path. Guitar Pro is best-effort (placeholders never auto-save).
-            Audio is a monophonic / lead-biased draft — always editable, never a perfect full-band
-            auto-tab.
+            Audio is a lead-biased multipitch draft (up to ~4 fretted voices) — always editable, never
+            a perfect full-band multi-track auto-tab.
           </p>
         </div>
       </div>
@@ -379,11 +379,11 @@ export function UploadPage() {
         </ol>
         <p className="text-xs text-[var(--text-muted)] mt-3 leading-relaxed">
           <AudioLines className="w-3.5 h-3.5 inline mr-1 text-mint" />
-          Best results: dry single-note melody (no heavy drums/chords). Full-band mixes use stereo mid
+          Best results: dry single-note or clear guitar lead. Full-band mixes use stereo mid
           (+ side when hard-panned), <strong className="text-[var(--text)]">Auto stem</strong> (HPSS
           lead / harmonic / mix / side), then a <strong className="text-[var(--text)]">pitch-engine race</strong>
-          (Basic Pitch vs autocorrelation) — still a monophonic draft; always edit by ear.
-          Prefer MIDI/MusicXML when you have them.
+          (Basic Pitch multipitch vs autocorrelation) — keeps up to ~4 fretted voices when detected;
+          always edit by ear. Prefer MIDI/MusicXML when you have them.
         </p>
         <div className="mt-4 grid sm:grid-cols-3 gap-3">
           <label className="block text-xs text-[var(--text-muted)]">
@@ -429,7 +429,7 @@ export function UploadPage() {
               <option value="mix">Full mix (no HPSS · harder)</option>
             </select>
             <span className="text-[10px] opacity-80">
-              Auto races lead / harmonic / mix (+ side on stereo) for the cleanest monophonic track
+              Auto races lead / harmonic / mix (+ side on stereo) for the cleanest fretting draft
             </span>
           </label>
         </div>
