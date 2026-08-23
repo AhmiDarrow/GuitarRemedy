@@ -260,6 +260,43 @@ describe('curriculum', () => {
     expect(phases.has('repertoire')).toBe(true)
     expect(getPhaseMeta().length).toBe(6)
   })
+
+  it('follows research-backed easy path order (music before overload)', () => {
+    // First chord is Em (easy win), not F barre
+    expect(getLesson(3)?.title).toMatch(/E Minor|Em/i)
+    // Campfire set before first lead map
+    expect(getLesson(6)?.title).toMatch(/D Major|Campfire/i)
+    expect(getLesson(7)?.title).toMatch(/Jam|Em|G|C|D/i)
+    // Pentatonic map after a week of chords/songs — not day 1
+    expect(getLesson(11)?.title).toMatch(/Pentatonic/i)
+    // Power chords before full F barre pressure
+    expect(getLesson(14)?.title).toMatch(/Power/i)
+    expect(getLesson(14)?.libraryIds).toContain('rf-power')
+    expect(getLesson(14)?.libraryIds).not.toContain('sg-mary-had-a-little-lamb')
+    // Fmaj7 gateway before full F heroics
+    expect(getLesson(42)?.title).toMatch(/F Maj7|Fmaj7|Gateway/i)
+    expect(getLesson(43)?.title).toMatch(/Full F|Barre|Strength/i)
+    // No truncated titles
+    const em = '\u2014'
+    for (const lesson of CURRICULUM) {
+      expect(lesson.title.trim().endsWith(em), `truncated title day ${lesson.day}`).toBe(false)
+      expect(lesson.title).not.toMatch(new RegExp(em + '\\s*Raised\\s*$', 'i'))
+    }
+  })
+
+  it('keeps theory bites teachably deep (not stub length)', () => {
+    for (const lesson of CURRICULUM) {
+      expect(
+        lesson.theoryBite.trim().length,
+        `day ${lesson.day} thin theory`,
+      ).toBeGreaterThanOrEqual(80)
+    }
+    // Power / lydian accuracy anchors
+    expect(getLesson(14)?.theoryBite).toMatch(/root|fifth|5th/i)
+    expect(getLesson(88)?.title).toMatch(/Raised 4|Lydian/i)
+    expect(getLesson(88)?.theoryBite).toMatch(/#4|raised 4/i)
+    expect(getLesson(88)?.libraryIds).toContain('sc-lydian')
+  })
 })
 
 describe('library', () => {
@@ -286,3 +323,4 @@ describe('library', () => {
     expect(pd.length).toBeGreaterThan(10)
   })
 })
+

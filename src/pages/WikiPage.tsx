@@ -10,6 +10,7 @@ import {
   type WikiCategory,
 } from '../data/wiki'
 import { APP_NAME } from '../lib/brand'
+import { parseWikiBody, sectionHeadingsFromBody, type WikiNode } from '../lib/wikiMarkdown'
 import clsx from 'clsx'
 
 function renderInline(text: string, keyBase: string): React.ReactNode[] {
@@ -37,96 +38,106 @@ function renderInline(text: string, keyBase: string): React.ReactNode[] {
   })
 }
 
+function renderNode(node: WikiNode, index: number): React.ReactNode {
+  const key = `n-${index}`
+  switch (node.type) {
+    case 'h2':
+      return (
+        <h2
+          key={key}
+          id={node.id}
+          className="font-display text-lg md:text-xl font-bold text-mint pt-4 border-t border-[var(--border)] first:border-0 first:pt-0 scroll-mt-24"
+        >
+          {node.text}
+        </h2>
+      )
+    case 'h3':
+      return (
+        <h3
+          key={key}
+          id={node.id}
+          className="font-display text-base font-semibold text-[var(--text)] pt-2 tracking-tight scroll-mt-24"
+        >
+          {node.text}
+        </h3>
+      )
+    case 'p':
+      return (
+        <p key={key} className="text-[15px] leading-relaxed text-soft">
+          {renderInline(node.text, key)}
+        </p>
+      )
+    case 'ul':
+      return (
+        <ul key={key} className="list-disc pl-5 space-y-1.5 marker:text-mint text-[15px] leading-relaxed text-soft">
+          {node.items.map((item, li) => (
+            <li key={li}>{renderInline(item, `${key}-u${li}`)}</li>
+          ))}
+        </ul>
+      )
+    case 'ol':
+      return (
+        <ol key={key} className="list-decimal pl-5 space-y-1.5 marker:text-mint text-[15px] leading-relaxed text-soft">
+          {node.items.map((item, li) => (
+            <li key={li}>{renderInline(item, `${key}-o${li}`)}</li>
+          ))}
+        </ol>
+      )
+    case 'table':
+      return (
+        <div
+          key={key}
+          className="overflow-x-auto rounded-xl border border-[var(--border)] shadow-[inset_0_1px_0_rgba(93,255,176,0.06)]"
+        >
+          <table className="w-full text-left text-xs md:text-sm">
+            <tbody>
+              {node.rows.map((row, ri) => {
+                const Tag = ri === 0 ? 'th' : 'td'
+                return (
+                  <tr
+                    key={ri}
+                    className={
+                      ri === 0
+                        ? 'bg-[var(--bg-elevated)] text-[var(--text)]'
+                        : ri % 2 === 0
+                          ? 'bg-black/20'
+                          : undefined
+                    }
+                  >
+                    {row.map((cell, ci) => (
+                      <Tag
+                        key={ci}
+                        className="px-3 py-2.5 border-t border-[var(--border)] align-top first:font-semibold text-soft"
+                      >
+                        {renderInline(cell, `${key}-t${ri}-${ci}`)}
+                      </Tag>
+                    ))}
+                  </tr>
+                )
+              })}
+            </tbody>
+          </table>
+        </div>
+      )
+    case 'pre':
+      return (
+        <pre
+          key={key}
+          className="overflow-x-auto rounded-xl border border-[var(--border)] bg-[var(--bg-elevated)] p-3 md:p-4 text-xs md:text-sm font-mono text-mint leading-relaxed"
+        >
+          {node.text}
+        </pre>
+      )
+    default:
+      return null
+  }
+}
+
 function WikiBody({ body }: { body: string }) {
-  const blocks = body.trim().split(/\n\n+/)
+  const nodes = useMemo(() => parseWikiBody(body), [body])
   return (
     <div className="wiki-prose space-y-4 text-[15px] leading-relaxed text-soft">
-      {blocks.map((block, bi) => {
-        const lines = block.split('\n')
-        if (lines.every((l) => l.trim().startsWith('- '))) {
-          return (
-            <ul key={bi} className="list-disc pl-5 space-y-1.5 marker:text-mint">
-              {lines.map((l, li) => (
-                <li key={li}>{renderInline(l.replace(/^\s*-\s*/, ''), `l-${bi}-${li}`)}</li>
-              ))}
-            </ul>
-          )
-        }
-        if (lines.every((l) => /^\d+\.\s/.test(l.trim()))) {
-          return (
-            <ol key={bi} className="list-decimal pl-5 space-y-1.5 marker:text-mint">
-              {lines.map((l, li) => (
-                <li key={li}>{renderInline(l.replace(/^\s*\d+\.\s*/, ''), `o-${bi}-${li}`)}</li>
-              ))}
-            </ol>
-          )
-        }
-        if (lines[0]?.startsWith('|') && lines.some((l) => l.includes('---'))) {
-          const rows = lines.filter((l) => l.trim().startsWith('|') && !l.includes('---'))
-          return (
-            <div
-              key={bi}
-              className="overflow-x-auto rounded-xl border border-[var(--border)] shadow-[inset_0_1px_0_rgba(93,255,176,0.06)]"
-            >
-              <table className="w-full text-left text-xs md:text-sm">
-                <tbody>
-                  {rows.map((row, ri) => {
-                    const cells = row
-                      .split('|')
-                      .map((c) => c.trim())
-                      .filter(Boolean)
-                    const Tag = ri === 0 ? 'th' : 'td'
-                    return (
-                      <tr
-                        key={ri}
-                        className={
-                          ri === 0
-                            ? 'bg-[var(--bg-elevated)] text-[var(--text)]'
-                            : ri % 2 === 0
-                              ? 'bg-black/20'
-                              : undefined
-                        }
-                      >
-                        {cells.map((cell, ci) => (
-                          <Tag
-                            key={ci}
-                            className="px-3 py-2.5 border-t border-[var(--border)] align-top first:font-semibold"
-                          >
-                            {renderInline(cell, `t-${bi}-${ri}-${ci}`)}
-                          </Tag>
-                        ))}
-                      </tr>
-                    )
-                  })}
-                </tbody>
-              </table>
-            </div>
-          )
-        }
-        if (lines[0]?.startsWith('### ')) {
-          return (
-            <div key={bi} className="space-y-2">
-              <h3 className="font-display text-base font-semibold text-[var(--text)] pt-1 tracking-tight">
-                {lines[0].replace(/^###\s+/, '')}
-              </h3>
-              {lines.slice(1).join('\n').trim() && (
-                <p>{renderInline(lines.slice(1).join(' '), `h-${bi}`)}</p>
-              )}
-            </div>
-          )
-        }
-        if (lines[0]?.startsWith('## ')) {
-          return (
-            <h2
-              key={bi}
-              className="font-display text-lg md:text-xl font-bold text-mint pt-3 border-t border-[var(--border)] first:border-0 first:pt-0"
-            >
-              {lines[0].replace(/^##\s+/, '')}
-            </h2>
-          )
-        }
-        return <p key={bi}>{renderInline(block.replace(/\n/g, ' '), `p-${bi}`)}</p>
-      })}
+      {nodes.map((node, i) => renderNode(node, i))}
     </div>
   )
 }
@@ -149,13 +160,8 @@ function relatedArticles(article: WikiArticle, limit = 6): WikiArticle[] {
   return scored.slice(0, limit).map((x) => x.a)
 }
 
-function sectionHeadings(body: string): string[] {
-  return body
-    .split('\n')
-    .map((l) => l.trim())
-    .filter((l) => l.startsWith('## '))
-    .map((l) => l.replace(/^##\s+/, ''))
-    .slice(0, 12)
+function sectionHeadings(body: string): { text: string; id: string }[] {
+  return sectionHeadingsFromBody(body)
 }
 
 function chipClass(active: boolean): string {
@@ -237,8 +243,10 @@ export function WikiPage() {
             <p className="section-title mb-2">On this page</p>
             <ol className="grid sm:grid-cols-2 gap-x-4 gap-y-1 text-sm text-soft list-decimal pl-5">
               {heads.map((h) => (
-                <li key={h} className="marker:text-mint/70">
-                  {h}
+                <li key={h.id} className="marker:text-mint/70">
+                  <a href={`#${h.id}`} className="hover:text-mint transition-colors">
+                    {h.text}
+                  </a>
                 </li>
               ))}
             </ol>

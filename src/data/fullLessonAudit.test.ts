@@ -148,6 +148,21 @@ describe('full lesson + imagery audit', () => {
     }
   })
 
+  it('keeps easy-path anchors and teachable theory depth', () => {
+    // Music before abstract overload; power before full F; no stub theory
+    expect(getLesson(11)!.day).toBe(11)
+    expect(getLesson(11)!.title).toMatch(/Pentatonic/i)
+    expect(getLesson(14)!.libraryIds).toContain('rf-power')
+    expect(getLesson(42)!.title).toMatch(/F Maj7|Gateway/i)
+    expect(getLesson(43)!.title).toMatch(/Full F|Strength|Mercy/i)
+    expect(getLesson(88)!.title).toMatch(/Lydian|Raised 4/i)
+    expect(getLesson(88)!.libraryIds).toContain('sc-lydian')
+    for (const L of CURRICULUM) {
+      expect(L.theoryBite.trim().length, `day ${L.day} thin theory`).toBeGreaterThanOrEqual(80)
+      expect(L.title.trim().endsWith('\u2014'), `day ${L.day} truncated title`).toBe(false)
+    }
+  })
+
   it('every diagram on every day is theory-accurate (resolve + analyze)', () => {
     const fails: string[] = []
     let total = 0
