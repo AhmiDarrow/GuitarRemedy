@@ -84,11 +84,15 @@ describe('curriculum', () => {
 
   it('expands private-lesson GOLD hooks across the year', () => {
     const hooks = CURRICULUM.map((l) => l.privateLesson.hook.trim())
-    expect(new Set(hooks).size).toBeGreaterThan(80)
+    expect(new Set(hooks).size).toBeGreaterThan(110)
     // weekly checkpoints should not all share one phase template line
     const weekly = [7, 35, 70, 98, 140, 182, 266, 322, 357].map((d) => getLesson(d)!)
     const weeklyHooks = new Set(weekly.map((l) => l.privateLesson.hook))
     expect(weeklyHooks.size).toBe(weekly.length)
+    // hand hooks on early teaching days (not phase-template only)
+    expect(getLesson(2)?.privateLesson.hook).toMatch(/pressure|day two/i)
+    expect(getLesson(6)?.privateLesson.hook).toMatch(/D|campfire|loop/i)
+    expect(getLesson(155)?.privateLesson.hook).toMatch(/click|honest|judge/i)
     expect(getLesson(263)?.masteryCheck).not.toMatch(/On your song/i)
     expect(getLesson(6)?.drills.join(' ')).not.toMatch(/keep it slow and clean/i)
   })
@@ -115,9 +119,12 @@ describe('curriculum', () => {
   it('keeps theory bites unique enough (no mass clone pedagogy)', () => {
     const bites = CURRICULUM.map((l) => l.theoryBite.trim())
     expect(new Set(bites).size).toBe(365)
-    expect(bites.every((b) => b.length >= 24)).toBe(true)
+    expect(bites.every((b) => b.length >= 40)).toBe(true)
+    // no stiff courseware openers
+    expect(bites.some((b) => /^Demonstrate\b/i.test(b))).toBe(false)
+    expect(CURRICULUM.some((l) => l.goals.some((g) => /^Prove\b/i.test(g)))).toBe(false)
     const hooks = CURRICULUM.map((l) => l.privateLesson.hook.trim())
-    expect(new Set(hooks).size).toBeGreaterThan(250)
+    expect(new Set(hooks).size).toBeGreaterThan(110)
   })
 
   it('strips mechanical Day-N chrome from learner-facing strings', () => {

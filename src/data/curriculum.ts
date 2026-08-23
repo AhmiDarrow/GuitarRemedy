@@ -132,7 +132,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     ],
     theoryBite: 'G major is G B D. Single shapes are nice; smooth changes are the real beginner skill.',
     drills: [
-      'Build G one finger at a time',
+      'Build G one finger at a time, then strum — fix buzz before speed',
       'Em | G at about 50 BPM, two bars each',
       'Keep the strum arm moving while your fretting hand switches'
     ],
@@ -176,7 +176,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     drills: [
       'Freeze the D triangle cleanly for ten full seconds',
       'G–C–D–G loop four times — only bump tempo after every change rings',
-      'Soft down-up strums on D only'
+      'Soft down-up strums on D only until every string speaks kindly'
     ],
     libraryIds: [
       'ch-d',
@@ -240,7 +240,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     ],
     theoryBite: 'Count 1 & 2 & 3 & 4 &. Your right hand is the drummer; the fretting hand just changes costumes.',
     drills: [
-      'Muted D-D-D-D for 60 seconds',
+      'Muted D-D-D-D strums for 60 seconds — right hand only, loose',
       'D-DU-D-DU on G for 8 bars with the foot locked to the pulse',
       'Ghost strums: miss the strings on purpose for groove'
     ],
@@ -263,7 +263,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     drills: [
       'Freeze A and audit string by string',
       'A–D–E–A twice at a walking pace — mute the open strings you do not want',
-      'A vs Am toggle on a steady beat'
+      'Toggle A vs Am on a steady beat — hear major brighten and minor soften'
     ],
     libraryIds: [
       'ch-a',
@@ -325,7 +325,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     theoryBite: 'Independence is coordination, not strength. Slow spiders wire clean fretting for every chord you’ll learn later.',
     drills: [
       'Spider on B and high E only — even volume, no flying fingers',
-      'Add the G string when it’s even',
+      'Add the G string only when the first two notes are already even',
       'Stop at the first real tension; shake out ten seconds'
     ],
     libraryIds: [
@@ -344,8 +344,8 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     ],
     theoryBite: 'A power chord is root + fifth (sometimes plus the octave). Movable, tough-sounding, and friendly when full barres still hurt.',
     drills: [
-      'E5 at open/2, then at frets 3/5',
-      'Palm-mute downstroke eighths',
+      'E5 at open/2, then move the shape to frets 3/5 — same grip',
+      'Palm-mute downstroke eighths on the power chord — steady wrist',
       'Little riff: move the root in time'
     ],
     libraryIds: [
@@ -365,8 +365,8 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     theoryBite: 'Economy of motion beats raw finger speed. The shortest path between shapes is its own practice skill.',
     drills: [
       'Film one change in slow-mo if you can',
-      'G–C isolation for two minutes',
-      'C–D isolation for two minutes'
+      'G–C isolation for two minutes — only that change, slow and kind',
+      'C–D isolation for two minutes — plant each shape before leaving'
     ],
     libraryIds: [
       'sg-london-bridge'
@@ -447,8 +447,8 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     ],
     theoryBite: 'A dominant 7th (1–3–5–b7) creates tension that wants the home chord. Folk and blues live on that pull.',
     drills: [
-      'Freeze G7, then resolve to C',
-      'Freeze D7, then resolve to G',
+      'Freeze G7 for a bar, then resolve to C like a door closing',
+      'Freeze D7 for a bar, then resolve to G — hear the pull home',
       'Loop G–G7–C four times and listen for the magnet'
     ],
     libraryIds: [
@@ -508,8 +508,8 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     ],
     theoryBite: 'Voice to fret is the shortest path to owning music. Wrong notes are clues, not crimes.',
     drills: [
-      'Hum → hunt → check, five times',
-      'Change the starting pitch once',
+      'Hum a note, hunt it on the neck, check — five calm rounds',
+      'Change the starting pitch once and hunt the new note cleanly',
       'Don’t write it down — trust your ears'
     ],
     libraryIds: [
@@ -546,10 +546,10 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'Mute idle strings with the fretting hand',
       'Play rest strokes on purpose'
     ],
-    theoryBite: 'Great rhythm guitar is half silence. Mutes turn strums into drums.',
+    theoryBite: 'Great rhythm guitar is half silence. Mutes turn strums into drums — practice the quiet as hard as the hit.',
     drills: [
       'Palm-muted open low-E eighths near the bridge',
-      'Chuck on the &s between chords',
+      'Chuck lightly on the &s between chord hits — groove, not noise',
       'Full stop rests for one bar in every four'
     ],
     libraryIds: [
@@ -610,7 +610,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     theoryBite: 'Fixing the weak link beats replaying what already feels good. One rescue per session adds up fast.',
     drills: [
       'Rank Em G C D A Am E from cleanest to messiest',
-      'Ugly-chord gym for five minutes',
+      'Ugly-chord gym for five minutes — freeze shapes, then release',
       'Progression with the ugly chord on every bar 2'
     ],
     libraryIds: [
@@ -651,9 +651,9 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     ],
     theoryBite: 'There’s no badge for pain. The only technique that reaches day 365 is the one you can still do next week.',
     drills: [
-      'Run a quick posture checklist',
+      'Run a quick posture checklist: thumb, wrist, shoulders, breath',
       'Play four minutes, break thirty seconds, repeat',
-      'Note any hotspots in your phone'
+      'Note any hand hotspots in your phone so you do not ignore pain'
     ],
     libraryIds: [
       'sg-amazing-grace'
@@ -692,8 +692,8 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     ],
     theoryBite: 'Chord changes get smoother with slow clean reps, not sloppy speed. Play something that sounds like music early so you stay hooked.',
     drills: [
-      'Core six parade: Em G C D Am E',
-      'Choose G–C or C–D as week focus',
+      'Parade the core six: Em G C D Am E — one clean bar each',
+      'Choose G–C or C–D as this week\'s change focus and write it down',
       '60s song loop before any timer ego'
     ],
     libraryIds: [
@@ -945,8 +945,8 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     theoryBite: 'Barre strength is tissue adaptation over weeks. Clarity on two strings beats six muffled strings.',
     drills: [
       'Barre chirps 1 minute — light pressure, release before the hand burns',
-      'F for 4 strums, rest, repeat',
-      'Swap Fmaj7 when form collapses'
+      'Hold F for four strums, rest, repeat — shake out if it burns',
+      'Swap in Fmaj7 when the full F form collapses — still counts'
     ],
     libraryIds: [
       'pr-12bar'
@@ -982,7 +982,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'Play C major arpeggio from the shape',
       'Connect chord tones, not only strums'
     ],
-    theoryBite: 'CAGED maps five chord shapes up the neck.',
+    theoryBite: 'CAGED maps five chord shapes up the neck so the same chord can live in different neighborhoods. Today is just a peek at the C-shape home.',
     drills: [
       'Open C arpeggio — one note at a time until every string speaks',
       'Library CAGED C riff once slow, then once at song tempo',
@@ -1006,7 +1006,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     drills: [
       'Chord order chant while fretting',
       'Loop the drill at 72 BPM with a metronome click',
-      'Melody doodle on G string only'
+      'Melody doodle on the G string only for one minute — stay calm'
     ],
     libraryIds: [
       'pr-6251'
@@ -1049,7 +1049,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     theoryBite: 'Am–G–F–E is a centuries-old descent. The E major chord is the spicy door home to Am.',
     drills: [
       'Hold two bars on each chord before changing',
-      'Bass note emphasis on beat 1',
+      'Emphasize the bass note on beat 1, then lighter strums after',
       'Build soft to strong into the E chord arrival'
     ],
     libraryIds: [
@@ -1107,7 +1107,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'Fix the worst string only',
       'Re-strum and re-audit'
     ],
-    theoryBite: 'Diagnosis before speed. Pros still pluck-audit when a chord turns to mud.',
+    theoryBite: 'Diagnosis before speed. Pros still pluck-audit when a chord turns to mud — name the dead string, fix only that, then rejoin the shape.',
     drills: [
       'String-audit G, C, D, and Am for buzz-free frets',
       'Worst-string isolation 3 minutes',
@@ -1127,11 +1127,11 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'Chord chuck on 2 and 4',
       'Apply to G–C–D'
     ],
-    theoryBite: 'Boom-chuck separates bass and chord — instant style without new harmony.',
+    theoryBite: 'Boom-chuck separates bass and chord — instant country/folk color without learning new harmony. Thumb tells the story; chord snaps the backbeat.',
     drills: [
       'Open-G boom-chuck for 1 minute — bass note clear, chuck light',
       'Add C and D chords into the loop with clean changes',
-      'Keep arm loose like a soft drum'
+      'Keep the strum arm loose like a soft drum — no death-grip elbow'
     ],
     libraryIds: [
       'pr-145'
@@ -1190,7 +1190,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     theoryBite: 'Capos let beginners play in many keys with open shapes — practical musicianship over theory pride.',
     drills: [
       'G–C–D open, then with capo 2 if available',
-      'Sing a higher comfortable note',
+      'Sing a higher comfortable note and find it slowly on the neck',
       'Write which fret felt good for your voice'
     ],
     libraryIds: [
@@ -1209,7 +1209,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     ],
     theoryBite: 'Chord-melody starts as ‘pad + top note.’ Smallest version still sounds arranged.',
     drills: [
-      'C with high E open/1/3 options',
+      'Try C with high E open, fret 1, and fret 3 — pick the clearest',
       'Resolve top notes to E (chord tone)',
       'Improvise a 4-bar pad melody over the vamp'
     ],
@@ -1251,7 +1251,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     ],
     theoryBite: 'Deliberate practice targets the bottleneck. Restarting from the intro wastes the reps that matter.',
     drills: [
-      'Identify stickiest two chords',
+      'Identify your stickiest two chords and loop only that change',
       'Isolate the sticky bar for two focused minutes',
       'Drop the lick into a 4-bar chord bed — stop if the pocket wobbles'
     ],
@@ -1564,7 +1564,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     theoryBite: 'A7\'s sus hangs the third out of reach — when it lands back on beat 1, that pull is the whole trick.',
     drills: [
       'A7 shape, lift the third finger on & of 4',
-      'Resolve to full A7 on beat 1',
+      'Land the full A7 on beat 1 after the setup — no late fingers',
       'Loop four bars; keep the strum arm moving',
     ],
     libraryIds: [
@@ -1667,7 +1667,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     drills: [
       '123 234 345 pattern slow until each finger lands without a slap',
       '1234 2345 finger pattern — even volume, no hammered leftovers',
-      'Resolve to root after each pass'
+      'Resolve to the root after each pass so the ear gets a period'
     ],
     libraryIds: [
       'rf-minor-slide-lick-study'
@@ -1751,7 +1751,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     drills: [
       'Pulse roots only on beats 1 and 3 for 8 bars',
       'Outline roots and fifths through the progression',
-      'Full box but end on chord tones'
+      'Run the full box but end phrases on chord tones you can name'
     ],
     libraryIds: [
       'sc-pent-min',
@@ -1793,7 +1793,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     drills: [
       'Play A natural minor one octave slowly with even tone',
       'Remove notes down to pent and compare — which version sings more?',
-      'Phrase using b6 on purpose once'
+      'Phrase using the b6 on purpose once — make it sound intentional'
     ],
     libraryIds: [
       'sc-pent-min',
@@ -1813,7 +1813,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     ],
     theoryBite: 'Dorian = natural minor with raised 6. Funk, Santana, modal jams — hopeful minor.',
     drills: [
-      'Find raised 6 relative to Dm',
+      'Find the raised 6 relative to Dm and mark it with a finger tap',
       'Side-by-side natural vs dorian lick',
       'Static Dm groove improv 1 minute'
     ],
@@ -1892,7 +1892,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'Answer lower or shorter',
       'Leave a full bar of rest between'
     ],
-    theoryBite: 'Conversation beats continuous notes. Rests are musical confidence.',
+    theoryBite: 'Conversation beats continuous notes. Rests are musical confidence — leave a bar of air and the next phrase lands harder.',
     drills: [
       'Play a two-bar question phrase, then leave space',
       'Rest one full bar, then re-enter cleanly on beat 1',
@@ -1914,7 +1914,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     ],
     theoryBite: 'The pro sound over changes is targeting, not denser scales. Hit the new chord’s third/root.',
     drills: [
-      'Roots only through progression',
+      'Roots only through the whole progression — fat and in time',
       'Play roots and thirds only through the progression',
       'Add pent connector notes between chord tones — keep the line singable'
     ],
@@ -1954,7 +1954,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     ],
     theoryBite: 'Harmonic minor’s raised 7 creates a strong leading tone — drama engine for minor keys.',
     drills: [
-      'Fragment around leading tone',
+      'Build a short fragment around the leading tone, then resolve',
       'Resolve the line to A and hold a clean long tone',
       'One exotic phrase max per 4 bars'
     ],
@@ -1975,7 +1975,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     theoryBite: 'Caged positions teach the neck as neighborhoods. Constraints breed creativity.',
     drills: [
       'Map root locations for the CAGED form in use',
-      'Riff only inside cage 2 minutes',
+      'Riff only inside the cage for two minutes — no runaway frets',
       'Optional: shift cage up 2 frets and repeat idea'
     ],
     libraryIds: [
@@ -2036,7 +2036,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     drills: [
       'C major pentatonic, 8 bars, start and end on C',
       'Play only 3 notes per bar — rhythm does the work',
-      'Rest on bar 4 and 8 on purpose',
+      'Rest on bars 4 and 8 on purpose — silence is a note choice',
       'Record it and listen for the landing',
     ],
     libraryIds: [
@@ -2078,7 +2078,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     theoryBite: 'Imitation is how every player builds vocabulary. Copy it, then give it your fingerprint.',
     drills: [
       'Learn a 4-note library motif note-for-note',
-      'Play it with twice the rests',
+      'Play the same idea with twice the rests — leave bigger holes',
       'Move the same phrase to a new string set without changing the rhythm',
       'End with your own rhythm version',
     ],
@@ -2099,7 +2099,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     theoryBite: 'Subdivisions are where timing lives. Beat 1 keeps you close; eighths keep you honest.',
     drills: [
       'Scale up and down in quarters first',
-      'Switch to eighths, same tempo',
+      'Switch to eighths at the same tempo only if quarters were clean',
       'If you rush, drop back to quarters',
       'Record 20 seconds and check the eighths',
     ],
@@ -2138,7 +2138,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'Loop that bar until it becomes a riff',
       'Leave with a riff you can repeat',
     ],
-    theoryBite: 'Riffs are frozen luck. Capture the accidental cool bar and give it a home.',
+    theoryBite: 'Riffs are frozen luck. Capture the accidental cool bar, give it a clear start and end, and you own a lick instead of a blur.',
     drills: [
       'Improvise over the vamp for 1 minute',
       'Circle the one bar that felt like something',
@@ -2163,7 +2163,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     drills: [
       'Loop the E phrygian vamp, hold the root E',
       'Try b2 (F) as a long tone, feel the pull',
-      'Then b7 (D), then resolve to E',
+      'Then land the b7 (D), then resolve to E like a sentence ending',
       'Solo with long tones on chord tones only',
     ],
     libraryIds: [
@@ -2206,7 +2206,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'Find C on the low E and the high E strings',
       'Play both C\'s on beat 1, in time',
       'Walk from low C to high C using scale steps',
-      'Do it again with eyes closed',
+      'Do the same pass again with eyes closed — trust the frets',
     ],
     libraryIds: [
       'rf-travis-pick-sketch-in-c'
@@ -2243,12 +2243,12 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'Let the click be the boss, not the speed',
       'Find where you tend to rush',
     ],
-    theoryBite: 'Eighths are a train track. Adding notes doesn\'t change the rails.',
+    theoryBite: 'Eighths are a train track. Adding scale notes does not change the rails — the click still owns the grid under every finger.',
     drills: [
       'Scale eighths with one chromatic passing note',
       'Mark where you rushed — that\'s the fix spot',
       'Loop that spot slowly five times',
-      'Run the full octave again',
+      'Run the full octave again — even fingers, no rush at the top',
     ],
     libraryIds: [
       'rf-blues-sh'
@@ -2285,9 +2285,9 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'Make the riff loop-able back to the start',
       'Play it twice through without losing the fire',
     ],
-    theoryBite: 'A riff without an ending is a loop; a riff with an ending is a statement.',
+    theoryBite: 'A riff without an ending is a loop; a riff with an ending is a statement. Practice the last note like it matters.',
     drills: [
-      'Loop your existing riff 4 times',
+      'Loop your existing riff four times before you change a note',
       'Add a one-note ending that leads back in',
       'Play it as: riff, riff, riff, ending',
       'Record the full cycle twice; keep the take with steadier time',
@@ -2329,8 +2329,8 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     ],
     theoryBite: 'Same shapes, different mood. Minor pentatonic turns the same journey into a different weather.',
     drills: [
-      'A minor pentatonic box, 8 bars',
-      'Start and end on A this time',
+      'A minor pentatonic box for 8 bars — simple, in time, breathing',
+      'Start and end on A this time so the ear hears home base',
       'Use the flat 3rd as a color on bar 6',
       'Compare with last week\'s major story',
     ],
@@ -2395,8 +2395,8 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     drills: [
       'Two-octave scale in quarters, hands warm',
       'Eighths, focusing on the shift note',
-      'Land the top note on a click',
-      'Descend without dragging',
+      'Land the top note exactly on a click — freeze if you miss',
+      'Descend the scale without dragging behind the click',
     ],
     libraryIds: [
       'rf-caged-c'
@@ -2414,7 +2414,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     ],
     theoryBite: 'Once you can A/B modes, you can paint with both. The mix is where your voice shows up.',
     drills: [
-      'Loop a mixolydian vamp',
+      'Loop a short mixolydian vamp and sit in it for a minute',
       'Start the phrase in mode A, resolve in mode B',
       'Use mode B only on the last two bars',
       'Record and hear which mix you liked',
@@ -2434,11 +2434,11 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'Let the low notes carry the motion',
       'Keep the riff simple enough to groove',
     ],
-    theoryBite: 'Bass motion under a riff makes it move without adding notes on top.',
+    theoryBite: 'Bass motion under a riff makes it move without adding notes on top. One walking note between repeats can feel like a whole arrangement.',
     drills: [
       'Take your riff and play only its bass notes',
       'Add a stepwise walk between them',
-      'Re-attach the riff on top',
+      'Re-attach your riff on top of the vamp — same tempo',
       'Loop it with the walk every 4 bars',
     ],
     libraryIds: [
@@ -2502,7 +2502,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'Call out the root\'s string/fret before you play it',
       'Find G on five strings in 30 seconds',
       'Play a phrase that lands on G from three directions',
-      'Time yourself — beat last week',
+      'Time yourself on the checkpoint and try to beat last week kindly',
     ],
     libraryIds: [
       'rf-minor-slide-lick-study'
@@ -2521,7 +2521,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     theoryBite: 'Motifs grow by being stretched and squeezed. Space is part of the sentence.',
     drills: [
       'Play the motif twice as fast over two bars',
-      'Then stretched across four bars',
+      'Then stretch the same idea across four bars with more air',
       'Call (motif), rest a bar, answer with a variation',
       'Finish with the answer on the root',
     ],
@@ -2872,7 +2872,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     drills: [
       'Chug quarters, play exactly on the click, 8 bars',
       'Lean slightly behind the click for 8 bars',
-      'Push slightly ahead for 8 bars',
+      'Push slightly ahead of the beat for 8 bars, then sit back in',
       'Return to dead-center and feel the difference',
     ],
     libraryIds: [
@@ -2893,7 +2893,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     theoryBite: 'Dynamics are a wave, not a switch. Ramp volume slowly so listeners ride it with you.',
     drills: [
       'Strum one chord, quiet to loud over 4 bars',
-      'Loud to quiet over the next 4',
+      'Shape loud to quiet over the next 4 bars on purpose',
       'Repeat with eighths, keep the tempo locked',
       'Mark the loudest bar on your chart',
     ],
@@ -2915,7 +2915,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     theoryBite: 'Odd meters are just 4/4 with a secret. 5/4 = one bar of 3 plus one bar of 2, counted as one loop.',
     drills: [
       'Count 1-2-3, 1-2 out loud for 30 seconds',
-      'Tap the 5 beats with your foot',
+      'Tap all 5 beats with your foot before you add the guitar',
       'Strum a 5-beat groove: down on every beat',
       'Switch back to 4/4 and feel how square it is',
     ],
@@ -2959,7 +2959,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     theoryBite: 'Bass, chord, bass, chord. The thumb and the strum hand do different jobs — that split is the skill.',
     drills: [
       'Bass on open D/G strings beats 1 & 3, 60 seconds',
-      'Add light muted chucks on 2 & 4',
+      'Add light muted chucks on 2 and 4 once the kick pulse is solid',
       'G-C-D boom-chuck at walking tempo',
       'Remove chucks 4 bars, bring them back',
     ],
@@ -3246,7 +3246,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'Play less when the melody is busy',
       'Accent the melody\'s pickups',
     ],
-    theoryBite: 'A good comp is a road with lanes. When the melody moves, you move less.',
+    theoryBite: 'A good comp is a road with lanes. When the melody moves, you move less — stay out of the singer\'s way and lock the pocket.',
     drills: [
       'Comp 2-bar pattern, hum the melody over it',
       'On busy melody bars, cut to downstrokes only',
@@ -3311,7 +3311,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     durationMin: 30,
     goals: [
       'Checkpoint with the metronome audible',
-      'Prove the pocket holds at a fixed tempo',
+      'Show the pocket still holds when the click stays put',
       'Fix one timing spot after listening back',
     ],
     theoryBite: 'The metronome is the honest judge. One audible-click take tells you exactly where the time bends.',
@@ -3384,7 +3384,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     drills: [
       'Build a 2-bar 5/4 riff with the accent in bar 1',
       'Loop it until it sounds like a song intro',
-      'Add a 4/4 release section',
+      'Add a short 4/4 release section so the odd meter can breathe',
       'Move between them at a phrase boundary',
     ],
     libraryIds: [
@@ -3475,7 +3475,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       '16 bars: soft start, build, peak, settle',
       'Include the week\'s pattern in the build',
       'Keep the click steady through the whole arc',
-      'Listen back and grade the arc',
+      'Listen back once and grade only the dynamic arc, not note spam',
     ],
     libraryIds: [
       'pr-1645',
@@ -3785,7 +3785,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     theoryBite: 'The rhythm phase\'s final checkpoint is a mini-set. Comp, drive, dynamics, and a finish — that\'s the toolkit.',
     drills: [
       'Warm up: groove, comp pattern, dynamics',
-      'Take a full 32-bar form',
+      'Take a full 32-bar form without stopping to restart bars',
       'Include every week\'s skill at least once',
       'Keep the best take and write the next step',
     ],
@@ -4045,7 +4045,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     ],
     theoryBite: 'Motif development is classical and rock craft alike: same DNA, new clothes. Listeners track rhythm and contour more than note count.',
     drills: [
-      'Write a 4-note motif',
+      'Write a simple 4-note motif you can hum back immediately',
       'Play it in quarter notes, then eighths, then mixed',
       'Sequence it starting one scale degree higher, three times',
       'Resolve the last note to a chord root or third'
@@ -4133,7 +4133,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     theoryBite: 'Space is a lead technique. Dense note streams often signal fear of silence more than musical abundance.',
     drills: [
       'Solo rule: maximum 2 beats of notes per bar for 8 bars',
-      'Call 1 bar, rest 1 bar — strict',
+      'Call one bar, rest one bar — strict. The rest is part of the lick',
       'Play a blues chorus leaving bars 2, 4, 6 mostly empty',
       'Listen back and celebrate the air'
     ],
@@ -4155,7 +4155,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     theoryBite: 'Blues lead is language over a known form. Form awareness beats scale-shape tourism.',
     drills: [
       'Speak the 12-bar form while comping simply',
-      'Call-lick on I, answer on I',
+      'Call-lick on the I chord, then answer still on I — leave space',
       'New call on IV, answer resolving toward I',
       'Full chorus with at least two clear call-response pairs'
     ],
@@ -4245,7 +4245,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     drills: [
       'Loop Am–G–F–E and hum the root each bar',
       'Play one note per chord, landing on E',
-      'Add a second note on the F bar',
+      'Add a second melody note on the F bar without rushing the hand',
       'Finish every phrase on E for a full pass',
     ],
     libraryIds: [
@@ -4268,8 +4268,8 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     drills: [
       'Two strings apart: downstroke on string A, keep down onto string B',
       'Play the pair slowly, no re-pick',
-      'Add a third string to the sweep',
-      'Alternate directions and repeat',
+      'Add a third string to the sweep only when two strings are even',
+      'Alternate sweep directions and repeat until both feel honest',
     ],
     libraryIds: [
       'rf-g-caged-run-study'
@@ -4288,7 +4288,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     theoryBite: 'Hybrid picking is a second hand inside one — the pick takes the bass, the fingers take the melody.',
     drills: [
       'Pick a low note, pluck a high note with the middle finger',
-      'Same rhythm, two strings apart',
+      'Same rhythm pattern, two strings apart — watch the fretting gaps',
       'Balance the volumes until they match',
       'Play a two-note groove for 30 seconds',
     ],
@@ -4398,7 +4398,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'Play E Phrygian phrases on the E bar only',
       'Switch to F-major-ish lines on the F bar',
       'Contrast the two colors across two passes',
-      'End each pass on E, let it ring',
+      'End each pass on E and let it ring — no nervous extra notes',
     ],
     libraryIds: [
       'pr-andalu',
@@ -4442,7 +4442,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'Thumb on the low string, steady quarters',
       'Middle finger melody on the high strings',
       'Keep the bass even while the melody moves',
-      'One 8-bar loop, melody on top',
+      'One 8-bar loop with a simple melody on top of the pad',
     ],
     libraryIds: [
       'rf-travis-pick-sketch-in-c'
@@ -4463,7 +4463,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'Learn the rag motif\'s rhythm first, clapping it',
       'Add the notes once the rhythm is solid',
       'Play it three times, accent the offbeats',
-      'Quote it inside a simple vamp',
+      'Quote the lick inside a simple vamp so it feels like music',
     ],
     libraryIds: [
       'sg-maple-leaf-rag-motif-joplin-publ',
@@ -4507,7 +4507,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'Pre-bend a half step silently, release on beat 1',
       'Match: play the lower note, then the release',
       'End one phrase with a release instead of a bend',
-      'Four bars of pre-bend phrasing',
+      'Four bars of pre-bend phrasing — bend is ready before the hit',
     ],
     libraryIds: [
       'rf-minor-slide-lick-study'
@@ -4547,7 +4547,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     ],
     theoryBite: 'In E phrygian, the 3rd of each chord is its personality — hit it on the downbeat and the line sounds like harmony, not scales.',
     drills: [
-      'Find the 3rd of Am, G, F, and E',
+      'Find the 3rd of Am, G, F, and E on the neck and land each clean',
       'End each phrase on the next chord\'s 3rd',
       'Loop the cadence, move with the chord changes',
       'One full pass with only chord-tone endings',
@@ -4593,8 +4593,8 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     drills: [
       'Pick a bass note, add middle and ring together',
       'Strum-roll the three into one chord shape',
-      'Repeat the group in rhythm',
-      'Two bars of the pattern, steady',
+      'Repeat the hybrid group in rhythm until the thumb feels automatic',
+      'Two bars of the hybrid pattern, steady — then rest two bars',
     ],
     libraryIds: [
       'rf-travis-pick-sketch-in-c'
@@ -4697,7 +4697,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'Make every landing feel inevitable',
       'Keep the line flowing through the changes',
     ],
-    theoryBite: 'A half-step approach makes a landing sing — phrygian likes leaning into E',
+    theoryBite: 'A half-step approach makes a landing sing — phrygian loves leaning into E. Aim the tension note, then resolve like you meant it.',
     drills: [
       'Pick a target chord tone to land on each bar',
       'Approach it from the note a half step below',
@@ -4762,7 +4762,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'Keep the quote recognizable but brief',
       'Return to your own line after',
     ],
-    theoryBite: 'A quote is a wink — say it once, briefly, then go back to your story.',
+    theoryBite: 'A quote is a wink — say a public-domain fragment once, briefly, then go back to your own story so it feels clever, not copied.',
     drills: [
       'Vamp two chords steadily, no ornament yet',
       'Insert the 4-note quote on the second bar of the loop',
@@ -4849,7 +4849,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'Play less, land more',
       'Leave space where the harmony is already moving',
     ],
-    theoryBite: 'The cadence moves on its own — let phrygian color it, don\'t force it.',
+    theoryBite: 'The Andalusian cadence moves on its own — let phrygian color ride the chords. Do not force extra notes where the harmony already pulls.',
     drills: [
       'Play one note, then rest a full bar of silence',
       'Only play on the F and E bars, leave the rest empty',
@@ -4875,9 +4875,9 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     theoryBite: 'A sweep inside a run is a shortcut, not a showpiece — the line keeps moving through it.',
     drills: [
       'Scale run with one sweep on a string skip',
-      'Keep the rest alternate-picked',
+      'Keep the rest of the line alternate-picked and even',
       'Loop the run, let the sweep land on a chord tone',
-      'Two full runs, even throughout',
+      'Two full runs of the line, even throughout — no sprint finish',
     ],
     libraryIds: [
       'rf-g-caged-run-study'
@@ -4939,7 +4939,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     theoryBite: 'A phrase with a shape is a sentence: it starts somewhere, rises, and lands. Listeners feel that arc.',
     drills: [
       'Plan a 4-bar phrase: low start, rise, land',
-      'Play it with the shape in mind',
+      'Play the line with the chord shape still in your mind\'s eye',
       'Repeat with a different peak note',
       'Keep the take where the arc was clearest',
     ],
@@ -5024,7 +5024,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'Down-sweeps and up-sweeps sound equal',
       'Change direction without a hiccup',
     ],
-    theoryBite: 'Up-sweeps are usually the weak side. Practice the direction you avoid.',
+    theoryBite: 'Up-sweeps are usually the weak side of economy picking. Practice the direction you avoid until both ways feel equally honest.',
     drills: [
       'Down-sweep the arpeggio, letting each note ring',
       'Up-sweep it back, same even spacing',
@@ -5114,8 +5114,8 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     drills: [
       'Pre-bend silently, start the phrase on the release',
       'Let the release be the phrase\'s first note',
-      'Follow with a descending answer',
-      'Two entrances, both clean',
+      'Follow the bend with a short descending answer phrase',
+      'Two phrase entrances in a row — both clean, no rushed pickup',
     ],
     libraryIds: [
       'rf-minor-slide-lick-study'
@@ -5305,7 +5305,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'Use the high register for the answer phrase',
       'Let register change the mood of the same line',
     ],
-    theoryBite: 'The same phrygian line low and high is two different feelings.',
+    theoryBite: 'The same phrygian line low and high is two different feelings. Register is arrangement — try both and keep the one that serves the song.',
     drills: [
       'Play the line low for two cycles, warm and clear',
       'Repeat it an octave up, same articulation',
@@ -5480,7 +5480,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'Make the technique serve the line',
       'Record a take that sounds like music',
     ],
-    theoryBite: 'Technique graduates when you stop hearing it. This pass is the graduation.',
+    theoryBite: 'Technique graduates when you stop hearing it. This pass is the graduation: musical sentences first, pick mechanics invisible.',
     drills: [
       'Pick a vamp and choose a chord-tone target note',
       'One phrase with a sweep toward the target',
@@ -5501,7 +5501,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'Keep balance, groove, and clarity the whole way',
       'Record a take worth keeping',
     ],
-    theoryBite: 'The study is done when it survives a full take. This is the full take.',
+    theoryBite: 'Hybrid picking is done when it survives a full take, not a perfect two-bar loop. Today is the full-take honesty check.',
     drills: [
       'Warm the pattern twice through, slow and loose',
       'One full performance pass, no stopping allowed',
@@ -5729,7 +5729,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'Chorus loop with one lift lever only (density or voicing)',
       'Verse→chorus transition 10 times focusing on energy change',
       'If lift fails, raise voicing rather than only hitting harder',
-      'Capture a keepable chorus take'
+      'Capture one keepable chorus take you would actually replay'
     ],
     libraryIds: [
       'sg-auld-lang-syne',
@@ -5843,7 +5843,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     drills: [
       'Assign soft/medium/loud to sections on the chart',
       'Play with exaggerated dynamics once',
-      'Play with musical dynamics once',
+      'Play the section with real dynamics once — soft verse energy',
       'Make sure tempo stays flat when volume rises'
     ],
     libraryIds: [
@@ -5865,7 +5865,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     theoryBite: 'Memory thrives on chunks and cues, not heroic full runs on day one of recall.',
     drills: [
       'Turn chart face down; play one section from memory',
-      'Turn chart back for seams only',
+      'Turn the chart face-back and play seams from memory only',
       'Add a second section to memory when the first is stable',
       'Note the exact bar where memory blinks'
     ],
@@ -5913,7 +5913,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'Rewrite messy bars with larger fret numbers',
       'Add feel marks (mute, accent, light) in one ink color',
       'Remove obsolete marks that confuse you',
-      'Photo the chart for backup'
+      'Photo or export the chart so you have a backup off the stand'
     ],
     libraryIds: [
       'sg-jingle-bells',
@@ -5931,7 +5931,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'Prefer clarity of changes over excess gain or force',
       'A/B record to verify the arrangement reads'
     ],
-    theoryBite: 'Brighter for lift, darker for verses, less gain for clarity of changes.',
+    theoryBite: 'Tone is arrangement: brighter for lift, darker for verses, less gain when changes need clarity. One tone tweak can fix a muddy section.',
     drills: [
       'Verse tone: darker/softer attack for 8 bars',
       'Chorus tone: clearer/brighter for 8 bars',
@@ -6023,7 +6023,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'Place the break at a form breath point',
       'Keep break tempo honest and shorter than ego wants'
     ],
-    theoryBite: 'A break is a short story inside the song, not a separate shred audition.',
+    theoryBite: 'A lead break is a short story inside the song, not a separate shred audition. Start clear, peak once, land before the vocal returns.',
     drills: [
       'Write a 2-bar break maximum on paper',
       'Place it after a chorus or before a final verse',
@@ -6046,7 +6046,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'Answer with a clear short guitar phrase',
       'Avoid talking over the call bar'
     ],
-    theoryBite: 'Guitar answers voice (or hummed line). Leave holes where the call lives.',
+    theoryBite: 'Guitar answers voice (or a hummed line). Leave holes where the call lives — if you play through the singer, you are competing, not talking.',
     drills: [
       'Hum a call; answer on guitar in the next bar',
       'Leave the call bar mostly empty on guitar',
@@ -6097,7 +6097,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'Order two or three songs by energy curve',
       'Check keys for monotony; adjust capo plan if needed',
       'Speak transitions once as if on stage',
-      'Time the mini-set roughly'
+      'Time the mini-set roughly with a phone timer — note overruns'
     ],
     libraryIds: [
       'sg-the-streets-of-laredo',
@@ -6166,7 +6166,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'One full section or song take with performance rules',
       'No stopping mid-take unless safety issue',
       'Listen once before deleting anything',
-      'Keep the file even if imperfect'
+      'Keep the take file even if imperfect — you need the evidence'
     ],
     libraryIds: [
       'sg-joy-to-the-world',
@@ -6184,12 +6184,12 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'Choose one fix only',
       'Avoid shame spirals that kill the next loop'
     ],
-    theoryBite: 'Kindness first, pencil second. Shame kills practice loops.',
+    theoryBite: 'Kindness first, pencil second. Shame kills practice loops; one specific fix keeps you coming back tomorrow.',
     drills: [
       'Listen for time first, notes second',
       'Write one keep sentence and one fix sentence',
       'Apply only the fix in a short loop',
-      'Avoid multi-issue spiral'
+      'Avoid the multi-issue spiral — fix one complaint per listen'
     ],
     libraryIds: [
       'sg-turkey-in-the-straw',
@@ -6209,10 +6209,10 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     ],
     theoryBite: 'Isolating the sticky bar is high-use practice. Context returns after the bar is honest.',
     drills: [
-      'Locate the single stickiest bar',
-      'Loop it at 70% speed 20 times',
+      'Locate the single stickiest bar and put a star on the chart',
+      'Loop that bar at about 70% speed twenty times, then rest',
       'Add bar before and after (context) 10 times',
-      'Reinsert into full section once'
+      'Reinsert the fixed bar into the full section once, slowly'
     ],
     libraryIds: [
       'sg-minuet-in-g-bach-public-domain',
@@ -6276,7 +6276,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'Land stillness after the last sound',
       'Remove embarrassed rushes off the neck'
     ],
-    theoryBite: 'Last bars linger in memory. Practice endings as hard as openings.',
+    theoryBite: 'Last bars linger in memory longer than middles. Practice endings as hard as openings so the room remembers a clean finish.',
     drills: [
       'Last 4 bars + stillness 15 times',
       'Decide facial/body end pose (simple)',
@@ -6299,9 +6299,9 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'Slow the seam until it\'s inevitable',
       'Only then raise tempo'
     ],
-    theoryBite: 'Medleys need key/tempo bridges. Plan the seam before you glue songs live.',
+    theoryBite: 'Medleys need key and tempo bridges. Plan the seam on paper before you glue songs live — surprise joins are how trains wreck.',
     drills: [
-      'Pick two song fragments to join',
+      'Pick two song fragments to join and write the seam bar down',
       'Write a 2-bar seam on one chord or hit',
       'Practice A-end → seam → B-start slowly',
       'Only then attempt performance tempo'
@@ -6324,7 +6324,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     ],
     theoryBite: 'Same progression, new right-hand dialect (folk, rock, ballad). Style is mostly rhythm and density.',
     drills: [
-      'Same section, ballad density',
+      'Same section at ballad density — fewer hits, more air',
       'Same section, rock eighth density',
       'Same section, boom-chuck if fits',
       'Choose the style that serves lyrics/melody best today'
@@ -6366,14 +6366,14 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     goals: [
       'Identify and erase unwanted open-string noise',
       'Assign specific mute responsibilities',
-      'Recheck at performance volume'
+      'Recheck the part at performance volume — soft practice lies'
     ],
     theoryBite: 'Unwanted open-string noise is arrangement dirt. Left-hand chops and right-hand palms are erasers.',
     drills: [
       'Slow motion: identify noisy open strings',
       'Assign left-hand mute or palm for each culprit',
       'Loop dirty bar until noise floor drops',
-      'Recheck at performance volume'
+      'Recheck the part at performance volume — soft practice lies'
     ],
     libraryIds: [
       'sg-fr-re-jacques',
@@ -6510,7 +6510,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     theoryBite: 'Half-time makes grooves heavier. Backbeat placement shifts while form length stays honest.',
     drills: [
       'Move backbeat emphasis to create half-time feel',
-      '8 bars normal, 8 bars half-time',
+      'Eight bars normal feel, eight bars half-time — hard edges clean',
       'Keep chord moments aligned to form',
       'Great for final verse drama if song allows'
     ],
@@ -6696,9 +6696,9 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     theoryBite: 'Boom-chuck turns a song into train motion. Bass/chord roles must stay distinct.',
     drills: [
       'Boom on 1 and 3, chuck on 2 and 4 for full section',
-      'Keep chucks lighter than booms',
+      'Keep chucks lighter than the boom bass notes so groove reads',
       'Chord change practice at boom-chuck tempo',
-      'Smile-test recording 30 seconds'
+      'Smile-test: record 30 seconds and keep only if it feels kind'
     ],
     libraryIds: [
       'sg-maple-leaf-rag-motif-joplin-publ',
@@ -6832,12 +6832,12 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'Practice human transitions (talk/breath)',
       'Time the arc roughly'
     ],
-    theoryBite: 'Welcome, lift, rest, peak, goodbye. Plan talk breaks if needed.',
+    theoryBite: 'A solo set needs shape: welcome, lift, rest, peak, goodbye. Plan where you breathe or talk so the set feels guided, not random.',
     drills: [
       'Write a 3-song or 3-section energy arc on paper',
       'Practice speaking one sentence between sections',
       'Time the arc roughly with a phone clock — know where the lift lives',
-      'Run once with performance rules'
+      'Run once with performance rules — no stopping for small flubs'
     ],
     libraryIds: [
       'sg-happy-birthday',
@@ -6858,9 +6858,9 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     theoryBite: 'Click polish reveals kind lies. Use it to stabilize, then graduate to human feel.',
     drills: [
       'Full section with click at practice tempo',
-      'Note where you pull forward',
+      'Note where you pull ahead of the click and circle those bars',
       'Loop only rushing bars with click',
-      'One keep take with click'
+      'One keep take with the click — stop when form is honest'
     ],
     libraryIds: [
       'sg-scarborough-fair',
@@ -6878,7 +6878,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'Compare to click reference',
       'Tap foot honestly if form stretches'
     ],
-    theoryBite: 'After click trust, practice breathing time without wandering form length.',
+    theoryBite: 'After click trust, practice breathing time without wandering form length. Humanize the pocket, not the bar count.',
     drills: [
       'Immediately after click work, play without click',
       'Record and compare length of section to click version',
@@ -6929,7 +6929,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'Choose second vehicle easier or contrasting',
       'Do intake: form map + section 1 loop',
       'Don\'t abandon song 1 — schedule both',
-      'Log BPM and capo for each'
+      'Log BPM and capo for each song so tomorrow starts faster'
     ],
     libraryIds: [
       'sg-wild-mountain-thyme',
@@ -6947,12 +6947,12 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'Keep difficulty staggered in the set',
       'Sketch order early'
     ],
-    theoryBite: 'Three songs begin a real mini-set. Keep difficulty staggered.',
+    theoryBite: 'Three songs begin a real mini-set. Stagger difficulty so you have a landing pad song when nerves spike.',
     drills: [
       'Third song should be a confidence piece',
       'Speak a quick form map only, then play from memory',
-      'Run section 1 clean 5 times',
-      'Sketch mini-set order 1-2-3'
+      'Run section 1 clean five times before touching section 2',
+      'Sketch a mini-set order 1–2–3 and say why that flow works'
     ],
     libraryIds: [
       'sg-drunken-sailor',
@@ -6995,10 +6995,10 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     ],
     theoryBite: 'Reviving an old song with new skills proves growth. Avoid autopilot nostalgia thrash.',
     drills: [
-      'Revisit an early-course song',
+      'Revisit an early-course song and notice what feels easier now',
       'Apply a new skill (mute cleanup or dynamic arc)',
       'Record a before-memory vs after-take if possible',
-      'Celebrate measurable growth'
+      'Celebrate one measurable growth vs the first time you learned it'
     ],
     libraryIds: [
       'sg-aura-lee',
@@ -7016,11 +7016,11 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'Stop before fatigue encodes errors',
       'Write the intake checklist once and reuse'
     ],
-    theoryBite: 'Form, groove, sticky bar, then ornaments. Resist full-speed first passes.',
+    theoryBite: 'New song intake: form, groove, sticky bar, then ornaments. Resist full-speed first passes — they encode panic.',
     drills: [
       'New song intake checklist on paper',
       'Form first, sticky bar second, ornaments never first',
-      'Five slow loops of section 1',
+      'Five slow loops of section 1 before any speed attempt',
       'Stop before fatigue encodes errors'
     ],
     libraryIds: [
@@ -7044,7 +7044,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'Slice section into phrase units of 2–4 bars',
       'Master phrase A, phrase B, then A+B only',
       'Don\'t run full section until links work',
-      'Mark phrase breaths on chart'
+      'Mark phrase breaths on the chart where you actually inhale'
     ],
     libraryIds: [
       'sg-buffalo-gals',
@@ -7066,8 +7066,8 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     drills: [
       'Loop bars spanning the section boundary only',
       'Slow the boundary 20% under section tempo',
-      'Add one bar context each side',
-      'Reintegrate full sections'
+      'Add one bar of context on each side of the sticky chunk',
+      'Reintegrate the chunk into full sections at a kind tempo'
     ],
     libraryIds: [
       'sg-sailor-s-hornpipe',
@@ -7085,12 +7085,12 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'Require clean reps to graduate',
       'Step down without drama when needed'
     ],
-    theoryBite: 'Secure slow, musical medium, careful faster. Never skip the middle.',
+    theoryBite: 'Secure slow, musical medium, careful faster. Never skip the middle rung or the fast take is just a messy slow take.',
     drills: [
       'Three tempos on metronome: slow / medium / goal-1',
       'Two clean runs required to graduate a rung',
       'If fail, step down a rung without drama',
-      'Log best clean tempo today'
+      'Log the best clean tempo you hit today — write the number down'
     ],
     libraryIds: [
       'sg-canon-in-d-pachelbel-theme-publi',
@@ -7157,9 +7157,9 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     theoryBite: 'Video shows posture and panic motions audio misses. Watch once muted, once with sound.',
     drills: [
       'Film one section once and note one fix afterward',
-      'Watch muted for posture/tension',
-      'Watch with audio for time',
-      'Pick one visual fix only'
+      'Watch the video muted once and only grade posture and tension',
+      'Watch the video with audio once and only grade time feel',
+      'Pick one visual fix only (shoulder, thumb, face) and re-film 20s'
     ],
     libraryIds: [
       'sg-ode',
@@ -7177,12 +7177,12 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'Timestamp issues',
       'Fix timing before tone chasing'
     ],
-    theoryBite: 'Audio review without mirrors focuses time and tone. Timestamp one fix.',
+    theoryBite: 'Audio review without a mirror focuses time and tone. Timestamp one fix only so the next loop has a job.',
     drills: [
       'Do one audio-only take and listen back once',
-      'Listen without looking at hands',
+      'Listen back without looking at your hands — ear-only critique',
       'Timestamp one timing issue and one tone issue',
-      'Fix timing first in loops'
+      'Fix timing first in short loops before chasing tone or flash'
     ],
     libraryIds: [
       'sg-oh-susanna',
@@ -7200,9 +7200,9 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'If solo, simulate peer with a focused question',
       'Apply at most one suggestion'
     ],
-    theoryBite: 'If you do, ask for one specific feedback target, not global judgment.',
+    theoryBite: 'If you share, ask for one specific feedback target, not global judgment. Clear questions get useful answers.',
     drills: [
-      'Optional share of 30–60s clip',
+      'Optional: share a 30–60s clip with someone kind — or just archive it',
       'Ask one question (e.g. \'does chorus lift?\')',
       'If no peer, ask future-you the same question on listenback',
       'Apply at most one suggestion today'
@@ -7227,7 +7227,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     drills: [
       'Explain section fretting aloud as if teaching',
       'Give yourself a count-in and demo at student tempo',
-      'Teach the sticky bar twice',
+      'Teach the sticky bar aloud twice like a patient teacher',
       'Notice what you understood better after teaching'
     ],
     libraryIds: [
@@ -7269,12 +7269,12 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'One ornament family at a time',
       'Abort if time wobbles'
     ],
-    theoryBite: 'Add slides, hammer decoration, or bass walks only on a stable skeleton.',
+    theoryBite: 'Add slides, hammers, or bass walks only on a stable skeleton. Ornaments on a wobbly form just decorate the wobble.',
     drills: [
       'Do a skeleton take first — form only, no ornaments',
       'Add one ornament type only (slide or hammer)',
       'Place ornaments on weak beats or phrase ends',
-      'Abort ornaments if time wobbles'
+      'Abort ornaments if time wobbles — plain notes win on show week'
     ],
     libraryIds: [
       'sg-she-ll-be-coming-round-the-mount',
@@ -7294,7 +7294,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     ],
     theoryBite: 'One signature lick placed well beats five random fills. Put it where form breathes.',
     drills: [
-      'Write a 1-bar signature lick',
+      'Write a 1-bar signature lick you could play half-asleep',
       'Place it in the same form location each time',
       'Practice song with lick omitted vs included',
       'Keep lick slower than surrounding ego'
@@ -7342,7 +7342,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     drills: [
       'Hands ready, true silence, then count-in',
       'First hit confident mf, not accidental graze',
-      'Ten reps of silence→start',
+      'Ten reps: silence, then a clean start — no flinch on beat 1',
       'If noise creeps, freeze longer before counting'
     ],
     libraryIds: [
@@ -7363,10 +7363,10 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     ],
     theoryBite: 'Cold endings stop together. Practice the final hit and the still body after.',
     drills: [
-      'Final hit + mute + still body',
-      'No string noise after cutoff',
+      'Final hit, mute, still body — hold the quiet like part of the song',
+      'No string noise after cutoff — right hand parks clean',
       'Fifteen cold endings in a row — button the last hit every time',
-      'Video the stillness once'
+      'Video the stillness once after the last hit — no string noise'
     ],
     libraryIds: [
       'sg-the-parting-glass',
@@ -7384,10 +7384,10 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'Connect tag to button cleanly',
       'Notate so you remember under pressure'
     ],
-    theoryBite: 'Tags repeat a final hook. Decide how many repeats before the button.',
+    theoryBite: 'Tags repeat a final hook. Decide how many repeats before the button ending so you do not improvise yourself into a corner.',
     drills: [
       'Decide tag length (1 or 2 repeats)',
-      'Practice tag into button',
+      'Practice the tag into a firm button ending without extra hits',
       'Keep tag dynamics intentional (build or shrink)',
       'Notate the tag ending on your chart before playing'
     ],
@@ -7430,10 +7430,10 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'Connect old key area into new center',
       'Abort if tempo or pitch fails'
     ],
-    theoryBite: 'Walkups into a new key need clear bass motion. Slow is mandatory at first.',
+    theoryBite: 'Walkups into a new key need clear bass motion. Slow is mandatory at first — name the notes so the ear learns the door.',
     drills: [
       'Write bass walk into a new tonal center',
-      'Slow walk with named notes',
+      'Slow walk the modulation with named notes under your breath',
       'Connect from old chorus into walked lift',
       'Abort if intonation or tempo fails'
     ],
@@ -7482,7 +7482,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'Strip section to skeleton (roots or light chops)',
       'Loop the sticky 8 bars until the hitch disappears twice in a row',
       'Rebuild to full texture over 4 bars',
-      'Contrast should feel obvious'
+      'Make the contrast obvious enough a friend would notice cold'
     ],
     libraryIds: [
       'sg-turkey-in-the-straw',
@@ -7500,11 +7500,11 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'Keep form length true',
       'Still prepare the ending'
     ],
-    theoryBite: 'Higher voicing, fuller strums, or a harmony hint.',
+    theoryBite: 'Final chorus lift can be higher voicing, fuller strums, or a harmony hint — pick one, not all three at once.',
     drills: [
       'Final chorus adds one lift element only',
       'Practice penultimate vs final chorus back-to-back',
-      'Keep form length identical',
+      'Keep form length identical when you add the final chorus lift',
       'Practice the ending cold — last chord held, no fade-out shrug'
     ],
     libraryIds: [
@@ -7546,11 +7546,11 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'Slow-practice the seam',
       'Then run real endings into real beginnings'
     ],
-    theoryBite: 'Shared chord, drum fill feel, or held note.',
+    theoryBite: 'Medley bridges can be a shared chord, a drum-fill feel, or a held note. The seam should feel inevitable, not clever-for-clever.',
     drills: [
       'Write 2–4 bar bridge between two repertoire songs',
       'Shared chord or drum-like hits as glue',
-      'Slow seam practice 10 times',
+      'Slow seam practice ten times where the medley pieces join',
       'Then song A end → bridge → song B start'
     ],
     libraryIds: [
@@ -7572,8 +7572,8 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     theoryBite: 'Journal what improved and what is next. Written goals outperform mood memory.',
     drills: [
       'Write 5 lines: wins, sticky bar, tempo, energy, next action',
-      'Circle one next action only',
-      'Do that action for 10 minutes',
+      'Circle one next action only in the journal — ignore the rest',
+      'Do that one circled action for ten focused minutes — nothing else',
       'Close journal — avoid endless planning'
     ],
     libraryIds: [
@@ -7592,11 +7592,11 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'Write it large on the chart',
       'Test candidates with 8-bar samples'
     ],
-    theoryBite: 'Choose a goal tempo with evidence (singability, clean changes), not ego.',
+    theoryBite: 'Choose a goal tempo with evidence — singability and clean changes — not ego. Write the number down so practice has a target.',
     drills: [
       'Candidate tempos: safe / stretch / ego',
       'Test eight bars at each tempo step before speeding',
-      'Pick safe or stretch only',
+      'Pick a safe tempo or a stretch tempo — not both in one take',
       'Write BPM on chart in large numbers'
     ],
     libraryIds: [
@@ -7619,7 +7619,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     drills: [
       'Whole session loyal to practice BPM',
       'If clean, tiny +2 BPM at end optional',
-      'No random jumps mid-section',
+      'No random tempo jumps mid-section — finish what you started',
       'Log the ending BPM you can play cleanly today'
     ],
     libraryIds: [
@@ -7643,7 +7643,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'Choose performance BPM before the take',
       'Count-in at that BPM out loud, then play — no mystery starts',
       'No mid-song tempo arguments with yourself',
-      'Post-take note if it felt kind'
+      'After the take, note whether it felt kind — not only correct'
     ],
     libraryIds: [
       'sg-skip-to-my-lou',
@@ -7661,10 +7661,10 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'Score recovery separately from perfection',
       'Keep finished takes'
     ],
-    theoryBite: 'Allow a small error budget in performance takes. Finish the story anyway.',
+    theoryBite: 'Allow a small error budget in performance takes. Finish the story anyway; the audience remembers completion more than one flub.',
     drills: [
       'Allow up to 2 visible errors without stopping',
-      'Practice finishing anyway',
+      'Practice finishing the phrase anyway after a small mistake',
       'Score recovery quality separately from note perfection',
       'Keep a take that finished strong'
     ],
@@ -7689,7 +7689,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'At sticky bar, exhale and slight smile on purpose',
       'Rehearse smile reset 10 times on that bar',
       'Notice tempo calms when jaw softens',
-      'Use in the next full run'
+      'Use the smile-and-breathe reset in the next full run on purpose'
     ],
     libraryIds: [
       'sg-go-tell-aunt-rhody',
@@ -7730,11 +7730,11 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'Fix one friction point',
       'Never skip checklist before dress runs'
     ],
-    theoryBite: 'Cable, tuning, strap, battery — boring rituals prevent exciting failures.',
+    theoryBite: 'Cable, tuning, strap, battery — boring gear rituals prevent exciting failures. Run the list aloud before the first note.',
     drills: [
       'Checklist: tuning, strap, cable/path, battery/pick reserve',
-      'Run checklist aloud once',
-      'Fix one gear friction today',
+      'Run the gear checklist aloud once before you play a note',
+      'Fix one gear friction today (cable, strap, stand, tuner place)',
       'Don\'t skip checklist before dress runs'
     ],
     libraryIds: [
@@ -7781,7 +7781,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'Estimate each song length at performance tempo',
       'Add 10–20s talk/tune buffer between songs',
       'Play the mini-set in order and total the runtime',
-      'Adjust set if over time budget'
+      'Adjust the set if you are over time budget — cut kindly'
     ],
     libraryIds: [
       'sg-black-is-the-color',
@@ -7803,7 +7803,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     drills: [
       'Decide encore song or decide none',
       'If encore, keep it easy and beloved',
-      'Practice bow + exit either way',
+      'Practice a small bow and exit whether the take was good or messy',
       'Avoid undecided hovering endings'
     ],
     libraryIds: [
@@ -7845,7 +7845,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'Protect song 3 with simplicity if needed',
       'Log total minutes and energy'
     ],
-    theoryBite: 'Three songs reveal stamina and set arc. Keep one easy landing pad song.',
+    theoryBite: 'Three songs reveal stamina and set arc. Keep one easy landing-pad song so the set can recover if something wobbles.',
     drills: [
       'Run three songs with short resets',
       'Watch stamina on song 3 — if the hand dies, simplify the part, do not push through trash',
@@ -7870,7 +7870,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     ],
     theoryBite: 'Full runs with chart allowed still require musical continuity and recovery.',
     drills: [
-      'Full song with chart allowed',
+      'Full song with the chart allowed — aim for musical, not heroic',
       'No stopping for anything but safety',
       'Circle only bars that truly needed eyes',
       'Schedule memory work on those bars tomorrow'
@@ -7891,12 +7891,12 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'Mark danger spots afterward without shame',
       'Convert marks into loop plans'
     ],
-    theoryBite: 'Memory runs expose cue gaps. Mark only the true danger spots afterward.',
+    theoryBite: 'Memory runs expose cue gaps. Mark only the true danger spots afterward — not every imperfect bar.',
     drills: [
-      'Chart face down or closed app',
-      'Full run recovery rules on',
+      'Chart face down or app closed — memory run, gentle tempo',
+      'Full run with recovery rules on — no shame stops mid-song',
       'Afterward, reopen chart and mark danger spots',
-      'Don\'t shame — schedule loops'
+      'Don\'t shame rough spots — schedule loops for them tomorrow'
     ],
     libraryIds: [
       'sg-i-ve-been-working-on-the-railroa',
@@ -7914,12 +7914,12 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'Limit retakes',
       'Value finishing energy'
     ],
-    theoryBite: 'Limited stops, full recovery, real tempo.',
+    theoryBite: 'Dress rehearsal means limited stops, full recovery rules, and real tempo. Practice the show energy, not only the notes.',
     drills: [
       'Performance clothing optional; performance rules mandatory',
       'One primary full take — start to end, no stopping to fix mid-song',
       'Limited second take only if technical failure',
-      'Celebrate finishing energy'
+      'Celebrate finishing energy more than perfect note scores'
     ],
     libraryIds: [
       'sg-arkansas-traveler',
@@ -7939,8 +7939,8 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     ],
     theoryBite: 'Light days protect hands. Touch the starts and endings; avoid grinding mistakes.',
     drills: [
-      'Touch intros and endings only',
-      'Light hands, short minutes',
+      'Touch intros and endings only — leave middles for later',
+      'Light hands, short minutes — protect the hands before show day',
       'Hydrate and stretch fretting hand for thirty seconds',
       'No grinding sticky bars into fear'
     ],
@@ -7964,7 +7964,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     drills: [
       'Run each section of vehicle song for quality',
       'Don\'t require full set stamina yet',
-      'Score sections 1–5 honestly',
+      'Score sections 1–5 honestly on paper — no grade inflation',
       'Pick lowest section for extra loops'
     ],
     libraryIds: [
@@ -8006,7 +8006,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'Capture notes kindly after',
       'Protect hands — capstone is near'
     ],
-    theoryBite: 'Capstone C is a full story run with recovery rules and kind notes after.',
+    theoryBite: 'Capstone C is a full story run with recovery rules and kind notes after. You are rehearsing the year, not hunting perfection.',
     drills: [
       'Full story run with recovery rules',
       'Record the take if possible and keep the best one',

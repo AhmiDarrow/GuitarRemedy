@@ -817,6 +817,171 @@ const GOLD: Partial<Record<number, Partial<PrivateLessonFields> & { teachExtra?:
     encouragement: 'You finished a year-shaped path. That matters as much as any lick.',
     funBonus: 'Put the first practice of the next 30 days on your calendar before you put the guitar down.',
   },
+  2: {
+    hook: 'Day two — pressure without panic.',
+    teacherIntro:
+      'Yesterday was names and open strings. Today we add fretting pressure gently — buzz is information, not failure.',
+  },
+  4: {
+    hook: 'G major — three fingers, one clear win.',
+    teacherIntro:
+      'We build G slowly so every string rings. No racing the shape; clean beats fast forever.',
+  },
+  5: {
+    hook: 'C shape — the careful chord.',
+    teacherIntro:
+      'C asks for neat fretting and a quiet low E. We will go slow enough that neat becomes normal.',
+  },
+  6: {
+    hook: 'D and the first three-chord loop.',
+    teacherIntro:
+      'G, C, and D are a campfire engine. Today we make the loop musical, not just correct.',
+  },
+  8: {
+    hook: 'Am and E — minor color, same family skills.',
+    teacherIntro:
+      'New shapes, same honesty: freeze, audit strings, then change only as fast as clean.',
+  },
+  15: {
+    hook: 'Isolation day — hard changes get their own gym.',
+    teacherIntro:
+      'We will not hide sticky changes inside full songs yet. Two chords, honest time, lots of kindness.',
+  },
+  45: {
+    hook: 'CAGED peek — a map, not a mountain.',
+    teacherIntro:
+      'You do not need all five shapes today. See one neighborhood on the neck and breathe.',
+  },
+  55: {
+    hook: 'Voicing choices — same chord, different story.',
+    teacherIntro:
+      'Where you play a chord changes the mood. We listen more than we stretch today.',
+  },
+  65: {
+    hook: 'Record once — ears over ego.',
+    teacherIntro:
+      'One take, one listen, one fix. That loop teaches faster than ten ignored recordings.',
+  },
+  85: {
+    hook: 'Dorian color — minor with a raised smile.',
+    teacherIntro:
+      'Hear the raised sixth against plain minor. One note changes the weather.',
+  },
+  95: {
+    hook: 'Mode mood — name the feeling out loud.',
+    teacherIntro:
+      'If you cannot say bright, dark, or floaty, play slower until the color is obvious.',
+  },
+  115: {
+    hook: 'Riff extraction — keep the accident.',
+    teacherIntro:
+      'When something cool falls out of your hands, freeze it, end it, and own it.',
+  },
+  125: {
+    hook: 'Subdivision trust — the grid under the groove.',
+    teacherIntro:
+      'We lock smaller slices of the beat so bigger grooves stop drifting.',
+  },
+  135: {
+    hook: 'Push and pull — human time on purpose.',
+    teacherIntro:
+      'Ahead and behind only count if the center still exists. Find center first.',
+  },
+  145: {
+    hook: 'One pattern, no drift — pocket gym.',
+    teacherIntro:
+      'Eight bars identical on purpose. Boredom is the teacher of groove.',
+  },
+  155: {
+    hook: 'Click in the room — honest judge day.',
+    teacherIntro:
+      'Audible metronome, foot locked, one marked fix after. That is a real checkpoint.',
+  },
+  165: {
+    hook: 'Odd meter taste — count without fear.',
+    teacherIntro:
+      'We go slow enough that five feels like a walk, not a math test.',
+  },
+  185: {
+    hook: 'Motif first — lead without a note salad.',
+    teacherIntro:
+      'Four notes you can sing beat twenty you cannot remember. Build from the motif.',
+  },
+  195: {
+    hook: 'Blues language — call, wait, answer.',
+    teacherIntro:
+      'Leave space like a singer. The rest is part of the lick.',
+  },
+  205: {
+    hook: 'Double stops — two notes, one intention.',
+    teacherIntro:
+      'Match volume and timing so the pair sounds like one voice.',
+  },
+  215: {
+    hook: 'Hybrid again — thumb and pick as teammates.',
+    teacherIntro:
+      'Even volume between pick and fingers. If one yells, soften it.',
+  },
+  225: {
+    hook: 'Andalusian color — let the cadence pull.',
+    teacherIntro:
+      'The chords already want to move. Add phrygian spice without fighting the pull.',
+  },
+  235: {
+    hook: 'Economy picking — weak direction gets love.',
+    teacherIntro:
+      'Practice the sweep you avoid. Balance is the skill.',
+  },
+  255: {
+    hook: 'Full-take hybrid — survive the whole form.',
+    teacherIntro:
+      'Loops lie. Today the technique has to live inside a real take.',
+  },
+  265: {
+    hook: 'Chorus keep-take — record something kind.',
+    teacherIntro:
+      'One chorus you would replay. Not perfect — keepable.',
+  },
+  275: {
+    hook: 'Arrangement ears — tone serves the section.',
+    teacherIntro:
+      'Brighter, darker, or cleaner: pick the tone that makes the form obvious.',
+  },
+  285: {
+    hook: 'Kind listenback — one pencil mark only.',
+    teacherIntro:
+      'Shame off, specificity on. Fix the one thing that matters most.',
+  },
+  295: {
+    hook: 'Count-in ritual — starts are performances.',
+    teacherIntro:
+      'Ten clean beginnings beat one heroic middle. Own the first bar.',
+  },
+  305: {
+    hook: 'Simplify to strengthen — less is a feature.',
+    teacherIntro:
+      'Strip ornaments until the song stands. Then add back only what earns its place.',
+  },
+  325: {
+    hook: 'Chunk boundaries — glue the seams.',
+    teacherIntro:
+      'Hard parts get context bars on both sides so the join stops surprising you.',
+  },
+  335: {
+    hook: 'Silence into downbeat — own the entrance.',
+    teacherIntro:
+      'From nothing to sound without a flinch. That calm is stage skill.',
+  },
+  345: {
+    hook: 'Journal one action — ignore the rest.',
+    teacherIntro:
+      'A single next step beats a guilt list. Circle it and do ten minutes.',
+  },
+  355: {
+    hook: 'Bow and exit — finish like you meant it.',
+    teacherIntro:
+      'Practice the last look and the quiet after the last chord. Endings are part of the show.',
+  },
 }
 
 /**
