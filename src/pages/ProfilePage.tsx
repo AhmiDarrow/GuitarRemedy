@@ -16,11 +16,7 @@ import { useAppStore } from '../store/appStore'
 import { useUserTabsStore } from '../store/userTabsStore'
 import { TUNINGS, type TuningName } from '../lib/theory'
 import { CURRICULUM, getLesson } from '../data/curriculum'
-import {
-  ABOUT_HELLO,
-  APP_NAME,
-  APP_VERSION_FALLBACK,
-} from '../lib/brand'
+import { ABOUT_HELLO, APP_NAME, APP_VERSION } from '../lib/brand'
 
 const PHASE_LABEL: Record<string, string> = {
   basics: 'Basics',
@@ -91,7 +87,7 @@ export function ProfilePage() {
             Progress, fretboard prefs, and shortcuts. Everything stays on this device.
           </p>
           <p className="text-[11px] text-[var(--text-muted)] mt-3">
-            {APP_NAME} · v{APP_VERSION_FALLBACK} · local-first
+            {APP_NAME} · v{APP_VERSION} · local-first
           </p>
         </div>
       </div>

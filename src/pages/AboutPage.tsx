@@ -16,7 +16,8 @@ import {
   ABOUT_FOOTER_META,
   ABOUT_HELLO,
   APP_NAME,
-  APP_VERSION_FALLBACK,
+  APP_VERSION,
+  resolveAppVersion,
   GITHUB_ISSUES,
   GITHUB_PROFILE,
   GITHUB_RELEASES,
@@ -55,18 +56,14 @@ const EXT_LINKS: ExtLink[] = [
 ]
 
 export function AboutPage() {
-  const [appVersion, setAppVersion] = useState(APP_VERSION_FALLBACK)
+  const [appVersion, setAppVersion] = useState(APP_VERSION)
   const [updateMsg, setUpdateMsg] = useState<string | null>(null)
   const [updateBusy, setUpdateBusy] = useState(false)
   const [pendingVersion, setPendingVersion] = useState<string | null>(null)
   const [linkError, setLinkError] = useState<string | null>(null)
 
   useEffect(() => {
-    if (!isTauri()) return
-    void import('@tauri-apps/api/app')
-      .then(({ getVersion }) => getVersion())
-      .then(setAppVersion)
-      .catch(() => setAppVersion(APP_VERSION_FALLBACK))
+    void resolveAppVersion().then(setAppVersion)
   }, [])
 
   const openLink = useCallback(async (url: string) => {
