@@ -5,6 +5,7 @@
  */
 import type { LessonPhase } from './curriculum'
 import type { SkillLevel } from './library'
+import { sessionCoachFor, type DaySessionCoach } from './sessionCoach'
 
 export interface LessonSegment {
   id: 'arrive' | 'warmup' | 'teach' | 'guided' | 'jam' | 'cooldown'
@@ -102,24 +103,32 @@ function segmentPlan(total: number): Record<LessonSegment['id'], number> {
   return { arrive, warmup, teach, guided, jam, cooldown }
 }
 
-function warmupFor(phase: LessonPhase, day: number, seed: LessonSeed): { coach: string; youDo: string[] } {
+function warmupFor(
+  phase: LessonPhase,
+  day: number,
+  seed: LessonSeed,
+  dayCoach?: DaySessionCoach,
+): { coach: string; youDo: string[] } {
   const base = [
     'Open strings low→high, then high→low — name them if you can.',
     'Shake out fretting hand 10 seconds. Thumb behind the neck, not strangling it.',
   ]
+  const preview = seed.drills[0]
+    ? `Light preview: ${seed.drills[0]}`
+    : '60 seconds of whatever felt hard yesterday — half speed.'
   switch (phase) {
     case 'basics':
       return {
-        coach: 'We start gentle. Buzz and muted notes are information, not failure.',
+        coach: dayCoach?.warmup ?? 'We start gentle. Buzz and muted notes are information, not failure.',
         youDo: [
           ...base,
           'Finger taps on frets 1–4 of the high E, no rush.',
-          seed.drills[0] ? `Light preview: ${seed.drills[0]}` : '60 seconds of whatever felt hard yesterday — half speed.',
+          preview,
         ],
       }
     case 'chords':
       return {
-        coach: 'Warm the shapes you’ll need. Clean > fast.',
+        coach: dayCoach?.warmup ?? 'Warm the shapes you’ll need. Clean first — tempo later.',
         youDo: [
           ...base,
           'Form yesterday’s easiest chord, strum once per beat for 30s.',
@@ -129,16 +138,16 @@ function warmupFor(phase: LessonPhase, day: number, seed: LessonSeed): { coach: 
       }
     case 'scales':
       return {
-        coach: 'Wake the fretting hand with spider motion, then touch today’s root.',
+        coach: dayCoach?.warmup ?? 'Wake the fretting hand with spider motion, then touch today’s root.',
         youDo: [
           '1-2-3-4 chromatic on one string, then reverse — slow.',
           'Find today’s root note and pulse it on quarter notes for 20s.',
-          'Ascend 4 notes of the focus shape, descend — breathe between.',
+          preview,
         ],
       }
     case 'rhythm':
       return {
-        coach: 'Body first. If your foot isn’t steady, the right hand won’t be either.',
+        coach: dayCoach?.warmup ?? 'Body first. If your foot isn’t steady, the right hand won’t be either.',
         youDo: [
           'Tap quarter notes with your foot for 30s (no guitar).',
           'Muted strums on open strings: down only, then down-up.',
@@ -147,56 +156,78 @@ function warmupFor(phase: LessonPhase, day: number, seed: LessonSeed): { coach: 
       }
     case 'lead':
       return {
-        coach: 'Loose hands, singing brain. Warm vibrato and bends gently.',
+        coach: dayCoach?.warmup ?? 'Loose hands, singing brain. Warm vibrato and bends gently.',
         youDo: [
           'Long tones on one fretted note — try a tiny vibrato.',
           'Half-step bend on G string (careful) — match pitch if you can.',
-          'Play a 3-note idea, rest a full bar, repeat.',
+          preview,
         ],
       }
     default:
       return {
-        coach: 'Song day warm-up: touch the key sections lightly, no hero takes yet.',
+        coach: dayCoach?.warmup ?? 'Song day warm-up: touch the key sections lightly, no hero takes yet.',
         youDo: [
           ...base,
           'Hum or sing the melody once before fretting it.',
           'Play only the intro or first phrase — soft dynamics.',
-          'Stretch fretting hand 30s after the first run.',
+          preview,
         ],
       }
   }
 }
 
-function teachBlock(phase: LessonPhase, seed: LessonSeed, day: number): { coach: string; youDo: string[] } {
+function teachBlock(
+  phase: LessonPhase,
+  seed: LessonSeed,
+  day: number,
+  dayCoach?: DaySessionCoach,
+): { coach: string; youDo: string[] } {
+  const coach =
+    dayCoach?.teach ??
+    `${seed.theoryBite} Take it at a tempo where your hands stay honest — clean first.`
   return {
-    coach: `${seed.theoryBite} We’ll go slower than your ego wants — that’s the pro move.`,
+    coach,
     youDo: [
-      'Skim the theory bite once, then put your hands on the guitar.',
+      'Read the idea once, then put your hands on the guitar.',
       phase === 'chords'
         ? 'Build the shape finger-by-finger; pluck strings one at a time before strumming.'
         : phase === 'scales'
           ? 'Trace the shape on the neck with your eyes before you play it.'
-          : 'Watch your hands 20 seconds — fix one tense spot, not ten.',
-      pick(
-        [
-          'Metronome quieter than you are.',
-          'Sharp pain = stop. Tired is fine; injury is not.',
-          'When one note rings clean, notice it. That’s the win.',
-        ],
-        day,
-      ),
+          : phase === 'rhythm'
+            ? 'Count a bar out loud, then add the guitar on the same grid.'
+            : phase === 'lead'
+              ? 'Sing or hum a 3–4 note version before you fret it.'
+              : phase === 'repertoire'
+                ? 'Name the section you’re serving (intro, verse, chorus) before you play.'
+                : 'Watch your hands 20 seconds — fix one tense spot, not ten.',
+      seed.goals[0]
+        ? `Hold this win in mind: ${seed.goals[0]}`
+        : pick(
+            [
+              'Metronome quieter than you are.',
+              'Sharp pain = stop. Tired is fine; injury is not.',
+              'When one note rings clean, notice it. That’s the win.',
+            ],
+            day,
+          ),
     ],
   }
 }
 
-function guidedBlock(seed: LessonSeed, day: number): { coach: string; youDo: string[] } {
+function guidedBlock(
+  seed: LessonSeed,
+  day: number,
+  dayCoach?: DaySessionCoach,
+): { coach: string; youDo: string[] } {
   const drills =
     seed.drills.length >= 3
       ? seed.drills
       : [...seed.drills, 'Repeat the cleanest take twice', 'Half-speed pass with a metronome']
+  const coach =
+    dayCoach?.guided ??
+    `Guided practice for ${seed.title.includes('—') ? seed.title.split('—').slice(1).join('—').trim() : seed.title}. Stay where most reps are clean before you nudge tempo.`
   return {
-    coach:
-      'Guided practice. Stay at a tempo where most reps are clean. Speed is a reward, not a tax.',
+    coach,
     youDo: drills.map((d, i) => {
       const mins = i === 0 ? '~3 min' : i === 1 ? '~3 min' : '~2 min'
       return `${mins}: ${d}`
@@ -204,7 +235,12 @@ function guidedBlock(seed: LessonSeed, day: number): { coach: string; youDo: str
   }
 }
 
-function jamBlock(phase: LessonPhase, seed: LessonSeed, day: number): { coach: string; youDo: string[]; tip: string } {
+function jamBlock(
+  phase: LessonPhase,
+  seed: LessonSeed,
+  day: number,
+  dayCoach?: DaySessionCoach,
+): { coach: string; youDo: string[]; tip: string } {
   const ideas: Record<LessonPhase, string[]> = {
     basics: [
       'Tiny song: 4 open-string hits, 4 fretted notes, repeat.',
@@ -231,20 +267,25 @@ function jamBlock(phase: LessonPhase, seed: LessonSeed, day: number): { coach: s
       'One phone take. Listen once kind, once with a note.',
     ],
   }
+  const topic = seed.title.includes('—')
+    ? seed.title.split('—').slice(1).join('—').trim()
+    : seed.title
   return {
-    coach: 'Jam time — this is the fun you earned. Play something that sounds like music.',
+    coach:
+      dayCoach?.jam ??
+      `Jam time for "${topic}". Play something that sounds like music — not another drill checklist.`,
     youDo: [
       pick(ideas[phase], day),
-      'Keep your foot tapping the whole time.',
+      seed.goals[1] ? `Keep this nearby: ${seed.goals[1]}` : 'Keep your foot tapping the whole time.',
       'Last 60s: simplest clean version. Victory lap.',
     ],
     tip: 'If you freeze, one note in time until your brain comes back.',
   }
 }
 
-function cooldownBlock(seed: LessonSeed): { coach: string; youDo: string[] } {
+function cooldownBlock(seed: LessonSeed, dayCoach?: DaySessionCoach): { coach: string; youDo: string[] } {
   return {
-    coach: 'Cool-down. Soft hands, short check, done.',
+    coach: dayCoach?.cooldown ?? 'Cool-down. Soft hands, short check, done.',
     youDo: [
       'Soft open strings or one gentle chord for 30–45s.',
       `Quick check — could you do this yet? ${seed.masteryCheck}`,
@@ -996,11 +1037,12 @@ export function expandPrivateLesson(
 ): PrivateLessonFields {
   const durationMin = Math.max(seed.durationMin || 30, minutesForPhase(phase, day))
   const plan = segmentPlan(durationMin)
-  const warm = warmupFor(phase, day, seed)
-  const teach = teachBlock(phase, seed, day)
-  const guided = guidedBlock(seed, day)
-  const jam = jamBlock(phase, seed, day)
-  const cool = cooldownBlock(seed)
+  const dayCoach = sessionCoachFor(day)
+  const warm = warmupFor(phase, day, seed, dayCoach)
+  const teach = teachBlock(phase, seed, day, dayCoach)
+  const guided = guidedBlock(seed, day, dayCoach)
+  const jam = jamBlock(phase, seed, day, dayCoach)
+  const cool = cooldownBlock(seed, dayCoach)
   const gold = GOLD[day]
 
   // Unique per day without title-paste chrome in goals/drills — casual topic tag only.
@@ -1016,7 +1058,7 @@ export function expandPrivateLesson(
       id: 'arrive',
       name: 'Arrive & set intention',
       minutes: plan.arrive,
-      coach: pick(ARRIVE_LINES, day),
+      coach: dayCoach?.arrive ?? pick(ARRIVE_LINES, day),
       youDo: [
         seed.goals[0] ?? 'One clean win today.',
         seed.goals[1] ?? 'Stay relaxed.',
@@ -1045,7 +1087,7 @@ export function expandPrivateLesson(
       minutes: plan.guided,
       coach: guided.coach,
       youDo: guided.youDo,
-      tip: '8/10 clean reps → nudge tempo +4 BPM. Else stay.',
+      tip: '8/10 clean reps → nudge tempo a little. If form slips, stay put.',
     },
     {
       id: 'jam',

@@ -53,7 +53,7 @@ describe('curriculum', () => {
       expect(lesson?.libraryIds.length).toBeGreaterThan(0)
       expect(lesson?.theoryBite.length).toBeGreaterThan(20)
       expect(lesson?.masteryCheck.length).toBeGreaterThan(15)
-      expect(lesson?.title).not.toMatch(/— Day \d+$/)
+      expect(lesson?.title).not.toMatch(/- Day \d+$/)
       expect(lesson?.privateLesson.durationMin).toBeGreaterThanOrEqual(25)
       expect(lesson?.privateLesson.hook.length).toBeGreaterThan(10)
       expect(lesson?.privateLesson.winCondition.length).toBeGreaterThan(10)
@@ -80,6 +80,43 @@ describe('curriculum', () => {
         expect(d, `day ${lesson.day} drill`).not.toMatch(/keep it slow and clean/i)
       }
     }
+  })
+
+  it('uses per-day session coach without ego or speed stencil', () => {
+    const teachCoaches: string[] = []
+    const guidedCoaches: string[] = []
+    const jamCoaches: string[] = []
+    const arriveCoaches: string[] = []
+    const warmCoaches: string[] = []
+    const coolCoaches: string[] = []
+
+    for (const lesson of CURRICULUM) {
+      const segs = lesson.privateLesson.segments
+      const blob = segs.map((s) => s.coach).join('\n')
+      expect(blob.toLowerCase().includes('slower than your ego wants')).toBe(false)
+      expect(blob.toLowerCase().includes('speed is a reward')).toBe(false)
+      teachCoaches.push(segs.find((s) => s.id === 'teach')?.coach ?? '')
+      guidedCoaches.push(segs.find((s) => s.id === 'guided')?.coach ?? '')
+      jamCoaches.push(segs.find((s) => s.id === 'jam')?.coach ?? '')
+      arriveCoaches.push(segs.find((s) => s.id === 'arrive')?.coach ?? '')
+      warmCoaches.push(segs.find((s) => s.id === 'warmup')?.coach ?? '')
+      coolCoaches.push(segs.find((s) => s.id === 'cooldown')?.coach ?? '')
+    }
+
+    expect(new Set(teachCoaches).size).toBe(365)
+    expect(new Set(guidedCoaches).size).toBe(365)
+    expect(new Set(jamCoaches).size).toBe(365)
+    expect(new Set(arriveCoaches).size).toBeGreaterThan(100)
+    expect(new Set(warmCoaches).size).toBeGreaterThan(100)
+    expect(new Set(coolCoaches).size).toBeGreaterThan(100)
+
+    const teach1 = getLesson(1)?.privateLesson.segments.find((s) => s.id === 'teach')?.coach ?? ''
+    const teach3 = getLesson(3)?.privateLesson.segments.find((s) => s.id === 'teach')?.coach ?? ''
+    const guided365 =
+      getLesson(365)?.privateLesson.segments.find((s) => s.id === 'guided')?.coach ?? ''
+    expect(/E A D G B E|open string/i.test(teach1)).toBe(true)
+    expect(/E minor|Em|E G B/i.test(teach3)).toBe(true)
+    expect(/Capstone|Path Performance|Year/i.test(guided365)).toBe(true)
   })
 
   it('expands private-lesson GOLD hooks across the year', () => {
@@ -267,7 +304,7 @@ describe('curriculum', () => {
     // Campfire set before first lead map
     expect(getLesson(6)?.title).toMatch(/D Major|Campfire/i)
     expect(getLesson(7)?.title).toMatch(/Jam|Em|G|C|D/i)
-    // Pentatonic map after a week of chords/songs — not day 1
+    // Pentatonic map after a week of chords/songs - not day 1
     expect(getLesson(11)?.title).toMatch(/Pentatonic/i)
     // Power chords before full F barre pressure
     expect(getLesson(14)?.title).toMatch(/Power/i)

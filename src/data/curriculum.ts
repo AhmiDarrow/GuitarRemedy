@@ -6039,14 +6039,14 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     goals: [
       'Write a short break that serves the song',
       'Place the break at a form breath point',
-      'Keep break tempo honest and shorter than ego wants'
+      'Keep the break short and honest — serve the song, not the shred'
     ],
     theoryBite: 'A lead break is a short story inside the song, not a separate shred audition. Start clear, peak once, land before the vocal returns.',
     drills: [
       'Write a 2-bar break maximum on paper — keep going if you flub; mark it and finish',
       'Place it after a chorus or before a final verse — one keepable take beats five restarts',
       'Practice song with break omitted vs included — breathe on the bar line before the hard entrance',
-      'Keep break slower than your ego wants — keep going if you flub; mark it and finish'
+      'Play the break under tempo until every note lands — flub, mark it, finish the form'
     ],
     libraryIds: [
       'sg-simple-gifts',
