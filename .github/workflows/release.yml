@@ -108,7 +108,9 @@ jobs:
             - Solid structured path: MIDI / MusicXML · GP best-effort
 
             See README, docs/AUTOUPDATE.md, and docs/ANDROID.md.
-          releaseDraft: true
+          # Must be published (not draft) so desktop updater can fetch:
+          # https://github.com/.../releases/latest/download/latest.json
+          releaseDraft: false
           prerelease: false
           includeUpdaterJson: true
           updaterJsonPreferNsis: true
@@ -149,10 +151,22 @@ jobs:
         run: |
           npx cap add android
           npx cap sync android
-          # Fresh android/ has no mic — tuner needs RECORD_AUDIO for the system prompt
+          # Fresh android/ has no mic — tuner needs RECORD_AUDIO + MODIFY_AUDIO_SETTINGS
           node scripts/ensure-android-mic-permission.mjs
           # Replace default Capacitor launcher with brand-mark icons
           node scripts/ensure-app-icons.mjs
+          # android/ is gitignored — sync versionName/versionCode from package.json
+          VER=$(node -p "require('./package.json').version")
+          CODE=$(node -p "const [a,b,c]=require('./package.json').version.split('.').map(Number); a*10000+b*100+c")
+          node -e "
+            const fs=require('fs');
+            const p='android/app/build.gradle';
+            let s=fs.readFileSync(p,'utf8');
+            s=s.replace(/versionName\\s+\\\"[^\\\"]+\\\"/, 'versionName \\\"${VER}\\\"');
+            s=s.replace(/versionCode\\s+\\d+/, 'versionCode ${CODE}');
+            fs.writeFileSync(p,s);
+            console.log('Android versionName', '${VER}', 'versionCode', '${CODE}');
+          "
 
       - name: Assemble debug APK
         working-directory: android
@@ -185,7 +199,9 @@ jobs:
             sleep 15
           done
           gh release upload "$TAG" "${{ steps.apk.outputs.path }}" --clobber
-          echo "Uploaded APK to release $TAG"
+          # Ensure release is public (updater + /releases/latest need non-draft)
+          gh release edit "$TAG" --draft=false --latest
+          echo "Uploaded APK and published release $TAG"
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4

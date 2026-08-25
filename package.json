@@ -1,7 +1,7 @@
 {
   "name": "guitar-remedy",
   "private": true,
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "GuitarRemedy — scales, tabs, 365-day path, song upload breakdown. Hi I'm Ahmi, hope this helps!",
   "author": "Ahmi Darrow <https://github.com/AhmiDarrow>",
   "license": "MIT",

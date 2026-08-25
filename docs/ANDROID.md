@@ -73,7 +73,7 @@ Release/Play builds need your own keystore (never commit it).
 | Feature | Notes |
 |---------|--------|
 | Learn / Library / Practice / Wiki | Full SPA |
-| **Tuner (mic)** | Tap **Listen** → system mic prompt. Needs `RECORD_AUDIO` in the manifest (see below). |
+| **Tuner (mic)** | Tap **Listen** → system mic prompt. Needs **both** `RECORD_AUDIO` and `MODIFY_AUDIO_SETTINGS` (see below). |
 | Upload audio → tabs | Uses Web Audio in WebView; prefer WAV/MP3 |
 | Your tabs | `localStorage` (clearing app data wipes them) |
 | PWA install | Still available in Chrome without Capacitor |
@@ -122,7 +122,7 @@ Tag `v*` runs `.github/workflows/release.yml` → **build-android** job (after W
 3. `npx cap add android` + `npx cap sync android` (fresh tree; `android/` is gitignored)
 4. `node scripts/ensure-android-mic-permission.mjs` (tuner `RECORD_AUDIO`)
 5. `gradlew assembleDebug`
-6. Upload `GuitarRemedy_<version>-debug.apk` to the draft GitHub Release
+6. Upload `GuitarRemedy_<version>-debug.apk` to the published GitHub Release (release workflow does this on tag)
 
 Debug-signed only — fine for sideload testing. Play Store needs your own release keystore.
 

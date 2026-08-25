@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 /**
  * Single source of truth for product version.
- * Bumps package.json, src-tauri/tauri.conf.json, and src-tauri/Cargo.toml together.
+ * Bumps package.json, src-tauri/tauri.conf.json, src-tauri/Cargo.toml,
+ * and android/app/build.gradle (versionName + versionCode) together.
  *
  * Usage: node scripts/bump-version.mjs 0.1.1
  *    or: npm run version:bump -- 0.1.1
@@ -35,21 +36,54 @@ function writeJsonVersion(rel, keyPath = ['version']) {
 function writeCargoToml(rel) {
   const full = path.join(root, rel)
   const raw = fs.readFileSync(full, 'utf8')
+  // Match package version only (first version = "..." under [package])
   const next = raw.replace(
-    /^version\s*=\s*"[^"]+"/m,
-    `version = "${ver}"`,
+    /(^\[package\][\s\S]*?^version\s*=\s*")[^"]+(")/m,
+    `$1${ver}$2`,
   )
   if (next === raw) {
-    console.error(`Could not find version = "..." in ${rel}`)
+    // Fallback: first bare version line
+    const alt = raw.replace(/^version\s*=\s*"[^"]+"/m, `version = "${ver}"`)
+    if (alt === raw) {
+      console.error(`Could not find version = "..." in ${rel}`)
+      process.exit(1)
+    }
+    fs.writeFileSync(full, alt, 'utf8')
+  } else {
+    fs.writeFileSync(full, next, 'utf8')
+  }
+  console.log(`  ${rel}: → ${ver}`)
+}
+
+/** versionCode = major*10000 + minor*100 + patch (fits 0.x.y and modest growth). */
+function versionCodeFromSemver(v) {
+  const m = /^(\d+)\.(\d+)\.(\d+)/.exec(v)
+  if (!m) return 1
+  return Number(m[1]) * 10000 + Number(m[2]) * 100 + Number(m[3])
+}
+
+function writeAndroidGradle(rel) {
+  const full = path.join(root, rel)
+  if (!fs.existsSync(full)) {
+    console.log(`  ${rel}: skip (no android tree yet)`)
+    return
+  }
+  const raw = fs.readFileSync(full, 'utf8')
+  const code = versionCodeFromSemver(ver)
+  let next = raw.replace(/versionName\s+"[^"]+"/, `versionName "${ver}"`)
+  next = next.replace(/versionCode\s+\d+/, `versionCode ${code}`)
+  if (next === raw) {
+    console.error(`Could not patch versionName/versionCode in ${rel}`)
     process.exit(1)
   }
   fs.writeFileSync(full, next, 'utf8')
-  console.log(`  ${rel}: → ${ver}`)
+  console.log(`  ${rel}: versionName ${ver}, versionCode ${code}`)
 }
 
 console.log(`Bumping GuitarRemedy to ${ver}`)
 writeJsonVersion('package.json')
 writeJsonVersion('src-tauri/tauri.conf.json')
 writeCargoToml('src-tauri/Cargo.toml')
+writeAndroidGradle('android/app/build.gradle')
 console.log('Done. UI picks up package.json via Vite __APP_VERSION__.')
 console.log(`Next: commit, tag v${ver}, push tag to run Release.`)

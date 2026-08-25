@@ -28,13 +28,13 @@ npm run tauri:build
 #   src-tauri/target/release/bundle/msi/
 ```
 
-## GitHub Release (draft)
+## GitHub Release
 
 1. Repo secret `TAURI_SIGNING_PRIVATE_KEY` = contents of `~/.tauri/guitarremedy.key`
 2. Tag: `git tag v0.1.0 && git push origin v0.1.0`
-3. Workflow `.github/workflows/release.yml` → draft release with NSIS + MSI + `latest.json`
+3. Workflow `.github/workflows/release.yml` → **published** release with NSIS + MSI + `latest.json` + Android APK
 4. Smoke-install the NSIS build on a clean Windows VM
-5. Publish the draft when happy
+5. Confirm `latest.json` is public at `/releases/latest/download/latest.json`
 
 See also [`docs/AUTOUPDATE.md`](./AUTOUPDATE.md).
 
@@ -71,7 +71,7 @@ signtool sign /fd SHA256 /tr http://timestamp.digicert.com /td SHA256 /f cert.pf
 
 ### Without a cert (current default)
 
-- Ship **draft** releases; early testers click “More info → Run anyway”.
+- Releases publish automatically; early testers may still click “More info → Run anyway” until Authenticode is added.
 - Reputation builds over time with consistent publisher name **Ahmi Darrow** / `com.ahmidarrow.guitarremedy`.
 - Document this on the Release notes (template already mentions NSIS preference).
 

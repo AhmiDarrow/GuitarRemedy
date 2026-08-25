@@ -6,14 +6,15 @@ GuitarRemedy desktop uses the same Tauri 2 updater pattern as SecretSticky / Sec
 
 1. **Release workflow** (`.github/workflows/release.yml`) on tag `v*`:
    - **Windows:** NSIS + MSI + minisign updater artifacts + `latest.json`
-   - **Android:** Capacitor debug APK attached to the same draft release
+   - **Android:** Capacitor debug APK attached to the **same published** release
 2. Artifacts are **minisign-signed** with `TAURI_SIGNING_PRIVATE_KEY` (desktop installers).
 3. `latest.json` is published on the GitHub Release (via `includeUpdaterJson`).
-4. The app polls:
+4. Releases are **not left as drafts** — `/releases/latest/download/latest.json` only works for published releases.
+5. The app polls:
 
    `https://github.com/AhmiDarrow/GuitarRemedy/releases/latest/download/latest.json`
 
-5. **About → Check for updates → Install & restart** downloads and relaunches.
+6. **About → Check for updates → Install & restart** downloads and relaunches.
 
 ### In-app pieces (already wired)
 
@@ -66,8 +67,7 @@ git push origin main --tags
 ```bash
 git push -u origin main          # CI must go green
 git tag v0.1.0
-git push origin v0.1.0           # Release workflow → draft
-# Smoke-install NSIS, then publish the draft on GitHub
+git push origin v0.1.0           # Release workflow → published Windows + APK + latest.json
 ```
 
 ## Installer polish
