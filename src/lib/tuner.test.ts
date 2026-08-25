@@ -17,6 +17,7 @@ import {
   phaseVsTarget,
   pushHistory,
   readingFromHz,
+  requestTunerMicrophone,
   shouldAnalyzeFrame,
   smoothCents,
   smoothCentsAdaptive,
@@ -25,6 +26,7 @@ import {
   DEFAULT_CENTS_IN_TUNE,
   DEFAULT_RMS_GATE,
   TUNER_ANALYSIS_SR,
+  TUNER_MIC_AUDIO_CONSTRAINTS,
 } from './tuner'
 import { midiToHz } from './audioToMidi'
 import { TUNINGS } from './theory'
@@ -176,8 +178,9 @@ describe('tuner', () => {
 
   it('formats mic permission errors for players', () => {
     const denied = Object.assign(new Error('Permission denied'), { name: 'NotAllowedError' })
-    expect(formatMicPermissionError(denied)).toMatch(/Microphone permission denied/i)
+    expect(formatMicPermissionError(denied)).toMatch(/Microphone blocked/i)
     expect(formatMicPermissionError(denied)).toMatch(/Listen again/i)
+    expect(formatMicPermissionError(denied)).toMatch(/reinstall|WebView|force-stop/i)
 
     const missing = Object.assign(new Error('Requested device not found'), { name: 'NotFoundError' })
     expect(formatMicPermissionError(missing)).toMatch(/No microphone found/i)
@@ -189,6 +192,52 @@ describe('tuner', () => {
       /Microphone permission needed/i,
     )
     expect(formatMicPermissionError({})).toMatch(/Could not open the microphone/i)
+  })
+
+  it('requestTunerMicrophone falls back to plain audio on OverconstrainedError', async () => {
+    const stream = { id: 'mic-ok' } as unknown as MediaStream
+    const calls: unknown[] = []
+    const gum = async (constraints: unknown) => {
+      calls.push(constraints)
+      if (calls.length === 1) {
+        const err = Object.assign(new Error('overconstrained'), { name: 'OverconstrainedError' })
+        throw err
+      }
+      return stream
+    }
+    const prev = globalThis.navigator
+    Object.defineProperty(globalThis, 'navigator', {
+      configurable: true,
+      value: { mediaDevices: { getUserMedia: gum } },
+    })
+    try {
+      const got = await requestTunerMicrophone()
+      expect(got).toBe(stream)
+      expect(calls).toHaveLength(2)
+      expect(calls[0]).toEqual({ audio: TUNER_MIC_AUDIO_CONSTRAINTS })
+      expect(calls[1]).toEqual({ audio: true })
+    } finally {
+      Object.defineProperty(globalThis, 'navigator', { configurable: true, value: prev })
+    }
+  })
+
+  it('requestTunerMicrophone does not retry plain audio on NotAllowedError', async () => {
+    let calls = 0
+    const gum = async () => {
+      calls++
+      throw Object.assign(new Error('denied'), { name: 'NotAllowedError' })
+    }
+    const prev = globalThis.navigator
+    Object.defineProperty(globalThis, 'navigator', {
+      configurable: true,
+      value: { mediaDevices: { getUserMedia: gum } },
+    })
+    try {
+      await expect(requestTunerMicrophone()).rejects.toThrow(/Microphone blocked/i)
+      expect(calls).toBe(1)
+    } finally {
+      Object.defineProperty(globalThis, 'navigator', { configurable: true, value: prev })
+    }
   })
 
 

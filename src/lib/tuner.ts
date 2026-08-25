@@ -671,7 +671,9 @@ export const TUNER_MIC_AUDIO_CONSTRAINTS: MediaTrackConstraints = {
 
 /**
  * Map getUserMedia / DOMException failures into short player-facing copy.
- * Android needs RECORD_AUDIO in the manifest or the OS never shows a prompt.
+ * Android: Capacitor WebView needs RECORD_AUDIO + MODIFY_AUDIO_SETTINGS in the
+ * manifest, and BridgeWebChromeClient must grant AUDIO_CAPTURE after the OS prompt.
+ * OS "Microphone: Allowed" alone is not enough if the WebView grant path fails.
  */
 export function formatMicPermissionError(err: unknown): string {
   const name =
@@ -686,7 +688,7 @@ export function formatMicPermissionError(err: unknown): string {
         : ''
 
   if (name === 'NotAllowedError' || name === 'PermissionDeniedError') {
-    return 'Microphone permission denied. Allow mic access for GuitarRemedy, then tap Listen again.'
+    return 'Microphone blocked for the tuner. On Android: App info → Permissions → Microphone → Allow, force-stop the app, reopen, then tap Listen again. If it is already Allowed, reinstall the latest APK (WebView mic bridge).'
   }
   if (name === 'NotFoundError' || name === 'DevicesNotFoundError') {
     return 'No microphone found. Plug one in or check device settings, then try again.'
@@ -701,15 +703,25 @@ export function formatMicPermissionError(err: unknown): string {
     return 'Could not open the microphone with tuner settings. Check mic permissions and try again.'
   }
   if (/permission|not allowed|denied|secure/i.test(msg)) {
-    return 'Microphone permission needed. Allow mic access for GuitarRemedy (Android: App info → Permissions → Microphone), then tap Listen again.'
+    return 'Microphone permission needed. Allow mic access for GuitarRemedy (Android: App info → Permissions → Microphone), force-stop and reopen, then tap Listen again.'
   }
   if (msg.trim()) return msg
   return 'Could not open the microphone. Allow mic access, then tap Listen again.'
 }
 
+function isConstraintFailure(err: unknown): boolean {
+  const name =
+    err && typeof err === 'object' && 'name' in err
+      ? String((err as { name?: string }).name)
+      : ''
+  return name === 'OverconstrainedError' || name === 'ConstraintNotSatisfiedError'
+}
+
 /**
  * Request mic access for the tuner (triggers the OS / browser permission prompt).
  * Call from a user gesture (Listen button).
+ * Tries guitar-friendly constraints first, then plain audio (some Android WebViews
+ * reject ideal/advanced constraint bags even when permission is granted).
  */
 export async function requestTunerMicrophone(): Promise<MediaStream> {
   if (typeof navigator === 'undefined' || !navigator.mediaDevices?.getUserMedia) {
@@ -717,12 +729,19 @@ export async function requestTunerMicrophone(): Promise<MediaStream> {
       'Microphone not available here. Use the Android app, desktop app, or a browser that supports mic access.',
     )
   }
+  const gum = navigator.mediaDevices.getUserMedia.bind(navigator.mediaDevices)
   try {
-    return await navigator.mediaDevices.getUserMedia({
-      audio: TUNER_MIC_AUDIO_CONSTRAINTS,
-    })
-  } catch (err) {
-    throw new Error(formatMicPermissionError(err))
+    return await gum({ audio: TUNER_MIC_AUDIO_CONSTRAINTS })
+  } catch (first) {
+    // Retry plain audio only when constraints were the problem — not on real denies.
+    if (isConstraintFailure(first)) {
+      try {
+        return await gum({ audio: true })
+      } catch (second) {
+        throw new Error(formatMicPermissionError(second))
+      }
+    }
+    throw new Error(formatMicPermissionError(first))
   }
 }
 

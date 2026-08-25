@@ -81,11 +81,14 @@ Release/Play builds need your own keystore (never commit it).
 
 ## Microphone permission (tuner)
 
-Android will **not** show a mic prompt unless the app declares it:
+Capacitor’s WebView grants `getUserMedia` AUDIO_CAPTURE only after **both** OS permissions succeed:
 
 ```xml
 <uses-permission android:name="android.permission.RECORD_AUDIO" />
+<uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
 ```
+
+`RECORD_AUDIO` alone is not enough: the OS can show **Microphone: Allowed** while WebView still returns `NotAllowedError` if `MODIFY_AUDIO_SETTINGS` is missing from the APK.
 
 `android/` is generated / gitignored, so every sync must re-apply this:
 
@@ -97,13 +100,18 @@ npm run mobile:mic    # node scripts/ensure-android-mic-permission.mjs
 
 Release CI runs the same script after `cap add` / `cap sync`.
 
-If the user denied once: **App info → Permissions → Microphone → Allow**, then open Practice → Tuner → **Listen** again.
+**If mic is Allowed but Listen still fails:** install a build that includes both permissions, force-stop the app, reopen, Practice → Tuner → **Listen**.
+
+If the user denied once: **App info → Permissions → Microphone → Allow**, force-stop, reopen, then **Listen** again.
 
 ## Icons & splash
 
-1. Replace `android/app/src/main/res/` mipmaps after `cap add`, or use  
-   `@capacitor/assets` with `public/assets/brand-mark.png`.
-2. Keep status/nav bars dark to match Dark Forest.
+1. **Brand icons** come from `public/assets/brand-mark.png` via  
+   `node scripts/ensure-app-icons.mjs` (also `npm run icons` / after `mobile:sync`).
+2. That script writes density mipmaps + adaptive foreground and sets the  
+   launcher background to Dark Forest void (`#050a08`).
+3. Release CI runs the same script after `cap add` / `cap sync`.
+4. Keep status/nav bars dark to match Dark Forest.
 
 ## CI release APK
 

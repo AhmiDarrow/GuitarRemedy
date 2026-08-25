@@ -78,7 +78,7 @@ signtool sign /fd SHA256 /tr http://timestamp.digicert.com /td SHA256 /f cert.pf
 ## Installer UX checklist
 
 - [x] Product name **GuitarRemedy**
-- [x] Dark Forest icons in `src-tauri/icons/`
+- [x] Dark Forest icons in `src-tauri/icons/` (from `public/assets/brand-mark.png` via `npm run icons`)
 - [x] currentUser NSIS (no admin for default path)
 - [x] Updater endpoint + pubkey embedded
 - [x] About → Check for updates → Install & restart
