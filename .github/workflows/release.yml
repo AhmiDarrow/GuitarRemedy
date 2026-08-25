@@ -149,12 +149,22 @@ jobs:
 
       - name: Scaffold Capacitor Android + sync
         run: |
-          npx cap add android
+          set -euo pipefail
+          # Fresh checkout has no android/ (gitignored) — scaffold then harden.
+          if [ -d android ]; then
+            echo "android/ already present — sync only"
+          else
+            npx cap add android
+          fi
           npx cap sync android
           # Fresh android/ has no mic — tuner needs RECORD_AUDIO + MODIFY_AUDIO_SETTINGS
           node scripts/ensure-android-mic-permission.mjs
-          # Replace default Capacitor launcher with brand-mark icons
+          # Brand-mark launcher icons (Node fallback if Python/Pillow missing)
           node scripts/ensure-app-icons.mjs
+          test -f android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png
+          test -f android/app/src/main/AndroidManifest.xml
+          grep -q 'RECORD_AUDIO' android/app/src/main/AndroidManifest.xml
+          grep -q 'MODIFY_AUDIO_SETTINGS' android/app/src/main/AndroidManifest.xml
           # android/ is gitignored — sync versionName/versionCode from package.json
           VER=$(node -p "require('./package.json').version")
           CODE=$(node -p "const [a,b,c]=require('./package.json').version.split('.').map(Number); a*10000+b*100+c")

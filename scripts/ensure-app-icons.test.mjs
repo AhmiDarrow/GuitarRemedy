@@ -29,4 +29,16 @@ describe('ensure-app-icons', () => {
       expect(fs.statSync(p).size).toBeGreaterThan(200)
     }
   })
+
+  it('node fallback still writes android launcher icons when present', () => {
+    const androidRes = path.join(root, 'android', 'app', 'src', 'main', 'res')
+    if (!fs.existsSync(androidRes)) return
+    const r = spawnSync(process.execPath, [script], { encoding: 'utf8', cwd: root })
+    expect(r.status, r.stderr || r.stdout).toBe(0)
+    const launcher = path.join(androidRes, 'mipmap-xxxhdpi', 'ic_launcher.png')
+    expect(fs.existsSync(launcher)).toBe(true)
+    expect(fs.statSync(launcher).size).toBeGreaterThan(200)
+    const adaptive = path.join(androidRes, 'mipmap-anydpi-v26', 'ic_launcher.xml')
+    expect(fs.existsSync(adaptive)).toBe(true)
+  })
 })
