@@ -5,6 +5,7 @@ import {
   detectPitchYin,
   downsampleFrame,
   estimateNoiseFloorGate,
+  formatMicPermissionError,
   frameRms,
   fusePitchDetectors,
   medianFilter,
@@ -172,6 +173,24 @@ describe('tuner', () => {
     const off = readingFromHz(midiToHz(69) * 2 ** (12 / 1200), 0.9, 440)
     expect(off.inTune).toBe(false)
   })
+
+  it('formats mic permission errors for players', () => {
+    const denied = Object.assign(new Error('Permission denied'), { name: 'NotAllowedError' })
+    expect(formatMicPermissionError(denied)).toMatch(/Microphone permission denied/i)
+    expect(formatMicPermissionError(denied)).toMatch(/Listen again/i)
+
+    const missing = Object.assign(new Error('Requested device not found'), { name: 'NotFoundError' })
+    expect(formatMicPermissionError(missing)).toMatch(/No microphone found/i)
+
+    const busy = Object.assign(new Error('Could not start audio source'), { name: 'NotReadableError' })
+    expect(formatMicPermissionError(busy)).toMatch(/busy|blocked/i)
+
+    expect(formatMicPermissionError(new Error('Permission denied by system'))).toMatch(
+      /Microphone permission needed/i,
+    )
+    expect(formatMicPermissionError({})).toMatch(/Could not open the microphone/i)
+  })
+
 
   it('MPM detects A4', () => {
     const sr = 44100

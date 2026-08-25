@@ -661,6 +661,72 @@ export function pushHistory(hist: number[], value: number, max = 64): number[] {
 
 export type TunerStop = () => void
 
+/** Constraints tuned for guitar pitch (no AEC/NS/AGC smearing). */
+export const TUNER_MIC_AUDIO_CONSTRAINTS: MediaTrackConstraints = {
+  echoCancellation: false,
+  noiseSuppression: false,
+  autoGainControl: false,
+  channelCount: 1,
+}
+
+/**
+ * Map getUserMedia / DOMException failures into short player-facing copy.
+ * Android needs RECORD_AUDIO in the manifest or the OS never shows a prompt.
+ */
+export function formatMicPermissionError(err: unknown): string {
+  const name =
+    err && typeof err === 'object' && 'name' in err
+      ? String((err as { name?: string }).name)
+      : ''
+  const msg =
+    err instanceof Error
+      ? err.message
+      : typeof err === 'string'
+        ? err
+        : ''
+
+  if (name === 'NotAllowedError' || name === 'PermissionDeniedError') {
+    return 'Microphone permission denied. Allow mic access for GuitarRemedy, then tap Listen again.'
+  }
+  if (name === 'NotFoundError' || name === 'DevicesNotFoundError') {
+    return 'No microphone found. Plug one in or check device settings, then try again.'
+  }
+  if (name === 'NotReadableError' || name === 'TrackStartError') {
+    return 'Microphone is busy or blocked by another app. Close other apps using the mic, then try again.'
+  }
+  if (name === 'SecurityError') {
+    return 'Microphone blocked in this context. Use the installed app or HTTPS, allow mic access, then try again.'
+  }
+  if (name === 'OverconstrainedError') {
+    return 'Could not open the microphone with tuner settings. Check mic permissions and try again.'
+  }
+  if (/permission|not allowed|denied|secure/i.test(msg)) {
+    return 'Microphone permission needed. Allow mic access for GuitarRemedy (Android: App info → Permissions → Microphone), then tap Listen again.'
+  }
+  if (msg.trim()) return msg
+  return 'Could not open the microphone. Allow mic access, then tap Listen again.'
+}
+
+/**
+ * Request mic access for the tuner (triggers the OS / browser permission prompt).
+ * Call from a user gesture (Listen button).
+ */
+export async function requestTunerMicrophone(): Promise<MediaStream> {
+  if (typeof navigator === 'undefined' || !navigator.mediaDevices?.getUserMedia) {
+    throw new Error(
+      'Microphone not available here. Use the Android app, desktop app, or a browser that supports mic access.',
+    )
+  }
+  try {
+    return await navigator.mediaDevices.getUserMedia({
+      audio: TUNER_MIC_AUDIO_CONSTRAINTS,
+    })
+  } catch (err) {
+    throw new Error(formatMicPermissionError(err))
+  }
+}
+
+
 /** Inline AudioWorklet processor source (no separate file — blob URL). */
 export const TUNER_WORKLET_CODE = `
 class GuitarRemedyTunerProcessor extends AudioWorkletProcessor {
@@ -711,18 +777,9 @@ export async function startLiveTuner(
   const guitarTemperament = opts?.guitarTemperament !== false
   const tuning = openStringMidis(opts?.tuning)
 
-  if (typeof navigator === 'undefined' || !navigator.mediaDevices?.getUserMedia) {
-    throw new Error('Microphone not available in this environment')
-  }
+  // User-gesture entry (Listen) → OS/browser mic prompt (Android needs RECORD_AUDIO).
+  const stream = await requestTunerMicrophone()
 
-  const stream = await navigator.mediaDevices.getUserMedia({
-    audio: {
-      echoCancellation: false,
-      noiseSuppression: false,
-      autoGainControl: false,
-      channelCount: 1,
-    },
-  })
 
   const ctx = new AudioContext()
   try {

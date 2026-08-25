@@ -149,6 +149,8 @@ jobs:
         run: |
           npx cap add android
           npx cap sync android
+          # Fresh android/ has no mic — tuner needs RECORD_AUDIO for the system prompt
+          node scripts/ensure-android-mic-permission.mjs
 
       - name: Assemble debug APK
         working-directory: android

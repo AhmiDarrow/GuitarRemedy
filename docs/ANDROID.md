@@ -73,10 +73,31 @@ Release/Play builds need your own keystore (never commit it).
 | Feature | Notes |
 |---------|--------|
 | Learn / Library / Practice / Wiki | Full SPA |
+| **Tuner (mic)** | Tap **Listen** → system mic prompt. Needs `RECORD_AUDIO` in the manifest (see below). |
 | Upload audio → tabs | Uses Web Audio in WebView; prefer WAV/MP3 |
 | Your tabs | `localStorage` (clearing app data wipes them) |
 | PWA install | Still available in Chrome without Capacitor |
 | Tauri desktop APIs | No-ops on mobile (`isTauri()` false) |
+
+## Microphone permission (tuner)
+
+Android will **not** show a mic prompt unless the app declares it:
+
+```xml
+<uses-permission android:name="android.permission.RECORD_AUDIO" />
+```
+
+`android/` is generated / gitignored, so every sync must re-apply this:
+
+```bash
+npm run mobile:sync   # build + cap sync + ensure mic permission
+# or after a manual cap sync:
+npm run mobile:mic    # node scripts/ensure-android-mic-permission.mjs
+```
+
+Release CI runs the same script after `cap add` / `cap sync`.
+
+If the user denied once: **App info → Permissions → Microphone → Allow**, then open Practice → Tuner → **Listen** again.
 
 ## Icons & splash
 
@@ -91,8 +112,9 @@ Tag `v*` runs `.github/workflows/release.yml` → **build-android** job (after W
 1. Node 22 · Temurin **JDK 21** · Android SDK
 2. `npm ci` → `npm run build`
 3. `npx cap add android` + `npx cap sync android` (fresh tree; `android/` is gitignored)
-4. `gradlew assembleDebug`
-5. Upload `GuitarRemedy_<version>-debug.apk` to the draft GitHub Release
+4. `node scripts/ensure-android-mic-permission.mjs` (tuner `RECORD_AUDIO`)
+5. `gradlew assembleDebug`
+6. Upload `GuitarRemedy_<version>-debug.apk` to the draft GitHub Release
 
 Debug-signed only — fine for sideload testing. Play Store needs your own release keystore.
 
@@ -107,6 +129,8 @@ Debug-signed only — fine for sideload testing. Play Store needs your own relea
 | Issue | Fix |
 |-------|-----|
 | Blank WebView | `npm run build` then `npx cap sync` |
+| Tuner never asks for mic | `npm run mobile:mic` (or full `mobile:sync`); reinstall APK |
+| Mic denied earlier | App info → Permissions → Microphone → Allow |
 | Audio decode fails | Try WAV; some WebViews are picky about codecs |
 | `cap` not found | `npx cap` or install `@capacitor/cli` devDep |
 | Path spaces | Keep project path free of odd Unicode |

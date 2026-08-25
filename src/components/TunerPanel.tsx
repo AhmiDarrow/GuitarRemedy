@@ -283,10 +283,11 @@ export function TunerPanel() {
       setStopFn(() => stopHandle)
       setLive(true)
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Microphone permission denied')
+      setError(e instanceof Error ? e.message : 'Microphone permission needed — allow mic, then Listen again.')
       setLive(false)
     }
   }, [a4, focusString, steelStrings, onReading, recordPractice, rmsGate, tuning])
+
 
   useEffect(() => {
     return () => {
@@ -321,9 +322,10 @@ export function TunerPanel() {
         })) as TunerStopHandle
         setStopFn(() => stopHandle)
       } catch (e) {
-        setError(e instanceof Error ? e.message : 'Mic error')
+        setError(e instanceof Error ? e.message : 'Microphone error — allow mic access, then Listen again.')
         setLive(false)
       }
+
     })()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [a4, steelStrings, tuningName, customTuning])
@@ -418,6 +420,11 @@ export function TunerPanel() {
             type="button"
             className={clsx(live ? 'btn-ghost' : 'btn-primary', 'min-w-[7rem]', live && 'pulse-glow')}
             onClick={() => void (live ? stop() : start())}
+            title={
+              live
+                ? 'Stop listening'
+                : 'Start tuner — your device will ask for microphone permission if needed'
+            }
           >
             {live ? (
               <>
@@ -429,6 +436,7 @@ export function TunerPanel() {
               </>
             )}
           </button>
+
         </div>
       </div>
 
@@ -508,11 +516,9 @@ export function TunerPanel() {
       {error && (
         <p className="text-sm text-rose/90 bg-rose/10 border border-rose/25 rounded-xl px-3 py-2 relative">
           {error}
-          {error.toLowerCase().includes('mic') || error.toLowerCase().includes('permission')
-            ? '. Allow microphone access, then try again.'
-            : ''}
         </p>
       )}
+
       {calNote && (
         <p className="text-xs text-mint/90 bg-mint/10 border border-mint/25 rounded-xl px-3 py-2">
           {calNote}
