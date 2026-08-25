@@ -6,6 +6,36 @@ export type UpdateCheckResult =
   | { kind: 'unsupported'; message: string }
   | { kind: 'error'; message: string }
 
+/** Map raw plugin / network errors into something a player can act on. */
+export function friendlyUpdaterError(raw: string): string {
+  const msg = (raw || '').trim() || 'Update check failed.'
+  const lower = msg.toLowerCase()
+  if (
+    lower.includes('not valid') ||
+    lower.includes('invalid') ||
+    lower.includes('could not fetch') ||
+    lower.includes('error decoding response body') ||
+    lower.includes('unexpected end') ||
+    lower.includes('eof while parsing') ||
+    lower.includes('404') ||
+    lower.includes('not found') ||
+    lower.includes('json')
+  ) {
+    return (
+      'No published update feed yet (latest.json missing or draft release). ' +
+      'Publish a non-draft GitHub Release that includes latest.json, ' +
+      'or you are already on the only public build.'
+    )
+  }
+  if (lower.includes('signature') || lower.includes('minisign')) {
+    return 'Update signature check failed. Re-download from the official GitHub Releases page.'
+  }
+  if (lower.includes('network') || lower.includes('timed out') || lower.includes('dns')) {
+    return 'Could not reach GitHub Releases. Check your network and try again.'
+  }
+  return msg
+}
+
 /** Probe GitHub Releases for a newer signed build (no download yet). */
 export async function checkForAppUpdate(): Promise<UpdateCheckResult> {
   if (!isTauri()) {
@@ -26,7 +56,8 @@ export async function checkForAppUpdate(): Promise<UpdateCheckResult> {
       body: update.body,
     }
   } catch (e) {
-    return { kind: 'error', message: String(e) }
+    const raw = e instanceof Error ? e.message : String(e)
+    return { kind: 'error', message: friendlyUpdaterError(raw) }
   }
 }
 

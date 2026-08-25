@@ -4,7 +4,7 @@ import { useAppStore } from '../store/appStore'
 
 export function Onboarding() {
   const completeOnboarding = useAppStore((s) => s.completeOnboarding)
-  const [name, setName] = useState('')
+  const [name, setName] = useState('Player')
   const [lefty, setLefty] = useState(false)
   const [step, setStep] = useState(0)
 
@@ -54,7 +54,7 @@ export function Onboarding() {
             <label className="block text-sm font-medium mb-1.5">Your name</label>
             <input
               className="input mb-4"
-              placeholder="Ahmi"
+              placeholder="Player"
               value={name}
               onChange={(e) => setName(e.target.value)}
               autoFocus

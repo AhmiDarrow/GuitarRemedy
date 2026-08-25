@@ -11,11 +11,16 @@ import { AboutPage } from './pages/AboutPage'
 import { WikiPage } from './pages/WikiPage'
 import { Onboarding } from './components/Onboarding'
 import { useAppStore } from './store/appStore'
-import { setPlaybackA4 } from './lib/audio'
+import { bindAudioUnlock, setPlaybackA4 } from './lib/audio'
 
 export default function App() {
   const onboarded = useAppStore((s) => s.onboarded)
   const a4 = useAppStore((s) => s.a4)
+
+  // WebView2 / desktop: resume AudioContext on first real user gesture.
+  useEffect(() => {
+    bindAudioUnlock()
+  }, [])
 
   // Default Tone playback pitch from Profile (fretboard/scales/tabs). Tuner sets its own A4 while live.
   useEffect(() => {

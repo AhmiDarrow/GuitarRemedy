@@ -18,12 +18,31 @@ import { playOneShotClick, stopMetronome } from './metronome'
 let toneModule: typeof import('tone') | null = null
 let synth: import('tone').PolySynth | null = null
 let started = false
+let unlockBound = false
 /** Active concert pitch for playback (Profile A4). Tone's MIDI map is always A4=440. */
 let playbackA4 = 440
 
 async function tone() {
   if (!toneModule) toneModule = await import('tone')
   return toneModule
+}
+
+/**
+ * WebView2 / desktop shells often keep AudioContext suspended until a real
+ * user gesture. Bind once so the first click/key/touch resumes Tone.
+ */
+export function bindAudioUnlock(): void {
+  if (unlockBound || typeof window === 'undefined') return
+  unlockBound = true
+  const unlock = () => {
+    void ensureAudio().catch(() => {
+      /* first gesture may still race; play paths retry */
+    })
+  }
+  const opts: AddEventListenerOptions = { capture: true, passive: true }
+  for (const ev of ['pointerdown', 'keydown', 'touchstart', 'mousedown'] as const) {
+    window.addEventListener(ev, unlock, opts)
+  }
 }
 
 /** Set concert A used for MIDI→Hz when playing notes/tabs/refs. */
@@ -43,17 +62,32 @@ export function midiNoteHz(midi: number, a4 = playbackA4): number {
 }
 
 export async function ensureAudio(): Promise<void> {
+  bindAudioUnlock()
   const Tone = await tone()
-  if (!started) {
+  // Always try to resume — WebView2 often re-suspends after focus loss.
+  try {
     await Tone.start()
+    const ctx = Tone.getContext()?.rawContext as AudioContext | undefined
+    if (ctx && ctx.state === 'suspended') {
+      await ctx.resume()
+    }
     started = true
+  } catch {
+    started = false
+    throw new Error('Audio context could not start — click the app once, then play again')
   }
   if (!synth) {
     synth = new Tone.PolySynth(Tone.Synth, {
       oscillator: { type: 'triangle' },
-      envelope: { attack: 0.01, decay: 0.2, sustain: 0.3, release: 0.8 },
+      envelope: { attack: 0.005, decay: 0.18, sustain: 0.35, release: 0.6 },
     }).toDestination()
-    synth.volume.value = -8
+    synth.volume.value = -6
+  }
+  // Nudge destination gain in case the shell muted the graph.
+  try {
+    Tone.getDestination().volume.value = 0
+  } catch {
+    /* older tone builds */
   }
 }
 

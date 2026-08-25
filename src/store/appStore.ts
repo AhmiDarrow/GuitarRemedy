@@ -205,12 +205,15 @@ export const useAppStore = create<AppState>()(
         const p = (persisted ?? {}) as Record<string, unknown>
         const legacyDone = Boolean(p.onboardingDone)
         const onboarded = Boolean(p.onboarded || legacyDone || current.onboarded)
+        const rawName = typeof p.displayName === 'string' ? p.displayName.trim() : ''
+        const displayName = rawName || 'Player'
         const rest = { ...p }
         delete rest.onboardingDone
         return {
           ...current,
           ...rest,
           onboarded,
+          displayName,
         } as AppState
       },
     },

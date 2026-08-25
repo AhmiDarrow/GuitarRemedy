@@ -42,7 +42,16 @@ describe('checkForAppUpdate', () => {
     const result = await checkForAppUpdate()
     expect(result.kind).toBe('error')
     if (result.kind === 'error') {
-      expect(result.message).toMatch(/network down/)
+      expect(result.message).toMatch(/network|GitHub Releases/i)
+    }
+  })
+
+  it('maps invalid release json to a clear feed message', async () => {
+    check.mockRejectedValue(new Error('Could not fetch a valid release JSON from the remote'))
+    const result = await checkForAppUpdate()
+    expect(result.kind).toBe('error')
+    if (result.kind === 'error') {
+      expect(result.message).toMatch(/latest\.json|draft release|update feed/i)
     }
   })
 })
