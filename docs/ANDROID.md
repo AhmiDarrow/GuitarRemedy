@@ -4,9 +4,9 @@ Mobile-responsive **web / PWA** is the default. Capacitor wraps the same `dist/`
 
 ## Prerequisites
 
-- Node 20+
+- Node **22+** (Capacitor CLI 8 requires it)
 - [Android Studio](https://developer.android.com/studio) (SDK 34+, build-tools)
-- JDK 17+
+- **JDK 21+** (Capacitor Android compiles with source/target 21 — JDK 17 fails with `invalid source release: 21`)
 - Optional: physical device with USB debugging
 
 ## One-time scaffold
@@ -86,12 +86,13 @@ Release/Play builds need your own keystore (never commit it).
 
 ## CI release APK
 
-Tag `v*` runs `.github/workflows/release.yml` → **build-android** job:
+Tag `v*` runs `.github/workflows/release.yml` → **build-android** job (after Windows):
 
-1. `npm ci` → `npm test` → `npm run build`
-2. `npx cap add android` + `npx cap sync android` (fresh tree; `android/` is gitignored)
-3. `gradlew assembleDebug`
-4. Upload `GuitarRemedy_<tag>-debug.apk` to the draft GitHub Release
+1. Node 22 · Temurin **JDK 21** · Android SDK
+2. `npm ci` → `npm run build`
+3. `npx cap add android` + `npx cap sync android` (fresh tree; `android/` is gitignored)
+4. `gradlew assembleDebug`
+5. Upload `GuitarRemedy_<version>-debug.apk` to the draft GitHub Release
 
 Debug-signed only — fine for sideload testing. Play Store needs your own release keystore.
 
