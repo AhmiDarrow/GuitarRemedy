@@ -50,6 +50,24 @@ Or CLI run (device/emulator):
 npx cap run android
 ```
 
+### Local debug APK (no Play signing)
+
+```bash
+npm run mobile:sync
+cd android
+# ensure local.properties has: sdk.dir=<your Android SDK>
+gradlew.bat assembleDebug
+# → android/app/build/outputs/apk/debug/app-debug.apk
+```
+
+Install on a device with USB debugging:
+
+```bash
+adb install -r android/app/build/outputs/apk/debug/app-debug.apk
+```
+
+Release/Play builds need your own keystore (never commit it).
+
 ## What works on Android
 
 | Feature | Notes |

@@ -25,12 +25,17 @@
     "tauri": "tauri",
     "tauri:dev": "tauri dev",
     "tauri:build": "tauri build",
+    "tauri:build:nsis": "tauri build --bundles nsis",
     "mobile:sync": "npm run build && npx cap sync android",
     "mobile:android": "npx cap open android",
     "mobile:add": "npx cap add android",
+    "mobile:apk": "npm run mobile:sync && cd android && gradlew.bat assembleDebug",
     "cap": "cap"
   },
   "dependencies": {
+    "@capacitor/android": "^8.5.0",
+    "@capacitor/app": "^8.1.1",
+    "@capacitor/core": "^8.5.0",
     "@spotify/basic-pitch": "^1.0.1",
     "@tauri-apps/api": "^2.2.0",
     "@tauri-apps/plugin-dialog": "^2.2.0",
@@ -46,6 +51,7 @@
     "zustand": "^5.0.2"
   },
   "devDependencies": {
+    "@capacitor/cli": "^8.5.0",
     "@tailwindcss/vite": "^4.0.0",
     "@tauri-apps/cli": "^2.2.0",
     "@types/node": "^26.2.0",

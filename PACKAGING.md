@@ -17,8 +17,10 @@ npx serve dist         # or any static host
 Prereqs: Rust toolchain, WebView2 (Windows 10/11 usually present).
 
 ```bash
-npm run tauri:dev      # dev shell + Vite
-npm run tauri:build    # MSI/NSIS under src-tauri/target/release/bundle/
+npm run tauri:dev         # dev shell + Vite
+npm run tauri:build       # MSI/NSIS under src-tauri/target/release/bundle/
+npm run tauri:build:nsis  # NSIS setup.exe only (faster local installer)
+# Local copies often staged in dist-installers/ (gitignored convenience folder)
 ```
 
 - Shell code: `src-tauri/`

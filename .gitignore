@@ -1,6 +1,7 @@
 # Dependencies / build
 node_modules/
 dist/
+dist-installers/
 dist-ssr/
 coverage/
 .vitest/
