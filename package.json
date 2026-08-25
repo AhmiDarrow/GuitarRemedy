@@ -30,7 +30,9 @@
     "mobile:android": "npx cap open android",
     "mobile:add": "npx cap add android",
     "mobile:apk": "npm run mobile:sync && cd android && gradlew.bat assembleDebug",
-    "cap": "cap"
+    "cap": "cap",
+    "version:bump": "node scripts/bump-version.mjs",
+    "ci:local": "npm test && npm run build && npm run test:rust"
   },
   "dependencies": {
     "@capacitor/android": "^8.5.0",

@@ -4,8 +4,10 @@ GuitarRemedy desktop uses the same Tauri 2 updater pattern as SecretSticky / Sec
 
 ## How it works
 
-1. **Release workflow** (`.github/workflows/release.yml`) builds Windows NSIS + MSI on tag `v*`.
-2. Artifacts are **minisign-signed** with `TAURI_SIGNING_PRIVATE_KEY`.
+1. **Release workflow** (`.github/workflows/release.yml`) on tag `v*`:
+   - **Windows:** NSIS + MSI + minisign updater artifacts + `latest.json`
+   - **Android:** Capacitor debug APK attached to the same draft release
+2. Artifacts are **minisign-signed** with `TAURI_SIGNING_PRIVATE_KEY` (desktop installers).
 3. `latest.json` is published on the GitHub Release (via `includeUpdaterJson`).
 4. The app polls:
 
@@ -13,41 +15,62 @@ GuitarRemedy desktop uses the same Tauri 2 updater pattern as SecretSticky / Sec
 
 5. **About → Check for updates → Install & restart** downloads and relaunches.
 
-## One-time setup (before first push / release)
+### In-app pieces (already wired)
+
+| Piece | Location |
+|--------|----------|
+| Updater plugin | `src-tauri` + `tauri-plugin-updater` |
+| Pubkey + endpoint | `src-tauri/tauri.conf.json` → `plugins.updater` |
+| Capabilities | `updater:default`, `process:allow-restart` |
+| UI | `src/lib/updater.ts` + About page |
+| Tests | `src/lib/updater.test.ts` |
+
+Web/PWA builds show a clear “desktop only” message — no fake update path.
+
+## One-time setup
 
 ```bash
-# Key already generated locally (do not commit):
-#   C:\Users\Administrator\.tauri\guitarremedy.key
-#   C:\Users\Administrator\.tauri\guitarremedy.key.pub
+# Key lives locally (do not commit):
+#   %USERPROFILE%\.tauri\guitarremedy.key
+#   %USERPROFILE%\.tauri\guitarremedy.key.pub
+# Public half is embedded in tauri.conf.json.
 
-# After the GitHub repo exists:
 gh secret set TAURI_SIGNING_PRIVATE_KEY < %USERPROFILE%\.tauri\guitarremedy.key
-# optional if you set a password on the key:
+# optional if the key has a password:
 # gh secret set TAURI_SIGNING_PRIVATE_KEY_PASSWORD
 ```
 
-Public key is embedded in `src-tauri/tauri.conf.json` → `plugins.updater.pubkey`.
+## CI (every push / PR)
 
-## CI (no release)
-
-`.github/workflows/ci.yml` on `main` / PRs:
+`.github/workflows/ci.yml`:
 
 | Job | Gates |
 |-----|--------|
 | Frontend | `npm ci` → `npm test` (tsc + vitest) → `npm run build` |
 | Rust | `cargo fmt --check` → `cargo test --all-features` |
 
-## Local git ready / no push yet
+Local mirror: `npm run ci:local`
 
-This tree is prepared as a local git repo. **Do not push** until you create `AhmiDarrow/GuitarRemedy` and set the signing secret.
+## Version bump (all surfaces)
 
 ```bash
-# later:
-gh repo create AhmiDarrow/GuitarRemedy --private --source=. --remote=origin
-git push -u origin main
-git tag v0.1.0 && git push origin v0.1.0
+npm run version:bump -- 0.1.1
+# updates package.json + tauri.conf.json + Cargo.toml
+git commit -am "chore: bump version to 0.1.1"
+git tag v0.1.1
+git push origin main --tags
+```
+
+## First release
+
+```bash
+git push -u origin main          # CI must go green
+git tag v0.1.0
+git push origin v0.1.0           # Release workflow → draft
+# Smoke-install NSIS, then publish the draft on GitHub
 ```
 
 ## Installer polish
 
-See [`WINDOWS_INSTALLER.md`](WINDOWS_INSTALLER.md) for NSIS/MSI, WebView2 bootstrapper, timestamp URL, and optional Authenticode. Updater minisign is separate from OS code-signing.
+See [`WINDOWS_INSTALLER.md`](WINDOWS_INSTALLER.md) and [`ANDROID.md`](ANDROID.md).  
+Updater minisign is separate from Windows Authenticode (SmartScreen).

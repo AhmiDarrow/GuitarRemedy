@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
     inputs:
       tag:
-        description: "Release tag to build (e.g. v0.1.0). Leave empty to use package version."
+        description: "Release tag to build (e.g. v0.1.0). Leave empty on tag push."
         required: false
         default: ""
 
@@ -23,11 +23,28 @@ env:
 
 jobs:
   build-windows:
-    name: Build Windows installer
+    name: Build Windows installer + updater
     runs-on: windows-latest
+    outputs:
+      release_tag: ${{ steps.meta.outputs.tag }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Resolve release tag
+        id: meta
+        shell: bash
+        run: |
+          if [ -n "${{ github.event.inputs.tag }}" ]; then
+            TAG="${{ github.event.inputs.tag }}"
+          elif [[ "${{ github.ref }}" == refs/tags/* ]]; then
+            TAG="${{ github.ref_name }}"
+          else
+            VER=$(node -p "require('./package.json').version")
+            TAG="v${VER}"
+          fi
+          echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
+          echo "Using release tag: ${TAG}"
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -68,10 +85,10 @@ jobs:
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
         with:
-          tagName: ${{ github.event.inputs.tag != '' && github.event.inputs.tag || github.ref_name }}
-          releaseName: "GuitarRemedy ${{ github.event.inputs.tag != '' && github.event.inputs.tag || github.ref_name }}"
+          tagName: ${{ steps.meta.outputs.tag }}
+          releaseName: "GuitarRemedy ${{ steps.meta.outputs.tag }}"
           releaseBody: |
-            ## GuitarRemedy ${{ github.event.inputs.tag != '' && github.event.inputs.tag || github.ref_name }}
+            ## GuitarRemedy ${{ steps.meta.outputs.tag }}
 
             Learn guitar — scales, tabs, free library, song upload → tabs, Day 1–365 path.
 
@@ -80,18 +97,92 @@ jobs:
             - Repo: https://github.com/AhmiDarrow/GuitarRemedy
 
             ### Install
-            - Prefer the **NSIS setup** (`.exe`) for a normal Windows install.
-            - MSI is also attached when available.
-            - Installed builds check **GitHub Releases** for signed updates (About → Check for updates).
+            - **Windows:** prefer the **NSIS setup** (`.exe`). MSI attached when available.
+            - **Android:** debug APK on this release (sideload; not Play Store).
+            - Installed desktop builds check **GitHub Releases** for signed updates (About → Check for updates).
 
             ### Notes
-            - Local-first progress and Your tabs under this device
-            - Audio → MIDI → tabs is monophonic assist (editable)
-            - Solid path: MIDI / MusicXML / Guitar Pro (best-effort)
+            - Local-first progress and Your tabs on this device
+            - Audio → tabs is lead-biased multipitch assist (always editable)
+            - Solid structured path: MIDI / MusicXML · GP best-effort
 
-            See README and docs/AUTOUPDATE.md.
+            See README, docs/AUTOUPDATE.md, and docs/ANDROID.md.
           releaseDraft: true
           prerelease: false
           includeUpdaterJson: true
           updaterJsonPreferNsis: true
           args: --bundles nsis,msi
+
+  build-android:
+    name: Build Android APK
+    needs: build-windows
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install frontend deps
+        run: npm ci
+
+      - name: Production web build
+        run: npm run build
+
+      - name: Scaffold Capacitor Android + sync
+        run: |
+          npx cap add android
+          npx cap sync android
+
+      - name: Assemble debug APK
+        working-directory: android
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleDebug --no-daemon
+
+      - name: Stage APK
+        id: apk
+        run: |
+          mkdir -p dist-installers
+          VER=$(node -p "require('./package.json').version")
+          SRC="android/app/build/outputs/apk/debug/app-debug.apk"
+          DEST="dist-installers/GuitarRemedy_${VER}-debug.apk"
+          cp "$SRC" "$DEST"
+          echo "path=${DEST}" >> "$GITHUB_OUTPUT"
+          ls -la dist-installers/
+
+      - name: Upload APK to GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG="${{ needs.build-windows.outputs.release_tag }}"
+          # Ensure draft release exists (Windows job creates it)
+          for i in 1 2 3 4 5 6 7 8 9 10; do
+            if gh release view "$TAG" >/dev/null 2>&1; then
+              break
+            fi
+            echo "Waiting for release $TAG..."
+            sleep 15
+          done
+          gh release upload "$TAG" "${{ steps.apk.outputs.path }}" --clobber
+          echo "Uploaded APK to release $TAG"
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: GuitarRemedy-android-debug-apk
+          path: dist-installers/*.apk
+          if-no-files-found: error

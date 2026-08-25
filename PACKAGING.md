@@ -64,15 +64,17 @@ Full-band audio uses **median HPSS lead stem** → melody band → pitch → tem
 5. Smoke Learn day 1 + Library play/stop
 6. (Optional) `npm run mobile:sync` after Capacitor install
 
-## Pre-push readiness (local → GitHub)
-
-Code can ship without a remote. When you are ready:
+## GitHub + auto-update
 
 | Step | Command / note |
 |------|----------------|
-| Create repo | `gh repo create AhmiDarrow/GuitarRemedy --private --source=. --remote=origin` |
-| First push | `git push -u origin main` — watch **CI** go green |
-| Updater secret | `gh secret set TAURI_SIGNING_PRIVATE_KEY < %USERPROFILE%\.tauri\guitarremedy.key` |
-| First release | Tag `v0.1.0` after CI green (draft Windows installer + `latest.json`) |
+| Remote | `origin` → `https://github.com/AhmiDarrow/GuitarRemedy` |
+| CI | `.github/workflows/ci.yml` on `main` / PRs |
+| Release | Tag `v*` → Windows NSIS/MSI + `latest.json` + Android debug APK |
+| Version | `npm run version:bump -- X.Y.Z` (package + tauri + Cargo) |
+| Updater secret | `TAURI_SIGNING_PRIVATE_KEY` (minisign; never commit `.key`) |
+| Local CI | `npm run ci:local` |
 
-**Do not** commit `.tauri/*.key` or large full-band sample audio. Authenticode cert is optional (SmartScreen); minisign still protects in-app updates.
+**Public repo** preferred so desktop clients can fetch `latest.json` without auth.  
+Authenticode cert is optional (SmartScreen); minisign still protects in-app updates.  
+Do **not** commit `.tauri/*.key` or large full-band sample audio.

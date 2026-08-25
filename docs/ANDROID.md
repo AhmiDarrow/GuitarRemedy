@@ -84,6 +84,17 @@ Release/Play builds need your own keystore (never commit it).
    `@capacitor/assets` with `public/assets/brand-mark.png`.
 2. Keep status/nav bars dark to match Dark Forest.
 
+## CI release APK
+
+Tag `v*` runs `.github/workflows/release.yml` → **build-android** job:
+
+1. `npm ci` → `npm test` → `npm run build`
+2. `npx cap add android` + `npx cap sync android` (fresh tree; `android/` is gitignored)
+3. `gradlew assembleDebug`
+4. Upload `GuitarRemedy_<tag>-debug.apk` to the draft GitHub Release
+
+Debug-signed only — fine for sideload testing. Play Store needs your own release keystore.
+
 ## Store / signing
 
 - Create a release keystore **outside** the repo.
