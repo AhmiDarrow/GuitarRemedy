@@ -1,6 +1,6 @@
 [package]
 name = "guitar-remedy"
-version = "0.1.0"
+version = "0.1.1"
 description = "GuitarRemedy — desktop shell"
 authors = ["Ahmi Darrow"]
 edition = "2021"
