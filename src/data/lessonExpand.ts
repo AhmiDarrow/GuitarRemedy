@@ -222,15 +222,10 @@ function guidedBlock(
     seed.drills.length >= 3
       ? seed.drills
       : [...seed.drills, 'Repeat the cleanest take twice', 'Half-speed pass with a metronome']
-  const coach =
-    dayCoach?.guided ??
-    `Guided practice for ${seed.title.includes('—') ? seed.title.split('—').slice(1).join('—').trim() : seed.title}. Stay where most reps are clean before you nudge tempo.`
+  const coach = `Practice: ${seed.title}. Work through one exercise at a time. Begin with: ${seed.drills[0]} Repeat slowly and change only one thing when a note is unclear.`
   return {
     coach,
-    youDo: drills.map((d, i) => {
-      const mins = i === 0 ? '~3 min' : i === 1 ? '~3 min' : '~2 min'
-      return `${mins}: ${d}`
-    }),
+    youDo: drills,
   }
 }
 

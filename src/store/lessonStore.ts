@@ -4,6 +4,7 @@ import { persist } from 'zustand/middleware'
 export type Confidence = 'building' | 'steady' | 'ready'
 export interface LessonSession {
   segment: number
+  practiceStep?: number
   checked: Record<string, boolean>
   note: string
   confidence?: Confidence

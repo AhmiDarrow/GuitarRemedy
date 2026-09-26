@@ -65,3 +65,27 @@ it('normalizes fractional lesson URLs and shows actual completion rather than pa
   expect(host.querySelector('h2')?.textContent).toContain('E Minor')
   expect(host.querySelector('[aria-label="Phase completion"]')?.getAttribute('aria-valuenow')).toBe('0')
 })
+
+it('shows one practice step, saves its place, and focuses the next instruction', async () => {
+  await render('/learn/3')
+  expect(host.querySelector('.practice-instruction')?.textContent).toContain('middle fingertip')
+  await click(button('Next step'))
+  expect(host.querySelector('.practice-instruction')?.textContent).toContain('ring fingertip')
+  expect(document.activeElement?.id).toBe('current-practice-step')
+  expect(useLessonStore.getState().sessions[3].practiceStep).toBe(1)
+  await click(host.querySelector<HTMLButtonElement>('button[aria-label="Next lesson"]')!)
+  expect(host.querySelector('#current-practice-step')?.textContent).toBe('Build G')
+  await click(host.querySelector<HTMLButtonElement>('button[aria-label="Previous lesson"]')!)
+  expect(host.querySelector('#current-practice-step')?.textContent).toBe('Place the second finger')
+  expect(useAppStore.getState().completedLessons).toEqual([])
+})
+
+it('keeps optional reading collapsed and brings the self-check before the long plan', async () => {
+  await render('/learn/9')
+  const details = [...host.querySelectorAll('details')]
+  expect(details.every(d => !d.open)).toBe(true)
+  const full = details.find(d => d.querySelector('summary')?.textContent?.includes('Full session'))!
+  expect(host.querySelector('#lesson-check')!.compareDocumentPosition(full) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+  await click(host.querySelector<HTMLButtonElement>('button[aria-label="Go to practice step 3"]')!)
+  expect(host.querySelector('table')?.getAttribute('aria-label')).toContain('down, down up')
+})

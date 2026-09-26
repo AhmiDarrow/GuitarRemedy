@@ -476,3 +476,14 @@ textarea {
 .coach-rating:hover, .coach-rating.is-selected { border-color: var(--mint); background: rgba(93, 255, 176, 0.08); }
 .coach-note { width: 100%; padding: 0.8rem; border: 1px solid var(--border); border-radius: 0.85rem; background: var(--bg); color: var(--text); resize: vertical; font: inherit; }
 .coach-note::placeholder { color: var(--text-muted); opacity: 0.85; }
+.lesson-page { max-width: 56rem; margin-inline: auto; }
+.lesson-page .coach-card { background: linear-gradient(135deg, rgba(93, 255, 176, 0.045), rgba(7, 17, 12, 0.7)); }
+.practice-step-panel { padding: clamp(1rem, 3vw, 1.5rem); background: var(--bg-elevated); border: 1px solid rgba(93, 255, 176, 0.35); border-radius: 1rem; }
+.practice-instruction { max-width: 60ch; font-size: 1.05rem; line-height: 1.8; color: var(--text); }
+.practice-step-dot { width: 2.5rem; min-height: 2.5rem; border: 1px solid var(--border); border-radius: 50%; color: var(--text-muted); }
+.practice-step-dot.is-current { background: var(--mint); color: var(--bg); border-color: var(--mint); font-weight: 700; }
+.lesson-disclosure > summary { cursor: pointer; font-size: 0.9rem; font-weight: 500; min-height: 2.75rem; align-content: center; color: var(--text); }
+.lesson-disclosure > summary:focus-visible { outline: 2px solid var(--lime); outline-offset: 4px; border-radius: 0.25rem; }
+.rhythm-count { border-collapse: collapse; width: 100%; max-width: 28rem; text-align: center; font-size: 0.9rem; }
+.rhythm-count th, .rhythm-count td { border: 1px solid var(--border); padding: 0.5rem 0.25rem; }
+.rhythm-count td { color: var(--mint); }

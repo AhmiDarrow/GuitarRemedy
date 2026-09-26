@@ -217,9 +217,9 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'Notice how the shapes are cousins',
       'Color a loop Am–E–Am–E'
     ],
-    theoryBite: 'Am is the relative minor of C. Shared shape families mean less to memorize — your hand already knows half the job.',
+    theoryBite: 'Am uses A C E. E major uses E G# B. To change Am into E major, move all three fingers one string toward the thickest string while keeping their fret numbers. Strum five strings for Am and all six for E.',
     drills: [
-      'See Am as Em slid toward the floor — stop and fix buzz before you add speed',
+      'Build Am: index on B fret 1, middle on D fret 2, ring on G fret 2; strum from the open A string',
       'Am–E changes at 60 BPM until both shapes land without a scramble',
       'Loop C–Am–E–Am four times and notice the mood shift'
     ],
@@ -238,7 +238,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
       'Put upstrokes on the & counts',
       'Run D-DU-D-DU over G–C–D'
     ],
-    theoryBite: 'Count 1 & 2 & 3 & 4 &. Your right hand is the drummer; the fretting hand just changes costumes. Keep shoulders soft; clean and slow today becomes easy later.',
+    theoryBite: 'Count 1 & 2 & 3 & 4 &; say each & as “and.” D means a downstroke and U means an upstroke. In D-DU-D-DU, strum down on 1, 2, 3, 4 and up on the & after 2 and 4. Keep moving on the two silent upstrokes.',
     drills: [
       'Muted D-D-D-D strums for 60 seconds — right hand only, loose',
       'D-DU-D-DU on G for 8 bars with the foot locked to the pulse',
@@ -320,7 +320,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     goals: [
       'Run 1-2-3-4 moving from string to string',
       'Keep idle fingers soft',
-      'Stay under tempo ego'
+      'Choose a speed where the notes stay even'
     ],
     theoryBite: 'Independence is coordination, not strength. Slow spiders wire clean fretting for every chord you’ll learn later.',
     drills: [
@@ -344,7 +344,7 @@ const DEEP_LESSONS: Record<number, DeepLessonSeed> = {
     ],
     theoryBite: 'A power chord is root + fifth (often with the octave). No third means it is neither major nor minor — that is why it moves so easily and sounds tough. Learn the grip once; the neck becomes a map of roots.',
     drills: [
-      'Build E5 (open low E + 2nd fret A), then the same shape at frets 3 and 5 — name the root each time',
+      'Build E5 (open low E + A fret 2), G5 (low E fret 3 + A fret 5), then A5 (low E fret 5 + A fret 7); play only those two strings',
       'Palm-mute eighth notes on one power chord for 60 seconds with a foot pulse',
       'Four-bar riff: two bars on frets 3/5, two bars on frets 5/7, then reverse — keep unused strings quiet'
     ],

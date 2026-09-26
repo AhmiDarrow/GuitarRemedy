@@ -3,6 +3,15 @@
 All notable changes, grounded in `git log` (repo created 2026-08-21, `e8e497d`).
 On-disk version source of truth: `package.json` · `src-tauri/tauri.conf.json` · `src-tauri/Cargo.toml` (all synced by `node scripts/bump-version.mjs`).
 
+## [0.2.1] — 2026-09-26
+
+- One instruction at a time, with previous/next controls and a saved place in every lesson.
+- Handwritten steps for the first 14 lessons, a counted strumming grid, and definitions of unfamiliar guitar terms.
+- Shorter lesson pages: the goal and practice come first; longer sessions, theory, and path navigation are optional.
+- Correct Am-to-E finger placement and explicit E5/G5/A5 power-chord positions; remove stale generated instructions.
+- Clearer self-check guidance and keyboard focus that follows the active step.
+- Repair Android CI setup by requesting the supported platform-tools package.
+
 ## [0.2.0] — 2026-09-26
 
 - Concrete first-week demonstrations, listening cues, and smaller practice steps when a skill is difficult.

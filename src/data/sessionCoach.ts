@@ -72,9 +72,9 @@ const SESSION_COACH_JSON = {
   },
   "8": {
     "arrive": "Day 8. Land in the chair. One breath. Here is today's aim: Add clear Am and E shapes.",
-    "warmup": "Day 8. Easy blood-flow first. Light preview — See Am as Em slid toward the floor — stop and fix buzz before you add speed.",
-    "teach": "Here is the heart of it: Am is the relative minor of C. Shared shape families mean less to memorize — your hand already knows half the job. First win to aim at: Add clear Am and E shapes. Feel it in the hands before you chase neatness.",
-    "guided": "Now we earn it with clean reps for day 8 — A Minor & E Major — Shape Family. Start with: See Am as Em slid toward the floor — stop and fix buzz before you add speed. Then: Am–E changes at 60 BPM until both shapes land without a scramble. Stay kind when it buzzes — adjust and repeat.",
+    "warmup": "Day 8. Build Am slowly: index on B fret 1, middle on D fret 2, ring on G fret 2. Pick from the open A string to the thinnest E.",
+    "teach": "Am has three fingers. Move each one a string toward the thickest E, keeping the same fret numbers, to make E major. Am uses five strings; E major uses all six.",
+    "guided": "Practice Am and E major separately before changing between them. Pick each string to check it rings. Then change slowly, leaving four counts between strums.",
     "jam": "Play window — make it sound like a song fragment. Day 8 jam on A Minor & E Major — Shape Family — Tiny song energy: few notes, steady pulse, done.",
     "cooldown": "Day 8. Ease out so tomorrow's hands forgive you. Win check: Eight clean strums each on Am and E with no dead notes."
   },
@@ -120,9 +120,9 @@ const SESSION_COACH_JSON = {
   },
   "14": {
     "arrive": "Day 14. Land in the chair. One breath. Here is today's aim: Fret a root + fifth power shape on the low strings.",
-    "warmup": "Day 14. Easy blood-flow first. Light preview — Build E5 (open low E + 2nd fret A), then the same shape at frets 3 and 5 — name the root each time.",
+    "warmup": "Day 14. Play open low E with A fret 2 for E5. For G5, use low E fret 3 and A fret 5. For A5, use low E fret 5 and A fret 7. Pick only those two strings.",
     "teach": "One clear idea today: A power chord is root + fifth (often with the octave). No third means it is neither major nor minor — that is why it moves so easily and... First win to aim at: Fret a root + fifth power shape on the low strings. Feel it in the hands before you chase neatness.",
-    "guided": "Slow enough that form stays honest for day 14 — Power Chords Intro — Two-Finger Rock. Start with: Build E5 (open low E + 2nd fret A), then the same shape at frets 3 and 5 — name the root each time. Then: Palm-mute eighth notes on one power chord for 60 seconds with a foot pulse. Stay kind when it buzzes — adjust and repeat.",
+    "guided": "Day 14. Practice G5 at low E fret 3 and A fret 5. Move both fingers two frets toward the body for A5. Keep the unused strings quiet and take time to place each shape.",
     "jam": "Let the hands make a little story. Day 14 jam on Power Chords Intro — Two-Finger Rock — Tiny song energy: few notes, steady pulse, done.",
     "cooldown": "Day 14. Ease out so tomorrow's hands forgive you. Win check: Play a four-bar power-chord riff twice with clear muting and steady time."
   },

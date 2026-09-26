@@ -1,40 +1,67 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { getLesson, type Lesson } from '../data/curriculum'
 import { practiceGuide } from '../data/practiceGuide'
 import { dueLessons, EMPTY_SESSION, useLessonStore, type Confidence } from '../store/lessonStore'
 import { useAppStore } from '../store/appStore'
+import { teachingSteps, termsForLesson } from '../data/teachingSteps'
 
 export function LessonCoach({ lesson }: { lesson: Lesson }) {
   const guide = practiceGuide(lesson)
   const [showHelp, setShowHelp] = useState(false)
   const [showRecall, setShowRecall] = useState(false)
+  const savedStep = useLessonStore(s => s.sessions[lesson.day]?.practiceStep ?? 0)
+  const update = useLessonStore(s => s.update)
+  const steps = teachingSteps(lesson)
+  const step = Math.max(0, Math.min(steps.length - 1, Math.floor(savedStep) || 0))
+  const heading = useRef<HTMLHeadingElement>(null)
+  const previousStep = useRef(step)
+  useEffect(() => {
+    if (previousStep.current !== step) heading.current?.focus()
+    previousStep.current = step
+  }, [step])
   const previous = getLesson(lesson.day - 1)
   return <section className="coach-card space-y-5" aria-labelledby="practice-focus">
     <div className="flex flex-wrap justify-between gap-3 items-start">
-      <div><p className="coach-eyebrow">Today’s practice focus</p>
-        <h3 id="practice-focus" className="font-display text-xl font-semibold mt-1">One clear win, at your pace.</h3></div>
+      <div><p className="coach-eyebrow">Start here</p>
+        <h3 id="practice-focus" className="text-xl font-semibold mt-1">One step at a time.</h3></div>
       <Link to="/practice" state={{ tool: 'tuner' }} className="btn-ghost text-sm">Tune up first</Link>
     </div>
-    <p className="text-sm text-mint leading-relaxed">{lesson.masteryCheck}</p>
-    {previous && <div className="coach-recall">
-      <p className="text-sm font-semibold">Before you start · 60-second recall</p>
-      <p className="text-sm text-[var(--text-muted)] mt-1">Try yesterday’s skill from memory: {previous.title}. Then check the target.</p>
-      <button className="text-sm text-mint mt-2 underline underline-offset-4" type="button" aria-expanded={showRecall} onClick={() => setShowRecall(!showRecall)}>{showRecall ? 'Hide recall target' : 'Reveal recall target'}</button>
-      {showRecall && <p className="text-sm mt-2">{previous.masteryCheck} <Link className="text-mint underline" to={`/learn/${previous.day}`}>Revisit lesson</Link></p>}
-    </div>}
-    <div className="grid md:grid-cols-2 gap-5">
-      <div><p className="coach-eyebrow">01 · Try it on your guitar</p><p className="text-sm leading-relaxed mt-2">{guide.example}</p></div>
-      <div><p className="coach-eyebrow">02 · Listen and adjust</p><p className="text-sm leading-relaxed mt-2">{guide.listen}</p>
-        <p className="text-sm text-[var(--text-muted)] mt-2">Repeat three times. If two attempts break down, simplify. If all three feel controlled, try a small tempo increase.</p></div>
+    <p className="text-sm leading-relaxed">Take as long as you need on each step. You can stop and return here later. The lesson number is a place in the path, not a deadline.</p>
+    <div className="practice-step-panel">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <p className="coach-eyebrow">Step {step + 1} of {steps.length}</p>
+        <nav aria-label="Practice steps" className="flex gap-1.5">{steps.map((s, i) => <button type="button" key={s.title} aria-label={`Go to practice step ${i + 1}`} aria-current={i === step ? 'step' : undefined} className={`practice-step-dot ${i === step ? 'is-current' : ''}`} onClick={() => update(lesson.day, { practiceStep: i })}>{i + 1}</button>)}</nav>
+      </div>
+      <h4 ref={heading} tabIndex={-1} className="text-lg font-semibold mt-4 scroll-mt-24" id="current-practice-step">{steps[step].title}</h4>
+      <p className="practice-instruction mt-2">{steps[step].instruction}</p>
+      {lesson.day === 9 && step >= 2 && <div className="mt-4 overflow-x-auto">
+        <table className="rhythm-count" aria-label="Strum pattern: down, down up, down, down up"><tbody>
+          <tr><th scope="row">Count</th>{['1', '&', '2', '&', '3', '&', '4', '&'].map((beat, i) => <td key={i}>{beat}</td>)}</tr>
+          <tr><th scope="row">Strum</th>{['↓', '–', '↓', '↑', '↓', '–', '↓', '↑'].map((stroke, i) => <td key={i}>{stroke}</td>)}</tr>
+        </tbody></table><p className="text-xs text-[var(--text-muted)] mt-2">↓ down · ↑ up · – move the hand without touching the strings. & means “and.”</p>
+      </div>}
+      <div className="flex flex-wrap gap-2 mt-5">
+        <button type="button" className="btn-ghost" disabled={step === 0} onClick={() => update(lesson.day, { practiceStep: step - 1 })}>Previous step</button>
+        {step < steps.length - 1
+          ? <button type="button" className="btn-primary" onClick={() => update(lesson.day, { practiceStep: step + 1 })}>Next step</button>
+          : <a href="#lesson-check" className="btn-primary">Try the self-check</a>}
+      </div>
     </div>
+    <div><p className="coach-eyebrow">What to listen for</p><p className="text-sm leading-relaxed mt-2">{guide.listen}</p>
+      <p className="text-sm text-[var(--text-muted)] mt-2">Try the exercise three times slowly. If it keeps breaking down, use the smaller step below. Clear, comfortable playing matters more than speed.</p></div>
     <div className="flex flex-wrap items-center gap-3">
       <button className="btn-secondary text-sm" type="button" aria-expanded={showHelp} onClick={() => setShowHelp(!showHelp)}>{showHelp ? 'Hide smaller step' : 'Stuck? Make it smaller'}</button>
       <Link to="/practice" state={{ tool: 'metronome' }} className="btn-ghost text-sm">Open metronome</Link>
       <a href="#lesson-check" className="btn-ghost text-sm">Jump to self-check</a>
-      <span className="text-xs text-[var(--text-muted)]">Lesson checkboxes and notes save on this device.</span>
     </div>
     {showHelp && <p className="coach-recall text-sm leading-relaxed" role="status">{guide.rescue}</p>}
+    <details className="lesson-disclosure"><summary>What do these words mean?</summary><dl className="mt-3 space-y-3">{termsForLesson(lesson).map(t => <div key={t.term}><dt className="font-semibold text-sm text-mint">{t.term}</dt><dd className="text-sm leading-relaxed mt-1">{t.meaning}</dd></div>)}</dl></details>
+    {previous && <details className="lesson-disclosure"><summary>Optional warm-up: revisit the previous lesson</summary><div className="mt-3">
+      <p className="text-sm text-[var(--text-muted)] mt-1">If you have practiced lesson {previous.day}, try its skill from memory: {previous.title}.</p>
+      <button className="text-sm text-mint mt-2 underline underline-offset-4" type="button" aria-expanded={showRecall} onClick={() => setShowRecall(!showRecall)}>{showRecall ? 'Hide recall target' : 'Reveal recall target'}</button>
+      {showRecall && <p className="text-sm mt-2">{previous.masteryCheck} <Link className="text-mint underline" to={`/learn/${previous.day}`}>Revisit lesson</Link></p>}
+    </div></details>}
   </section>
 }
 
@@ -59,10 +86,10 @@ export function LessonReflection({ lesson, onNext }: { lesson: Lesson; onNext: (
     setSaved(true)
   }
   return <section className="coach-card space-y-4" aria-labelledby="lesson-check">
-    <div><p className="coach-eyebrow">03 · Check without the instructions</p>
-      <h3 id="lesson-check" tabIndex={-1} className="font-display text-xl font-semibold mt-1 scroll-mt-6">What can you repeat?</h3></div>
+    <div><p className="coach-eyebrow">When you feel ready</p>
+      <h3 id="lesson-check" tabIndex={-1} className="text-xl font-semibold mt-1 scroll-mt-24">Try it on your own.</h3></div>
     <p className="text-sm leading-relaxed">{lesson.masteryCheck}</p>
-    <p className="text-sm text-[var(--text-muted)]">Try the target twice without reading the steps. This is your own assessment; the app is not listening or grading your playing. Repeating a lesson is part of learning.</p>
+    <p className="text-sm text-[var(--text-muted)]">Try the target twice without reading the steps. Choose the answer that fits today. Every answer saves your practice; only “Ready to move on” completes the lesson. The app does not listen to or grade your playing.</p>
     <fieldset><legend className="text-sm font-medium mb-2">How did it feel?</legend>
       <div className="grid sm:grid-cols-3 gap-2">{RATINGS.map(r => <label key={r.value} className={`coach-rating ${rating === r.value ? 'is-selected' : ''}`}>
         <input type="radio" name="lesson-confidence" value={r.value} checked={rating === r.value} onChange={() => { setRating(r.value); setSaved(false) }} className="accent-[var(--mint)]" />
@@ -70,7 +97,7 @@ export function LessonReflection({ lesson, onNext }: { lesson: Lesson; onNext: (
       </label>)}</div>
     </fieldset>
     <label className="block text-sm">A note for your next practice <span className="text-[var(--text-muted)]">(optional · saved as you type)</span>
-      <textarea className="coach-note mt-2" rows={2} maxLength={500} value={session.note} placeholder="e.g. C → D was clean at 50 BPM. Try the change again tomorrow." onChange={e => update(lesson.day, { note: e.target.value })} />
+      <textarea className="coach-note mt-2" rows={2} maxLength={500} value={session.note} placeholder="e.g. The first two steps felt easier. Repeat the last step slowly next time." onChange={e => update(lesson.day, { note: e.target.value })} />
     </label>
     <div className="flex flex-wrap gap-2">
       <button className="btn-primary" type="button" disabled={!rating || saved} onClick={save}>{saved ? 'Practice saved' : rating === 'ready' ? 'Save & complete lesson' : 'Save practice'}</button>

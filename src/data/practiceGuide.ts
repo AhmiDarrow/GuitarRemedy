@@ -1,4 +1,5 @@
 import type { Lesson, LessonPhase } from './curriculum'
+import { teachingSteps } from './teachingSteps'
 
 interface PracticeGuide {
   example: string
@@ -53,7 +54,18 @@ const PHASE_GUIDES: Record<LessonPhase, Omit<PracticeGuide, 'example'>> = {
   repertoire: { listen: 'The transition into and out of the difficult section. Keep the pulse through a mistake and recover at the next phrase.', rescue: 'Loop the last bar of the previous section and the first bar of the next. Join them slowly before adding the rest of the song.' },
 }
 
+const SECOND_WEEK: Record<number, Omit<PracticeGuide, 'example'>> = {
+  8: { listen: 'Five clear strings in Am; six in E major. The open thinnest E must ring in both shapes.', rescue: 'Stay on Am. Check just B fret 1 and the open thinnest E. Curve the index fingertip so it does not silence the E. Add the change only after Am is clear.' },
+  9: { listen: 'The downstrokes stay on the numbers. The two upstrokes fit halfway between beats, without making the next downstroke late.', rescue: 'Leave out the chord. Use muted strings and play only downstrokes on 1, 2, 3, 4. Add just the upstroke after 4, then the one after 2.' },
+  10: { listen: 'The open A and thinnest E ring clearly. Each new chord begins on count 1, at the same slow pace.', rescue: 'Work only on A. Pick its five strings separately. Reposition the ring fingertip if the thinnest E is silent. Practice A → D before adding E.' },
+  11: { listen: 'One clear note at a time, with equal gaps. Finish on A at low E fret 5 and notice the sense of arriving home.', rescue: 'Use only low E frets 5 and 8, then A string fret 5. Play these three notes forward and backward before adding more of the pattern.' },
+  12: { listen: 'The notes follow the melody you hummed. Keep long notes long; do not speed up to get past a difficult change.', rescue: 'Take only the first three notes in the tab. Hum them, find them, and play them slowly. Add one more note when those three feel familiar.' },
+  13: { listen: 'Similar volume and equal gaps between notes, including when you move to the next string.', rescue: 'Use frets 1 and 2 on the B string only. Make two clear notes with relaxed fingers, then try those same frets on high E.' },
+  14: { listen: 'Only the two intended strings ring. G5 and A5 have the same shape, and the pulse stays even as the shape moves.', rescue: 'Stay on G5: low E fret 3 and A fret 5. Pick the pair gently four times. Practice moving the shape silently before adding A5 strums.' },
+}
+
 export function practiceGuide(lesson: Lesson): PracticeGuide {
+  if (SECOND_WEEK[lesson.day]) return { ...SECOND_WEEK[lesson.day], example: teachingSteps(lesson).map(s => s.instruction).join(' ') }
   return FIRST_WEEK[lesson.day] ?? {
     ...PHASE_GUIDES[lesson.phase],
     example: `${lesson.drills[0]} First try it once slowly. Identify the smallest part that breaks down, practice that part three times, then put it back into the whole exercise.`,
