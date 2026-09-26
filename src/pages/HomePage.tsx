@@ -16,6 +16,7 @@ import { useUserTabsStore } from '../store/userTabsStore'
 import { CURRICULUM, getLesson } from '../data/curriculum'
 import { LIBRARY } from '../data/library'
 import { APP_NAME } from '../lib/brand'
+import { ReviewQueue } from '../components/LessonCoach'
 
 const PHASE_LABEL: Record<string, string> = {
   basics: 'Basics',
@@ -100,11 +101,11 @@ export function HomePage() {
           </p>
           <p className="text-sm text-[var(--text-muted)] mt-2">Welcome back, {hello}</p>
           <h1 className="font-display text-3xl md:text-4xl font-bold tracking-tight mt-1 max-w-xl">
-            {streak > 0 ? 'Keep the streak alive' : 'Start your path'}
+            {streak > 0 ? 'A little practice. A little progress.' : 'Your next song starts here.'}
           </h1>
           <p className="text-[var(--text-muted)] mt-2 max-w-lg text-sm md:text-base leading-relaxed">
-            Scales, tabs, a 365-day path, song → tabs, and a full guitar wiki — practice in the Dark
-            Forest.
+            Tune up, find your rhythm, and learn something you can play today.
+            Your next lesson is ready when you are.
           </p>
           <div className="flex flex-wrap gap-2.5 mt-5">
             <Link to={`/learn/${currentDay}`} className="btn-primary">
@@ -112,8 +113,8 @@ export function HomePage() {
               {lesson ? `: ${lesson.title}` : ''}
               <ArrowRight className="w-4 h-4" />
             </Link>
-            <Link to="/practice" state={{ tool: 'fretboard' }} className="btn-secondary">
-              <Guitar className="w-4 h-4" /> Fretboard
+            <Link to="/practice" state={{ tool: 'tuner' }} className="btn-secondary">
+              <AudioLines className="w-4 h-4" /> Tune up first
             </Link>
             <Link to="/upload" className="btn-secondary">
               <Upload className="w-4 h-4" /> Song → tabs
@@ -121,6 +122,8 @@ export function HomePage() {
           </div>
         </div>
       </section>
+
+      <ReviewQueue />
 
       {/* Stats + path bar */}
       <section className="space-y-3">
@@ -253,7 +256,7 @@ export function HomePage() {
         <div>
           <h2 className="font-display font-semibold">Jump in</h2>
           <p className="text-xs text-[var(--text-muted)] mt-0.5">
-            Practice tools, path, library, convert — same order as the logo menu.
+            Everything you need for a good practice, one click away.
           </p>
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2">

@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { Link, useNavigate, useParams } from 'react-router-dom'
+import { Link, Navigate, useNavigate, useParams } from 'react-router-dom'
 import {
   BookOpen,
   CheckCircle2,
@@ -18,6 +18,8 @@ import { diagramsForLesson } from '../data/lessonImagery'
 import { LessonDiagramGallery } from '../components/LessonDiagram'
 import { useAppStore } from '../store/appStore'
 import clsx from 'clsx'
+import { LessonCoach, LessonReflection } from '../components/LessonCoach'
+import { EMPTY_SESSION, useLessonStore } from '../store/lessonStore'
 
 const PHASE_TONE: Record<
   LessonPhase,
@@ -72,15 +74,19 @@ const SEG_LABEL: Record<string, string> = {
 
 export function LearnPage() {
   const { day: dayParam } = useParams()
-  const navigate = useNavigate()
   const currentDay = useAppStore((s) => s.currentDay)
+  const raw = Number(dayParam ?? currentDay)
+  const day = Number.isFinite(raw) ? Math.max(1, Math.min(365, Math.floor(raw))) : 1
+  if (dayParam !== String(day)) return <Navigate to={`/learn/${day}`} replace />
+  return <LessonContent key={day} day={day} />
+}
+
+function LessonContent({ day }: { day: number }) {
+  const navigate = useNavigate()
   const completed = useAppStore((s) => s.completedLessons)
-  const completeLesson = useAppStore((s) => s.completeLesson)
-  const recordPractice = useAppStore((s) => s.recordPractice)
   const setCurrentDay = useAppStore((s) => s.setCurrentDay)
   const streak = useAppStore((s) => s.streak)
 
-  const day = Math.max(1, Math.min(365, Number(dayParam) || currentDay || 1))
   const lesson = getLesson(day)!
   const pl = lesson.privateLesson
   const done = completed.includes(day)
@@ -89,12 +95,15 @@ export function LearnPage() {
   const phaseMeta = phases.find((p) => p.phase === lesson.phase)!
   const phaseLen = phaseMeta.end - phaseMeta.start + 1
   const phasePos = day - phaseMeta.start + 1
-  const phasePct = Math.round((phasePos / phaseLen) * 100)
-  const pathPct = Math.round((day / 365) * 100)
   const completedInPhase = completed.filter((d) => d >= phaseMeta.start && d <= phaseMeta.end).length
+  const phasePct = Math.round((completedInPhase / phaseLen) * 100)
+  const pathPct = Math.round((completed.length / 365) * 100)
 
-  const [activeSeg, setActiveSeg] = useState(0)
-  const [checked, setChecked] = useState<Record<string, boolean>>({})
+  const session = useLessonStore(s => s.sessions[day] ?? EMPTY_SESSION)
+  const updateSession = useLessonStore(s => s.update)
+  const activeSeg = session.segment
+  const checked = session.checked
+  const setActiveSeg = (segment: number) => updateSession(day, { segment })
   const [easyOn, setEasyOn] = useState(false)
 
   const related = lesson.libraryIds
@@ -132,19 +141,11 @@ export function LearnPage() {
   const go = (d: number) => {
     const next = Math.max(1, Math.min(365, d))
     setCurrentDay(next)
-    setActiveSeg(0)
-    setChecked({})
-    setEasyOn(false)
     navigate(`/learn/${next}`)
   }
 
-  const markDone = () => {
-    completeLesson(day)
-    recordPractice()
-  }
-
   const toggleCheck = (key: string) => {
-    setChecked((c) => ({ ...c, [key]: !c[key] }))
+    updateSession(day, { checked: { ...checked, [key]: !checked[key] } })
   }
 
   return (
@@ -158,13 +159,13 @@ export function LearnPage() {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <button type="button" className="btn-ghost !px-3" disabled={day <= 1} onClick={() => go(day - 1)}>
+          <button type="button" aria-label="Previous lesson" className="btn-ghost !px-3" disabled={day <= 1} onClick={() => go(day - 1)}>
             <ChevronLeft className="w-4 h-4" />
           </button>
           <span className="font-mono text-sm text-[var(--text-muted)] min-w-[7.5rem] text-center">
             Day {day} / 365
           </span>
-          <button type="button" className="btn-ghost !px-3" disabled={day >= 365} onClick={() => go(day + 1)}>
+          <button type="button" aria-label="Next lesson" className="btn-ghost !px-3" disabled={day >= 365} onClick={() => go(day + 1)}>
             <ChevronRight className="w-4 h-4" />
           </button>
         </div>
@@ -185,7 +186,7 @@ export function LearnPage() {
             </div>
           </div>
         </div>
-        <div className="h-2 rounded-full bg-ink/60 overflow-hidden border border-[var(--border)]">
+        <div role="progressbar" aria-label="Phase completion" aria-valuemin={0} aria-valuemax={100} aria-valuenow={phasePct} className="h-2 rounded-full bg-ink/60 overflow-hidden border border-[var(--border)]">
           <div
             className={clsx('h-full rounded-full transition-all duration-300', tone.bar)}
             style={{ width: `${phasePct}%` }}
@@ -258,6 +259,8 @@ export function LearnPage() {
           </div>
         )}
 
+        <LessonCoach lesson={lesson} />
+
         {/* Session timeline */}
         {segments.length > 0 && (
           <div className="space-y-3">
@@ -275,6 +278,7 @@ export function LearnPage() {
                   key={s.id}
                   type="button"
                   onClick={() => setActiveSeg(i)}
+                  aria-pressed={i === activeSeg}
                   className={clsx(
                     'shrink-0 rounded-xl border px-3 py-2 text-left min-w-[5.5rem] transition-colors',
                     i === activeSeg
@@ -285,7 +289,7 @@ export function LearnPage() {
                   <div className="text-[10px] uppercase tracking-wide opacity-80">
                     {SEG_LABEL[s.id] || s.name}
                   </div>
-                  <div className="text-xs font-medium mt-0.5">{s.minutes} min</div>
+                  <div className="text-xs font-medium mt-0.5">{s.minutes} min · {s.youDo.filter((_, idx) => checked[`${s.id}-${idx}`]).length}/{s.youDo.length} done</div>
                 </button>
               ))}
             </div>
@@ -302,7 +306,7 @@ export function LearnPage() {
                       type="button"
                       className="btn-ghost !px-2 text-xs"
                       disabled={activeSeg <= 0}
-                      onClick={() => setActiveSeg((n) => Math.max(0, n - 1))}
+                      onClick={() => setActiveSeg(Math.max(0, activeSeg - 1))}
                     >
                       Prev
                     </button>
@@ -310,7 +314,7 @@ export function LearnPage() {
                       type="button"
                       className="btn-secondary !px-3 text-xs"
                       disabled={activeSeg >= segments.length - 1}
-                      onClick={() => setActiveSeg((n) => Math.min(segments.length - 1, n + 1))}
+                      onClick={() => setActiveSeg(Math.min(segments.length - 1, activeSeg + 1))}
                     >
                       Next segment
                     </button>
@@ -363,8 +367,8 @@ export function LearnPage() {
         {diagrams.length > 0 && (
           <LessonDiagramGallery
             diagrams={diagrams}
-            title="Neck"
-            subtitle="Chord charts and the live fretboard — same theory engine as Practice."
+            title="See it on the guitar"
+            subtitle="Match the diagram to your instrument, then try the shape slowly."
           />
         )}
 
@@ -420,6 +424,7 @@ export function LearnPage() {
             type="button"
             className={clsx('btn-ghost text-xs', easyOn && 'border-mint/40 text-mint')}
             onClick={() => setEasyOn((v) => !v)}
+            aria-expanded={easyOn}
           >
             {easyOn ? 'Easy mode on' : 'Having a hard day? Easy mode'}
           </button>
@@ -462,10 +467,8 @@ export function LearnPage() {
           </div>
         )}
 
+        <LessonReflection lesson={lesson} onNext={() => go(day + 1)} />
         <div className="flex flex-wrap gap-2 pt-1">
-          <button type="button" className="btn-primary" onClick={markDone} disabled={done}>
-            {done ? 'Already completed' : 'Mark complete & log practice'}
-          </button>
           <Link to="/practice" className="btn-secondary">
             <Guitar className="w-4 h-4" />
             Open fretboard

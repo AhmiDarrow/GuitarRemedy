@@ -216,6 +216,10 @@ export function TunerPanel() {
 
   const [reading, setReading] = useState<TunerReading>(empty)
   const [live, setLive] = useState(false)
+  const [starting, setStarting] = useState(false)
+  const sessionGeneration = useRef(0)
+  const activeStop = useRef<TunerStopHandle | null>(null)
+  const opening = useRef(false)
   const [error, setError] = useState<string | null>(null)
   const [stopFn, setStopFn] = useState<TunerStopHandle | null>(null)
   const [history, setHistory] = useState<number[]>([])
@@ -258,20 +262,27 @@ export function TunerPanel() {
   }, [])
 
   const stop = useCallback(() => {
-    stopFn?.()
+    sessionGeneration.current += 1
+    opening.current = false
+    activeStop.current?.()
+    activeStop.current = null
     setStopFn(null)
+    setStarting(false)
     setLive(false)
     setReading(empty)
     setHistory([])
     targetCents.current = 0
     setCalNote(null)
-  }, [stopFn])
+  }, [])
 
   const start = useCallback(async () => {
+    if (opening.current) return
+    opening.current = true
+    setStarting(true)
+    const generation = ++sessionGeneration.current
     setError(null)
     setCalNote(null)
     try {
-      recordPractice()
       setPlaybackA4(a4)
       const stopHandle = (await startLiveTuner(onReading, {
         a4,
@@ -280,20 +291,37 @@ export function TunerPanel() {
         guitarTemperament: steelStrings,
         tuning,
       })) as TunerStopHandle
+      if (generation !== sessionGeneration.current) {
+        stopHandle()
+        return
+      }
+      activeStop.current = stopHandle
       setStopFn(() => stopHandle)
       setLive(true)
+      recordPractice()
     } catch (e) {
+      if (generation !== sessionGeneration.current) return
       setError(e instanceof Error ? e.message : 'Microphone permission needed — allow mic, then Listen again.')
       setLive(false)
+    } finally {
+      if (generation === sessionGeneration.current) {
+        opening.current = false
+        setStarting(false)
+      }
     }
   }, [a4, focusString, steelStrings, onReading, recordPractice, rmsGate, tuning])
 
 
   useEffect(() => {
+    const pauseWhenHidden = () => { if (document.hidden) stop() }
+    document.addEventListener('visibilitychange', pauseWhenHidden)
     return () => {
-      stopFn?.()
+      document.removeEventListener('visibilitychange', pauseWhenHidden)
+      sessionGeneration.current += 1
+      activeStop.current?.()
+      activeStop.current = null
     }
-  }, [stopFn])
+  }, [stop])
 
   // Push focus / temperament / gate into live session without full restart when possible
   useEffect(() => {
@@ -308,25 +336,9 @@ export function TunerPanel() {
 
   // Restart mic path if A4 or temperament changes while live
   useEffect(() => {
-    if (!live) return
-    void (async () => {
-      stopFn?.()
-      try {
-        setPlaybackA4(a4)
-        const stopHandle = (await startLiveTuner(onReading, {
-          a4,
-          rmsGate,
-          focusString,
-          guitarTemperament: steelStrings,
-          tuning,
-        })) as TunerStopHandle
-        setStopFn(() => stopHandle)
-      } catch (e) {
-        setError(e instanceof Error ? e.message : 'Microphone error — allow mic access, then Listen again.')
-        setLive(false)
-      }
-
-    })()
+    if (!live && !opening.current) return
+    stop()
+    void start()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [a4, steelStrings, tuningName, customTuning])
 
@@ -419,14 +431,14 @@ export function TunerPanel() {
           <button
             type="button"
             className={clsx(live ? 'btn-ghost' : 'btn-primary', 'min-w-[7rem]', live && 'pulse-glow')}
-            onClick={() => void (live ? stop() : start())}
+            onClick={() => void (live || starting ? stop() : start())}
             title={
               live
                 ? 'Stop listening'
                 : 'Start tuner — your device will ask for microphone permission if needed'
             }
           >
-            {live ? (
+            {starting ? 'Cancel request' : live ? (
               <>
                 <MicOff className="w-4 h-4" /> Stop
               </>

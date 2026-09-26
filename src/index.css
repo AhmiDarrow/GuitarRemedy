@@ -1,5 +1,12 @@
 @import "tailwindcss";
 
+/* Clear keyboard navigation and comfortable touch targets across PC/tablet. */
+.skip-to-content { position: fixed; left: 16px; top: -100px; z-index: 100; padding: 12px 18px; border-radius: 10px; background: #c8f560; color: #07110c; }
+.skip-to-content:focus { top: 16px; }
+:where(button, a, input, select, textarea):focus-visible { outline: 2px solid #c8f560; outline-offset: 4px; }
+@media (pointer: coarse) { :where(.btn-primary, .btn-secondary, .btn-ghost, .nav-link) { min-height: 44px; } }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; } }
+
 /* Dark Forest — same family as Remedy Desktop (void green · mint · lime) */
 @theme {
   --font-sans: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
@@ -454,3 +461,18 @@ textarea {
 .wiki-prose a {
   color: #5dffb0;
 }
+
+/* Lesson coaching: readable, quiet, and usable with a guitar in hand. */
+.coach-card {
+  padding: clamp(1rem, 3vw, 1.5rem);
+  border: 1px solid rgba(93, 255, 176, 0.25);
+  border-radius: 1.25rem;
+  background: linear-gradient(135deg, rgba(93, 255, 176, 0.07), rgba(7, 17, 12, 0.7));
+}
+.coach-eyebrow { color: var(--mint); font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; font-weight: 600; }
+.coach-recall { padding: 1rem; border: 1px solid var(--border); border-radius: 0.85rem; background: rgba(0, 0, 0, 0.18); }
+.coach-rating { display: flex; align-items: flex-start; gap: 0.65rem; padding: 1rem; border: 1px solid var(--border); border-radius: 0.85rem; cursor: pointer; }
+.coach-rating input { margin-top: 0.2rem; }
+.coach-rating:hover, .coach-rating.is-selected { border-color: var(--mint); background: rgba(93, 255, 176, 0.08); }
+.coach-note { width: 100%; padding: 0.8rem; border: 1px solid var(--border); border-radius: 0.85rem; background: var(--bg); color: var(--text); resize: vertical; font: inherit; }
+.coach-note::placeholder { color: var(--text-muted); opacity: 0.85; }

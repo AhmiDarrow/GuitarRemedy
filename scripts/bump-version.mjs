@@ -82,6 +82,8 @@ function writeAndroidGradle(rel) {
 
 console.log(`Bumping GuitarRemedy to ${ver}`)
 writeJsonVersion('package.json')
+writeJsonVersion('package-lock.json')
+writeJsonVersion('package-lock.json', ['packages', '', 'version'])
 writeJsonVersion('src-tauri/tauri.conf.json')
 writeCargoToml('src-tauri/Cargo.toml')
 writeAndroidGradle('android/app/build.gradle')

@@ -95,11 +95,11 @@ function minutesForPhase(phase: LessonPhase, day: number): number {
 function segmentPlan(total: number): Record<LessonSegment['id'], number> {
   // ~ private lesson timing
   const arrive = 2
-  const warmup = Math.max(4, Math.round(total * 0.15))
-  const teach = Math.max(5, Math.round(total * 0.18))
-  const guided = Math.max(8, Math.round(total * 0.3))
+  const warmup = Math.round(total * 0.15)
+  const teach = Math.round(total * 0.18)
+  const guided = Math.round(total * 0.3)
   const cooldown = 3
-  const jam = Math.max(5, total - arrive - warmup - teach - guided - cooldown)
+  const jam = total - arrive - warmup - teach - guided - cooldown
   return { arrive, warmup, teach, guided, jam, cooldown }
 }
 
@@ -122,7 +122,7 @@ function warmupFor(
         coach: dayCoach?.warmup ?? 'We start gentle. Buzz and muted notes are information, not failure.',
         youDo: [
           ...base,
-          'Finger taps on frets 1–4 of the high E, no rush.',
+          day === 1 ? 'Keep the fretting hand off the strings. Let each open note ring.' : 'Finger taps on frets 1–4 of the high E, no rush.',
           preview,
         ],
       }
@@ -182,9 +182,8 @@ function teachBlock(
   day: number,
   dayCoach?: DaySessionCoach,
 ): { coach: string; youDo: string[] } {
-  const coach =
-    dayCoach?.teach ??
-    `${seed.theoryBite} Take it at a tempo where your hands stay honest — clean first.`
+  // Use the full explanation; generated coach summaries can truncate the actual instruction.
+  const coach = `${seed.theoryBite} Try the idea slowly, then explain what you heard in your own words.`
   return {
     coach,
     youDo: [
@@ -275,7 +274,7 @@ function jamBlock(
       dayCoach?.jam ??
       `Jam time for "${topic}". Play something that sounds like music — not another drill checklist.`,
     youDo: [
-      pick(ideas[phase], day),
+      day === 1 ? 'Pluck low E on count 1, A on count 3, then D on the next count 1. Let the open strings ring and repeat.' : pick(ideas[phase], day),
       seed.goals[1] ? `Keep this nearby: ${seed.goals[1]}` : 'Keep your foot tapping the whole time.',
       'Last 60s: simplest clean version. Victory lap.',
     ],

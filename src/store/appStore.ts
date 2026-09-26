@@ -4,6 +4,7 @@ import type { TuningName } from '../lib/theory'
 import { STANDARD_TUNING, TUNINGS } from '../lib/theory'
 import { BPM_DEFAULT, clampPracticeBpm } from '../lib/tabScore'
 import { setPlaybackA4 } from '../lib/audio'
+import { localDate } from './lessonStore'
 
 export type Handedness = 'right' | 'left'
 
@@ -66,13 +67,13 @@ interface AppState {
 }
 
 function todayISO() {
-  return new Date().toISOString().slice(0, 10)
+  return localDate()
 }
 
 function yesterdayISO() {
   const d = new Date()
   d.setDate(d.getDate() - 1)
-  return d.toISOString().slice(0, 10)
+  return localDate(d)
 }
 
 export const useAppStore = create<AppState>()(

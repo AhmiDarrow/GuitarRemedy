@@ -42,12 +42,13 @@ export function AppShell() {
 
   return (
     <div className="min-h-dvh flex flex-col md:flex-row">
+      <a href="#main-content" className="skip-to-content">Skip to content</a>
       <aside className="hidden md:flex md:w-60 lg:w-64 shrink-0 flex-col border-r border-[var(--border)] bg-[var(--bg-elevated)]/80 backdrop-blur-xl sticky top-0 h-dvh">
         <div className="px-4 pt-5 pb-4">
           <AppMenu size="md" showTitle />
         </div>
 
-        <nav className="flex-1 px-3 space-y-0.5">
+        <nav aria-label="Main navigation" className="flex-1 px-3 space-y-0.5">
           {nav.map(({ to, label, icon: Icon, end }) => (
             <NavLink
               key={to}
@@ -81,12 +82,12 @@ export function AppShell() {
           </div>
         </header>
 
-        <main className="flex-1 px-4 py-5 md:px-8 md:py-8 max-w-6xl w-full mx-auto">
+        <main id="main-content" tabIndex={-1} className="flex-1 px-4 py-5 md:px-8 md:py-8 max-w-6xl w-full mx-auto">
           <Outlet />
         </main>
       </div>
 
-      <nav className="md:hidden fixed bottom-0 inset-x-0 z-40 glass border-t border-[var(--border)] safe-bottom">
+      <nav aria-label="Mobile navigation" className="md:hidden fixed bottom-0 inset-x-0 z-40 glass border-t border-[var(--border)] safe-bottom">
         <div className="flex justify-around items-stretch px-1 py-1">
           {mobileNav.map(({ to, label, icon: Icon, end }) => (
             <NavLink
