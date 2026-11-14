@@ -1,7 +1,19 @@
 # Changelog — GuitarRemedy
 
 All notable changes, grounded in `git log` (repo created 2026-08-21, `e8e497d`).
-On-disk version source of truth: `package.json` · `src-tauri/tauri.conf.json` · `src-tauri/Cargo.toml` (all synced by `node scripts/bump-version.mjs`).
+On-disk version source of truth: `package.json` · `src-tauri/tauri.conf.json` · `src-tauri/Cargo.toml` (+ lockfiles; all synced by `node scripts/bump-version.mjs`).
+
+## [0.2.2] — 2026-11-14
+
+- Number fields (BPM, A4, custom tuning, tab-editor tempo, fret, and timing) accept typed values instead of snapping to the limit after the first digit.
+- Changing the tuner's A4 no longer restarts the microphone on every keystroke; A4 accepts the full 400–480 Hz range.
+- The tuner releases the microphone if it cannot start, keeps a steadier reading, and quiet-room calibration listens to a full second of the room.
+- Editing a note's start beat or string in the tab editor keeps that note selected.
+- The metronome and tab player return to idle when another player takes over the audio, instead of showing a stale Stop button.
+- Older or hand-made `.grtab.json` files import cleanly instead of breaking the Library.
+- If the device cannot save Your tabs (storage full or blocked), the app now says so and suggests exporting a copy.
+- Exports (`.grtab.json`, MIDI, ASCII tab) download reliably in more browsers and the Android app.
+- Security updates for the Android app runtime.
 
 ## [0.2.1] — 2026-09-26
 

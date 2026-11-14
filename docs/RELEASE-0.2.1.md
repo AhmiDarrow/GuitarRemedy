@@ -8,4 +8,4 @@ The goal, practice steps, guitar map, and self-check take priority. Longer pract
 
 This update also corrects the Am-to-E shape explanation, makes power-chord finger positions explicit, and removes stale instructions from the generated coaching copy. Existing lesson notes, checkboxes, reviews, and completions are preserved.
 
-Validation: 293 frontend tests, production builds, Rust tests, and browser checks at desktop and phone widths. Android is a debug APK for sideloading. Windows supports the signed in-app updater under About → Check for updates.
+Android is a debug APK for sideloading. Windows supports the signed in-app updater under About → Check for updates.
