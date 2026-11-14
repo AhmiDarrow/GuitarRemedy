@@ -14,6 +14,8 @@ interface UserTabsState {
   tabs: UserTab[]
   hydrated: boolean
   activeTabId: string | null
+  /** Set when the last write to device storage failed (e.g. storage full). */
+  persistError: string | null
   hydrate: () => void
   upsertTab: (tab: UserTab) => void
   saveFromBreakdown: (
@@ -25,6 +27,9 @@ interface UserTabsState {
   importGrTabJson: (text: string) => UserTab | null
   getById: (id: string) => UserTab | undefined
 }
+
+export const PERSIST_ERROR =
+  'Could not save Your tabs on this device (storage full or blocked). Export a .grtab.json copy so nothing is lost, or delete old tabs and try again.'
 
 function ensureHydrated(
   get: () => UserTabsState,
@@ -42,14 +47,20 @@ export const useUserTabsStore = create<UserTabsState>((set, get) => ({
   tabs: [],
   hydrated: false,
   activeTabId: null,
+  persistError: null,
   hydrate: () => {
     ensureHydrated(get, set)
   },
   upsertTab: (tab) => {
     const cur = ensureHydrated(get, set)
     const next = upsertUserTab(cur, tab)
-    saveUserTabs(next)
-    set({ tabs: next, hydrated: true, activeTabId: tab.id })
+    const persisted = saveUserTabs(next)
+    set({
+      tabs: next,
+      hydrated: true,
+      activeTabId: tab.id,
+      persistError: persisted ? null : PERSIST_ERROR,
+    })
   },
   saveFromBreakdown: (b, opts) => {
     const sourceName = typeof opts === 'string' ? opts : opts?.sourceName
@@ -63,9 +74,9 @@ export const useUserTabsStore = create<UserTabsState>((set, get) => ({
   removeTab: (id) => {
     const cur = ensureHydrated(get, set)
     const next = removeUserTab(cur, id)
-    saveUserTabs(next)
+    const persisted = saveUserTabs(next)
     const active = get().activeTabId === id ? null : get().activeTabId
-    set({ tabs: next, activeTabId: active })
+    set({ tabs: next, activeTabId: active, persistError: persisted ? null : PERSIST_ERROR })
   },
   setActiveTabId: (id) => set({ activeTabId: id }),
   importGrTabJson: (text) => {

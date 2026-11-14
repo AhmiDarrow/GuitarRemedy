@@ -147,6 +147,7 @@ export function LibraryPage() {
   const removeTab = useUserTabsStore((s) => s.removeTab)
   const getTuning = useAppStore((s) => s.getTuning)
   const upsertTab = useUserTabsStore((s) => s.upsertTab)
+  const persistError = useUserTabsStore((s) => s.persistError)
   const activeTabId = useUserTabsStore((s) => s.activeTabId)
   const setActiveTabId = useUserTabsStore((s) => s.setActiveTabId)
   const [selectedId, setSelectedId] = useState<string | null>(
@@ -422,7 +423,11 @@ export function LibraryPage() {
         </div>
       </header>
 
-      {importMsg ? <p className="text-sm text-mint px-1">{importMsg}</p> : null}
+      {persistError ? (
+        <p role="alert" className="text-sm text-rose/90 bg-rose/10 border border-rose/25 rounded-xl px-3 py-2">{persistError}</p>
+      ) : importMsg ? (
+        <p className="text-sm text-mint px-1">{importMsg}</p>
+      ) : null}
 
       <div className="flex flex-col lg:flex-row gap-5">
         <aside className="lg:w-96 shrink-0 space-y-3">

@@ -3,6 +3,8 @@
 import type { LibraryItem, TabMeasure, TabNote, TabSong } from '../data/library'
 import type { RemedyBreakdown, TabNote as ScoreNote, TabScore } from './breakdown'
 import { buildSimpleMidi } from './midi'
+import { triggerBlobDownload } from './download'
+import { tabSongToScore } from './tabScore'
 
 export interface UserTab {
   id: string
@@ -231,13 +233,8 @@ export function downloadUserTabFile(tab: UserTab, filename?: string) {
   const payload = userTabToExportPayload(tab)
   const json = JSON.stringify(payload, null, 2)
   const blob = new Blob([json], { type: 'application/json' })
-  const url = URL.createObjectURL(blob)
-  const a = document.createElement('a')
   const base = (filename || tab.title || 'tab').replace(/[^\w\-]+/g, '_').slice(0, 48)
-  a.href = url
-  a.download = base.endsWith('.grtab.json') ? base : `${base}.grtab.json`
-  a.click()
-  URL.revokeObjectURL(url)
+  triggerBlobDownload(blob, base.endsWith('.grtab.json') ? base : `${base}.grtab.json`)
 }
 
 /**
@@ -286,13 +283,8 @@ export function userTabToAscii(tab: UserTab, opts?: { colsPerBeat?: number }): s
 export function downloadAsciiTab(tab: UserTab, filename?: string) {
   const text = userTabToAscii(tab)
   const blob = new Blob([text], { type: 'text/plain' })
-  const url = URL.createObjectURL(blob)
-  const a = document.createElement('a')
   const base = (filename || tab.title || 'tab').replace(/[^\w\-]+/g, '_').slice(0, 48)
-  a.href = url
-  a.download = `${base}.txt`
-  a.click()
-  URL.revokeObjectURL(url)
+  triggerBlobDownload(blob, `${base}.txt`)
 }
 
 const DEFAULT_EXPORT_TPQ = 480
@@ -333,35 +325,61 @@ export function userTabToMidiBytes(tab: UserTab, tpq = DEFAULT_EXPORT_TPQ): Arra
 export function downloadUserTabMidi(tab: UserTab, filename?: string) {
   const bytes = userTabToMidiBytes(tab)
   const blob = new Blob([bytes], { type: 'audio/midi' })
-  const url = URL.createObjectURL(blob)
-  const a = document.createElement('a')
   const base = (filename || tab.title || 'tab').replace(/[^\w\-]+/g, '_').slice(0, 48)
-  a.href = url
-  a.download = base.endsWith('.mid') ? base : `${base}.mid`
-  a.click()
-  URL.revokeObjectURL(url)
+  triggerBlobDownload(blob, base.endsWith('.mid') ? base : `${base}.mid`)
+}
+
+/**
+ * Fill in fields that hand-made or older `.grtab.json` files may omit so the
+ * Library, editor, and exports never touch `undefined` (e.g. a missing score).
+ * Returns null when there is no usable tab body.
+ */
+export function normalizeUserTab(raw: unknown): UserTab | null {
+  if (!raw || typeof raw !== 'object') return null
+  const t = raw as Partial<UserTab>
+  if (typeof t.id !== 'string' || !t.id.trim()) return null
+  if (!t.tab || typeof t.tab !== 'object' || !Array.isArray(t.tab.measures)) return null
+  const now = new Date().toISOString()
+  const title =
+    typeof t.title === 'string' && t.title.trim()
+      ? t.title
+      : typeof t.tab.title === 'string' && t.tab.title.trim()
+        ? t.tab.title
+        : 'Untitled tab'
+  const tempoBpm =
+    typeof t.tempoBpm === 'number' && Number.isFinite(t.tempoBpm) && t.tempoBpm > 0
+      ? t.tempoBpm
+      : typeof t.tab.tempo === 'number' && t.tab.tempo > 0
+        ? t.tab.tempo
+        : 100
+  const score: TabScore =
+    t.score && typeof t.score === 'object' && Array.isArray(t.score.notes)
+      ? t.score
+      : tabSongToScore(t.tab)
+  return {
+    ...t,
+    id: t.id,
+    title,
+    createdAt: typeof t.createdAt === 'string' && t.createdAt ? t.createdAt : now,
+    updatedAt: typeof t.updatedAt === 'string' && t.updatedAt ? t.updatedAt : now,
+    sourceKind: t.sourceKind ?? 'midi',
+    tempoBpm,
+    tab: t.tab,
+    score,
+    tags: Array.isArray(t.tags) ? t.tags.filter((x): x is string => typeof x === 'string') : [],
+  }
 }
 
 export function parseImportedTabFile(text: string): UserTab | null {
   try {
     const data = JSON.parse(text) as GrTabFile | UserTab
     if (data && typeof data === 'object' && 'format' in data && data.format === 'guitar-remedy-tab') {
-      const t = data.tab
-      if (t?.id && t?.tab?.measures) return t as UserTab
+      return normalizeUserTab(data.tab)
     }
-    if (
-      data &&
-      typeof data === 'object' &&
-      'id' in data &&
-      'tab' in data &&
-      (data as UserTab).tab?.measures
-    ) {
-      return data as UserTab
-    }
+    return normalizeUserTab(data)
   } catch {
     return null
   }
-  return null
 }
 
 /** Alias used by store / Library import UI */
@@ -374,19 +392,23 @@ export function loadUserTabs(): UserTab[] {
   try {
     const raw = localStorage.getItem(STORAGE_KEY)
     if (!raw) return []
-    const data = JSON.parse(raw) as UserTab[]
-    return Array.isArray(data) ? data.filter((t) => t?.id && t?.tab?.measures) : []
+    const data = JSON.parse(raw) as unknown
+    if (!Array.isArray(data)) return []
+    return data.map(normalizeUserTab).filter((t): t is UserTab => t != null)
   } catch {
     return []
   }
 }
 
-export function saveUserTabs(tabs: UserTab[]): void {
-  if (typeof localStorage === 'undefined') return
+/** Persist Your tabs. Returns false when storage is full or unavailable. */
+export function saveUserTabs(tabs: UserTab[]): boolean {
+  if (typeof localStorage === 'undefined') return false
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(tabs))
+    return true
   } catch {
-    // quota / private mode
+    // quota exceeded / private mode
+    return false
   }
 }
 
@@ -411,7 +433,7 @@ export function userTabToLibraryItem(t: UserTab): LibraryItem {
     key: t.keyLabel,
     genre: 'User convert',
     tags: t.tags,
-    description: `Saved ${t.sourceKind} convert · ${t.score.notes?.length ?? 0} notes · ${new Date(t.createdAt).toLocaleString()}`,
+    description: `Saved ${t.sourceKind} convert · ${t.score?.notes?.length ?? 0} notes · ${new Date(t.createdAt).toLocaleString()}`,
     tab: t.tab,
     openLicense: true,
   }

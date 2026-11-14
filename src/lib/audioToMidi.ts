@@ -12,6 +12,7 @@
  */
 
 import { buildSimpleMidi, parseMidi, type MidiNote, type MidiParseResult } from './midi'
+import { triggerBlobDownload } from './download'
 import {
   basicPitchAvailable,
   notesFromBasicPitch,
@@ -2163,14 +2164,8 @@ export function detectedToMidiNotes(notes: DetectedNote[], tpq = DEFAULT_TPQ): M
 
 /** Trigger browser download of converted MIDI. */
 export function downloadMidiBytes(bytes: ArrayBuffer, filename = 'converted.mid') {
-  if (typeof document === 'undefined') return
   const blob = new Blob([bytes], { type: 'audio/midi' })
-  const url = URL.createObjectURL(blob)
-  const a = document.createElement('a')
-  a.href = url
-  a.download = filename.endsWith('.mid') ? filename : `${filename}.mid`
-  a.click()
-  URL.revokeObjectURL(url)
+  triggerBlobDownload(blob, filename.endsWith('.mid') ? filename : `${filename}.mid`)
 }
 
 /** Synthetic mono tone for tests (no Web Audio needed). */

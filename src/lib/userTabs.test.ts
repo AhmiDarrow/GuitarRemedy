@@ -3,6 +3,7 @@ import {
   breakdownToTabSong,
   breakdownToUserTab,
   loadUserTabs,
+  normalizeUserTab,
   parseGrTabFile,
   removeUserTab,
   saveUserTabs,
@@ -10,6 +11,7 @@ import {
   upsertUserTab,
   userTabToAscii,
   userTabToExportPayload,
+  userTabToLibraryItem,
   userTabToMidiBytes,
   type UserTab,
 } from './userTabs'
@@ -296,5 +298,59 @@ describe('userTabs', () => {
     const secondFret = body.search(/3/)
     expect(secondFret).toBeGreaterThan(firstFret + 2)
     expect(body.slice(firstFret + 1, secondFret)).toMatch(/-/)
+  })
+
+  it('imports a hand-made .grtab.json without a score and builds one from the tab', () => {
+    const file = {
+      format: 'guitar-remedy-tab',
+      version: 1,
+      tab: {
+        id: 'user-hand-made',
+        title: 'Hand made',
+        tab: {
+          title: 'Hand made',
+          tempo: 90,
+          timeSig: [4, 4],
+          measures: [{ notes: [{ string: 0, fret: 3, duration: 1, start: 0 }] }],
+        },
+      },
+    }
+    const parsed = parseGrTabFile(JSON.stringify(file))
+    expect(parsed).not.toBeNull()
+    expect(parsed!.score.notes).toHaveLength(1)
+    expect(parsed!.tags).toEqual([])
+    expect(parsed!.tempoBpm).toBe(90)
+    expect(() => userTabToLibraryItem(parsed!)).not.toThrow()
+    expect(() => userTabToMidiBytes(parsed!)).not.toThrow()
+  })
+
+  it('normalizeUserTab rejects entries without an id or tab body', () => {
+    expect(normalizeUserTab(null)).toBeNull()
+    expect(normalizeUserTab({ id: 'x' })).toBeNull()
+    expect(normalizeUserTab({ tab: { measures: [] } })).toBeNull()
+  })
+
+  it('loadUserTabs repairs stored tabs that are missing fields', () => {
+    mem.set(
+      'guitarremedy.userTabs.v1',
+      JSON.stringify([{ id: 'user-old', tab: { title: 'Old', tempo: 80, timeSig: [3, 4], measures: [] } }, 7]),
+    )
+    const loaded = loadUserTabs()
+    expect(loaded).toHaveLength(1)
+    expect(loaded[0].title).toBe('Old')
+    expect(Array.isArray(loaded[0].score.notes)).toBe(true)
+  })
+
+  it('saveUserTabs reports when device storage rejects the write', () => {
+    const prev = ls.setItem
+    ls.setItem = () => {
+      throw new Error('QuotaExceededError')
+    }
+    try {
+      expect(saveUserTabs([])).toBe(false)
+    } finally {
+      ls.setItem = prev
+    }
+    expect(saveUserTabs([])).toBe(true)
   })
 })

@@ -71,6 +71,7 @@ export function UploadPage() {
   const getTuning = useAppStore((s) => s.getTuning)
   const a4 = useAppStore((s) => s.a4)
   const saveFromBreakdown = useUserTabsStore((s) => s.saveFromBreakdown)
+  const persistError = useUserTabsStore((s) => s.persistError)
   const userTabCount = useUserTabsStore((s) => s.tabs.length)
   const [breakdown, setBreakdown] = useState<RemedyBreakdown | null>(null)
   const [savedTab, setSavedTab] = useState<UserTab | null>(null)
@@ -576,7 +577,12 @@ export function UploadPage() {
                     </button>
                   </div>
                 </div>
-                {savedTab && (
+                {savedTab && persistError ? (
+                  <p role="alert" className="mt-3 rounded-xl border border-rose/25 bg-rose/10 px-3 py-2 text-sm text-rose/90">
+                    {persistError}
+                  </p>
+                ) : null}
+                {savedTab && !persistError && (
                   <div className="mt-3 flex flex-wrap items-center gap-2 rounded-xl border border-mint/30 bg-mint/10 px-3 py-2 text-sm">
                     <CheckCircle2 className="w-4 h-4 text-mint shrink-0" />
                     <span className="text-mint font-medium min-w-0 truncate">
