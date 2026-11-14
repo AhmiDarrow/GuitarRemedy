@@ -13,7 +13,7 @@ On-disk version source of truth: `package.json` · `src-tauri/tauri.conf.json` �
 - Older or hand-made `.grtab.json` files import cleanly instead of breaking the Library.
 - If the device cannot save Your tabs (storage full or blocked), the app now says so and suggests exporting a copy.
 - Exports (`.grtab.json`, MIDI, ASCII tab) download reliably in more browsers and the Android app.
-- Security updates for the Android app runtime.
+- Security updates for the Android app runtime and the desktop app's secure connections (used for update checks).
 
 ## [0.2.1] — 2026-09-26
 

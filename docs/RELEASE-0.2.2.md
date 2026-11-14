@@ -10,6 +10,6 @@ This update fixes the small things that got in the way while practicing.
 
 **Your tabs.** Older or hand-made `.grtab.json` files import cleanly. If your device can't store a tab (for example, storage is full), the app tells you and suggests exporting a copy so nothing is lost. Exports download reliably in more browsers and in the Android app.
 
-**Security.** The Android app runtime includes the latest security fixes.
+**Security.** The Android app runtime and the desktop app's secure connections (used for update checks) include the latest security fixes.
 
 Your lesson progress, notes, reviews, and saved tabs carry over unchanged. Android is a debug APK for sideloading. Windows installs update in place via About → Check for updates.
