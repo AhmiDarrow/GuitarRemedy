@@ -73,7 +73,8 @@ function readWavPcm(path: string): { samples: Float32Array; sampleRate: number }
 
 const required = ['a4_tone.wav', 'c_major_scale.wav', 'ode_to_joy_melody.wav', 'twinkle_melody.wav']
 
-describe('sample WAV → MIDI → guitar tabs', () => {
+// Real DSP on full WAV files: allow headroom on loaded CI runners.
+describe('sample WAV → MIDI → guitar tabs', { timeout: 60_000 }, () => {
   it('has free sample files on disk', () => {
     expect(existsSync(samplesDir)).toBe(true)
     const names = readdirSync(samplesDir)
