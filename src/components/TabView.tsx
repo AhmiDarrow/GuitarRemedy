@@ -7,6 +7,7 @@ import {
   cancelDraw,
   claimAudioSession,
   ensureAudio,
+  onAudioSessionChange,
   playNote,
   releaseAudioSession,
   scheduleDraw,
@@ -99,6 +100,24 @@ export function TabView({ score, className, title, stopToken, onPlayingChange }:
   }, [stopToken])
 
   useEffect(() => () => stop(), [])
+
+  // Metronome / scale playback took the audio session and silenced this tab:
+  // reset the transport UI (audio is already stopped by the new owner).
+  const playingRef = useRef(false)
+  playingRef.current = playing
+  useEffect(
+    () =>
+      onAudioSessionChange((owner) => {
+        if (owner === 'tabs' || !playingRef.current) return
+        stopRef.current = true
+        runIdRef.current += 1
+        clearEndTimer()
+        setPlayingState(false)
+        setCursor(-1)
+      }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [],
+  )
 
   const play = async () => {
     if (playing || columns.length === 0) return
