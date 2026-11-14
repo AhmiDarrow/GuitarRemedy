@@ -10,7 +10,9 @@ import {
   type Subdivision,
   type TimeBeats,
 } from '../lib/metronome'
+import { onAudioSessionChange } from '../lib/audio'
 import { useAppStore } from '../store/appStore'
+import { NumberInput } from './NumberInput'
 
 const BEATS: TimeBeats[] = [2, 3, 4, 5, 6, 7]
 const SUBS: { v: Subdivision; label: string }[] = [
@@ -89,6 +91,20 @@ export function MetronomePanel() {
       void stopMetronome()
     }
   }, [])
+
+  // Scale / chord / tab playback claims the audio session and silences the
+  // click; reflect that here instead of showing a running metronome.
+  useEffect(
+    () =>
+      onAudioSessionChange((owner) => {
+        if (owner === 'metronome') return
+        setRunning(false)
+        setMetronomeOn(false)
+        setPulse(0)
+        setCountingIn(false)
+      }),
+    [setMetronomeOn],
+  )
 
   const tapTempo = () => {
     const now = performance.now()
@@ -170,13 +186,14 @@ export function MetronomePanel() {
             >
               <Minus className="w-4 h-4" />
             </button>
-            <input
-              type="number"
+            <NumberInput
+              integer
+              aria-label="Beats per minute"
               className="input !py-2 !text-lg font-display font-bold w-20 text-center"
               value={bpm}
               min={30}
               max={300}
-              onChange={(e) => setBpm(Number(e.target.value))}
+              onCommit={setBpm}
             />
             <button
               type="button"

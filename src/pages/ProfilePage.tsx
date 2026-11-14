@@ -12,6 +12,7 @@ import {
   ScrollText,
   Upload,
 } from 'lucide-react'
+import { NumberInput } from '../components/NumberInput'
 import { useAppStore } from '../store/appStore'
 import { useUserTabsStore } from '../store/userTabsStore'
 import { TUNINGS, type TuningName } from '../lib/theory'
@@ -263,15 +264,15 @@ export function ProfilePage() {
               {['E', 'A', 'D', 'G', 'B', 'e'].map((label, i) => (
                 <label key={label} className="block text-[10px] text-[var(--text-muted)]">
                   {label}
-                  <input
-                    type="number"
+                  <NumberInput
+                    integer
                     className="input mt-0.5 !py-1.5 !text-sm"
                     min={28}
                     max={88}
                     value={customTuning[i] ?? getTuning()[i] ?? 40}
-                    onChange={(e) => {
+                    onCommit={(n) => {
                       const next = [...(customTuning.length === 6 ? customTuning : getTuning())]
-                      next[i] = Number(e.target.value) || next[i]
+                      next[i] = n
                       setCustomTuning(next)
                     }}
                   />
@@ -283,13 +284,13 @@ export function ProfilePage() {
 
         <label className="block text-xs text-[var(--text-muted)]">
           Play-along A4 (Hz)
-          <input
-            type="number"
+          <NumberInput
+            integer
             className="input mt-1"
-            min={415}
-            max={466}
+            min={400}
+            max={480}
             value={a4}
-            onChange={(e) => setA4(Number(e.target.value) || 440)}
+            onCommit={setA4}
           />
           <span className="block text-[10px] mt-1 text-[var(--text-muted)]">
             Scales, tabs, and tones. Tuner A4 is set inside the tuner.
@@ -308,13 +309,13 @@ export function ProfilePage() {
 
         <label className="block text-xs text-[var(--text-muted)]">
           Default BPM
-          <input
-            type="number"
+          <NumberInput
+            integer
             className="input mt-1"
             min={30}
             max={300}
             value={bpm}
-            onChange={(e) => setBpm(Number(e.target.value) || 80)}
+            onCommit={setBpm}
           />
           <span className="block text-[10px] mt-1 text-[var(--text-muted)]">
             Shared by metronome, scale play, and tab playback (30–300).

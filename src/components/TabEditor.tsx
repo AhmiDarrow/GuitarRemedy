@@ -21,9 +21,10 @@ import {
   lockLeadMono,
   reFretScore,
   setScoreTempo,
-  updateScoreNote,
+  updateScoreNoteTracked,
   type NotePatch,
 } from '../lib/tabEdit'
+import { NumberInput } from './NumberInput'
 import { TabView } from './TabView'
 import type { FretPositionPrefer } from '../lib/theory'
 
@@ -90,7 +91,10 @@ export function TabEditor({
 
   const patchSelected = (patch: NotePatch) => {
     if (safeIndex < 0) return
-    setDraft((s) => updateScoreNote(s, safeIndex, patch))
+    // Editing start beat / string re-sorts notes; keep the edited note selected.
+    const next = updateScoreNoteTracked(draft, safeIndex, patch)
+    setDraft(next.score)
+    setSelected(next.index)
   }
 
   const scrubToSelected = () => {
@@ -112,12 +116,12 @@ export function TabEditor({
           </h3>
           <label className="text-xs text-[var(--text-muted)] flex items-center gap-2">
             Tempo
-            <input
-              type="number"
+            <NumberInput
+              integer
               min={30}
               max={300}
               value={draft.tempo ?? 100}
-              onChange={(e) => setDraft((s) => setScoreTempo(s, Number(e.target.value)))}
+              onCommit={(n) => setDraft((s) => setScoreTempo(s, n))}
               className="w-16 rounded-lg bg-[var(--bg-elevated)] border border-[var(--border)] px-2 py-1 text-[var(--text)]"
             />
           </label>
@@ -336,35 +340,33 @@ export function TabEditor({
                 </label>
                 <label className="block text-xs text-[var(--text-muted)]">
                   Fret
-                  <input
-                    type="number"
+                  <NumberInput
+                    integer
                     min={0}
                     max={24}
                     className="mt-1 w-full rounded-lg bg-[var(--bg)] border border-[var(--border)] px-2 py-1.5 text-[var(--text)]"
                     value={current.fret}
-                    onChange={(e) => patchSelected({ fret: Number(e.target.value) })}
+                    onCommit={(n) => patchSelected({ fret: n })}
                   />
                 </label>
                 <label className="block text-xs text-[var(--text-muted)]">
                   Start beat
-                  <input
-                    type="number"
+                  <NumberInput
                     min={0}
                     step={0.25}
                     className="mt-1 w-full rounded-lg bg-[var(--bg)] border border-[var(--border)] px-2 py-1.5 text-[var(--text)]"
                     value={current.time}
-                    onChange={(e) => patchSelected({ time: Number(e.target.value) })}
+                    onCommit={(n) => patchSelected({ time: n })}
                   />
                 </label>
                 <label className="block text-xs text-[var(--text-muted)]">
                   Duration (beats)
-                  <input
-                    type="number"
+                  <NumberInput
                     min={0.05}
                     step={0.25}
                     className="mt-1 w-full rounded-lg bg-[var(--bg)] border border-[var(--border)] px-2 py-1.5 text-[var(--text)]"
                     value={current.duration}
-                    onChange={(e) => patchSelected({ duration: Number(e.target.value) })}
+                    onCommit={(n) => patchSelected({ duration: n })}
                   />
                 </label>
                 <label className="block text-xs text-[var(--text-muted)]">

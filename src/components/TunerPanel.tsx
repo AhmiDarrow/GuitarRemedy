@@ -13,6 +13,7 @@ import { playMidiNote, setPlaybackA4 } from '../lib/audio'
 import { useAppStore } from '../store/appStore'
 import { useTunerStore } from '../store/tunerStore'
 import { TUNINGS, type TuningName } from '../lib/theory'
+import { NumberInput } from './NumberInput'
 
 const empty: TunerReading = {
   hz: 0,
@@ -481,15 +482,15 @@ export function TunerPanel() {
               {['E', 'A', 'D', 'G', 'B', 'e'].map((label, i) => (
                 <label key={label} className="block text-[10px] text-[var(--text-muted)]">
                   {label}
-                  <input
-                    type="number"
+                  <NumberInput
+                    integer
                     className="input mt-0.5 !py-1.5 !text-sm"
                     min={28}
                     max={88}
                     value={customTuning[i] ?? tuning[i] ?? 40}
-                    onChange={(e) => {
+                    onCommit={(n) => {
                       const next = [...(customTuning.length === 6 ? customTuning : tuning)]
-                      next[i] = Number(e.target.value) || next[i]
+                      next[i] = n
                       setCustomTuning(next)
                     }}
                   />
@@ -500,12 +501,12 @@ export function TunerPanel() {
           <div className="flex flex-wrap items-center gap-3">
             <label className="flex items-center gap-2 text-xs text-[var(--text-muted)]">
               A4 (Hz)
-              <input
-                type="number"
-                min={415}
-                max={466}
+              <NumberInput
+                integer
+                min={400}
+                max={480}
                 value={a4}
-                onChange={(e) => setA4(Number(e.target.value) || 440)}
+                onCommit={setA4}
                 className="w-16 rounded-lg bg-[rgba(3,12,8,0.6)] border border-[var(--border)] px-2 py-1 text-[var(--text)] tabular-nums"
               />
             </label>

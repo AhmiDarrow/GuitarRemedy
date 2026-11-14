@@ -196,9 +196,29 @@ export function sortScoreNotes(notes: TabNote[]): TabNote[] {
 }
 
 export function updateScoreNote(score: TabScore, index: number, patch: NotePatch): TabScore {
-  if (index < 0 || index >= score.notes.length) return score
-  const notes = score.notes.map((n, i) => (i === index ? applyNotePatch(n, patch) : n))
-  return { ...score, notes: sortScoreNotes(notes) }
+  return updateScoreNoteTracked(score, index, patch).score
+}
+
+/**
+ * Patch one note and report where it lands after re-sorting by time/string,
+ * so editors can keep the edited note selected when its start or string moves.
+ */
+export function updateScoreNoteTracked(
+  score: TabScore,
+  index: number,
+  patch: NotePatch,
+): { score: TabScore; index: number } {
+  if (index < 0 || index >= score.notes.length) return { score, index }
+  const tagged = score.notes.map((n, i) => ({
+    note: normalizeNote(i === index ? applyNotePatch(n, patch) : n),
+    edited: i === index,
+  }))
+  // Same ordering as sortScoreNotes (stable sort on time, then string).
+  tagged.sort((a, b) => a.note.time - b.note.time || a.note.string - b.note.string)
+  return {
+    score: { ...score, notes: tagged.map((t) => t.note) },
+    index: tagged.findIndex((t) => t.edited),
+  }
 }
 
 export function deleteScoreNote(score: TabScore, index: number): TabScore {

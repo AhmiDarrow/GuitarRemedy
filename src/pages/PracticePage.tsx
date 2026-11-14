@@ -4,6 +4,7 @@ import { Fretboard } from '../components/Fretboard'
 import { ScalePicker } from '../components/ScalePicker'
 import { MetronomePanel } from '../components/MetronomePanel'
 import { TunerPanel } from '../components/TunerPanel'
+import { NumberInput } from '../components/NumberInput'
 import {
   midisToPitchClasses,
   playScale,
@@ -265,13 +266,13 @@ export function PracticePage() {
                 BPM
                 <div className="flex items-center gap-2">
                   <Gauge className="w-3.5 h-3.5 text-mint/70" />
-                  <input
-                    type="number"
+                  <NumberInput
+                    integer
                     className="input !py-2 !text-sm w-20"
                     value={bpm}
                     min={30}
                     max={300}
-                    onChange={(e) => setBpm(Number(e.target.value))}
+                    onCommit={setBpm}
                   />
                 </div>
               </label>

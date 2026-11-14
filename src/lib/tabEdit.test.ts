@@ -14,6 +14,7 @@ import {
   reFretScore,
   setScoreTempo,
   updateScoreNote,
+  updateScoreNoteTracked,
 } from './tabEdit'
 import { breakdownToUserTab } from './userTabs'
 
@@ -144,5 +145,23 @@ describe('tabEdit', () => {
     const open = reFretScore(score, 'open')
     expect(open.notes.every((n) => n.fret >= 0 && n.fret <= 17)).toBe(true)
     expect(open.preferPosition).toBe('open')
+  })
+
+  it('updateScoreNoteTracked follows the edited note after re-sorting', () => {
+    const score = {
+      notes: [
+        { string: 0, fret: 0, time: 0, duration: 1, midi: 64 },
+        { string: 0, fret: 2, time: 1, duration: 1, midi: 66 },
+        { string: 0, fret: 3, time: 2, duration: 1, midi: 67 },
+      ],
+    }
+    // Move the first note after the others: it must stay selected.
+    const moved = updateScoreNoteTracked(score, 0, { time: 3 })
+    expect(moved.index).toBe(2)
+    expect(moved.score.notes[moved.index].time).toBe(3)
+    expect(moved.score.notes[moved.index].fret).toBe(0)
+    expect(moved.score.notes.map((n) => n.time)).toEqual([1, 2, 3])
+    // Same ordering as the plain helper.
+    expect(updateScoreNote(score, 0, { time: 3 })).toEqual(moved.score)
   })
 })
