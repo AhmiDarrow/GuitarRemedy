@@ -757,7 +757,9 @@ class GuitarRemedyTunerProcessor extends AudioWorkletProcessor {
     this.port.onmessage = (e) => {
       if (e.data && e.data.fftSize) {
         const n = e.data.fftSize | 0
-        if (n === 2048 || n === 4096 || n === 8192) {
+        // Only resize on a real change — resetting on every message would
+        // discard the partially filled window and add latency.
+        if (n !== this._fft && (n === 2048 || n === 4096 || n === 8192)) {
           this._fft = n
           this._buf = new Float32Array(n)
           this._pos = 0
@@ -799,15 +801,28 @@ export async function startLiveTuner(
   // User-gesture entry (Listen) → OS/browser mic prompt (Android needs RECORD_AUDIO).
   const stream = await requestTunerMicrophone()
 
-
-  const ctx = new AudioContext()
+  // If the audio graph cannot be built, release the mic instead of leaving it
+  // open (recording indicator stuck on) with no tuner running.
+  let graphCtx: AudioContext | null = null
+  let source: MediaStreamAudioSourceNode
   try {
-    await ctx.resume()
-  } catch {
-    /* ignore */
+    graphCtx = new AudioContext()
+    try {
+      await graphCtx.resume()
+    } catch {
+      /* ignore */
+    }
+    source = graphCtx.createMediaStreamSource(stream)
+  } catch (err) {
+    for (const t of stream.getTracks()) t.stop()
+    void graphCtx?.close().catch(() => {})
+    throw new Error(
+      err instanceof Error && err.message
+        ? `Could not start the tuner audio: ${err.message}`
+        : 'Could not start the tuner audio. Try again.',
+    )
   }
-
-  const source = ctx.createMediaStreamSource(stream)
+  const ctx: AudioContext = graphCtx
 
   let smoothC = 0
   let hasSmooth = false
@@ -1014,6 +1029,7 @@ export async function startLiveTuner(
 
   // Try AudioWorklet first
   let usedWorklet = false
+  let postedFft = TUNER_FFT_HUNT
   try {
     const blob = new Blob([TUNER_WORKLET_CODE], { type: 'application/javascript' })
     const url = URL.createObjectURL(blob)
@@ -1031,9 +1047,12 @@ export async function startLiveTuner(
       if (stopped) return
       const data = ev.data
       if (data && data.length) handleFrame(data, ctx.sampleRate)
-      // Adaptive window size message
+      // Adaptive window size message — only when the wanted size changes
       const want = useLockedFft ? TUNER_FFT_LOCKED : TUNER_FFT_HUNT
-      workletNode?.port.postMessage({ fftSize: want })
+      if (want !== postedFft) {
+        postedFft = want
+        workletNode?.port.postMessage({ fftSize: want })
+      }
     }
     usedWorklet = true
     cleanupExtra = () => {
@@ -1061,16 +1080,11 @@ export async function startLiveTuner(
       if (analyser && analyser.fftSize !== fft) {
         analyser.fftSize = fft
       }
-      const size = analyser?.fftSize ?? TUNER_FFT_HUNT
-      if (buf.length !== size) {
-        // re-alloc
-        const b = new Float32Array(size)
-        analyser?.getFloatTimeDomainData(b)
-        handleFrame(b, ctx.sampleRate)
-      } else {
-        analyser?.getFloatTimeDomainData(buf)
-        handleFrame(buf.subarray(0, size), ctx.sampleRate)
-      }
+      const size = Math.min(buf.length, analyser?.fftSize ?? TUNER_FFT_HUNT)
+      // Reuse one buffer (no per-frame allocation at 60 fps).
+      const view = buf.subarray(0, size)
+      analyser?.getFloatTimeDomainData(view)
+      handleFrame(view, ctx.sampleRate)
       raf = requestAnimationFrame(tick)
     }
     raf = requestAnimationFrame(tick)
@@ -1097,7 +1111,7 @@ export async function startLiveTuner(
     } catch {
       /* ignore */
     }
-    void ctx.close()
+    void ctx.close().catch(() => {})
     for (const t of stream.getTracks()) t.stop()
   }
 
@@ -1109,7 +1123,13 @@ export async function startLiveTuner(
   return stop
 }
 
-/** Collect N samples from a media source (for noise calibrate). */
+/**
+ * Collect ~N fresh samples from a media source (for noise calibrate).
+ * Each animation frame copies only the audio that arrived since the previous
+ * frame, so "1 second" really samples one second of the room rather than
+ * re-reading overlapping analyser windows. A timer fallback keeps it finishing
+ * when animation frames are throttled.
+ */
 async function collectSamples(
   ctx: AudioContext,
   source: MediaStreamAudioSourceNode,
@@ -1122,25 +1142,45 @@ async function collectSamples(
   ac.smoothingTimeConstant = 0
   source.connect(ac)
   const tmp = new Float32Array(ac.fftSize)
+  let lastTime = ctx.currentTime
+  const maxWaitMs = Math.ceil((n / ctx.sampleRate) * 1000) * 3 + 500
+  const startedAt = Date.now()
 
   return new Promise((resolve) => {
-    const step = () => {
-      ac.getFloatTimeDomainData(tmp)
-      const take = Math.min(tmp.length, n - offset)
-      out.set(tmp.subarray(0, take), offset)
-      offset += take
-      if (offset >= n) {
-        try {
-          ac.disconnect()
-        } catch {
-          /* ignore */
-        }
-        resolve(out)
-        return
+    let done = false
+    const finish = () => {
+      if (done) return
+      done = true
+      clearInterval(timer)
+      try {
+        ac.disconnect()
+      } catch {
+        /* ignore */
       }
-      requestAnimationFrame(step)
+      resolve(offset >= n ? out : out.subarray(0, offset))
     }
-    requestAnimationFrame(step)
+    const step = () => {
+      if (done) return
+      const now = ctx.currentTime
+      const fresh = Math.round((now - lastTime) * ctx.sampleRate)
+      if (fresh > 0 || offset === 0) {
+        lastTime = now
+        ac.getFloatTimeDomainData(tmp)
+        const want = offset === 0 ? tmp.length : Math.min(tmp.length, fresh)
+        const take = Math.min(want, n - offset)
+        out.set(tmp.subarray(tmp.length - take), offset)
+        offset += take
+      }
+      if (offset >= n || ctx.state === 'closed' || Date.now() - startedAt > maxWaitMs) {
+        finish()
+      }
+    }
+    const frameLoop = () => {
+      step()
+      if (!done) requestAnimationFrame(frameLoop)
+    }
+    const timer = setInterval(step, 50)
+    requestAnimationFrame(frameLoop)
   })
 }
 

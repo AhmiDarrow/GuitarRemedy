@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import {
   centsOffPitch,
   detectPitchMpm,
@@ -27,6 +27,8 @@ import {
   DEFAULT_RMS_GATE,
   TUNER_ANALYSIS_SR,
   TUNER_MIC_AUDIO_CONSTRAINTS,
+  startLiveTuner,
+  TUNER_WORKLET_CODE,
 } from './tuner'
 import { midiToHz } from './audioToMidi'
 import { TUNINGS } from './theory'
@@ -318,5 +320,63 @@ describe('tuner', () => {
     const steel = readingFromHz(midiToHz(64, 440), 0.9, 440, 5, { guitarTemperament: true })
     // Exact ET high-E with steel bias should read slightly flat of 0
     expect(steel.cents).toBeLessThan(plain.cents)
+  })
+
+  it('worklet keeps buffered audio when asked for the window size it already uses', () => {
+    const posted: Float32Array[] = []
+    let Proc: (new () => {
+      port: { onmessage: ((e: { data: unknown }) => void) | null; postMessage: (d: Float32Array) => void }
+      process: (inputs: Float32Array[][]) => boolean
+    }) | null = null
+    class FakeProcessor {
+      port = {
+        onmessage: null as ((e: { data: unknown }) => void) | null,
+        postMessage: (d: Float32Array) => posted.push(d),
+      }
+    }
+    new Function('AudioWorkletProcessor', 'registerProcessor', TUNER_WORKLET_CODE)(
+      FakeProcessor,
+      (_name: string, cls: typeof Proc) => {
+        Proc = cls
+      },
+    )
+    expect(Proc).not.toBeNull()
+    const proc = new Proc!()
+    const block = new Float32Array(128).fill(0.1)
+    for (let i = 0; i < 32; i++) proc.process([[block]]) // 4096 of 8192 samples
+    proc.port.onmessage?.({ data: { fftSize: 8192 } })
+    for (let i = 0; i < 32; i++) proc.process([[block]])
+    expect(posted).toHaveLength(1)
+    expect(posted[0]).toHaveLength(8192)
+    // A real size change still switches the window.
+    proc.port.onmessage?.({ data: { fftSize: 4096 } })
+    for (let i = 0; i < 32; i++) proc.process([[block]])
+    expect(posted).toHaveLength(2)
+    expect(posted[1]).toHaveLength(4096)
+  })
+
+  it('startLiveTuner releases the microphone when the audio graph cannot start', async () => {
+    const stopTrack = vi.fn()
+    const stream = { getTracks: () => [{ stop: stopTrack }] } as unknown as MediaStream
+    const prevNav = globalThis.navigator
+    Object.defineProperty(globalThis, 'navigator', {
+      configurable: true,
+      value: { mediaDevices: { getUserMedia: async () => stream } },
+    })
+    vi.stubGlobal(
+      'AudioContext',
+      class {
+        constructor() {
+          throw new Error('no audio device')
+        }
+      },
+    )
+    try {
+      await expect(startLiveTuner(() => {})).rejects.toThrow(/tuner audio/i)
+      expect(stopTrack).toHaveBeenCalledTimes(1)
+    } finally {
+      vi.unstubAllGlobals()
+      Object.defineProperty(globalThis, 'navigator', { configurable: true, value: prevNav })
+    }
   })
 })
