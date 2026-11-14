@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * Single source of truth for product version.
- * Bumps package.json, src-tauri/tauri.conf.json, src-tauri/Cargo.toml,
+ * Bumps package.json (+ lock), src-tauri/tauri.conf.json, src-tauri/Cargo.toml (+ lock),
  * and android/app/build.gradle (versionName + versionCode) together.
  *
  * Usage: node scripts/bump-version.mjs 0.1.1
@@ -37,11 +37,11 @@ function writeCargoToml(rel) {
   const full = path.join(root, rel)
   const raw = fs.readFileSync(full, 'utf8')
   // Match package version only (first version = "..." under [package])
-  const next = raw.replace(
-    /(^\[package\][\s\S]*?^version\s*=\s*")[^"]+(")/m,
-    `$1${ver}$2`,
-  )
-  if (next === raw) {
+  const pkgVersion = /(^\[package\][\s\S]*?^version\s*=\s*")[^"]+(")/m
+  // Test for a match, not a diff: re-running with the same version is a no-op, not an error.
+  if (pkgVersion.test(raw)) {
+    fs.writeFileSync(full, raw.replace(pkgVersion, `$1${ver}$2`), 'utf8')
+  } else {
     // Fallback: first bare version line
     const alt = raw.replace(/^version\s*=\s*"[^"]+"/m, `version = "${ver}"`)
     if (alt === raw) {
@@ -49,9 +49,20 @@ function writeCargoToml(rel) {
       process.exit(1)
     }
     fs.writeFileSync(full, alt, 'utf8')
-  } else {
-    fs.writeFileSync(full, next, 'utf8')
   }
+  console.log(`  ${rel}: → ${ver}`)
+}
+
+/** Keep the crate's own entry in Cargo.lock in step (cargo would rewrite it on the next build). */
+function writeCargoLock(rel) {
+  const full = path.join(root, rel)
+  if (!fs.existsSync(full)) return
+  const raw = fs.readFileSync(full, 'utf8')
+  const next = raw.replace(
+    /(\[\[package\]\]\r?\nname = "guitar-remedy"\r?\nversion = ")[^"]+(")/,
+    `$1${ver}$2`,
+  )
+  if (next !== raw) fs.writeFileSync(full, next, 'utf8')
   console.log(`  ${rel}: → ${ver}`)
 }
 
@@ -72,7 +83,7 @@ function writeAndroidGradle(rel) {
   const code = versionCodeFromSemver(ver)
   let next = raw.replace(/versionName\s+"[^"]+"/, `versionName "${ver}"`)
   next = next.replace(/versionCode\s+\d+/, `versionCode ${code}`)
-  if (next === raw) {
+  if (!/versionName\s+"[^"]+"/.test(raw) || !/versionCode\s+\d+/.test(raw)) {
     console.error(`Could not patch versionName/versionCode in ${rel}`)
     process.exit(1)
   }
@@ -86,6 +97,7 @@ writeJsonVersion('package-lock.json')
 writeJsonVersion('package-lock.json', ['packages', '', 'version'])
 writeJsonVersion('src-tauri/tauri.conf.json')
 writeCargoToml('src-tauri/Cargo.toml')
+writeCargoLock('src-tauri/Cargo.lock')
 writeAndroidGradle('android/app/build.gradle')
 console.log('Done. UI picks up package.json via Vite __APP_VERSION__.')
 console.log(`Next: commit, tag v${ver}, push tag to run Release.`)
