@@ -3,6 +3,11 @@
 All notable changes, grounded in `git log` (repo created 2026-08-21, `e8e497d`).
 On-disk version source of truth: `package.json` · `src-tauri/tauri.conf.json` · `src-tauri/Cargo.toml` (+ lockfiles; all synced by `node scripts/bump-version.mjs`).
 
+## [0.3.0] — 2026-11-15
+
+- Now available in Spanish, French, German, Portuguese (Brazil), Italian, Russian, Polish, Japanese, Korean and Chinese (Simplified). Apps use your system language by default; change it any time in Settings → Language.
+- Lesson progress, notes, reviews, and saved tabs carry over unchanged.
+
 ## [0.2.2] — 2026-11-14
 
 - Number fields (BPM, A4, custom tuning, tab-editor tempo, fret, and timing) accept typed values instead of snapping to the limit after the first digit.
