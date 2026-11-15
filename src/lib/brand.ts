@@ -21,6 +21,12 @@ export const GITHUB_ISSUES = `${GITHUB_REPO}/issues`
 export const PATREON_URL = 'https://www.patreon.com/AhmiDarrow'
 
 export const ABOUT_HELLO = "Hi I'm Ahmi, hope this helps!"
+
+/**
+ * Family sign-off. Same characters in every language — do not pass this through `tx()`.
+ * Quote marks and the " - Ahmi" suffix are part of the line.
+ */
+export const ABOUT_SIGN_OFF = '"Hope this helps" - Ahmi'
 export const ABOUT_BLURB =
   'Interactive scales, full tabs, a free open library, song → tabs, and a Day 1–365 path — local-first on Windows and the web.'
 export const ABOUT_FOOTER_META =

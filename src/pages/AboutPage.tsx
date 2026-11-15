@@ -13,6 +13,7 @@ import {
 } from 'lucide-react'
 import {
   ABOUT_HELLO,
+  ABOUT_SIGN_OFF,
   APP_NAME,
   APP_VERSION,
   resolveAppVersion,
@@ -155,6 +156,19 @@ export function AboutPage() {
           </p>
           <p className="text-[11px] text-[var(--text-muted)] pt-1">
             {tx('v{version} · {shell} · local-first', { version: appVersion, shell: shellLabel })}
+          </p>
+          <a
+            href={GITHUB_REPO}
+            className="inline-block text-sm text-mint underline underline-offset-2 hover:text-lime"
+            onClick={(event) => {
+              event.preventDefault()
+              void openLink(GITHUB_REPO)
+            }}
+          >
+            {GITHUB_REPO}
+          </a>
+          <p className="text-sm font-medium text-soft" translate="no" data-about-signoff="">
+            {ABOUT_SIGN_OFF}
           </p>
           <div className="flex flex-wrap gap-1.5 pt-1">
             {(

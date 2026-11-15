@@ -157,3 +157,5 @@ Dependencies and the Basic Pitch model are **free/open licenses only** — see [
 <p align="center">
   <sub>GitHub · Releases · <a href="https://www.patreon.com/AhmiDarrow">Patreon</a></sub>
 </p>
+
+"Hope this helps" - Ahmi
