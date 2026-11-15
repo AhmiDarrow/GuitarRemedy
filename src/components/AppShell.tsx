@@ -11,44 +11,42 @@ import {
   Info,
 } from 'lucide-react'
 import { useAppStore } from '../store/appStore'
+import { useI18n } from '../i18n/useI18n'
 import { AppMenu } from './AppMenu'
 import clsx from 'clsx'
-
-/** Full rail on desktop. */
-const nav = [
-  { to: '/', label: 'Home', icon: Home, end: true },
-  { to: '/learn', label: 'Learn', icon: BookOpen },
-  { to: '/library', label: 'Library', icon: Library },
-  { to: '/practice', label: 'Practice', icon: Guitar },
-  { to: '/upload', label: 'Upload', icon: Upload },
-  { to: '/wiki', label: 'Wiki', icon: ScrollText },
-  { to: '/profile', label: 'You', icon: User },
-  { to: '/about', label: 'About', icon: Info },
-]
-
-/** Phone bottom bar — keep primary practice surfaces; Wiki/About via menu + rail. */
-const mobileNav = [
-  { to: '/', label: 'Home', icon: Home, end: true },
-  { to: '/learn', label: 'Learn', icon: BookOpen },
-  { to: '/library', label: 'Library', icon: Library },
-  { to: '/practice', label: 'Practice', icon: Guitar },
-  { to: '/upload', label: 'Upload', icon: Upload },
-  { to: '/profile', label: 'You', icon: User },
-]
 
 export function AppShell() {
   const streak = useAppStore((s) => s.streak)
   const displayName = useAppStore((s) => s.displayName)
+  const { tx, tCount } = useI18n()
+  const nav = [
+    { to: '/', label: tx('Home'), icon: Home, end: true },
+    { to: '/learn', label: tx('Learn'), icon: BookOpen },
+    { to: '/library', label: tx('Library'), icon: Library },
+    { to: '/practice', label: tx('Practice'), icon: Guitar },
+    { to: '/upload', label: tx('Upload'), icon: Upload },
+    { to: '/wiki', label: tx('Wiki'), icon: ScrollText },
+    { to: '/profile', label: tx('You'), icon: User },
+    { to: '/about', label: tx('About'), icon: Info },
+  ]
+  const mobileNav = [
+    { to: '/', label: tx('Home'), icon: Home, end: true },
+    { to: '/learn', label: tx('Learn'), icon: BookOpen },
+    { to: '/library', label: tx('Library'), icon: Library },
+    { to: '/practice', label: tx('Practice'), icon: Guitar },
+    { to: '/upload', label: tx('Upload'), icon: Upload },
+    { to: '/profile', label: tx('You'), icon: User },
+  ]
 
   return (
     <div className="min-h-dvh flex flex-col md:flex-row">
-      <a href="#main-content" className="skip-to-content">Skip to content</a>
+      <a href="#main-content" className="skip-to-content">{tx('Skip to content')}</a>
       <aside className="hidden md:flex md:w-60 lg:w-64 shrink-0 flex-col border-r border-[var(--border)] bg-[var(--bg-elevated)]/80 backdrop-blur-xl sticky top-0 h-dvh">
         <div className="px-4 pt-5 pb-4">
           <AppMenu size="md" showTitle />
         </div>
 
-        <nav aria-label="Main navigation" className="flex-1 px-3 space-y-0.5">
+        <nav aria-label={tx('Main navigation')} className="flex-1 px-3 space-y-0.5">
           {nav.map(({ to, label, icon: Icon, end }) => (
             <NavLink
               key={to}
@@ -65,10 +63,10 @@ export function AppShell() {
         <div className="p-4 m-3 rounded-2xl bg-[var(--bg-card)] border border-[var(--border)]">
           <div className="flex items-center gap-2 text-mint text-sm font-medium">
             <Flame className="w-4 h-4" />
-            {streak} day streak
+            {tCount('shell.streak', streak)}
           </div>
-          <p className="text-xs text-[var(--text-muted)] mt-1 truncate">
-            {displayName || 'Player'}
+          <p className="text-xs text-[var(--text-muted)] mt-1 break-words">
+            {displayName || tx('Player')}
           </p>
         </div>
       </aside>
@@ -87,7 +85,7 @@ export function AppShell() {
         </main>
       </div>
 
-      <nav aria-label="Mobile navigation" className="md:hidden fixed bottom-0 inset-x-0 z-40 glass border-t border-[var(--border)] safe-bottom">
+      <nav aria-label={tx('Mobile navigation')} className="md:hidden fixed bottom-0 inset-x-0 z-40 glass border-t border-[var(--border)] safe-bottom">
         <div className="flex justify-around items-stretch px-1 py-1">
           {mobileNav.map(({ to, label, icon: Icon, end }) => (
             <NavLink

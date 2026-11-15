@@ -1028,10 +1028,11 @@ export function expandPrivateLesson(
   phase: LessonPhase,
   _skill: SkillLevel,
   seed: LessonSeed,
+  opts?: { skipSessionCoach?: boolean },
 ): PrivateLessonFields {
   const durationMin = Math.max(seed.durationMin || 30, minutesForPhase(phase, day))
   const plan = segmentPlan(durationMin)
-  const dayCoach = sessionCoachFor(day)
+  const dayCoach = opts?.skipSessionCoach ? undefined : sessionCoachFor(day)
   const warm = warmupFor(phase, day, seed, dayCoach)
   const teach = teachBlock(phase, seed, day, dayCoach)
   const guided = guidedBlock(seed, day, dayCoach)

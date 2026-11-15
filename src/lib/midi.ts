@@ -1,5 +1,7 @@
 /** Lightweight SMF (Standard MIDI File) parser for song import */
 
+import { tx } from '../i18n/runtime'
+
 export interface MidiNote {
   pitch: number
   startTick: number
@@ -56,7 +58,7 @@ export function parseMidi(buffer: ArrayBuffer): MidiParseResult {
   const bytes = new Uint8Array(buffer)
   const view = new DataView(buffer)
   if (bytes.length < 14 || String.fromCharCode(bytes[0], bytes[1], bytes[2], bytes[3]) !== 'MThd') {
-    throw new Error('Not a MIDI file (missing MThd)')
+    throw new Error(tx('Not a MIDI file (missing MThd)'))
   }
   const headerLength = readU32(view, 4)
   const format = readU16(view, 8)

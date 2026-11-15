@@ -11,18 +11,14 @@ import {
   type TimeBeats,
 } from '../lib/metronome'
 import { onAudioSessionChange } from '../lib/audio'
+import { useI18n } from '../i18n/useI18n'
 import { useAppStore } from '../store/appStore'
 import { NumberInput } from './NumberInput'
 
 const BEATS: TimeBeats[] = [2, 3, 4, 5, 6, 7]
-const SUBS: { v: Subdivision; label: string }[] = [
-  { v: 1, label: 'Quarter' },
-  { v: 2, label: 'Eighth' },
-  { v: 3, label: 'Triplet' },
-  { v: 4, label: '16th' },
-]
 
 export function MetronomePanel() {
+  const { tx } = useI18n()
   const bpm = useAppStore((s) => s.bpm)
   const setBpm = useAppStore((s) => s.setBpm)
   const beats = useAppStore((s) => s.timeSignatureBeats) as TimeBeats
@@ -114,24 +110,32 @@ export function MetronomePanel() {
   }
 
   const safeBeats = Math.max(2, Math.min(8, beats || 4))
+  const subs: { v: Subdivision; label: string }[] = [
+    { v: 1, label: tx('Quarter') },
+    { v: 2, label: tx('Eighth') },
+    { v: 3, label: tx('Triplet') },
+    { v: 4, label: tx('16th') },
+  ]
+  const countInLabel = (n: number) =>
+    n === 0 ? tx('None') : n === 1 ? tx('{n} bar', { n }) : tx('{n} bars', { n })
 
   return (
     <div className="card p-4 md:p-5 space-y-4">
       <div className="flex items-start justify-between gap-3">
         <div>
-          <p className="text-xs uppercase tracking-widest text-mint/80 font-semibold">Metronome</p>
-          <h2 className="font-display text-xl font-bold mt-0.5">Keep time</h2>
+          <p className="text-xs uppercase tracking-widest text-mint/80 font-semibold">{tx('Metronome')}</p>
+          <h2 className="font-display text-xl font-bold mt-0.5">{tx('Keep time')}</h2>
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <button
             type="button"
             className="btn-ghost !py-2 !px-3"
             onClick={() => void resetDefaults()}
-            title="Reset to defaults (80 BPM, 4/4, quarters, accent on, 1-bar count-in)"
-            aria-label="Reset metronome to defaults"
+            title={tx('Reset to defaults (80 BPM, 4/4, quarters, accent on, 1-bar count-in)')}
+            aria-label={tx('Reset metronome to defaults')}
           >
             <RotateCcw className="w-4 h-4" />
-            Defaults
+            {tx('Defaults')}
           </button>
           <button
             type="button"
@@ -140,11 +144,11 @@ export function MetronomePanel() {
           >
             {running ? (
               <>
-                <Square className="w-4 h-4" /> Stop
+                <Square className="w-4 h-4" /> {tx('Stop')}
               </>
             ) : (
               <>
-                <Play className="w-4 h-4" /> Start
+                <Play className="w-4 h-4" /> {tx('Start')}
               </>
             )}
           </button>
@@ -169,26 +173,26 @@ export function MetronomePanel() {
         ))}
         {countingIn && running ? (
           <span className="text-[10px] uppercase tracking-wider text-teal font-semibold ml-1">
-            Count-in
+            {tx('Count-in')}
           </span>
         ) : null}
       </div>
 
       <div className="flex flex-wrap items-end gap-4">
         <div className="flex flex-col gap-1">
-          <span className="text-xs text-[var(--text-muted)]">BPM</span>
+          <span className="text-xs text-[var(--text-muted)]">{tx('BPM')}</span>
           <div className="flex items-center gap-2">
             <button
               type="button"
               className="btn-ghost !px-2 !py-2"
               onClick={() => setBpm(bpm - 1)}
-              aria-label="Slower"
+              aria-label={tx('Slower')}
             >
               <Minus className="w-4 h-4" />
             </button>
             <NumberInput
               integer
-              aria-label="Beats per minute"
+              aria-label={tx('Beats per minute')}
               className="input !py-2 !text-lg font-display font-bold w-20 text-center"
               value={bpm}
               min={30}
@@ -199,7 +203,7 @@ export function MetronomePanel() {
               type="button"
               className="btn-ghost !px-2 !py-2"
               onClick={() => setBpm(bpm + 1)}
-              aria-label="Faster"
+              aria-label={tx('Faster')}
             >
               <Plus className="w-4 h-4" />
             </button>
@@ -215,7 +219,7 @@ export function MetronomePanel() {
         </div>
 
         <label className="flex flex-col gap-1 text-xs text-[var(--text-muted)]">
-          Time
+          {tx('Time')}
           <select
             className="input !py-2 !text-sm"
             value={safeBeats}
@@ -230,13 +234,13 @@ export function MetronomePanel() {
         </label>
 
         <label className="flex flex-col gap-1 text-xs text-[var(--text-muted)]">
-          Subdivision
+          {tx('Subdivision')}
           <select
             className="input !py-2 !text-sm"
             value={sub}
             onChange={(e) => setSub(Number(e.target.value))}
           >
-            {SUBS.map((s) => (
+            {subs.map((s) => (
               <option key={s.v} value={s.v}>
                 {s.label}
               </option>
@@ -251,11 +255,11 @@ export function MetronomePanel() {
             onChange={(e) => setAccent(e.target.checked)}
             className="accent-mint"
           />
-          Accent 1
+          {tx('Accent 1')}
         </label>
 
         <label className="flex flex-col gap-1 text-xs text-[var(--text-muted)]">
-          Count-in
+          {tx('Count-in')}
           <select
             className="input !py-2 !text-sm"
             value={countInBars}
@@ -263,14 +267,14 @@ export function MetronomePanel() {
           >
             {[0, 1, 2, 3, 4].map((n) => (
               <option key={n} value={n}>
-                {n === 0 ? 'None' : `${n} bar${n > 1 ? 's' : ''}`}
+                {countInLabel(n)}
               </option>
             ))}
           </select>
         </label>
 
         <button type="button" className="btn-ghost !py-2" onClick={tapTempo}>
-          Tap tempo
+          {tx('Tap tempo')}
         </button>
       </div>
     </div>

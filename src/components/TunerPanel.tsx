@@ -13,6 +13,9 @@ import { playMidiNote, setPlaybackA4 } from '../lib/audio'
 import { useAppStore } from '../store/appStore'
 import { useTunerStore } from '../store/tunerStore'
 import { TUNINGS, type TuningName } from '../lib/theory'
+import { spellNoteToken } from '../i18n/notes'
+import { presentTuningName } from '../i18n/present'
+import { useI18n } from '../i18n/useI18n'
 import { NumberInput } from './NumberInput'
 
 const empty: TunerReading = {
@@ -62,6 +65,7 @@ function StrobeDisplay({
   active: boolean
   inTune: boolean
 }) {
+  const { tx } = useI18n()
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const phaseRef = useRef(0)
   const centsRef = useRef(0)
@@ -148,20 +152,22 @@ function StrobeDisplay({
     <div className="space-y-1.5">
       <div className="flex items-center justify-between text-[10px] uppercase tracking-widest text-[var(--text-muted)]">
         <span className="inline-flex items-center gap-1">
-          <Waves className="w-3 h-3 text-mint/80" /> Strobe
+          <Waves className="w-3 h-3 text-mint/80" /> {tx('Strobe')}
         </span>
         <span className="tabular-nums normal-case tracking-normal">
           {active
             ? inTune
-              ? 'locked'
-              : `phase ${(phase >= 0 ? '+' : '')}${(phase * 100).toFixed(0)}%`
-            : 'idle'}
+              ? tx('locked')
+              : tx('phase {pct}%', {
+                  pct: `${phase >= 0 ? '+' : ''}${(phase * 100).toFixed(0)}`,
+                })
+            : tx('idle')}
         </span>
       </div>
       <canvas
         ref={canvasRef}
         className="w-full h-14 rounded-xl border border-mint/20 bg-[rgba(3,12,8,0.9)]"
-        aria-label="Tuner strobe display"
+        aria-label={tx('Tuner strobe display')}
       />
     </div>
   )
@@ -207,13 +213,19 @@ export function TunerPanel() {
   const rmsGate = useTunerStore((s) => s.rmsGate)
   const setRmsGate = useTunerStore((s) => s.setRmsGate)
   const recordPractice = useAppStore((s) => s.recordPractice)
+  const noteSpelling = useAppStore((s) => s.noteSpelling)
+  const { tx } = useI18n()
   const tuning = useMemo(() => getTuning(), [getTuning, tuningName, customTuning])
   const openMidis = useMemo(() => openStringMidis(tuning), [tuning])
   const stringLabels = useMemo(() => openStringLabels(tuning), [tuning])
+  const spelledLabels = useMemo(
+    () => stringLabels.map((label) => spellNoteToken(label, noteSpelling)),
+    [stringLabels, noteSpelling],
+  )
   const tuningLabel =
     tuningName === 'custom'
-      ? `Custom · ${stringLabels.join(' ')}`
-      : (TUNINGS[tuningName]?.name ?? tuningName)
+      ? tx('Custom · {notes}', { notes: spelledLabels.join(' ') })
+      : presentTuningName(tuningName, TUNINGS[tuningName]?.name ?? tuningName)
 
   const [reading, setReading] = useState<TunerReading>(empty)
   const [live, setLive] = useState(false)
@@ -302,7 +314,7 @@ export function TunerPanel() {
       recordPractice()
     } catch (e) {
       if (generation !== sessionGeneration.current) return
-      setError(e instanceof Error ? e.message : 'Microphone permission needed — allow mic, then Listen again.')
+      setError(e instanceof Error ? e.message : tx('Microphone permission needed — allow mic, then Listen again.'))
       setLive(false)
     } finally {
       if (generation === sessionGeneration.current) {
@@ -310,7 +322,7 @@ export function TunerPanel() {
         setStarting(false)
       }
     }
-  }, [a4, focusString, steelStrings, onReading, recordPractice, rmsGate, tuning])
+  }, [a4, focusString, steelStrings, onReading, recordPractice, rmsGate, tuning, tx])
 
 
   useEffect(() => {
@@ -345,7 +357,7 @@ export function TunerPanel() {
 
   const calibrate = useCallback(async () => {
     if (!live || !stopFn?.calibrateNoiseFloor) {
-      setError('Start the mic first, then calibrate in a quiet room.')
+      setError(tx('Start the mic first, then calibrate in a quiet room.'))
       return
     }
     setCalibrating(true)
@@ -354,13 +366,13 @@ export function TunerPanel() {
     try {
       const gate = await stopFn.calibrateNoiseFloor(1)
       setRmsGate(gate)
-      setCalNote(`Quiet-room level set · ${gate.toFixed(4)}`)
+      setCalNote(tx('Quiet-room level set · {gate}', { gate: gate.toFixed(4) }))
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Calibrate failed')
+      setError(e instanceof Error ? e.message : tx('Calibrate failed'))
     } finally {
       setCalibrating(false)
     }
-  }, [live, stopFn])
+  }, [live, stopFn, tx])
 
   const angle = centsToAngle(displayCents)
   const inTune =
@@ -373,18 +385,19 @@ export function TunerPanel() {
   const spark = useMemo(() => sparklinePath(history, 280, 48), [history])
   const strobeActive = live && (reading.hz > 0 || lock > 0.2)
 
+  const shownNote = spellNoteToken(reading.noteName, noteSpelling)
   const statusLabel =
     reading.noteName === '—'
       ? live
         ? calibrating
-          ? 'Stay quiet — sampling room…'
-          : 'Play a sustained note…'
-        : 'Start mic to tune'
+          ? tx('Stay quiet — sampling room…')
+          : tx('Play a sustained note…')
+        : tx('Start mic to tune')
       : inTune
-        ? 'In tune'
+        ? tx('In tune')
         : displayCents > 0
-          ? 'Sharp — ease tension'
-          : 'Flat — tighten up'
+          ? tx('Sharp — ease tension')
+          : tx('Flat — tighten up')
 
   return (
     <div className="card p-4 md:p-5 space-y-4 overflow-hidden relative">
@@ -402,10 +415,10 @@ export function TunerPanel() {
 
       <div className="flex items-start justify-between gap-3 relative">
         <div>
-          <p className="text-xs uppercase tracking-widest text-mint/80 font-semibold">Tuner</p>
-          <h2 className="font-display text-xl font-bold mt-0.5">Chromatic tuner</h2>
+          <p className="text-xs uppercase tracking-widest text-mint/80 font-semibold">{tx('Tuner')}</p>
+          <h2 className="font-display text-xl font-bold mt-0.5">{tx('Chromatic tuner')}</h2>
           <p className="text-xs text-[var(--text-muted)] mt-1">
-            {tuningLabel} · A4={a4}
+            {tx('{tuning} · A4={a4}', { tuning: tuningLabel, a4 })}
           </p>
         </div>
         <div className="flex flex-col sm:flex-row gap-2">
@@ -416,18 +429,18 @@ export function TunerPanel() {
               showSettings && 'border-mint/40 text-mint',
             )}
             onClick={() => setShowSettings((v) => !v)}
-            title="Tuner-only settings (not Profile)"
+            title={tx('Tuner-only settings (not Profile)')}
           >
-            Settings
+            {tx('Settings')}
           </button>
           <button
             type="button"
             className="btn-ghost text-xs min-w-[6.5rem]"
             disabled={!live || calibrating}
             onClick={() => void calibrate()}
-            title="Sample a quiet room for one second so the mic ignores background noise"
+            title={tx('Sample a quiet room for one second so the mic ignores background noise')}
           >
-            {calibrating ? 'Sampling…' : 'Quiet room'}
+            {calibrating ? tx('Sampling…') : tx('Quiet room')}
           </button>
           <button
             type="button"
@@ -435,17 +448,17 @@ export function TunerPanel() {
             onClick={() => void (live || starting ? stop() : start())}
             title={
               live
-                ? 'Stop listening'
-                : 'Start tuner — your device will ask for microphone permission if needed'
+                ? tx('Stop listening')
+                : tx('Start tuner — your device will ask for microphone permission if needed')
             }
           >
-            {starting ? 'Cancel request' : live ? (
+            {starting ? tx('Cancel request') : live ? (
               <>
-                <MicOff className="w-4 h-4" /> Stop
+                <MicOff className="w-4 h-4" /> {tx('Stop')}
               </>
             ) : (
               <>
-                <Mic className="w-4 h-4" /> Listen
+                <Mic className="w-4 h-4" /> {tx('Listen')}
               </>
             )}
           </button>
@@ -457,14 +470,14 @@ export function TunerPanel() {
         <div className="rounded-2xl border border-mint/25 bg-[rgba(3,12,8,0.55)] p-4 space-y-3">
           <div className="flex items-start justify-between gap-2">
             <div>
-              <p className="text-xs font-semibold text-mint uppercase tracking-widest">Tuner settings</p>
+              <p className="text-xs font-semibold text-mint uppercase tracking-widest">{tx('Tuner settings')}</p>
               <p className="text-[11px] text-[var(--text-muted)] mt-0.5">
-                Standalone — does not change Profile, fretboard, or song convert.
+                {tx('Standalone — does not change Profile, fretboard, or song convert.')}
               </p>
             </div>
           </div>
           <label className="block text-xs text-[var(--text-muted)]">
-            Open-string tuning
+            {tx('Open-string tuning')}
             <select
               className="input mt-1"
               value={tuningName}
@@ -472,7 +485,7 @@ export function TunerPanel() {
             >
               {Object.entries(TUNINGS).map(([id, t]) => (
                 <option key={id} value={id}>
-                  {t.name}
+                  {presentTuningName(id, t.name)}
                 </option>
               ))}
             </select>
@@ -500,7 +513,7 @@ export function TunerPanel() {
           ) : null}
           <div className="flex flex-wrap items-center gap-3">
             <label className="flex items-center gap-2 text-xs text-[var(--text-muted)]">
-              A4 (Hz)
+              {tx('A4 (Hz)')}
               <NumberInput
                 integer
                 min={400}
@@ -517,10 +530,10 @@ export function TunerPanel() {
                 onChange={(e) => setSteelStrings(e.target.checked)}
                 className="rounded border-mint/40"
               />
-              Steel strings
+              {tx('Steel strings')}
             </label>
             <span className="text-[10px] text-[var(--text-muted)] tabular-nums ml-auto">
-              noise {rmsGate.toFixed(4)}
+              {tx('noise {level}', { level: rmsGate.toFixed(4) })}
             </span>
           </div>
         </div>
@@ -648,7 +661,7 @@ export function TunerPanel() {
                   : 'none',
             }}
           >
-            {reading.noteName}
+            {shownNote}
             {reading.midi >= 0 && (
               <span className="text-2xl md:text-3xl text-[var(--text-muted)] ml-1 font-semibold">
                 {reading.octave}
@@ -697,14 +710,14 @@ export function TunerPanel() {
       />
 
       <div className="grid grid-cols-3 gap-2 max-w-md mx-auto w-full">
-        <Meter label="Signal" value={level} color="#5dffb0" />
-        <Meter label="Clarity" value={clarity} color="#2dd4a8" />
-        <Meter label="Lock" value={lock} color="#c8f560" />
+        <Meter label={tx('Signal')} value={level} color="#5dffb0" />
+        <Meter label={tx('Clarity')} value={clarity} color="#2dd4a8" />
+        <Meter label={tx('Lock')} value={lock} color="#c8f560" />
       </div>
 
       <div className="rounded-xl border border-[var(--border)] bg-[rgba(3,12,8,0.45)] p-2.5">
         <p className="text-[10px] uppercase tracking-widest text-[var(--text-muted)] mb-1.5">
-          Cents history
+          {tx('Cents history')}
         </p>
         <svg viewBox="0 0 280 48" className="w-full h-12" aria-hidden>
           <line
@@ -733,7 +746,7 @@ export function TunerPanel() {
       <div className="space-y-2">
         <div className="flex items-center justify-between gap-2">
           <p className="text-[10px] uppercase tracking-widest text-[var(--text-muted)]">
-            Open strings · tap to hear · tap again to focus
+            {tx('Open strings · tap to hear · tap again to focus')}
           </p>
           <button
             type="button"
@@ -745,13 +758,14 @@ export function TunerPanel() {
             )}
             onClick={() => setFocusString(null)}
           >
-            Chromatic
+            {tx('Chromatic')}
           </button>
         </div>
         <div className="grid grid-cols-6 gap-1.5">
           {stringLabels.map((label, i) => {
             const active = reading.stringIndex === i
             const focused = focusString === i
+            const shown = spelledLabels[i] ?? label
             return (
               <button
                 key={`${label}-${i}`}
@@ -769,9 +783,12 @@ export function TunerPanel() {
                   setPlaybackA4(a4)
                   void playMidiNote(openMidis[i], 0.45, undefined, { a4 })
                 }}
-                title={`Focus ${label} (± band) · play reference at A4=${a4}`}
+                title={tx('Focus {note} (± band) · play reference at A4={a4}', {
+                  note: shown,
+                  a4,
+                })}
               >
-                <span className="block text-xs font-semibold">{label}</span>
+                <span className="block text-xs font-semibold">{shown}</span>
                 <span className="block text-[9px] text-[var(--text-muted)] mt-0.5">
                   {i + 1}
                 </span>
@@ -783,7 +800,7 @@ export function TunerPanel() {
 
       <div className="flex flex-wrap items-center gap-3 pt-1 border-t border-[var(--border)]">
         <span className="text-[10px] text-[var(--text-muted)]">
-          Tuner prefs live here only · Profile lefty/fretboard is separate
+          {tx('Tuner prefs live here only · Profile lefty/fretboard is separate')}
         </span>
         <button
           type="button"
@@ -792,9 +809,9 @@ export function TunerPanel() {
             setPlaybackA4(a4)
             void playMidiNote(69, 0.6, undefined, { a4 })
           }}
-          title={`Play concert A at ${a4} Hz`}
+          title={tx('Play concert A at {hz} Hz', { hz: a4 })}
         >
-          <Volume2 className="w-3.5 h-3.5" /> A4 tone
+          <Volume2 className="w-3.5 h-3.5" /> {tx('A4 tone')}
         </button>
       </div>
     </div>

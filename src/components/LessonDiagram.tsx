@@ -1,5 +1,6 @@
 import { useMemo } from 'react'
 import clsx from 'clsx'
+import { useI18n } from '../i18n/useI18n'
 import {
   resolveLessonDiagram,
   type LessonDiagramSpec,
@@ -214,7 +215,7 @@ export function LessonDiagramView({
 
 export function LessonDiagramGallery({
   diagrams,
-  title = 'Neck figures',
+  title,
   subtitle,
   className,
 }: {
@@ -223,14 +224,16 @@ export function LessonDiagramGallery({
   subtitle?: string
   className?: string
 }) {
+  const { tx } = useI18n()
   const visual = diagrams.filter(isVisualDiagram)
   if (!visual.length) return null
+  const heading = title ?? tx('Neck figures')
 
   return (
     <section className={clsx('space-y-3', className)}>
       <div>
         <h3 className="text-sm font-semibold uppercase tracking-wide text-[var(--text-secondary)]">
-          {title}
+          {heading}
         </h3>
         {subtitle && <p className="text-xs text-[var(--muted)] mt-0.5">{subtitle}</p>}
       </div>

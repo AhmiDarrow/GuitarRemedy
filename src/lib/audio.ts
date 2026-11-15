@@ -1,5 +1,6 @@
 /** Tone.js play-along helpers — lazy import to keep tests light */
 
+import { tx } from '../i18n/runtime'
 import type { ScaleId } from './theory'
 import {
   CHORDS,
@@ -74,7 +75,7 @@ export async function ensureAudio(): Promise<void> {
     started = true
   } catch {
     started = false
-    throw new Error('Audio context could not start — click the app once, then play again')
+    throw new Error(tx('Audio context could not start — click the app once, then play again'))
   }
   if (!synth) {
     synth = new Tone.PolySynth(Tone.Synth, {

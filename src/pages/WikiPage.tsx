@@ -10,6 +10,8 @@ import {
   type WikiCategory,
 } from '../data/wiki'
 import { APP_NAME } from '../lib/brand'
+import { useI18n } from '../i18n/useI18n'
+import { presentArticle, presentCategory } from '../i18n/present'
 import { parseWikiBody, sectionHeadingsFromBody, type WikiNode } from '../lib/wikiMarkdown'
 import clsx from 'clsx'
 
@@ -174,22 +176,29 @@ function chipClass(active: boolean): string {
 }
 
 export function WikiPage() {
+  const { tx, tCount, locale } = useI18n()
   const { slug } = useParams()
   const navigate = useNavigate()
   const [query, setQuery] = useState('')
   const [cat, setCat] = useState<WikiCategory | 'all'>('all')
+  const articleCount = (n: number) => tCount('wiki.articles', n)
+  const categoryChrome = (id: WikiCategory) => {
+    const meta = WIKI_CATEGORIES.find((c) => c.id === id)
+    return meta ? presentCategory(meta.id, meta.label, meta.blurb) : { label: id, blurb: '' }
+  }
 
   const article = slug ? getWikiArticle(slug) : undefined
   const results = useMemo(() => {
     let list = query.trim() ? searchWiki(query) : WIKI_ARTICLES
     if (cat !== 'all') list = list.filter((a) => a.category === cat)
     return list
-  }, [query, cat])
+  }, [query, cat, locale, tx])
 
   if (article) {
-    const catMeta = WIKI_CATEGORIES.find((c) => c.id === article.category)
+    const shown = presentArticle(article)
+    const catChrome = categoryChrome(article.category)
     const related = relatedArticles(article)
-    const heads = sectionHeadings(article.body)
+    const heads = sectionHeadings(shown.body)
     const sameCat = WIKI_ARTICLES.filter((a) => a.category === article.category)
     const idx = sameCat.findIndex((a) => a.id === article.id)
     const prev = idx > 0 ? sameCat[idx - 1] : undefined
@@ -203,7 +212,7 @@ export function WikiPage() {
           onClick={() => navigate('/wiki')}
         >
           <ArrowLeft className="w-4 h-4" />
-          Encyclopedia home
+          {tx('Encyclopedia home')}
         </button>
 
         <header className="relative overflow-hidden rounded-3xl border border-[var(--border)] bg-gradient-to-br from-[#06120c] via-[#030705] to-[#020403]">
@@ -217,13 +226,13 @@ export function WikiPage() {
           <div className="absolute -left-8 -bottom-10 w-40 h-40 rounded-full bg-mint/10 blur-3xl" />
           <div className="relative p-5 md:p-7 space-y-2">
             <p className="text-xs uppercase tracking-widest text-mint/80 font-semibold">
-              {catMeta?.label ?? article.category}
+              {catChrome.label}
             </p>
             <h1 className="font-display text-3xl md:text-4xl font-bold tracking-tight">
-              {article.title}
+              {shown.title}
             </h1>
             <p className="text-sm md:text-base text-[var(--text-muted)] max-w-2xl leading-relaxed">
-              {article.summary}
+              {shown.summary}
             </p>
             <div className="flex flex-wrap gap-1.5 pt-2">
               {article.tags.map((t) => (
@@ -239,8 +248,8 @@ export function WikiPage() {
         </header>
 
         {heads.length > 2 && (
-          <nav className="card p-4 md:p-5" aria-label="On this page">
-            <p className="section-title mb-2">On this page</p>
+          <nav className="card p-4 md:p-5" aria-label={tx('On this page')}>
+            <p className="section-title mb-2">{tx('On this page')}</p>
             <ol className="grid sm:grid-cols-2 gap-x-4 gap-y-1 text-sm text-soft list-decimal pl-5">
               {heads.map((h) => (
                 <li key={h.id} className="marker:text-mint/70">
@@ -254,14 +263,16 @@ export function WikiPage() {
         )}
 
         <article className="card p-5 md:p-8">
-          <WikiBody body={article.body} />
+          <WikiBody body={shown.body} />
         </article>
 
         {related.length > 0 && (
           <section className="space-y-3">
-            <h2 className="section-title">Keep reading</h2>
+            <h2 className="section-title">{tx('Keep reading')}</h2>
             <ul className="grid sm:grid-cols-2 gap-2">
-              {related.map((a) => (
+              {related.map((raw) => {
+                const a = presentArticle(raw)
+                return (
                 <li key={a.id}>
                   <Link
                     to={`/wiki/${a.id}`}
@@ -271,7 +282,8 @@ export function WikiPage() {
                     <p className="text-xs text-[var(--text-muted)] mt-1 line-clamp-2">{a.summary}</p>
                   </Link>
                 </li>
-              ))}
+                )
+              })}
             </ul>
           </section>
         )}
@@ -279,30 +291,30 @@ export function WikiPage() {
         <div className="flex flex-col sm:flex-row gap-2 sm:justify-between">
           {prev ? (
             <Link to={`/wiki/${prev.id}`} className="btn-secondary text-sm text-left">
-              ← {prev.title}
+              {tx('← {title}', { title: presentArticle(prev).title })}
             </Link>
           ) : (
             <span />
           )}
           {next ? (
             <Link to={`/wiki/${next.id}`} className="btn-secondary text-sm text-right sm:ml-auto">
-              {next.title} →
+              {tx('{title} →', { title: presentArticle(next).title })}
             </Link>
           ) : null}
         </div>
 
         <p className="text-xs text-[var(--text-muted)] leading-relaxed">
-          Free MIT teaching text — original for {APP_NAME}, not scraped textbooks. Prefer drills?{' '}
+          {tx('Free MIT teaching text — original for {app}, not scraped textbooks. Prefer drills?', { app: APP_NAME })}{' '}
           <Link className="text-mint hover:underline" to="/learn">
-            Learn
+            {tx('Learn')}
           </Link>
-          ,{' '}
+          {tx(', ')}
           <Link className="text-mint hover:underline" to="/practice">
-            Practice
+            {tx('Practice')}
           </Link>
-          , or{' '}
+          {tx(', or ')}
           <Link className="text-mint hover:underline" to="/library">
-            Library
+            {tx('Library')}
           </Link>
           .
         </p>
@@ -327,20 +339,22 @@ export function WikiPage() {
             <div className="flex items-center gap-2 text-mint">
               <BookMarked className="w-5 h-5" />
               <span className="text-xs uppercase tracking-widest font-semibold">
-                Free encyclopedia
+                {tx('Free encyclopedia')}
               </span>
             </div>
             <h1 className="font-display text-3xl md:text-4xl font-bold tracking-tight">
-              {APP_NAME} Wiki
+              {tx('{app} Wiki', { app: APP_NAME })}
             </h1>
             <p className="text-[var(--text-muted)] text-sm md:text-base leading-relaxed">
-              One-stop theory, neck craft, practice habits, and app guides — textbook depth in plain
-              English. Offline, searchable, MIT-licensed original teaching text. No paywall, no
-              scraped books.
+              {tx('One-stop theory, neck craft, practice habits, and app guides — textbook depth in plain English. Offline, searchable, MIT-licensed original teaching text. No paywall, no scraped books.')}
             </p>
             <p className="text-xs text-[var(--text-muted)] flex items-center gap-1.5 pt-1">
               <Library className="w-3.5 h-3.5 text-mint" />
-              {WIKI_ARTICLES.length} articles · {WIKI_CATEGORIES.length} chapters · free forever
+              {tCount('wiki.articles', WIKI_ARTICLES.length)}
+              {' · '}
+              {tCount('wiki.chapters', WIKI_CATEGORIES.length)}
+              {' · '}
+              {tx('free forever')}
             </p>
           </div>
           <div className="relative w-full md:w-80 shrink-0">
@@ -349,9 +363,9 @@ export function WikiPage() {
               type="search"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search modes, CAGED, upload…"
+              placeholder={tx('Search modes, CAGED, upload…')}
               className="input w-full pl-9 pr-3 py-2.5"
-              aria-label="Search wiki"
+              aria-label={tx('Search wiki')}
             />
           </div>
         </div>
@@ -359,7 +373,7 @@ export function WikiPage() {
 
       <div className="flex flex-wrap gap-2">
         <button type="button" className={chipClass(cat === 'all')} onClick={() => setCat('all')}>
-          All chapters
+          {tx('All chapters')}
         </button>
         {WIKI_CATEGORIES.map((c) => (
           <button
@@ -368,7 +382,7 @@ export function WikiPage() {
             className={chipClass(cat === c.id)}
             onClick={() => setCat(c.id)}
           >
-            {c.label}
+            {presentCategory(c.id, c.label, c.blurb).label}
           </button>
         ))}
       </div>
@@ -377,6 +391,7 @@ export function WikiPage() {
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
           {WIKI_CATEGORIES.map((c) => {
             const n = WIKI_ARTICLES.filter((a) => a.category === c.id).length
+            const chrome = presentCategory(c.id, c.label, c.blurb)
             return (
               <button
                 key={c.id}
@@ -385,11 +400,11 @@ export function WikiPage() {
                 className="card p-4 text-left hover:border-mint/40 transition-colors group"
               >
                 <h2 className="font-display font-semibold text-[var(--text)] group-hover:text-mint transition-colors">
-                  {c.label}
+                  {chrome.label}
                 </h2>
-                <p className="text-xs text-[var(--text-muted)] mt-1 leading-relaxed">{c.blurb}</p>
+                <p className="text-xs text-[var(--text-muted)] mt-1 leading-relaxed">{chrome.blurb}</p>
                 <p className="text-[10px] text-mint mt-3 uppercase tracking-wider font-semibold">
-                  {n} article{n === 1 ? '' : 's'}
+                  {articleCount(n)}
                 </p>
               </button>
             )
@@ -399,16 +414,17 @@ export function WikiPage() {
 
       <div className="space-y-2">
         <p className="text-xs text-[var(--text-muted)]">
-          {results.length} article{results.length === 1 ? '' : 's'}
+          {articleCount(results.length)}
           {query
-            ? ` matching “${query}”`
+            ? tx(' matching “{query}”', { query })
             : cat !== 'all'
-              ? ` in ${WIKI_CATEGORIES.find((c) => c.id === cat)?.label}`
+              ? tx(' in {category}', { category: categoryChrome(cat).label })
               : ''}
         </p>
         <ul className="grid gap-2">
-          {results.map((a) => {
-            const catMeta = WIKI_CATEGORIES.find((c) => c.id === a.category)
+          {results.map((raw) => {
+            const a = presentArticle(raw)
+            const catLabel = categoryChrome(a.category).label
             return (
               <li key={a.id}>
                 <Link
@@ -419,12 +435,12 @@ export function WikiPage() {
                     <div className="flex flex-wrap items-center gap-2">
                       <span className="font-semibold text-[var(--text)]">{a.title}</span>
                       <span className="text-[10px] uppercase tracking-wider text-mint">
-                        {catMeta?.label}
+                        {catLabel}
                       </span>
                     </div>
                     <p className="text-sm text-[var(--text-muted)] mt-0.5 line-clamp-2">{a.summary}</p>
                   </div>
-                  <span className="text-xs text-mint shrink-0 font-medium">Read →</span>
+                  <span className="text-xs text-mint shrink-0 font-medium">{tx('Read →')}</span>
                 </Link>
               </li>
             )
@@ -432,7 +448,7 @@ export function WikiPage() {
         </ul>
         {results.length === 0 && (
           <p className="text-sm text-[var(--text-muted)] py-8 text-center">
-            No articles matched. Try “scale”, “CAGED”, “capo”, or “practice”.
+            {tx('No articles matched. Try “scale”, “CAGED”, “capo”, or “practice”.')}
           </p>
         )}
       </div>

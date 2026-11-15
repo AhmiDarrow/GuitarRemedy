@@ -1,5 +1,6 @@
 /** Remedy breakdown — song import analysis (MIDI / MusicXML / GP / audio→tabs) */
 
+import { tx } from '../i18n/runtime'
 import {
   detectKeyFromPcs,
   frettingForMidi,
@@ -20,7 +21,7 @@ import { parseMusicXml, type MusicXmlParseResult } from './musicxml'
 import { convertArrayBufferToMidi, type AudioToMidiResult } from './audioToMidi'
 import { applyScoreToBreakdown, cleanUpAfterConvert } from './tabEdit'
 import {
-  GP_EXPORT_HINT,
+  gpExportHint,
   isGuitarProName,
   parseGuitarPro,
   setGuitarProOpenTuning,
@@ -300,7 +301,7 @@ function fretMelody(
 
 export function analyzeNotes(
   midis: number[],
-  title = 'Untitled',
+  title = tx('Untitled'),
   opts?: { tempoBpm?: number; tuning?: number[]; timeSig?: [number, number] },
 ): RemedyBreakdown {
   const pcs = midis.map((m) => ((m % 12) + 12) % 12)
@@ -343,16 +344,19 @@ export function analyzeNotes(
     scaleNotes,
     tab,
     explanation: [
-      `Analyzed ${midis.length} notes.`,
-      `Detected tonal center ≈ ${detected.root} ${SCALES[detected.scaleId as ScaleId]?.name || detected.scaleId}.`,
-      `Scale tones: ${scaleNotes.join(', ')}.`,
-      'Fretting uses your session tuning (always editable).',
+      tx('Analyzed {count} notes.', { count: midis.length }),
+      tx('Detected tonal center ≈ {root} {scale}.', {
+        root: detected.root,
+        scale: SCALES[detected.scaleId as ScaleId]?.name || detected.scaleId,
+      }),
+      tx('Scale tones: {tones}.', { tones: scaleNotes.join(', ') }),
+      tx('Fretting uses your session tuning (always editable).'),
     ],
     practicePlan: [
-      `Drone the root ${detected.root}, then ascend the scale slowly.`,
-      'Loop the first four notes at 70% tempo with a metronome.',
-      'Mark any stretch frets and isolate them for 2 minutes.',
-      'Play full phrase, then improvise using only scale tones.',
+      tx('Drone the root {root}, then ascend the scale slowly.', { root: detected.root }),
+      tx('Loop the first four notes at 70% tempo with a metronome.'),
+      tx('Mark any stretch frets and isolate them for 2 minutes.'),
+      tx('Play full phrase, then improvise using only scale tones.'),
     ],
     confidence: estimateNoteConfidence(midis),
     editable: true,
@@ -387,7 +391,7 @@ export function estimateNoteConfidence(
 }
 
 export function remedyExplanation(result: RemedyBreakdown): string {
-  return [...result.explanation, '', 'Practice plan:', ...result.practicePlan.map((p, i) => `${i + 1}. ${p}`)].join(
+  return [...result.explanation, '', tx('Practice plan:'), ...result.practicePlan.map((p, i) => `${i + 1}. ${p}`)].join(
     '\n',
   )
 }
@@ -469,16 +473,21 @@ export function midiToBreakdown(
     const bpms = (parsed.tempoMap || []).map((e) => e.bpm)
     const uniq = [...new Set(bpms)]
     warnings.push(
-      `MIDI has multiple tempos (${uniq.join(', ')} BPM). Note spacing is tempo-map warped so wall-clock feel is preserved at opening tempo ${tempoBpm} BPM.`,
+      tx(
+        'MIDI has multiple tempos ({tempos} BPM). Note spacing is tempo-map warped so wall-clock feel is preserved at opening tempo {bpm} BPM.',
+        { tempos: uniq.join(', '), bpm: tempoBpm },
+      ),
     )
   }
   if (parsed.smpteDivision) {
     warnings.push(
-      'MIDI used SMPTE time division; tick grid was normalized to 480 PPQ (timing may be approximate).',
+      tx('MIDI used SMPTE time division; tick grid was normalized to 480 PPQ (timing may be approximate).'),
     )
   }
   if (timeSig[0] !== 4 || timeSig[1] !== 4) {
-    warnings.push(`Time signature ${timeSig[0]}/${timeSig[1]} preserved from MIDI.`)
+    warnings.push(
+      tx('Time signature {num}/{den} preserved from MIDI.', { num: timeSig[0], den: timeSig[1] }),
+    )
   }
   let result = finish({
     kind: 'midi',
@@ -494,19 +503,24 @@ export function midiToBreakdown(
     scaleNotes,
     tab: notes,
     explanation: [
-      `Imported MIDI with ${notes.length} notes.`,
-      `Detected ≈ ${detected.root} ${SCALES[detected.scaleId as ScaleId]?.name || detected.scaleId}.`,
-      `Scale tones: ${scaleNotes.join(', ')}.`,
-      'Fretting uses hand-continuity mapping with chord grips on shared onsets (always editable).',
+      tx('Imported MIDI with {count} notes.', { count: notes.length }),
+      tx('Detected ≈ {root} {scale}.', {
+        root: detected.root,
+        scale: SCALES[detected.scaleId as ScaleId]?.name || detected.scaleId,
+      }),
+      tx('Scale tones: {tones}.', { tones: scaleNotes.join(', ') }),
+      tx('Fretting uses hand-continuity mapping with chord grips on shared onsets (always editable).'),
       parsed.hasTempoChanges
-        ? `Opening tempo ${tempoBpm} BPM — mid-song tempo changes warped into beat positions.`
-        : `Tempo ${tempoBpm} BPM.`,
+        ? tx('Opening tempo {bpm} BPM — mid-song tempo changes warped into beat positions.', {
+            bpm: tempoBpm,
+          })
+        : tx('Tempo {bpm} BPM.', { bpm: tempoBpm }),
     ],
     practicePlan: [
-      `Play root ${detected.root} drone, then scale at 60% tempo.`,
-      `Isolate early measures at ${Math.round(tempoBpm * 0.7)} BPM.`,
-      'Highlight chord tones (1–3–5) in the tab.',
-      'Slow full run, then mark sticky frets.',
+      tx('Play root {root} drone, then scale at 60% tempo.', { root: detected.root }),
+      tx('Isolate early measures at {bpm} BPM.', { bpm: Math.round(tempoBpm * 0.7) }),
+      tx('Highlight chord tones (1–3–5) in the tab.'),
+      tx('Slow full run, then mark sticky frets.'),
     ],
     confidence: estimateNoteConfidence(
       notes.map((n) => n.midi),
@@ -520,7 +534,7 @@ export function midiToBreakdown(
     result = applyScoreToBreakdown(result, cleaned)
     result.warnings = [
       ...result.warnings,
-      'Auto-cleaned timing (8th grid) and re-fretted for playable positions.',
+      tx('Auto-cleaned timing (8th grid) and re-fretted for playable positions.'),
     ]
   }
   if (opts?.midiBytes) result.midiBytes = opts.midiBytes
@@ -551,7 +565,10 @@ function musicXmlToBreakdown(
     const detectedLabel = `${d.root} ${SCALES[d.scaleId as ScaleId]?.name || d.scaleId}`
     if (d.score > 2 && (d.root !== root || d.scaleId !== scaleId)) {
       warnings.push(
-        `Written key is ${writtenLabel}; pitch content leans ${detectedLabel}. Keeping the written key for practice labels.`,
+        tx(
+          'Written key is {written}; pitch content leans {detected}. Keeping the written key for practice labels.',
+          { written: writtenLabel, detected: detectedLabel },
+        ),
       )
     }
   }
@@ -616,7 +633,7 @@ function musicXmlToBreakdown(
     if (!n.chord) voiceCursor.set(voice, onset + dur)
   }
   if (parserOnsetCount === 0 && tab.length > 0) {
-    warnings.push('MusicXML notes lacked parser onsets — rebuilt voice cursors.')
+    warnings.push(tx('MusicXML notes lacked parser onsets — rebuilt voice cursors.'))
   }
   const scaleNotes = scaleNoteNames(root, scaleId)
   const xmlTempo = clampImportBpm(
@@ -627,11 +644,16 @@ function musicXmlToBreakdown(
     parsed.timeSignature?.denominator || 4,
   ]
   if (timeSig[0] !== 4 || timeSig[1] !== 4) {
-    warnings.push(`Time signature ${timeSig[0]}/${timeSig[1]} preserved from MusicXML.`)
+    warnings.push(
+      tx('Time signature {num}/{den} preserved from MusicXML.', {
+        num: timeSig[0],
+        den: timeSig[1],
+      }),
+    )
   }
   return finish({
     kind: 'musicxml',
-    title: parsed.title || 'MusicXML',
+    title: parsed.title || tx('MusicXML'),
     tempoBpm: xmlTempo,
     timeSig,
     key: {
@@ -643,16 +665,24 @@ function musicXmlToBreakdown(
     scaleNotes,
     tab,
     explanation: [
-      `Parsed MusicXML “${parsed.title || 'score'}” with ${tab.length} pitched notes.`,
-      `Key context: ${root} ${SCALES[scaleId as ScaleId]?.name || scaleId} (written key preferred).`,
-      `Scale tones: ${scaleNotes.join(', ')}.`,
-      'Tab from MusicXML string/fret when present; otherwise fretted with your session tuning.',
+      parsed.title
+        ? tx('Parsed MusicXML “{title}” with {count} pitched notes.', {
+            title: parsed.title,
+            count: tab.length,
+          })
+        : tx('Parsed MusicXML “score” with {count} pitched notes.', { count: tab.length }),
+      tx('Key context: {root} {scale} (written key preferred).', {
+        root,
+        scale: SCALES[scaleId as ScaleId]?.name || scaleId,
+      }),
+      tx('Scale tones: {tones}.', { tones: scaleNotes.join(', ') }),
+      tx('Tab from MusicXML string/fret when present; otherwise fretted with your session tuning.'),
     ],
     practicePlan: [
-      'Clap the rhythm away from the guitar once.',
-      'Play open-string rhythm skeleton, then add frets.',
-      'Loop any two-bar cell at slow tempo.',
-      'Name scale degrees while playing the melody.',
+      tx('Clap the rhythm away from the guitar once.'),
+      tx('Play open-string rhythm skeleton, then add frets.'),
+      tx('Loop any two-bar cell at slow tempo.'),
+      tx('Name scale degrees while playing the melody.'),
     ],
     confidence: estimateNoteConfidence(
       tab.map((t) => t.midi),
@@ -667,7 +697,7 @@ function musicXmlToBreakdown(
 export function breakdownGuitarProStub(fileName: string): RemedyBreakdown {
   return guitarProToBreakdown(
     {
-      title: fileName.replace(/\.\w+$/, '') || 'GP import',
+      title: fileName.replace(/\.\w+$/, '') || tx('GP import'),
       tempoBpm: 100,
       notes: [
         { midi: 64, startBeat: 0, durationBeats: 1 },
@@ -681,8 +711,8 @@ export function breakdownGuitarProStub(fileName: string): RemedyBreakdown {
       ],
       source: 'stub',
       warnings: [
-        'Guitar Pro binary parse fell back to a placeholder melody.',
-        GP_EXPORT_HINT,
+        tx('Guitar Pro binary parse fell back to a placeholder melody.'),
+        gpExportHint(),
       ],
     },
     fileName,
@@ -700,14 +730,17 @@ export function guitarProToBreakdown(
     return finish({
       ...mx,
       kind: 'guitarpro',
-      title: parsed.title || mx.title || fileName.replace(/\.\w+$/, '') || 'GP import',
+      title: parsed.title || mx.title || fileName.replace(/\.\w+$/, '') || tx('GP import'),
       timeSig: mx.timeSig ?? [4, 4],
       warnings: [...(parsed.warnings || []), ...(mx.warnings || [])],
       explanation: [
-        `Guitar Pro package “${fileName}” contained MusicXML (${parsed.source}).`,
+        tx('Guitar Pro package “{name}” contained MusicXML ({source}).', {
+          name: fileName,
+          source: parsed.source,
+        }),
         ...mx.explanation,
       ],
-      statusMessage: 'Guitar Pro → MusicXML → tabs · ready',
+      statusMessage: tx('Guitar Pro → MusicXML → tabs · ready'),
     })
   }
 
@@ -764,12 +797,17 @@ export function guitarProToBreakdown(
     : [4, 4]
   const gpTimeWarnings =
     gpTimeSig[0] !== 4 || gpTimeSig[1] !== 4
-      ? [`Time signature ${gpTimeSig[0]}/${gpTimeSig[1]} preserved from Guitar Pro.`]
+      ? [
+          tx('Time signature {num}/{den} preserved from Guitar Pro.', {
+            num: gpTimeSig[0],
+            den: gpTimeSig[1],
+          }),
+        ]
       : []
 
   return finish({
     kind: 'guitarpro',
-    title: parsed.title || fileName.replace(/\.\w+$/, '') || 'GP import',
+    title: parsed.title || fileName.replace(/\.\w+$/, '') || tx('GP import'),
     tempoBpm: clampImportBpm(parsed.tempoBpm || 120),
     timeSig: gpTimeSig,
     key: {
@@ -782,25 +820,48 @@ export function guitarProToBreakdown(
     tab,
     explanation: [
       tab.length
-        ? `Guitar Pro “${parsed.title || fileName}” → ${tab.length} notes (${parsed.source}${parsed.versionHint ? ', ' + parsed.versionHint : ''}).`
-        : `Guitar Pro “${fileName}” opened but no pitched notes were readable (${parsed.source}).`,
-      `Key context ≈ ${detected.root} ${SCALES[detected.scaleId as ScaleId]?.name || detected.scaleId}.`,
-      scaleNotes.length ? `Scale tones: ${scaleNotes.join(', ')}.` : '',
+        ? parsed.versionHint
+          ? tx('Guitar Pro “{title}” → {count} notes ({source}, {hint}).', {
+              title: parsed.title || fileName,
+              count: tab.length,
+              source: parsed.source,
+              hint: parsed.versionHint,
+            })
+          : tx('Guitar Pro “{title}” → {count} notes ({source}).', {
+              title: parsed.title || fileName,
+              count: tab.length,
+              source: parsed.source,
+            })
+        : tx('Guitar Pro “{name}” opened but no pitched notes were readable ({source}).', {
+            name: fileName,
+            source: parsed.source,
+          }),
+      tx('Key context ≈ {root} {scale}.', {
+        root: detected.root,
+        scale: SCALES[detected.scaleId as ScaleId]?.name || detected.scaleId,
+      }),
+      scaleNotes.length ? tx('Scale tones: {tones}.', { tones: scaleNotes.join(', ') }) : '',
       isStub
-        ? 'PLACEHOLDER only — binary GP was not decoded. Export MIDI or MusicXML for real tabs. Not saved to Your tabs.'
-        : 'GPIF/zip best-effort parse. Complex multi-voice scores may still need MIDI/MusicXML export.',
+        ? tx(
+            'PLACEHOLDER only — binary GP was not decoded. Export MIDI or MusicXML for real tabs. Not saved to Your tabs.',
+          )
+        : tx(
+            'GPIF/zip best-effort parse. Complex multi-voice scores may still need MIDI/MusicXML export.',
+          ),
     ].filter(Boolean),
     practicePlan: isStub
       ? [
-          'Re-export this score as MIDI (.mid) or MusicXML from Guitar Pro / TuxGuitar.',
-          'Upload the export here for accurate fretting and timing.',
-          'Do not practice the placeholder melody as if it were the song.',
+          tx('Re-export this score as MIDI (.mid) or MusicXML from Guitar Pro / TuxGuitar.'),
+          tx('Upload the export here for accurate fretting and timing.'),
+          tx('Do not practice the placeholder melody as if it were the song.'),
         ]
       : [
-          'Check fretting against the original GP score if you have it open.',
-          `Loop the first four bars at ${Math.round((parsed.tempoBpm || 120) * 0.7)} BPM.`,
-          'Mark any stretch frets and isolate them for 2 minutes.',
-          'Save to Your tabs once the candidate looks right.',
+          tx('Check fretting against the original GP score if you have it open.'),
+          tx('Loop the first four bars at {bpm} BPM.', {
+            bpm: Math.round((parsed.tempoBpm || 120) * 0.7),
+          }),
+          tx('Mark any stretch frets and isolate them for 2 minutes.'),
+          tx('Save to Your tabs once the candidate looks right.'),
         ],
     confidence: conf,
     editable: true,
@@ -810,14 +871,14 @@ export function guitarProToBreakdown(
       ...(parsed.warnings || []),
       ...(isStub
         ? [
-            GP_EXPORT_HINT,
-            'Placeholder melody — not auto-saved. Export MIDI/MusicXML for a real tab.',
+            gpExportHint(),
+            tx('Placeholder melody — not auto-saved. Export MIDI/MusicXML for a real tab.'),
           ]
         : []),
     ],
     statusMessage: isStub
-      ? 'Guitar Pro · placeholder (not saved) — export MIDI/MusicXML'
-      : `Guitar Pro → tabs · ${tab.length} notes · ready`,
+      ? tx('Guitar Pro · placeholder (not saved) — export MIDI/MusicXML')
+      : tx('Guitar Pro → tabs · {count} notes · ready', { count: tab.length }),
   })
 }
 
@@ -845,29 +906,31 @@ export function breakdownAudioAssist(
     pitchHints.length > 0
       ? pitchHints
       : [57, 60, 62, 64, 67, 64, 62, 60] // A minor-ish demo hints
-  const base = analyzeNotes(pitches, fileName.replace(/\.\w+$/, '') || 'Audio sketch')
+  const base = analyzeNotes(pitches, fileName.replace(/\.\w+$/, '') || tx('Audio sketch'))
   return finish({
     ...base,
     kind: 'audio',
     confidence: pitchHints.length ? 0.45 : 0.25,
     editable: true,
     warnings: [
-      'Audio path is lead-biased multipitch assist (up to ~4 fretted voices) — not studio multi-track tabs.',
-      'Always edit candidate fretting before saving to your library.',
+      tx(
+        'Audio path is lead-biased multipitch assist (up to ~4 fretted voices) — not studio multi-track tabs.',
+      ),
+      tx('Always edit candidate fretting before saving to your library.'),
     ],
     explanation: [
-      `Audio assist for “${fileName}”.`,
+      tx('Audio assist for “{name}”.', { name: fileName }),
       pitchHints.length
-        ? `Using ${pitchHints.length} pitch hints → candidate fretting.`
-        : 'No pitch tracker data yet — showing an editable candidate sketch.',
-      'Confirm every note on the fretboard; Remedy will not claim perfect transcription in v1.',
+        ? tx('Using {count} pitch hints → candidate fretting.', { count: pitchHints.length })
+        : tx('No pitch tracker data yet — showing an editable candidate sketch.'),
+      tx('Confirm every note on the fretboard; Remedy will not claim perfect transcription in v1.'),
       ...base.explanation.slice(1),
     ],
     practicePlan: [
-      'Verify each candidate note against what you hear.',
-      'Delete false positives before practicing.',
-      'Once edited, treat it like any MIDI-derived tab.',
-      'Save only after human confirm.',
+      tx('Verify each candidate note against what you hear.'),
+      tx('Delete false positives before practicing.'),
+      tx('Once edited, treat it like any MIDI-derived tab.'),
+      tx('Save only after human confirm.'),
     ],
   })
 }
@@ -997,7 +1060,7 @@ export function audioMidiToBreakdown(
 ): RemedyBreakdown {
   if (opts?.tuning) setSessionTuning(opts.tuning)
   if (opts?.preferPosition) setSessionPreferPosition(opts.preferPosition)
-  const title = fileName.replace(/\.\w+$/, '') || 'Audio convert'
+  const title = fileName.replace(/\.\w+$/, '') || tx('Audio convert')
   if (!converted.notes.length) {
     const empty = breakdownAudioAssist(fileName, [])
     const result = finish({
@@ -1008,17 +1071,20 @@ export function audioMidiToBreakdown(
       confidence: 0.15,
       warnings: [
         ...converted.warnings,
-        'No pitches locked — try a cleaner lead clip (or MIDI/MusicXML) instead.',
+        tx('No pitches locked — try a cleaner lead clip (or MIDI/MusicXML) instead.'),
       ],
       explanation: [
-        `1) Decoded “${fileName}” (${converted.durationSec.toFixed(1)}s).`,
-        '2) MP3→MIDI found no stable notes.',
-        '3) Tabs skipped — use a dry single-note melody, or upload MIDI/MusicXML.',
+        tx('1) Decoded “{name}” ({sec}s).', {
+          name: fileName,
+          sec: converted.durationSec.toFixed(1),
+        }),
+        tx('2) MP3→MIDI found no stable notes.'),
+        tx('3) Tabs skipped — use a dry single-note melody, or upload MIDI/MusicXML.'),
         ...empty.explanation.slice(2),
       ],
     })
     result.midiBytes = converted.midiBytes
-    result.statusMessage = 'MP3→MIDI found no notes'
+    result.statusMessage = tx('MP3→MIDI found no notes')
     return result
   }
 
@@ -1040,9 +1106,11 @@ export function audioMidiToBreakdown(
     tuning: opts?.tuning,
     warnings: [
       ...converted.warnings,
-      'Converted via multipitch assist — use Clean up / Edit tab if anything is off.',
+      tx('Converted via multipitch assist — use Clean up / Edit tab if anything is off.'),
     ],
-    statusMessage: `Audio → MIDI → tabs · ${converted.notes.length} notes (cleaned)`,
+    statusMessage: tx('Audio → MIDI → tabs · {count} notes (cleaned)', {
+      count: converted.notes.length,
+    }),
   })
 
   const cleaned = cleanUpAfterConvert(tabs.score)
@@ -1103,24 +1171,48 @@ export function audioMidiToBreakdown(
       editable: true,
       warnings: [
         ...converted.warnings,
-        'Pipeline: audio → MIDI → tabs → auto clean (quantize + playable frets).',
-        'Still an assist draft — full-band mixes need ear checks; chords keep up to 4 voices when detected.',
+        tx('Pipeline: audio → MIDI → tabs → auto clean (quantize + playable frets).'),
+        tx(
+          'Still an assist draft — full-band mixes need ear checks; chords keep up to 4 voices when detected.',
+        ),
       ],
       explanation: [
-        `1) Decoded “${fileName}” (${converted.durationSec.toFixed(1)}s @ ${converted.sampleRate} Hz${
-          converted.analyzedSec && converted.analyzedSec + 0.2 < converted.durationSec
-            ? `, analyzed ${converted.analyzedSec.toFixed(0)}s`
-            : ''
-        }).`,
-        `2) Audio→MIDI locked ${converted.notes.length} notes @ ~${converted.tempoBpm} BPM (detected ≈ ${converted.detectedTempoBpm ?? converted.tempoBpm}; lead emphasis + octave repair).`,
-        `3) MIDI→tabs: ${withMeta.notes.length} notes after cleanup · key ≈ ${tabs.key.root} ${tabs.key.scaleName}.`,
-        `Scale tones: ${tabs.scaleNotes.join(', ')}. Confirm the first phrase against the recording.`,
+        converted.analyzedSec && converted.analyzedSec + 0.2 < converted.durationSec
+          ? tx('1) Decoded “{name}” ({sec}s @ {hz} Hz, analyzed {analyzed}s).', {
+              name: fileName,
+              sec: converted.durationSec.toFixed(1),
+              hz: converted.sampleRate,
+              analyzed: converted.analyzedSec.toFixed(0),
+            })
+          : tx('1) Decoded “{name}” ({sec}s @ {hz} Hz).', {
+              name: fileName,
+              sec: converted.durationSec.toFixed(1),
+              hz: converted.sampleRate,
+            }),
+        tx(
+          '2) Audio→MIDI locked {count} notes @ ~{bpm} BPM (detected ≈ {detected}; lead emphasis + octave repair).',
+          {
+            count: converted.notes.length,
+            bpm: converted.tempoBpm,
+            detected: converted.detectedTempoBpm ?? converted.tempoBpm,
+          },
+        ),
+        tx('3) MIDI→tabs: {count} notes after cleanup · key ≈ {root} {scale}.', {
+          count: withMeta.notes.length,
+          root: tabs.key.root,
+          scale: tabs.key.scaleName,
+        }),
+        tx('Scale tones: {tones}. Confirm the first phrase against the recording.', {
+          tones: tabs.scaleNotes.join(', '),
+        }),
       ],
       practicePlan: [
-        'Play the recording and check the first 8 tab notes by ear (A/B scrub in the editor).',
-        `Loop sticky spots at ~${Math.round((converted.tempoBpm || 100) * 0.7)} BPM.`,
-        'Use Edit tab → Clean up again, or fix frets by hand, then save to Your tabs.',
-        'Download the MIDI if you want to edit further in a DAW.',
+        tx('Play the recording and check the first 8 tab notes by ear (A/B scrub in the editor).'),
+        tx('Loop sticky spots at ~{bpm} BPM.', {
+          bpm: Math.round((converted.tempoBpm || 100) * 0.7),
+        }),
+        tx('Use Edit tab → Clean up again, or fix frets by hand, then save to Your tabs.'),
+        tx('Download the MIDI if you want to edit further in a DAW.'),
       ],
     },
     withMeta,
@@ -1130,7 +1222,8 @@ export function audioMidiToBreakdown(
   polished.analyzedSec = converted.analyzedSec ?? converted.durationSec
   polished.noteConfidences = confidences
   polished.statusMessage =
-    tabs.statusMessage ?? `Audio → MIDI → tabs · ${withMeta.notes.length} notes`
+    tabs.statusMessage ??
+    tx('Audio → MIDI → tabs · {count} notes', { count: withMeta.notes.length })
   return polished
 }
 
@@ -1163,10 +1256,10 @@ export async function convertAudioToGuitarTabs(
   const onProgress = opts?.onProgress
   if (opts?.tuning) setSessionTuning(opts.tuning)
   if (opts?.preferPosition) setSessionPreferPosition(opts.preferPosition)
-  onProgress?.('decode', '1/3 Decoding audio…')
+  onProgress?.('decode', tx('1/3 Decoding audio…'))
   try {
     const buf = await file.arrayBuffer()
-    onProgress?.('audio_to_midi', '2/3 Converting audio → MIDI…')
+    onProgress?.('audio_to_midi', tx('2/3 Converting audio → MIDI…'))
     // Omit tempo unless user set one — lets detectTempoBpm run
     const converted = await convertArrayBufferToMidi(buf, {
       tempoBpm: opts?.tempoBpm,
@@ -1178,29 +1271,32 @@ export async function convertAudioToGuitarTabs(
       swing: opts?.swing ?? 'none',
       drumGate: opts?.drumGate,
       onProgress: (pct, message) => {
-        onProgress?.('audio_to_midi', `2/3 ${message} (${pct}%)`)
+        onProgress?.('audio_to_midi', tx('2/3 {message} ({pct}%)', { message, pct }))
       },
     })
-    onProgress?.('midi_to_tabs', '3/3 MIDI → guitar tabs…')
+    onProgress?.('midi_to_tabs', tx('3/3 MIDI → guitar tabs…'))
     const result = audioMidiToBreakdown(converted, name, {
       tuning: opts?.tuning,
       preferPosition: opts?.preferPosition,
     })
-    onProgress?.('done', result.statusMessage ?? 'Done · audio → MIDI → tabs')
+    onProgress?.('done', result.statusMessage ?? tx('Done · audio → MIDI → tabs'))
     return result
   } catch (err) {
-    const msg = err instanceof Error ? err.message : 'decode failed'
-    onProgress?.('error', `Converter failed: ${msg}`)
+    const msg = err instanceof Error ? err.message : tx('decode failed')
+    onProgress?.('error', tx('Converter failed: {detail}', { detail: msg }))
     const fallback = breakdownAudioAssist(name)
     return finish({
       ...fallback,
-      warnings: [`MP3→MIDI could not decode this file (${msg}).`, ...fallback.warnings],
+      warnings: [
+        tx('MP3→MIDI could not decode this file ({detail}).', { detail: msg }),
+        ...fallback.warnings,
+      ],
       explanation: [
-        `Audio “${name}” failed the MP3→MIDI→tabs pipeline.`,
-        'Showing an editable sketch — or re-export as MIDI/MusicXML for the solid path.',
+        tx('Audio “{name}” failed the MP3→MIDI→tabs pipeline.', { name }),
+        tx('Showing an editable sketch — or re-export as MIDI/MusicXML for the solid path.'),
         ...fallback.explanation.slice(2),
       ],
-      statusMessage: `Converter error: ${msg}`,
+      statusMessage: tx('Converter error: {detail}', { detail: msg }),
     })
   }
 }
@@ -1231,39 +1327,41 @@ export async function breakdownFile(
 
   // Direct MIDI → tabs (skip audio stage)
   if (lower.endsWith('.mid') || lower.endsWith('.midi')) {
-    opts?.onProgress?.('midi_to_tabs', 'MIDI → guitar tabs…')
+    opts?.onProgress?.('midi_to_tabs', tx('MIDI → guitar tabs…'))
     const buf = await file.arrayBuffer()
     const result = midiBytesToGuitarTabs(buf, name, {
-      statusMessage: 'MIDI → tabs · ready',
+      statusMessage: tx('MIDI → tabs · ready'),
       tuning: opts?.tuning,
     })
-    opts?.onProgress?.('done', result.statusMessage ?? 'Done')
+    opts?.onProgress?.('done', result.statusMessage ?? tx('Done'))
     return result
   }
 
   if (lower.endsWith('.xml') || lower.endsWith('.musicxml')) {
-    opts?.onProgress?.('midi_to_tabs', 'Parsing MusicXML → tabs…')
+    opts?.onProgress?.('midi_to_tabs', tx('Parsing MusicXML → tabs…'))
     const textXml = file.text
       ? await file.text()
       : new TextDecoder().decode(await file.arrayBuffer())
     const result = musicXmlToBreakdown(parseMusicXml(textXml), { tuning: opts?.tuning })
-    result.statusMessage = 'MusicXML → tabs · ready'
+    result.statusMessage = tx('MusicXML → tabs · ready')
     opts?.onProgress?.('done', result.statusMessage)
     return result
   }
 
   if (isGuitarProName(name) || lower.endsWith('.gpif')) {
-    opts?.onProgress?.('midi_to_tabs', 'Guitar Pro → tabs (best-effort)…')
+    opts?.onProgress?.('midi_to_tabs', tx('Guitar Pro → tabs (best-effort)…'))
     const buf = await file.arrayBuffer()
     // Explicit opts.tuning (or session) drives GPIF open strings + fretting.
     const result = await breakdownGuitarPro(buf, name, { tuning: opts?.tuning })
     if (result.isPlaceholder) {
       result.warnings = [
         ...(result.warnings || []),
-        'Guitar Pro binary is best-effort — placeholder notes are never auto-saved. Prefer MIDI/MusicXML export from your editor.',
+        tx(
+          'Guitar Pro binary is best-effort — placeholder notes are never auto-saved. Prefer MIDI/MusicXML export from your editor.',
+        ),
       ]
     }
-    opts?.onProgress?.('done', result.statusMessage ?? 'Done')
+    opts?.onProgress?.('done', result.statusMessage ?? tx('Done'))
     return result
   }
 
@@ -1287,11 +1385,11 @@ export async function breakdownFile(
 
   // try midi parse anyway
   try {
-    opts?.onProgress?.('midi_to_tabs', 'Trying MIDI parse…')
+    opts?.onProgress?.('midi_to_tabs', tx('Trying MIDI parse…'))
     const buf = await file.arrayBuffer()
     return midiBytesToGuitarTabs(buf, name, { tuning: opts?.tuning })
   } catch {
-    opts?.onProgress?.('error', 'Unknown format')
+    opts?.onProgress?.('error', tx('Unknown format'))
     return finish({
       kind: 'unknown',
       title: name,
@@ -1303,16 +1401,18 @@ export async function breakdownFile(
       scaleNotes: scaleNoteNames('C', 'major'),
       tab: [],
       explanation: [
-        `Could not detect format for “${name}”.`,
-        `Upload audio (${AUDIO_FORMATS_LABEL}) for convert → MIDI → tabs, or a .mid / MusicXML file.`,
+        tx('Could not detect format for “{name}”.', { name }),
+        tx('Upload audio ({formats}) for convert → MIDI → tabs, or a .mid / MusicXML file.', {
+          formats: AUDIO_FORMATS_LABEL,
+        }),
       ],
       practicePlan: [
-        'Re-export from your DAW as MIDI or MusicXML, or try a clean monophonic MP3/WAV.',
+        tx('Re-export from your DAW as MIDI or MusicXML, or try a clean monophonic MP3/WAV.'),
       ],
       confidence: 0,
       editable: true,
-      warnings: ['Unknown format'],
-      statusMessage: 'Unknown format',
+      warnings: [tx('Unknown format')],
+      statusMessage: tx('Unknown format'),
     })
   }
 }

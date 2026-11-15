@@ -16,6 +16,8 @@ import {
   type ScaleId,
 } from '../lib/theory'
 import { useAppStore } from '../store/appStore'
+import { useI18n } from '../i18n/useI18n'
+import { presentScaleName } from '../i18n/present'
 import {
   ArrowDownUp,
   Gauge,
@@ -27,19 +29,19 @@ import clsx from 'clsx'
 
 type PracticeTab = 'tools' | 'fretboard' | 'metronome' | 'tuner'
 
-const POSITION_PRESETS: { fret: number | null; label: string; hint: string }[] = [
-  { fret: null, label: 'All', hint: 'Full neck' },
-  { fret: 0, label: 'Open', hint: 'Open position' },
-  { fret: 3, label: '3', hint: 'From fret 3' },
-  { fret: 5, label: '5', hint: 'From fret 5' },
-  { fret: 7, label: '7', hint: 'From fret 7' },
-  { fret: 9, label: '9', hint: 'From fret 9' },
-  { fret: 12, label: '12', hint: 'From fret 12' },
-]
-
 export function PracticePage() {
+  const { tx } = useI18n()
   const location = useLocation()
   const [tab, setTab] = useState<PracticeTab>('tools')
+  const positionPresets: { fret: number | null; label: string; hint: string }[] = [
+    { fret: null, label: tx('All'), hint: tx('Full neck') },
+    { fret: 0, label: tx('Open'), hint: tx('Open position') },
+    { fret: 3, label: '3', hint: tx('From fret {n}', { n: 3 }) },
+    { fret: 5, label: '5', hint: tx('From fret {n}', { n: 5 }) },
+    { fret: 7, label: '7', hint: tx('From fret {n}', { n: 7 }) },
+    { fret: 9, label: '9', hint: tx('From fret {n}', { n: 9 }) },
+    { fret: 12, label: '12', hint: tx('From fret {n}', { n: 12 }) },
+  ]
 
   useEffect(() => {
     const tool = (location.state as { tool?: string } | null)?.tool
@@ -149,22 +151,23 @@ export function PracticePage() {
     <div className="space-y-6 animate-fade-up">
       <div>
         <p className="text-xs uppercase tracking-widest text-mint/80 font-semibold">
-          Practice
+          {tx('Practice')}
         </p>
-        <h1 className="font-display text-3xl font-bold mt-1">Practice room</h1>
+        <h1 className="font-display text-3xl font-bold mt-1">{tx('Practice room')}</h1>
         <p className="text-sm text-[var(--text-muted)] mt-1">
-          Metronome, chromatic tuner, and fretboard lab. Left-handed:{' '}
-          {lefty ? 'on' : 'off'} (Profile).
+          {tx('Metronome, chromatic tuner, and fretboard lab. Left-handed: {state} (Profile).', {
+            state: lefty ? tx('on') : tx('off'),
+          })}
         </p>
       </div>
 
       <div className="flex flex-wrap gap-2 p-1 rounded-2xl bg-[var(--bg-card)] border border-[var(--border)] w-fit">
         {(
           [
-            { id: 'tools' as const, label: 'Both tools' },
-            { id: 'metronome' as const, label: 'Metronome' },
-            { id: 'tuner' as const, label: 'Tuner' },
-            { id: 'fretboard' as const, label: 'Fretboard lab' },
+            { id: 'tools' as const, label: tx('Both tools') },
+            { id: 'metronome' as const, label: tx('Metronome') },
+            { id: 'tuner' as const, label: tx('Tuner') },
+            { id: 'fretboard' as const, label: tx('Fretboard lab') },
           ] as const
         ).map((t) => (
           <button
@@ -201,30 +204,30 @@ export function PracticePage() {
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
                 <p className="text-xs uppercase tracking-widest text-mint/70 font-semibold">
-                  Fretboard lab
+                  {tx('Fretboard lab')}
                 </p>
                 <h2 className="font-display text-xl font-bold mt-0.5">
-                  {rootName} {scale.name}
+                  {rootName} {presentScaleName(scale.id, scale.name)}
                 </h2>
                 <p className="text-xs text-[var(--text-muted)] mt-1 max-w-xl">
                   {scale.category === 'mode'
-                    ? 'Mode colors — tap frets or Play to walk the pattern.'
+                    ? tx('Mode colors — tap frets or Play to walk the pattern.')
                     : scale.category === 'pentatonic'
-                      ? 'Five-note box shapes. Tap frets or Play to walk the neck.'
+                      ? tx('Five-note box shapes. Tap frets or Play to walk the neck.')
                       : scale.category === 'scale'
-                        ? 'Full diatonic map. Tap frets or Play to walk the neck.'
-                        : 'Tap a lit fret to hear it. Play walks the scale on the neck.'}
+                        ? tx('Full diatonic map. Tap frets or Play to walk the neck.')
+                        : tx('Tap a lit fret to hear it. Play walks the scale on the neck.')}
                 </p>
               </div>
               <div className="text-right text-[11px] font-mono text-mint/80 space-y-0.5">
                 <div>
-                  Degrees:{' '}
+                  {tx('Degrees:')}{' '}
                   <span className="text-[var(--text)]">
                     {scale.degrees.join(' · ')}
                   </span>
                 </div>
                 <div className="text-[var(--text-muted)]">
-                  Open (high→low): {openNames}
+                  {tx('Open (high→low): {notes}', { notes: openNames })}
                 </div>
               </div>
             </div>
@@ -237,11 +240,11 @@ export function PracticePage() {
             />
 
             <div className="space-y-2">
-              <p className="text-xs text-[var(--text-muted)]">Position box</p>
+              <p className="text-xs text-[var(--text-muted)]">{tx('Position box')}</p>
               <div className="flex flex-wrap gap-1.5">
-                {POSITION_PRESETS.map((p) => (
+                {positionPresets.map((p) => (
                   <button
-                    key={p.label}
+                    key={p.fret ?? 'all'}
                     type="button"
                     title={p.hint}
                     className={clsx(
@@ -257,13 +260,13 @@ export function PracticePage() {
                 ))}
               </div>
               <p className="text-[11px] text-[var(--text-muted)]">
-                Dims frets outside a 5-fret window (open strings stay lit). Good for box practice.
+                {tx('Dims frets outside a 5-fret window (open strings stay lit). Good for box practice.')}
               </p>
             </div>
 
             <div className="flex flex-wrap gap-3 items-end">
               <label className="flex flex-col gap-1 text-xs text-[var(--text-muted)]">
-                BPM
+                {tx('BPM')}
                 <div className="flex items-center gap-2">
                   <Gauge className="w-3.5 h-3.5 text-mint/70" />
                   <NumberInput
@@ -278,7 +281,7 @@ export function PracticePage() {
               </label>
 
               <label className="flex flex-col gap-1 text-xs text-[var(--text-muted)]">
-                Octaves
+                {tx('Octaves')}
                 <select
                   className="input !py-2 !text-sm w-24"
                   value={octaves}
@@ -296,7 +299,7 @@ export function PracticePage() {
                   onChange={(e) => setShowDegrees(e.target.checked)}
                   className="accent-mint"
                 />
-                Degrees
+                {tx('Degrees')}
               </label>
 
               <label className="flex items-center gap-2 text-sm pb-2 cursor-pointer select-none">
@@ -307,7 +310,7 @@ export function PracticePage() {
                   className="accent-mint"
                 />
                 <ArrowDownUp className="w-3.5 h-3.5 text-mint/80" />
-                Up then down
+                {tx('Up then down')}
               </label>
 
               <button
@@ -317,35 +320,35 @@ export function PracticePage() {
               >
                 {playing ? (
                   <>
-                    <Square className="w-4 h-4" /> Stop
+                    <Square className="w-4 h-4" /> {tx('Stop')}
                   </>
                 ) : (
                   <>
-                    <Play className="w-4 h-4" /> Play scale
+                    <Play className="w-4 h-4" /> {tx('Play scale')}
                   </>
                 )}
               </button>
 
               <button type="button" className="btn-ghost" onClick={resetLab}>
-                <RotateCcw className="w-4 h-4" /> Defaults
+                <RotateCcw className="w-4 h-4" /> {tx('Defaults')}
               </button>
             </div>
 
             <div className="flex flex-wrap gap-4 text-[11px] text-[var(--text-muted)] border-t border-[var(--border)] pt-3">
               <span className="inline-flex items-center gap-1.5">
                 <span className="w-3.5 h-3.5 rounded-full bg-lime ring-2 ring-mint/70" />
-                Root
+                {tx('Root')}
               </span>
               <span className="inline-flex items-center gap-1.5">
                 <span className="w-3.5 h-3.5 rounded-full bg-mint" />
-                Scale tone
+                {tx('Scale tone')}
               </span>
               <span className="inline-flex items-center gap-1.5">
                 <span className="w-3.5 h-3.5 rounded-full bg-lime ring-2 ring-white fret-dot-active" />
-                Sounding
+                {tx('Sounding')}
               </span>
               <span className="text-[var(--text-muted)]/80">
-                A4={a4} · Profile tuning · click any lit fret
+                {tx('A4={a4} · Profile tuning · click any lit fret', { a4 })}
               </span>
             </div>
           </div>

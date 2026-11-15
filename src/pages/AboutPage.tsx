@@ -12,8 +12,6 @@ import {
   Upload,
 } from 'lucide-react'
 import {
-  ABOUT_BLURB,
-  ABOUT_FOOTER_META,
   ABOUT_HELLO,
   APP_NAME,
   APP_VERSION,
@@ -26,6 +24,7 @@ import {
 } from '../lib/brand'
 import { isTauri } from '../lib/desktop'
 import { checkForAppUpdate, downloadAndInstallUpdate } from '../lib/updater'
+import { useI18n } from '../i18n/useI18n'
 
 async function openExternal(url: string): Promise<void> {
   if (isTauri()) {
@@ -47,17 +46,11 @@ type ExtLink = {
   primary?: boolean
 }
 
-const EXT_LINKS: ExtLink[] = [
-  { label: 'GitHub', url: GITHUB_PROFILE, icon: Github, primary: true },
-  { label: 'Repo', url: GITHUB_REPO, icon: ExternalLink },
-  { label: 'Releases', url: GITHUB_RELEASES, icon: Download },
-  { label: 'Patreon', url: PATREON_URL, icon: Heart },
-  { label: 'Issues', url: GITHUB_ISSUES, icon: ExternalLink },
-]
-
 export function AboutPage() {
+  const { tx } = useI18n()
   const [appVersion, setAppVersion] = useState(APP_VERSION)
   const [updateMsg, setUpdateMsg] = useState<string | null>(null)
+  const [updateTone, setUpdateTone] = useState<'ok' | 'muted'>('muted')
   const [updateBusy, setUpdateBusy] = useState(false)
   const [pendingVersion, setPendingVersion] = useState<string | null>(null)
   const [linkError, setLinkError] = useState<string | null>(null)
@@ -82,13 +75,17 @@ export function AboutPage() {
     try {
       const result = await checkForAppUpdate()
       if (result.kind === 'up-to-date') {
-        setUpdateMsg(`You're on the latest version (${appVersion}).`)
+        setUpdateTone('ok')
+        setUpdateMsg(tx("You're on the latest version ({version}).", { version: appVersion }))
       } else if (result.kind === 'available') {
         setPendingVersion(result.version)
-        setUpdateMsg(`Update ${result.version} is ready to install.`)
+        setUpdateTone('ok')
+        setUpdateMsg(tx('Update {version} is ready to install.', { version: result.version }))
       } else if (result.kind === 'unsupported') {
+        setUpdateTone('muted')
         setUpdateMsg(result.message)
       } else {
+        setUpdateTone('muted')
         setUpdateMsg(result.message)
       }
     } finally {
@@ -98,38 +95,46 @@ export function AboutPage() {
 
   const runUpdateInstall = async () => {
     setUpdateBusy(true)
-    setUpdateMsg('Downloading update…')
+    setUpdateTone('muted')
+    setUpdateMsg(tx('Downloading update…'))
     try {
       const ok = await downloadAndInstallUpdate((pct) => {
+        setUpdateTone('muted')
         if (pct == null) {
-          setUpdateMsg('Downloading update…')
+          setUpdateMsg(tx('Downloading update…'))
         } else {
-          setUpdateMsg(`Downloading update… ${pct}%`)
+          setUpdateMsg(tx('Downloading update… {pct}%', { pct }))
         }
       })
       if (!ok) {
-        setUpdateMsg(`You're on the latest version (${appVersion}).`)
+        setUpdateTone('ok')
+        setUpdateMsg(tx("You're on the latest version ({version}).", { version: appVersion }))
         setPendingVersion(null)
       }
       // relaunch() exits the process on success
     } catch (e) {
+      setUpdateTone('muted')
       setUpdateMsg(String(e))
     } finally {
       setUpdateBusy(false)
     }
   }
 
-  const shellLabel = isTauri() ? 'Windows desktop' : 'Web / PWA'
-  const updateOk =
-    !!updateMsg &&
-    (updateMsg.startsWith("You're on") || updateMsg.startsWith('Update '))
+  const shellLabel = isTauri() ? tx('Windows desktop') : tx('Web / PWA')
+  const extLinks: ExtLink[] = [
+    { label: tx('GitHub'), url: GITHUB_PROFILE, icon: Github, primary: true },
+    { label: tx('Repo'), url: GITHUB_REPO, icon: ExternalLink },
+    { label: tx('Releases'), url: GITHUB_RELEASES, icon: Download },
+    { label: tx('Patreon'), url: PATREON_URL, icon: Heart },
+    { label: tx('Issues'), url: GITHUB_ISSUES, icon: ExternalLink },
+  ]
 
   return (
     <div className="space-y-6 max-w-xl animate-fade-up">
       {/* Hero — matches You page family */}
       <section
         className="relative overflow-hidden rounded-3xl border border-[var(--border)] bg-gradient-to-br from-[#06120c] via-[#030705] to-[#020403]"
-        aria-label={`About ${APP_NAME}`}
+        aria-label={tx('About {name}', { name: APP_NAME })}
       >
         <img
           src="/assets/brand-mark.png"
@@ -140,22 +145,32 @@ export function AboutPage() {
         <div className="absolute inset-0 bg-gradient-to-r from-[#030705] via-[#030705]/92 to-transparent" />
         <div className="absolute -left-8 -bottom-10 w-40 h-40 rounded-full bg-mint/10 blur-3xl" />
         <div className="relative p-5 md:p-6 space-y-3">
-          <p className="text-xs uppercase tracking-widest text-mint/80 font-semibold">About</p>
+          <p className="text-xs uppercase tracking-widest text-mint/80 font-semibold">{tx('About')}</p>
           <h1 className="font-display text-3xl font-bold tracking-tight">{APP_NAME}</h1>
           <p className="text-mint font-medium text-sm md:text-base">{ABOUT_HELLO}</p>
           <p className="text-sm text-[var(--text-muted)] leading-relaxed max-w-md">
-            {ABOUT_BLURB}
+            {tx(
+              'Interactive scales, full tabs, a free open library, song → tabs, and a Day 1–365 path — local-first on Windows and the web.',
+            )}
           </p>
           <p className="text-[11px] text-[var(--text-muted)] pt-1">
-            v{appVersion} · {shellLabel} · local-first
+            {tx('v{version} · {shell} · local-first', { version: appVersion, shell: shellLabel })}
           </p>
           <div className="flex flex-wrap gap-1.5 pt-1">
-            {['Scales', 'Tabs', '365 path', 'Song → tabs', 'MIT'].map((tag) => (
+            {(
+              [
+                { id: 'scales', label: tx('Scales') },
+                { id: 'tabs', label: tx('Tabs') },
+                { id: 'path', label: tx('365 path') },
+                { id: 'song', label: tx('Song → tabs') },
+                { id: 'mit', label: tx('MIT') },
+              ] as const
+            ).map(({ id, label }) => (
               <span
-                key={tag}
+                key={id}
                 className="px-2 py-0.5 rounded-full text-[10px] uppercase tracking-wider border border-mint/20 bg-mint/5 text-soft"
               >
-                {tag}
+                {label}
               </span>
             ))}
           </div>
@@ -165,15 +180,15 @@ export function AboutPage() {
       {/* Links out */}
       <section className="card p-5 space-y-3">
         <div>
-          <h2 className="font-display font-semibold">Connect</h2>
+          <h2 className="font-display font-semibold">{tx('Connect')}</h2>
           <p className="text-xs text-[var(--text-muted)] mt-0.5">
-            Source, releases, support — opens in your browser.
+            {tx('Source, releases, support — opens in your browser.')}
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
-          {EXT_LINKS.map(({ label, url, icon: Icon, primary }) => (
+          {extLinks.map(({ label, url, icon: Icon, primary }) => (
             <button
-              key={label}
+              key={url}
               type="button"
               className={
                 primary
@@ -197,11 +212,13 @@ export function AboutPage() {
             <RefreshCw className="w-5 h-5 text-mint" />
           </span>
           <div className="min-w-0">
-            <h2 className="font-display font-semibold">Updates</h2>
+            <h2 className="font-display font-semibold">{tx('Updates')}</h2>
             <p className="text-xs text-[var(--text-muted)] mt-0.5 leading-relaxed">
               {isTauri()
-                ? 'Signed installs from GitHub Releases. Check anytime; install restarts the app.'
-                : 'Auto-update runs in the Windows desktop build. On web, refresh or reinstall the PWA for the latest.'}
+                ? tx('Signed installs from GitHub Releases. Check anytime; install restarts the app.')
+                : tx(
+                    'Auto-update runs in the Windows desktop build. On web, refresh or reinstall the PWA for the latest.',
+                  )}
             </p>
           </div>
         </div>
@@ -213,7 +230,7 @@ export function AboutPage() {
             onClick={() => void runUpdateCheck()}
           >
             <RefreshCw className={`w-4 h-4 ${updateBusy && !pendingVersion ? 'animate-spin' : ''}`} />
-            {updateBusy && !pendingVersion ? 'Checking…' : 'Check for updates'}
+            {updateBusy && !pendingVersion ? tx('Checking…') : tx('Check for updates')}
           </button>
           {pendingVersion && (
             <button
@@ -223,12 +240,12 @@ export function AboutPage() {
               onClick={() => void runUpdateInstall()}
             >
               <Download className="w-4 h-4" />
-              {updateBusy ? 'Installing…' : `Install ${pendingVersion} & restart`}
+              {updateBusy ? tx('Installing…') : tx('Install {version} & restart', { version: pendingVersion })}
             </button>
           )}
         </div>
         {updateMsg && (
-          <p className={`text-xs leading-relaxed ${updateOk ? 'text-mint' : 'text-[var(--text-muted)]'}`}>
+          <p className={`text-xs leading-relaxed ${updateTone === 'ok' ? 'text-mint' : 'text-[var(--text-muted)]'}`}>
             {updateMsg}
           </p>
         )}
@@ -236,27 +253,28 @@ export function AboutPage() {
 
       {/* Honest product scope */}
       <section className="card p-5 text-sm text-[var(--text-muted)] leading-relaxed space-y-3">
-        <h2 className="font-display font-semibold text-[var(--text)]">How song → tabs works</h2>
+        <h2 className="font-display font-semibold text-[var(--text)]">{tx('How song → tabs works')}</h2>
         <p>
-          <strong className="text-[var(--text)]">Solid path:</strong> MIDI and MusicXML become
-          deterministic tabs with key/scale analysis and a practice plan. Guitar Pro is best-effort
-          (GPIF/zip often works; classic binary may stay a placeholder and never auto-saves — export
-          MIDI/MusicXML from your DAW or GP).
+          <strong className="text-[var(--text)]">{tx('Solid path:')}</strong>{' '}
+          {tx(
+            'MIDI and MusicXML become deterministic tabs with key/scale analysis and a practice plan. Guitar Pro is best-effort (GPIF/zip often works; classic binary may stay a placeholder and never auto-saves — export MIDI/MusicXML from your DAW or GP).',
+          )}
         </p>
         <p>
-          <strong className="text-[var(--text)]">Audio path:</strong> MP3/WAV and friends →
-          lead-biased multipitch assist → MIDI → guitar tabs. Always editable; not multi-voice studio
-          transcription. Use stems, tempo, trim, Clean up, and the tab editor to finish by ear.
+          <strong className="text-[var(--text)]">{tx('Audio path:')}</strong>{' '}
+          {tx(
+            'MP3/WAV and friends → lead-biased multipitch assist → MIDI → guitar tabs. Always editable; not multi-voice studio transcription. Use stems, tempo, trim, Clean up, and the tab editor to finish by ear.',
+          )}
         </p>
         <p className="text-xs">
-          Your tabs stay on this device. Export .grtab.json, ASCII, or MIDI anytime.
+          {tx('Your tabs stay on this device. Export .grtab.json, ASCII, or MIDI anytime.')}
         </p>
         <div className="flex flex-wrap gap-2 pt-1">
           <Link to="/upload" className="btn-secondary text-sm px-4 py-2 rounded-xl">
-            <Upload className="w-4 h-4" /> Upload a song
+            <Upload className="w-4 h-4" /> {tx('Upload a song')}
           </Link>
           <Link to="/library?mine=1" className="btn-secondary text-sm px-4 py-2 rounded-xl">
-            <Library className="w-4 h-4" /> Your tabs
+            <Library className="w-4 h-4" /> {tx('Your tabs')}
           </Link>
         </div>
       </section>
@@ -264,9 +282,9 @@ export function AboutPage() {
       {/* In-app destinations — no self-link to About */}
       <section className="card p-5 space-y-3">
         <div>
-          <h2 className="font-display font-semibold">In the app</h2>
+          <h2 className="font-display font-semibold">{tx('In the app')}</h2>
           <p className="text-xs text-[var(--text-muted)] mt-0.5">
-            Jump to practice surfaces — this page stays About only.
+            {tx('Jump to practice surfaces — this page stays About only.')}
           </p>
         </div>
         <div className="grid grid-cols-2 gap-2">
@@ -275,33 +293,35 @@ export function AboutPage() {
             className="rounded-xl border border-[var(--border)] bg-[var(--bg-elevated)]/60 px-3 py-3 text-sm hover:border-mint/40 transition-colors flex items-center gap-2"
           >
             <BookOpen className="w-4 h-4 text-mint shrink-0" />
-            Lessons
+            {tx('Lessons')}
           </Link>
           <Link
             to="/wiki"
             className="rounded-xl border border-[var(--border)] bg-[var(--bg-elevated)]/60 px-3 py-3 text-sm hover:border-mint/40 transition-colors flex items-center gap-2"
           >
             <ScrollText className="w-4 h-4 text-lime shrink-0" />
-            Wiki
+            {tx('Wiki')}
           </Link>
           <Link
             to="/practice"
             className="rounded-xl border border-[var(--border)] bg-[var(--bg-elevated)]/60 px-3 py-3 text-sm hover:border-mint/40 transition-colors flex items-center gap-2"
           >
             <RefreshCw className="w-4 h-4 text-teal shrink-0" />
-            Practice
+            {tx('Practice')}
           </Link>
           <Link
             to="/profile"
             className="rounded-xl border border-[var(--border)] bg-[var(--bg-elevated)]/60 px-3 py-3 text-sm hover:border-mint/40 transition-colors flex items-center gap-2"
           >
             <Heart className="w-4 h-4 text-soft shrink-0" />
-            You
+            {tx('You')}
           </Link>
         </div>
       </section>
 
-      <p className="text-center text-[11px] text-[var(--text-muted)] pb-2">{ABOUT_FOOTER_META}</p>
+      <p className="text-center text-[11px] text-[var(--text-muted)] pb-2">
+        {tx('MIT · local-first · free-license content only · signed desktop updates via GitHub Releases')}
+      </p>
     </div>
   )
 }

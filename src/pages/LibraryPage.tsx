@@ -10,7 +10,9 @@ import {
   type SkillLevel,
 } from '../data/library'
 import { useAppStore } from '../store/appStore'
-import { useUserTabsStore } from '../store/userTabsStore'
+import { PERSIST_ERROR, useUserTabsStore } from '../store/userTabsStore'
+import { useI18n } from '../i18n/useI18n'
+import { kindLabel, presentLibraryItem, skillLabel } from '../i18n/present'
 import {
   downloadAsciiTab,
   downloadUserTabFile,
@@ -134,6 +136,7 @@ function libraryFretboardPreview(item: LibraryItem): { scale: ScaleDef; root: nu
 }
 
 export function LibraryPage() {
+  const { tx, locale } = useI18n()
   const [searchParams, setSearchParams] = useSearchParams()
   const mineParam = searchParams.get('mine') === '1'
   const itemParam = searchParams.get('item') || searchParams.get('id')
@@ -226,7 +229,7 @@ export function LibraryPage() {
       const text = await file.text()
       const tab = parseImportedTabFile(text)
       if (!tab?.tab?.measures) {
-        setImportMsg('Not a valid .grtab.json file.')
+        setImportMsg(tx('Not a valid .grtab.json file.'))
         return
       }
       const now = new Date().toISOString()
@@ -242,9 +245,9 @@ export function LibraryPage() {
       setSearchParams({ mine: '1' })
       setSelectedId(imported.id)
       setActiveTabId(imported.id)
-      setImportMsg(`Imported "${imported.title}" into Your tabs.`)
+      setImportMsg(tx('Imported "{title}" into Your tabs.', { title: imported.title }))
     } catch {
-      setImportMsg('Could not read that file.')
+      setImportMsg(tx('Could not read that file.'))
     }
   }
 
@@ -281,11 +284,14 @@ export function LibraryPage() {
     })
     const ids = new Set(users.map((u) => u.id))
     return [...users, ...builtin.filter((b) => !ids.has(b.id))]
-  }, [q, kind, skill, favOnly, favorites, mineOnly, userItems])
+  }, [q, kind, skill, favOnly, favorites, mineOnly, userItems, locale, tx])
 
   const selected: LibraryItem | null =
     items.find((i) => i.id === selectedId) ?? items[0] ?? null
+  const shown = selected ? presentLibraryItem(selected) : null
   const selectedUser = selected ? userTabs.find((t) => t.id === selected.id) : undefined
+  const kindText = (k: LibraryKind | 'all') => (k === 'all' ? tx('All') : kindLabel(k))
+  const skillText = (s: SkillLevel | 'all') => (s === 'all' ? tx('All') : skillLabel(s))
 
   const theoryPlayable =
     !!selected &&
@@ -389,10 +395,12 @@ export function LibraryPage() {
         <div className="absolute inset-0 bg-gradient-to-r from-[var(--bg)] via-[var(--bg)]/92 to-[var(--bg)]/70" />
         <div className="relative flex flex-wrap items-start justify-between gap-3">
           <div className="min-w-0">
-            <h1 className="font-display text-2xl md:text-3xl font-bold">Library</h1>
+            <h1 className="font-display text-2xl md:text-3xl font-bold">{tx('Library')}</h1>
             <p className="text-sm text-[var(--text-muted)] mt-1">
-              {userTabs.length} saved converts · {LIBRARY.length} open items
-              (public domain / traditional / original).
+              {tx('{saved} saved converts · {open} open items (public domain / traditional / original).', {
+                saved: userTabs.length,
+                open: LIBRARY.length,
+              })}
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
@@ -413,18 +421,22 @@ export function LibraryPage() {
               onClick={() => grtabInputRef.current?.click()}
             >
               <FileUp className="w-3.5 h-3.5" />
-              Import .grtab
+              {tx('Import .grtab')}
             </button>
             <Link to="/upload" className="btn-primary text-xs">
               <Upload className="w-3.5 h-3.5" />
-              Convert song
+              {tx('Convert song')}
             </Link>
           </div>
         </div>
       </header>
 
       {persistError ? (
-        <p role="alert" className="text-sm text-rose/90 bg-rose/10 border border-rose/25 rounded-xl px-3 py-2">{persistError}</p>
+        <p role="alert" className="text-sm text-rose/90 bg-rose/10 border border-rose/25 rounded-xl px-3 py-2">
+          {persistError === PERSIST_ERROR
+            ? tx('Could not save Your tabs on this device (storage full or blocked). Export a .grtab.json copy so nothing is lost, or delete old tabs and try again.')
+            : persistError}
+        </p>
       ) : importMsg ? (
         <p className="text-sm text-mint px-1">{importMsg}</p>
       ) : null}
@@ -435,7 +447,8 @@ export function LibraryPage() {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-muted)]" />
             <input
               className="input pl-9"
-              placeholder="Search library"
+              placeholder={tx('Search library')}
+              aria-label={tx('Search library')}
               value={q}
               onChange={(e) => setQ(e.target.value)}
             />
@@ -449,7 +462,7 @@ export function LibraryPage() {
                 setSearchParams({ mine: '1' })
               }}
             >
-              Your tabs
+              {tx('Your tabs')}
             </button>
             <button
               type="button"
@@ -459,14 +472,14 @@ export function LibraryPage() {
                 setSearchParams({})
               }}
             >
-              Built-in
+              {tx('Built-in')}
             </button>
             <button
               type="button"
               className={clsx('btn-ghost text-xs', favOnly && 'text-mint')}
               onClick={() => setFavOnly((v) => !v)}
             >
-              <Heart className="w-3 h-3" /> Favorites
+              <Heart className="w-3 h-3" /> {tx('Favorites')}
             </button>
           </div>
           {!mineOnly && (
@@ -479,7 +492,7 @@ export function LibraryPage() {
                     className={clsx('btn-ghost text-[10px] capitalize', kind === k && 'text-mint')}
                     onClick={() => setKind(k)}
                   >
-                    {k}
+                    {kindText(k)}
                   </button>
                 ))}
               </div>
@@ -491,16 +504,24 @@ export function LibraryPage() {
                     className={clsx('btn-ghost text-[10px] capitalize', skill === s && 'text-mint')}
                     onClick={() => setSkill(s)}
                   >
-                    {s}
+                    {skillText(s)}
                   </button>
                 ))}
               </div>
             </>
           )}
           <ul className="space-y-1 max-h-[60vh] overflow-y-auto pr-1">
-            {items.map((item) => {
+            {items.map((source) => {
+              const item = presentLibraryItem(source)
               const active = selected?.id === item.id
               const fav = favorites.includes(item.id)
+              const meta = item.key
+                ? tx('{kind} · {skill} · {key}', {
+                    kind: kindLabel(item.kind),
+                    skill: skillLabel(item.skill),
+                    key: item.key,
+                  })
+                : tx('{kind} · {skill}', { kind: kindLabel(item.kind), skill: skillLabel(item.skill) })
               return (
                 <li key={item.id}>
                   <button
@@ -519,10 +540,9 @@ export function LibraryPage() {
                   >
                     <div className="flex items-start justify-between gap-2">
                       <div className="min-w-0">
-                        <div className="font-medium text-sm truncate">{item.title}</div>
-                        <div className="text-[11px] text-[var(--text-muted)] truncate">
-                          {item.kind} · {item.skill}
-                          {item.key ? ` · ${item.key}` : ''}
+                        <div className="font-medium text-sm break-words">{item.title}</div>
+                        <div className="text-[11px] text-[var(--text-muted)] break-words">
+                          {meta}
                         </div>
                       </div>
                       <span
@@ -549,18 +569,18 @@ export function LibraryPage() {
               )
             })}
             {items.length === 0 && (
-              <li className="text-sm text-[var(--text-muted)] px-2 py-6 text-center">No matches.</li>
+              <li className="text-sm text-[var(--text-muted)] px-2 py-6 text-center">{tx('No matches.')}</li>
             )}
           </ul>
         </aside>
 
         <section className="flex-1 min-w-0 space-y-4">
-          {selected ? (
+          {selected && shown ? (
             <>
               <div className="card p-4 flex flex-wrap items-start justify-between gap-3">
                 <div className="min-w-0">
-                  <h2 className="font-display text-xl font-bold">{selected.title}</h2>
-                  <p className="text-sm text-[var(--text-muted)] mt-1">{selected.description}</p>
+                  <h2 className="font-display text-xl font-bold">{shown.title}</h2>
+                  <p className="text-sm text-[var(--text-muted)] mt-1">{shown.description}</p>
                 </div>
                 <div className="flex flex-wrap gap-2">
                   {theoryPlayable ? (
@@ -568,14 +588,14 @@ export function LibraryPage() {
                       type="button"
                       className="btn-primary text-xs"
                       onClick={() => toggleTheoryPlay()}
-                      aria-label={theoryPlaying ? 'Stop playback' : 'Play'}
+                      aria-label={theoryPlaying ? tx('Stop playback') : tx('Play')}
                     >
                       {theoryPlaying ? (
                         <Square className="w-3.5 h-3.5" />
                       ) : (
                         <Play className="w-3.5 h-3.5" />
                       )}
-                      {theoryPlaying ? 'Stop' : 'Play'}
+                      {theoryPlaying ? tx('Stop') : tx('Play')}
                     </button>
                   ) : null}
                   {selectedUser && (
@@ -586,7 +606,7 @@ export function LibraryPage() {
                         onClick={() => setEditingMine((v) => !v)}
                       >
                         <Pencil className="w-3.5 h-3.5" />
-                        {editingMine ? 'Close editor' : 'Edit tab'}
+                        {editingMine ? tx('Close editor') : tx('Edit tab')}
                       </button>
                       <button
                         type="button"
@@ -594,22 +614,22 @@ export function LibraryPage() {
                         onClick={() => downloadUserTabFile(selectedUser)}
                       >
                         <Download className="w-3.5 h-3.5" />
-                        .grtab
+                        {tx('.grtab')}
                       </button>
                       <button
                         type="button"
                         className="btn-secondary text-xs"
                         onClick={() => downloadAsciiTab(selectedUser)}
                       >
-                        ASCII
+                        {tx('ASCII')}
                       </button>
                       <button
                         type="button"
                         className="btn-secondary text-xs"
                         onClick={() => downloadUserTabMidi(selectedUser)}
-                        title="MIDI with embedded tempo (rebuilds from score if needed)"
+                        title={tx('MIDI with embedded tempo (rebuilds from score if needed)')}
                       >
-                        MIDI
+                        {tx('MIDI')}
                       </button>
                       <button
                         type="button"
@@ -617,11 +637,11 @@ export function LibraryPage() {
                         onClick={() => {
                           removeTab(selectedUser.id)
                           setSelectedId(null)
-                          setImportMsg('Removed from Your tabs.')
+                          setImportMsg(tx('Removed from Your tabs.'))
                         }}
                       >
                         <Trash2 className="w-3.5 h-3.5" />
-                        Delete
+                        {tx('Delete')}
                       </button>
                     </>
                   )}
@@ -650,7 +670,7 @@ export function LibraryPage() {
                     const next = applyScoreToUserTab(selectedUser, score)
                     upsertTab(next)
                     setEditingMine(false)
-                    setImportMsg(`Saved edits · "${next.title}"`)
+                    setImportMsg(tx('Saved edits · "{title}"', { title: next.title }))
                   }}
                 />
               ) : selectedUser?.score?.notes?.length ? (
@@ -659,31 +679,32 @@ export function LibraryPage() {
                   score={selectedUser.score}
                   stopToken={tabStopNonce}
                 />
-              ) : selected.tab ? (
+              ) : selected.tab && shown.tab ? (
                 <TabView
-                  title={selected.tab.title}
+                  title={shown.tab.title}
                   score={tabSongToScore(selected.tab, { tuning: getTuning() })}
                   stopToken={tabStopNonce}
                 />
               ) : theoryPlayable ? (
                 <p className="text-xs text-[var(--text-muted)] px-1">
-                  Use <span className="text-mint">Play</span> to hear this{' '}
+                  {tx('Use')}{' '}
+                  <span className="text-mint">{tx('Play')}</span>{' '}
                   {selected.kind === 'progression'
-                    ? 'progression'
+                    ? tx('to hear this progression.')
                     : selected.kind === 'chord'
-                      ? 'chord'
-                      : 'scale'}
-                  . Switching items stops audio automatically.
+                      ? tx('to hear this chord.')
+                      : tx('to hear this scale.')}{' '}
+                  {tx('Switching items stops audio automatically.')}
                 </p>
               ) : null}
             </>
           ) : (
             <div className="card p-8 text-center text-[var(--text-muted)] space-y-3">
-              <p>{mineOnly ? 'No saved converts yet.' : 'Select an item'}</p>
+              <p>{mineOnly ? tx('No saved converts yet.') : tx('Select an item')}</p>
               {mineOnly ? (
                 <Link to="/upload" className="btn-primary text-xs inline-flex">
                   <Upload className="w-3.5 h-3.5" />
-                  Drop an MP3 to convert
+                  {tx('Drop an MP3 to convert')}
                 </Link>
               ) : null}
             </div>

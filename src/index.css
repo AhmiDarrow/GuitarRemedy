@@ -9,9 +9,10 @@
 
 /* Dark Forest — same family as Remedy Desktop (void green · mint · lime) */
 @theme {
-  --font-sans: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
-  --font-display: "Orbitron", "Space Grotesk", sans-serif;
-  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+  /* Bundled faces are Latin-only. System CJK faces follow so ja/ko/zh-CN render. */
+  --font-sans: "Space Grotesk", "Segoe UI", "Yu Gothic UI", "Yu Gothic", Meiryo, "Malgun Gothic", "Microsoft YaHei UI", "Microsoft YaHei", "PingFang SC", "Noto Sans CJK SC", "Noto Sans SC", "Noto Sans JP", "Noto Sans KR", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Orbitron", "Space Grotesk", "Segoe UI", "Yu Gothic UI", "Yu Gothic", Meiryo, "Malgun Gothic", "Microsoft YaHei UI", "Microsoft YaHei", "PingFang SC", "Noto Sans CJK SC", "Noto Sans SC", "Noto Sans JP", "Noto Sans KR", sans-serif;
+  --font-mono: "JetBrains Mono", "Segoe UI", "Yu Gothic UI", Meiryo, "Malgun Gothic", "Microsoft YaHei UI", ui-monospace, monospace;
 
   --color-ink: #030705;
   --color-ink-2: #07110c;
@@ -63,6 +64,11 @@ html,
 body,
 #root {
   min-height: 100%;
+}
+
+html {
+  overflow-wrap: break-word;
+  line-break: strict;
 }
 
 /* Dark Forest scrollbars — vertical + horizontal (WebKit + Firefox) */
@@ -272,6 +278,10 @@ textarea {
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
+  white-space: normal;
+  height: auto;
+  text-align: center;
+  max-width: 100%;
   padding: 0.7rem 1.15rem;
   border-radius: 0.9rem;
   font-weight: 600;
@@ -300,6 +310,10 @@ textarea {
   align-items: center;
   justify-content: center;
   gap: 0.4rem;
+  white-space: normal;
+  height: auto;
+  text-align: center;
+  max-width: 100%;
   padding: 0.65rem 1rem;
   border-radius: 0.9rem;
   font-weight: 500;
@@ -326,6 +340,10 @@ textarea {
   align-items: center;
   justify-content: center;
   gap: 0.4rem;
+  white-space: normal;
+  height: auto;
+  text-align: center;
+  max-width: 100%;
   padding: 0.65rem 1rem;
   border-radius: 0.9rem;
   font-weight: 600;
@@ -380,6 +398,9 @@ textarea {
   display: flex;
   align-items: center;
   gap: 0.65rem;
+  white-space: normal;
+  height: auto;
+  text-align: start;
   padding: 0.65rem 0.85rem;
   border-radius: 0.85rem;
   font-size: 0.9rem;

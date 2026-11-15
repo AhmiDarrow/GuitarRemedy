@@ -3,6 +3,7 @@
  * GPIF / zip packages when possible; binary GP3-5 header detect + honest MIDI/MusicXML fallback.
  */
 
+import { tx } from '../i18n/runtime'
 import { parseMusicXml, type MusicXmlParseResult } from './musicxml'
 import { STANDARD_TUNING } from './theory'
 import { openMidiHighToLow } from './tabScore'
@@ -36,6 +37,13 @@ export interface GuitarProParseResult {
 
 export const GP_EXPORT_HINT =
   'For accurate tabs, open the file in Guitar Pro / TuxGuitar and export MIDI or MusicXML, then re-upload here.'
+
+/** Translated hint. The const stays the English source for any caller outside this module. */
+export function gpExportHint(): string {
+  return tx(
+    'For accurate tabs, open the file in Guitar Pro / TuxGuitar and export MIDI or MusicXML, then re-upload here.',
+  )
+}
 
 /** Display-order opens (0 = high e … 5 = low E). Override with session/Profile tuning. */
 const STANDARD_OPEN_HIGH_TO_LOW = openMidiHighToLow([...STANDARD_TUNING])
@@ -275,7 +283,7 @@ function stringFretFromNoteXml(noteXml: string): { string?: number; fret?: numbe
 
 export function parseGpif(xml: string): GuitarProParseResult {
   const warnings: string[] = []
-  let title = 'Guitar Pro import'
+  let title = tx('Guitar Pro import')
   let tempoBpm = 120
   let timeSignature: { numerator: number; denominator: number } | undefined
   const notes: GuitarProNote[] = []
@@ -356,12 +364,13 @@ export function parseGpif(xml: string): GuitarProParseResult {
   })
 
   if (notes.length === 0) {
-    warnings.push('GPIF contained no readable pitched notes.')
+    warnings.push(tx('GPIF contained no readable pitched notes.'))
   } else {
     warnings.push(
-      'Parsed ' +
-        notes.length +
-        ' notes from GPIF (best-effort — complex multi-voice GP may need MIDI/MusicXML export).',
+      tx(
+        'Parsed {count} notes from GPIF (best-effort — complex multi-voice GP may need MIDI/MusicXML export).',
+        { count: notes.length },
+      ),
     )
   }
 
@@ -382,7 +391,7 @@ function detectBinaryVersion(bytes: Uint8Array): string | undefined {
 }
 
 function stubResult(fileName: string, extra: Partial<GuitarProParseResult> = {}): GuitarProParseResult {
-  const base = fileName.replace(/\.\w+$/, '') || 'GP import'
+  const base = fileName.replace(/\.\w+$/, '') || tx('GP import')
   return {
     title: base,
     tempoBpm: 100,
@@ -398,8 +407,10 @@ function stubResult(fileName: string, extra: Partial<GuitarProParseResult> = {})
     ],
     source: 'stub',
     warnings: [
-      'Guitar Pro binary could not be fully decoded in-browser — showing a placeholder melody so the UI still works.',
-      GP_EXPORT_HINT,
+      tx(
+        'Guitar Pro binary could not be fully decoded in-browser — showing a placeholder melody so the UI still works.',
+      ),
+      gpExportHint(),
     ],
     ...extra,
   }
@@ -414,7 +425,7 @@ export async function parseGuitarPro(
 
   if (bytes.length === 0) {
     return stubResult(fileName, {
-      warnings: ['Empty Guitar Pro file.', GP_EXPORT_HINT],
+      warnings: [tx('Empty Guitar Pro file.'), gpExportHint()],
     })
   }
 
@@ -430,7 +441,7 @@ export async function parseGuitarPro(
             tempoBpm: 120,
             notes: [],
             source: 'musicxml-zip',
-            warnings: ['Embedded MusicXML detected.'],
+            warnings: [tx('Embedded MusicXML detected.')],
             musicXml: mx,
           }
         } catch {
@@ -470,7 +481,7 @@ export async function parseGuitarPro(
               notes: [],
               source: 'musicxml-zip',
               versionHint: 'zip:' + xmlName,
-              warnings: ['Found MusicXML inside Guitar Pro package.'],
+              warnings: [tx('Found MusicXML inside Guitar Pro package.')],
               musicXml: mx,
             }
           } catch {
@@ -481,8 +492,8 @@ export async function parseGuitarPro(
           source: 'stub',
           versionHint: 'zip-package',
           warnings: [
-            'Guitar Pro zip package opened but no score.gpif / MusicXML notes were readable.',
-            GP_EXPORT_HINT,
+            tx('Guitar Pro zip package opened but no score.gpif / MusicXML notes were readable.'),
+            gpExportHint(),
           ],
         })
       }
@@ -499,9 +510,9 @@ export async function parseGuitarPro(
       versionHint: ver || lower.split('.').pop(),
       warnings: [
         ver
-          ? 'Detected Guitar Pro binary (' + ver + '). Full binary decode is not in v1.'
-          : 'Guitar Pro binary format — full decode not in v1.',
-        GP_EXPORT_HINT,
+          ? tx('Detected Guitar Pro binary ({ver}). Full binary decode is not in v1.', { ver })
+          : tx('Guitar Pro binary format — full decode not in v1.'),
+        gpExportHint(),
       ],
     })
   }

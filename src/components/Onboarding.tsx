@@ -1,9 +1,12 @@
 import { useState } from 'react'
 import { Guitar, Hand, Music2, Sparkles } from 'lucide-react'
+import { useI18n } from '../i18n/useI18n'
 import { useAppStore } from '../store/appStore'
+import { LanguagePicker } from './LanguagePicker'
 
 export function Onboarding() {
   const completeOnboarding = useAppStore((s) => s.completeOnboarding)
+  const { tx } = useI18n()
   const [name, setName] = useState('Player')
   const [lefty, setLefty] = useState(false)
   const [step, setStep] = useState(0)
@@ -21,40 +24,43 @@ export function Onboarding() {
               <Guitar className="w-7 h-7 text-ink" />
             </div>
             <h1 className="font-display text-2xl font-bold tracking-tight">
-              Welcome to GuitarRemedy
+              {tx('Welcome to GuitarRemedy')}
             </h1>
             <p className="text-[var(--text-muted)] mt-2 text-sm leading-relaxed">
-              Scales, tabs, a 365-day path, song upload to tabs, and a full guitar wiki — polished for
-              desktop and phone. Built for real practice, not gimmicks.
+              {tx('Scales, tabs, a 365-day path, song upload to tabs, and a full guitar wiki — polished for desktop and phone. Built for real practice, not gimmicks.')}
             </p>
             <ul className="mt-5 space-y-3 text-sm">
               <li className="flex gap-3 items-start">
                 <Music2 className="w-4 h-4 text-mint mt-0.5 shrink-0" />
-                Interactive fretboard, modes, and play-along
+                {tx('Interactive fretboard, modes, and play-along')}
               </li>
               <li className="flex gap-3 items-start">
                 <Sparkles className="w-4 h-4 text-mint mt-0.5 shrink-0" />
-                Drop MP3/WAV/MIDI/MusicXML — get editable tabs + scale map
+                {tx('Drop MP3/WAV/MIDI/MusicXML — get editable tabs + scale map')}
               </li>
               <li className="flex gap-3 items-start">
                 <Hand className="w-4 h-4 text-mint mt-0.5 shrink-0" />
-                Day 1–365 private lessons with streaks
+                {tx('Day 1–365 private lessons with streaks')}
               </li>
             </ul>
             <button type="button" className="btn-primary w-full mt-6" onClick={() => setStep(1)}>
-              Get started
+              {tx('Get started')}
             </button>
           </>
         )}
 
         {step === 1 && (
           <>
-            <h2 className="font-display text-xl font-bold">Quick setup</h2>
-            <p className="text-sm text-[var(--text-muted)] mt-1 mb-5">Saved on this device only.</p>
-            <label className="block text-sm font-medium mb-1.5">Your name</label>
+            <h2 className="font-display text-xl font-bold">{tx('Quick setup')}</h2>
+            <p className="text-sm text-[var(--text-muted)] mt-1 mb-5">{tx('Saved on this device only.')}</p>
+            <div className="mb-4">
+              <LanguagePicker id="onboarding-language" />
+            </div>
+            <label className="block text-sm font-medium mb-1.5" htmlFor="onboarding-name">{tx('Your name')}</label>
             <input
+              id="onboarding-name"
               className="input mb-4"
-              placeholder="Player"
+              placeholder={tx('Player')}
               value={name}
               onChange={(e) => setName(e.target.value)}
               autoFocus
@@ -67,16 +73,16 @@ export function Onboarding() {
                 className="accent-[var(--mint)] w-4 h-4"
               />
               <span className="text-sm">
-                Left-handed fretboard
-                <span className="block text-xs text-[var(--text-muted)]">Mirrors the neck view</span>
+                {tx('Left-handed fretboard')}
+                <span className="block text-xs text-[var(--text-muted)]">{tx('Mirrors the neck view')}</span>
               </span>
             </label>
             <div className="flex gap-2 mt-6">
               <button type="button" className="btn-ghost flex-1" onClick={() => setStep(0)}>
-                Back
+                {tx('Back')}
               </button>
               <button type="button" className="btn-primary flex-1" onClick={finish}>
-                Start learning
+                {tx('Start learning')}
               </button>
             </div>
           </>
