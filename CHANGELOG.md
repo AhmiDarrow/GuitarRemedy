@@ -3,6 +3,10 @@
 All notable changes, grounded in `git log` (repo created 2026-08-21, `e8e497d`).
 On-disk version source of truth: `package.json` · `src-tauri/tauri.conf.json` · `src-tauri/Cargo.toml` (+ lockfiles; all synced by `node scripts/bump-version.mjs`).
 
+## [0.3.1] — 2026-11-15
+
+- Added an About section with version info.
+
 ## [0.3.0] — 2026-11-15
 
 - Now available in Spanish, French, German, Portuguese (Brazil), Italian, Russian, Polish, Japanese, Korean and Chinese (Simplified). Apps use your system language by default; change it any time in Settings → Language.
