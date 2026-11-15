@@ -14,6 +14,7 @@ import {
   stopAllNotes,
 } from '../lib/audio'
 import { useAppStore } from '../store/appStore'
+import { useI18n } from '../i18n/useI18n'
 import { Pause, Play, RotateCcw, Gauge, Square } from 'lucide-react'
 
 type Props = {
@@ -40,6 +41,7 @@ function groupByTime(notes: TabScore['notes']) {
 }
 
 export function TabView({ score, className, title, stopToken, onPlayingChange }: Props) {
+  const { tx } = useI18n()
   const [speed, setSpeed] = useState(1)
   const [playing, setPlaying] = useState(false)
   const [cursor, setCursor] = useState(-1)
@@ -192,11 +194,19 @@ export function TabView({ score, className, title, stopToken, onPlayingChange }:
     else void play()
   }
 
+  const articulationName = (a?: string) => {
+    if (a === 'bend') return tx('bend')
+    if (a === 'slide') return tx('slide')
+    if (a === 'hammer') return tx('hammer')
+    if (a === 'pull') return tx('pull')
+    return a ?? ''
+  }
+
   return (
     <div className={clsx('card overflow-hidden', className)}>
       <div className="flex flex-wrap items-center gap-3 px-4 py-3 border-b border-[var(--border)] bg-[var(--bg-elevated)]/50">
-        <div className="font-display font-semibold text-sm flex-1 min-w-0 truncate">
-          {title || score.title || 'Tablature'}
+        <div className="font-display font-semibold text-sm flex-1 min-w-0 break-words">
+          {title || score.title || tx('Tablature')}
         </div>
         <div className="flex items-center gap-2">
           <Gauge className="w-3.5 h-3.5 text-[var(--text-muted)]" />
@@ -208,11 +218,11 @@ export function TabView({ score, className, title, stopToken, onPlayingChange }:
             value={speed}
             onChange={(e) => setSpeed(Number(e.target.value))}
             className="w-24 accent-mint"
-            aria-label="Playback speed"
+            aria-label={tx('Playback speed')}
             disabled={playing}
           />
           <span className="text-xs font-mono text-[var(--text-muted)] w-10">
-            {Math.round(speed * 100)}%
+            {tx('{pct}%', { pct: Math.round(speed * 100) })}
           </span>
         </div>
         <button
@@ -220,18 +230,18 @@ export function TabView({ score, className, title, stopToken, onPlayingChange }:
           className="btn-secondary !py-1.5 !px-3 text-xs"
           onClick={() => void toggle()}
           disabled={columns.length === 0}
-          aria-label={playing ? 'Stop playback' : 'Play tab'}
+          aria-label={playing ? tx('Stop playback') : tx('Play tab')}
         >
           {playing ? <Square className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5" />}
-          {playing ? 'Stop' : 'Play'}
+          {playing ? tx('Stop') : tx('Play')}
         </button>
         {playing ? (
           <button
             type="button"
             className="btn-ghost !py-1.5 !px-2"
             onClick={stop}
-            aria-label="Pause"
-            title="Stop"
+            aria-label={tx('Pause')}
+            title={tx('Stop')}
           >
             <Pause className="w-3.5 h-3.5" />
           </button>
@@ -240,7 +250,7 @@ export function TabView({ score, className, title, stopToken, onPlayingChange }:
           type="button"
           className="btn-ghost !py-1.5 !px-2"
           onClick={stop}
-          aria-label="Reset"
+          aria-label={tx('Reset')}
         >
           <RotateCcw className="w-3.5 h-3.5" />
         </button>
@@ -248,7 +258,7 @@ export function TabView({ score, className, title, stopToken, onPlayingChange }:
 
       <div className="overflow-x-auto p-4 font-mono text-sm leading-7 select-none">
         {columns.length === 0 ? (
-          <p className="text-[var(--text-muted)] text-sm">No notes to display.</p>
+          <p className="text-[var(--text-muted)] text-sm">{tx('No notes to display.')}</p>
         ) : (
           <div className="inline-block min-w-full">
             {Array.from({ length: strings }, (_, s) => (
@@ -283,14 +293,18 @@ export function TabView({ score, className, title, stopToken, onPlayingChange }:
                         weak && !active && 'text-[var(--danger)]/90 opacity-80',
                       )}
                       title={
-                        note
-                          ? [
-                              typeof conf === 'number' ? `conf ${conf.toFixed(2)}` : null,
-                              art ? `art ${note.articulation}` : null,
-                            ]
-                              .filter(Boolean)
-                              .join(' · ') || undefined
-                          : undefined
+                        !note
+                          ? undefined
+                          : typeof conf === 'number' && art
+                            ? tx('conf {n} · art {name}', {
+                                n: conf.toFixed(2),
+                                name: articulationName(note.articulation),
+                              })
+                            : typeof conf === 'number'
+                              ? tx('conf {n}', { n: conf.toFixed(2) })
+                              : art
+                                ? tx('art {name}', { name: articulationName(note.articulation) })
+                                : undefined
                       }
                     >
                       {note ? `${note.fret}${art}` : '—'}
@@ -305,20 +319,21 @@ export function TabView({ score, className, title, stopToken, onPlayingChange }:
       </div>
 
       <div className="px-4 pb-3 flex flex-wrap gap-3 text-xs text-[var(--text-muted)]">
-        {score.tempo ? <span>♩ = {score.tempo}</span> : null}
+        {score.tempo ? <span>{tx('♩ = {bpm}', { bpm: score.tempo })}</span> : null}
         {score.timeSig ? (
           <span className="inline-flex items-center gap-1 rounded-md border border-mint/25 bg-mint/10 px-1.5 py-0.5 font-mono text-[11px] text-mint">
             {score.timeSig[0]}/{score.timeSig[1]}
           </span>
         ) : null}
-        {score.key ? <span>· Key hint: {score.key}</span> : null}
+        {score.key ? <span>{tx('· Key hint: {key}', { key: score.key })}</span> : null}
         <span>
-          · {columns.length} hits · ~
-          {Math.max(
-            1,
-            Math.round(((columns[columns.length - 1]?.[0]?.time ?? 0) + 1) * (60 / tempo)),
-          )}
-          s
+          {tx('· {hits} hits · ~{seconds}s', {
+            hits: columns.length,
+            seconds: Math.max(
+              1,
+              Math.round(((columns[columns.length - 1]?.[0]?.time ?? 0) + 1) * (60 / tempo)),
+            ),
+          })}
         </span>
       </div>
     </div>

@@ -39,6 +39,7 @@ import { getScale, noteToPc } from '../lib/theory'
 import { applyScoreToBreakdown } from '../lib/tabEdit'
 import { useAppStore } from '../store/appStore'
 import { useUserTabsStore } from '../store/userTabsStore'
+import { useI18n } from '../i18n/useI18n'
 import { isTauri, openMusicFileNative } from '../lib/desktop'
 
 function toScore(b: RemedyBreakdown): TabScore {
@@ -53,20 +54,17 @@ function toScore(b: RemedyBreakdown): TabScore {
   )
 }
 
-const PIPELINE_STEPS: { id: ConvertStage; label: string }[] = [
-  { id: 'decode', label: '1. Decode audio' },
-  { id: 'audio_to_midi', label: '2. Audio to MIDI' },
-  { id: 'midi_to_tabs', label: '3. MIDI to tabs' },
-]
+const PIPELINE_STEP_IDS: ConvertStage[] = ['decode', 'audio_to_midi', 'midi_to_tabs']
 
 function stageIndex(stage: ConvertStage | null): number {
   if (!stage || stage === 'idle') return -1
   if (stage === 'done') return 3
   if (stage === 'error') return -2
-  return PIPELINE_STEPS.findIndex((s) => s.id === stage)
+  return PIPELINE_STEP_IDS.indexOf(stage)
 }
 
 export function UploadPage() {
+  const { tx } = useI18n()
   const recordPractice = useAppStore((s) => s.recordPractice)
   const getTuning = useAppStore((s) => s.getTuning)
   const a4 = useAppStore((s) => s.a4)
@@ -142,7 +140,7 @@ export function UploadPage() {
         setSourceAudioUrl(URL.createObjectURL(file))
       }
       setStage(audio ? 'decode' : 'midi_to_tabs')
-      setStatus(audio ? '1/3 Decoding audio…' : `Parsing ${file.name}…`)
+      setStatus(audio ? tx('1/3 Decoding audio…') : tx('Parsing {name}…', { name: file.name }))
       try {
         // Fretting + editor cleanup follow Profile tuning (Drop D, custom, …).
         const tuning = getTuning()
@@ -206,15 +204,15 @@ export function UploadPage() {
           }
         }
         const saved = persistBreakdown(b, file.name)
+        const ready = tx('Ready · {count} notes', { count: b.tabNotes.length })
+        const base = b.statusMessage ?? ready
         if (saved) {
-          setStatus(
-            `${b.statusMessage ?? `Ready · ${b.tabNotes.length} notes`} · saved to Your tabs`,
-          )
+          setStatus(tx('{base} · saved to Your tabs', { base }))
         } else {
-          setStatus(b.statusMessage ?? `Ready · ${b.tabNotes.length} notes`)
+          setStatus(base)
         }
       } catch (e) {
-        setError(e instanceof Error ? e.message : 'Could not parse file')
+        setError(e instanceof Error ? e.message : tx('Could not parse file'))
         setBreakdown(null)
         setSavedTab(null)
         setStage('error')
@@ -234,6 +232,7 @@ export function UploadPage() {
       preferPosition,
       getTuning,
       a4,
+      tx,
     ],
   )
 
@@ -248,10 +247,10 @@ export function UploadPage() {
       const file = await openMusicFileNative()
       if (file) void runFile(file)
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Could not open file')
+      setError(e instanceof Error ? e.message : tx('Could not open file'))
       setStage('error')
     }
-  }, [runFile])
+  }, [runFile, tx])
 
   const onDownloadMidi = () => {
     if (breakdown?.midiBytes) {
@@ -285,7 +284,7 @@ export function UploadPage() {
       sourceName: savedTab?.sourceName,
       replaceId: savedTab?.id,
     })
-    if (tab) setStatus(`Saved “${tab.title}” to Your tabs`)
+    if (tab) setStatus(tx('Saved “{title}” to Your tabs', { title: tab.title }))
   }
 
   const onEditorSave = (score: TabScore) => {
@@ -299,11 +298,19 @@ export function UploadPage() {
     setEditing(false)
     setStatus(
       tab
-        ? `Edits saved · “${tab.title}” · ${score.notes.length} notes`
-        : `Edits applied · ${score.notes.length} notes`,
+        ? tx('Edits saved · “{title}” · {count} notes', {
+            title: tab.title,
+            count: score.notes.length,
+          })
+        : tx('Edits applied · {count} notes', { count: score.notes.length }),
     )
   }
 
+  const pipelineSteps = [
+    { id: 'decode' as const, label: tx('1. Decode audio') },
+    { id: 'audio_to_midi' as const, label: tx('2. Audio to MIDI') },
+    { id: 'midi_to_tabs' as const, label: tx('3. MIDI to tabs') },
+  ]
   const scaleId = breakdown?.scaleId || 'major'
   // Prefer getScale so camelCase / alias ids from analysis still resolve.
   const scale = getScale(scaleId)
@@ -320,25 +327,27 @@ export function UploadPage() {
         />
         <div className="absolute inset-0 bg-gradient-to-t from-[var(--bg)] via-[var(--bg)]/85 to-[var(--bg)]/40" />
         <div className="relative p-5 md:p-7">
-          <p className="section-title">Upload</p>
-          <h1 className="font-display text-3xl font-bold tracking-tight mt-1">Song → tabs</h1>
+          <p className="section-title">{tx('Upload')}</p>
+          <h1 className="font-display text-3xl font-bold tracking-tight mt-1">{tx('Song → tabs')}</h1>
           <p className="text-[var(--text-muted)] mt-2 text-sm max-w-2xl leading-relaxed">
-            Drop an <strong className="text-mint font-medium">MP3 / WAV</strong> and Remedy runs a
-            clean three-step converter: <span className="text-[var(--text)]">decode audio</span> →{' '}
-            <span className="text-[var(--text)]">audio to MIDI</span> →{' '}
-            <span className="text-[var(--text)]">MIDI to guitar tabs</span>. MIDI and MusicXML are
-            the solid structured path. Guitar Pro is best-effort (placeholders never auto-save).
-            Audio is a lead-biased multipitch draft (up to ~4 fretted voices) — always editable, never
-            a perfect full-band multi-track auto-tab.
+            {tx('Drop an ')}
+            <strong className="text-mint font-medium">{tx('MP3 / WAV')}</strong>
+            {tx(' and Remedy runs a clean three-step converter: ')}
+            <span className="text-[var(--text)]">{tx('decode audio')}</span>
+            {tx(' → ')}
+            <span className="text-[var(--text)]">{tx('audio to MIDI')}</span>
+            {tx(' → ')}
+            <span className="text-[var(--text)]">{tx('MIDI to guitar tabs')}</span>
+            {tx('. MIDI and MusicXML are the solid structured path. Guitar Pro is best-effort (placeholders never auto-save). Audio is a lead-biased multipitch draft (up to ~4 fretted voices) — always editable, never a perfect full-band multi-track auto-tab.')}
           </p>
         </div>
       </div>
 
       {/* Pipeline strip */}
       <div className="card p-4">
-        <p className="section-title mb-3">Converter pipeline</p>
+        <p className="section-title mb-3">{tx('Converter pipeline')}</p>
         <ol className="grid sm:grid-cols-3 gap-2">
-          {PIPELINE_STEPS.map((step, i) => {
+          {pipelineSteps.map((step, i) => {
             const done = activeIdx > i || stage === 'done'
             const current = activeIdx === i && busy
             return (
@@ -370,29 +379,29 @@ export function UploadPage() {
         </ol>
         <p className="text-xs text-[var(--text-muted)] mt-3 leading-relaxed">
           <Guitar className="w-3.5 h-3.5 inline mr-1 text-mint" />
-          Best results: dry single-note or clear guitar lead. Full-band mixes use stereo mid
-          (+ side when hard-panned), <strong className="text-[var(--text)]">Auto stem</strong> (HPSS
-          lead / harmonic / mix / side), then a <strong className="text-[var(--text)]">pitch-engine race</strong>
-          (Basic Pitch multipitch vs autocorrelation) — keeps up to ~4 fretted voices when detected;
-          always edit by ear. Prefer MIDI/MusicXML when you have them.
+          {tx('Best results: dry single-note or clear guitar lead. Full-band mixes use stereo mid (+ side when hard-panned), ')}
+          <strong className="text-[var(--text)]">{tx('Auto stem')}</strong>
+          {tx(' (HPSS lead / harmonic / mix / side), then a ')}
+          <strong className="text-[var(--text)]">{tx('pitch-engine race')}</strong>
+          {tx('(Basic Pitch multipitch vs autocorrelation) — keeps up to ~4 fretted voices when detected; always edit by ear. Prefer MIDI/MusicXML when you have them.')}
         </p>
         <div className="mt-4 grid sm:grid-cols-3 gap-3">
           <label className="block text-xs text-[var(--text-muted)]">
-            Tempo override (BPM)
+            {tx('Tempo override (BPM)')}
             <input
               type="number"
               min={0}
               max={300}
               className="input mt-1"
               value={tempoOverride || ''}
-              placeholder="Auto-detect"
+              placeholder={tx('Auto-detect')}
               disabled={busy}
               onChange={(e) => setTempoOverride(Math.max(0, Number(e.target.value) || 0))}
             />
-            <span className="text-[10px] opacity-80">0 or empty = detect from audio</span>
+            <span className="text-[10px] opacity-80">{tx('0 or empty = detect from audio')}</span>
           </label>
           <label className="block text-xs text-[var(--text-muted)]">
-            Analyze first (seconds)
+            {tx('Analyze first (seconds)')}
             <input
               type="number"
               min={0}
@@ -402,10 +411,10 @@ export function UploadPage() {
               disabled={busy}
               onChange={(e) => setTrimSec(Math.max(0, Number(e.target.value) || 0))}
             />
-            <span className="text-[10px] opacity-80">0 = full file · default 90s for long mixes</span>
+            <span className="text-[10px] opacity-80">{tx('0 = full file · default 90s for long mixes')}</span>
           </label>
           <label className="block text-xs text-[var(--text-muted)]">
-            Full-band stem (HPSS)
+            {tx('Full-band stem (HPSS)')}
             <select
               className="input mt-1"
               value={stem}
@@ -414,53 +423,53 @@ export function UploadPage() {
                 setStem(e.target.value as 'auto' | 'lead' | 'harmonic' | 'mix')
               }
             >
-              <option value="auto">Auto (default · race stems)</option>
-              <option value="lead">Lead only</option>
-              <option value="harmonic">Harmonic only</option>
-              <option value="mix">Full mix (no HPSS · harder)</option>
+              <option value="auto">{tx('Auto (default · race stems)')}</option>
+              <option value="lead">{tx('Lead only')}</option>
+              <option value="harmonic">{tx('Harmonic only')}</option>
+              <option value="mix">{tx('Full mix (no HPSS · harder)')}</option>
             </select>
             <span className="text-[10px] opacity-80">
-              Auto races lead / harmonic / mix (+ side on stereo) for the cleanest fretting draft
+              {tx('Auto races lead / harmonic / mix (+ side on stereo) for the cleanest fretting draft')}
             </span>
           </label>
           <label className="block text-xs text-[var(--text-muted)]">
-            Voices
+            {tx('Voices')}
             <select
               className="input mt-1"
               value={voiceMode}
               disabled={busy}
               onChange={(e) => setVoiceMode(e.target.value as 'auto' | 'mono' | 'multi')}
             >
-              <option value="auto">Auto (default)</option>
-              <option value="mono">Lock lead (mono)</option>
-              <option value="multi">Keep multipitch</option>
+              <option value="auto">{tx('Auto (default)')}</option>
+              <option value="mono">{tx('Lock lead (mono)')}</option>
+              <option value="multi">{tx('Keep multipitch')}</option>
             </select>
-            <span className="text-[10px] opacity-80">Mono when the mix is muddy</span>
+            <span className="text-[10px] opacity-80">{tx('Mono when the mix is muddy')}</span>
           </label>
           <label className="block text-xs text-[var(--text-muted)]">
-            Swing feel
+            {tx('Swing feel')}
             <select
               className="input mt-1"
               value={swing}
               disabled={busy}
               onChange={(e) => setSwing(e.target.value as 'none' | 'light' | 'medium')}
             >
-              <option value="none">Straight</option>
-              <option value="light">Light swing</option>
-              <option value="medium">Medium swing</option>
+              <option value="none">{tx('Straight')}</option>
+              <option value="light">{tx('Light swing')}</option>
+              <option value="medium">{tx('Medium swing')}</option>
             </select>
           </label>
           <label className="block text-xs text-[var(--text-muted)]">
-            Fret position
+            {tx('Fret position')}
             <select
               className="input mt-1"
               value={preferPosition}
               disabled={busy}
               onChange={(e) => setPreferPosition(e.target.value as 'auto' | 'open' | 'mid')}
             >
-              <option value="auto">Auto continuity</option>
-              <option value="open">Prefer open (0–5)</option>
-              <option value="mid">Prefer mid (5–7)</option>
+              <option value="auto">{tx('Auto continuity')}</option>
+              <option value="open">{tx('Prefer open (0–5)')}</option>
+              <option value="mid">{tx('Prefer mid (5–7)')}</option>
             </select>
           </label>
         </div>
@@ -483,23 +492,22 @@ export function UploadPage() {
         }}
       >
         <FileUp className="w-10 h-10 text-mint mx-auto mb-3" />
-        <p className="font-medium">Drop audio here to convert</p>
+        <p className="font-medium">{tx('Drop audio here to convert')}</p>
         <p className="text-sm text-[var(--text-muted)] mt-1 mb-4">
-          Audio: <span className="text-mint">{AUDIO_FORMATS_LABEL}</span> → MIDI → tabs
-          (Basic Pitch Apache-2.0 when the free model loads, else autocorrelation). Also:
-          .mid · .midi · .musicxml · .mxl · .gp / .gp3–5 / .gpx / .gp7 / .gpif · .grtab.json
-          (GP binary often needs MIDI/MusicXML export).
+          {tx('Audio: ')}
+          <span className="text-mint">{AUDIO_FORMATS_LABEL}</span>
+          {tx(' → MIDI → tabs (Basic Pitch Apache-2.0 when the free model loads, else autocorrelation). Also: .mid · .midi · .musicxml · .mxl · .gp / .gp3–5 / .gpx / .gp7 / .gpif · .grtab.json (GP binary often needs MIDI/MusicXML export).')}
         </p>
         <label
           className={`btn-primary inline-flex cursor-pointer ${busy ? 'opacity-70 pointer-events-none' : ''}`}
         >
           {busy ? (
             <>
-              <Loader2 className="w-4 h-4 animate-spin" /> Converting…
+              <Loader2 className="w-4 h-4 animate-spin" /> {tx('Converting…')}
             </>
           ) : (
             <>
-              <Guitar className="w-4 h-4" /> Choose audio or MIDI
+              <Guitar className="w-4 h-4" /> {tx('Choose audio or MIDI')}
             </>
           )}
           <input
@@ -539,22 +547,26 @@ export function UploadPage() {
                     <p className="text-sm text-[var(--text-muted)] mt-0.5">
                       {breakdown.keyLabel}
                       {breakdown.timeSig
-                        ? ` · ${breakdown.timeSig[0]}/${breakdown.timeSig[1]}`
+                        ? tx(' · {num}/{den}', {
+                            num: breakdown.timeSig[0],
+                            den: breakdown.timeSig[1],
+                          })
                         : ''}{' '}
-                      · ranking {Math.round(breakdown.confidence * 100)}%
+                      {tx('· ranking {pct}%', { pct: Math.round(breakdown.confidence * 100) })}
                       <span className="text-[var(--text-muted)]/80">
-                        {' '}
-                        (sort only — not fret/rhythm accuracy)
+                        {tx(' (sort only — not fret/rhythm accuracy)')}
                       </span>{' '}
-                      · {breakdown.kind === 'audio' ? 'audio→MIDI→tabs (draft)' : breakdown.kind}
-                      {breakdown.editable ? ' · editable' : ''}
-                      {breakdown.tempoBpm ? ` · ♩=${breakdown.tempoBpm}` : ''}
+                      {breakdown.kind === 'audio'
+                        ? tx('· audio→MIDI→tabs (draft)')
+                        : tx('· {kind}', { kind: breakdown.kind })}
+                      {breakdown.editable ? tx(' · editable') : ''}
+                      {breakdown.tempoBpm ? tx(' · ♩={bpm}', { bpm: breakdown.tempoBpm }) : ''}
                       {breakdown.detectedTempoBpm &&
                       breakdown.detectedTempoBpm !== breakdown.tempoBpm
-                        ? ` (detected ${breakdown.detectedTempoBpm})`
+                        ? tx(' (detected {bpm})', { bpm: breakdown.detectedTempoBpm })
                         : ''}
                       {breakdown.analyzedSec
-                        ? ` · ${breakdown.analyzedSec.toFixed(0)}s analyzed`
+                        ? tx(' · {sec}s analyzed', { sec: breakdown.analyzedSec.toFixed(0) })
                         : ''}
                     </p>
                   </div>
@@ -563,17 +575,17 @@ export function UploadPage() {
                       type="button"
                       className="btn-secondary text-xs"
                       onClick={onDownloadMidi}
-                      title="MIDI with embedded tempo for truthful re-import"
+                      title={tx('MIDI with embedded tempo for truthful re-import')}
                     >
                       <Download className="w-3.5 h-3.5" />
-                      MIDI
+                      {tx('MIDI')}
                     </button>
                     <button type="button" className="btn-secondary text-xs" onClick={onExportTabFile}>
                       <FileDown className="w-3.5 h-3.5" />
-                      Export .grtab
+                      {tx('Export .grtab')}
                     </button>
                     <button type="button" className="btn-ghost text-xs" onClick={onExportAscii}>
-                      ASCII tab
+                      {tx('ASCII tab')}
                     </button>
                   </div>
                 </div>
@@ -585,16 +597,16 @@ export function UploadPage() {
                 {savedTab && !persistError && (
                   <div className="mt-3 flex flex-wrap items-center gap-2 rounded-xl border border-mint/30 bg-mint/10 px-3 py-2 text-sm">
                     <CheckCircle2 className="w-4 h-4 text-mint shrink-0" />
-                    <span className="text-mint font-medium min-w-0 truncate">
-                      Saved to Your tabs · {savedTab.title}
+                    <span className="text-mint font-medium min-w-0 break-words">
+                      {tx('Saved to Your tabs · {title}', { title: savedTab.title })}
                     </span>
                     <Link to="/library?mine=1" className="btn-primary !py-1 !px-2.5 text-xs ml-auto">
                       <Library className="w-3.5 h-3.5" />
-                      Open in Library
+                      {tx('Open in Library')}
                     </Link>
                     <button type="button" className="btn-ghost !py-1 !px-2 text-xs" onClick={onSaveAgain}>
                       <Save className="w-3.5 h-3.5" />
-                      Save copy
+                      {tx('Save copy')}
                     </button>
                   </div>
                 )}
@@ -609,7 +621,7 @@ export function UploadPage() {
             </div>
             <div className="mt-4 grid md:grid-cols-2 gap-4 text-sm">
               <div>
-                <p className="section-title mb-2">What Remedy did</p>
+                <p className="section-title mb-2">{tx('What Remedy did')}</p>
                 <ul className="space-y-1.5 text-[var(--text-muted)]">
                   {breakdown.explanation.map((line) => (
                     <li key={line}>• {line}</li>
@@ -617,7 +629,7 @@ export function UploadPage() {
                 </ul>
               </div>
               <div>
-                <p className="section-title mb-2">Practice plan</p>
+                <p className="section-title mb-2">{tx('Practice plan')}</p>
                 <ol className="space-y-1.5 text-[var(--text-muted)] list-decimal list-inside">
                   {breakdown.practicePlan.map((line) => (
                     <li key={line}>{line}</li>
@@ -629,7 +641,7 @@ export function UploadPage() {
 
           <div className="card p-4 space-y-3">
             <div className="flex flex-wrap items-center justify-between gap-2">
-              <p className="section-title mb-0">Guitar tabs</p>
+              <p className="section-title mb-0">{tx('Guitar tabs')}</p>
               <div className="flex flex-wrap gap-2">
                 <button
                   type="button"
@@ -637,30 +649,33 @@ export function UploadPage() {
                   onClick={() => setEditing((v) => !v)}
                 >
                   <Pencil className="w-3.5 h-3.5" />
-                  {editing ? 'Close editor' : 'Edit tab'}
+                  {editing ? tx('Close editor') : tx('Edit tab')}
                 </button>
                 <button type="button" className="btn-ghost text-xs" onClick={onSaveAgain}>
                   <Save className="w-3.5 h-3.5" />
-                  Save to Your tabs
+                  {tx('Save to Your tabs')}
                 </button>
               </div>
             </div>
             {stemDrafts.length > 0 ? (
               <div className="rounded-xl border border-[var(--border)] bg-[var(--bg-elevated)]/40 p-3 text-xs">
-                <p className="section-title mb-2">Per-stem drafts (compare)</p>
+                <p className="section-title mb-2">{tx('Per-stem drafts (compare)')}</p>
                 <ul className="space-y-1 text-[var(--text-muted)]">
                   {stemDrafts.map((d) => (
                     <li key={d.stem} className="flex justify-between gap-2 font-mono">
                       <span className="text-mint">{d.stem}</span>
                       <span>
-                        score {d.score.toFixed(1)} · {d.noteCount} notes
+                        {tx('score {score} · {count} notes', {
+                          score: d.score.toFixed(1),
+                          count: d.noteCount,
+                        })}
                       </span>
                     </li>
                   ))}
                 </ul>
                 <p className="text-[10px] mt-2 opacity-80">
-                  Main tab used the winning stem/engine race. Re-convert with a forced stem if another draft looks cleaner.
-                  {sourceArrayBuffer ? ' Source bytes kept for re-runs this session.' : ''}
+                  {tx('Main tab used the winning stem/engine race. Re-convert with a forced stem if another draft looks cleaner.')}
+                  {sourceArrayBuffer ? tx(' Source bytes kept for re-runs this session.') : ''}
                 </p>
               </div>
             ) : null}
@@ -680,7 +695,7 @@ export function UploadPage() {
 
           <div className="card p-4">
             <p className="section-title mb-3">
-              Scale map — {breakdown.key.root} {scale.name}
+              {tx('Scale map — {root} {scale}', { root: breakdown.key.root, scale: scale.name })}
             </p>
             <Fretboard root={root} scale={scale} />
           </div>

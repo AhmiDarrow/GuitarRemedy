@@ -1,5 +1,6 @@
 /** Eternal user-converted tabs — local-first list + export helpers */
 
+import { tx } from '../i18n/runtime'
 import type { LibraryItem, TabMeasure, TabNote, TabSong } from '../data/library'
 import type { RemedyBreakdown, TabNote as ScoreNote, TabScore } from './breakdown'
 import { buildSimpleMidi } from './midi'
@@ -55,7 +56,7 @@ export function scoreToTabSong(
   opts?: { title?: string; tempo?: number; timeSig?: [number, number] },
 ): TabSong {
   const tempo = opts?.tempo ?? score.tempo ?? 100
-  const title = opts?.title ?? score.title ?? 'Converted tab'
+  const title = opts?.title ?? score.title ?? tx('Converted tab')
   // Prefer explicit opts, then score.timeSig — never silently force 4/4 when the score knows better.
   const timeSig: [number, number] = normalizeTimeSig(
     opts?.timeSig ?? score.timeSig ?? undefined,
@@ -95,7 +96,7 @@ export function scoreToTabSong(
 
 export function breakdownToTabSong(b: RemedyBreakdown): TabSong {
   const tempo = b.tempoBpm || b.score?.tempo || 100
-  const title = b.title || 'Converted tab'
+  const title = b.title || tx('Converted tab')
   const timeSig: [number, number] = b.timeSig?.length === 2
     ? [Math.max(1, b.timeSig[0] || 4), b.timeSig[1] || 4]
     : [4, 4]
@@ -198,7 +199,7 @@ export function breakdownToUserTab(
   const now = new Date().toISOString()
   return {
     id: opts?.id ?? slugId(b.title || opts?.sourceName || 'tab'),
-    title: b.title || opts?.sourceName || 'Converted tab',
+    title: b.title || opts?.sourceName || tx('Converted tab'),
     createdAt: now,
     updatedAt: now,
     sourceKind: b.kind,
@@ -276,7 +277,7 @@ export function userTabToAscii(tab: UserTab, opts?: { colsPerBeat?: number }): s
   const ts = tab.tab.timeSig
   const meter =
     Array.isArray(ts) && ts.length >= 2 ? `${ts[0]}/${ts[1]}` : `${beatsPer}/4`
-  const header = `${tab.title}\nTempo: ${tab.tempoBpm} · ${meter}${tab.keyLabel ? ` · ${tab.keyLabel}` : ''}\n\n`
+  const header = `${tab.title}\n${tx('Tempo: {bpm} · {meter}', { bpm: tab.tempoBpm, meter })}${tab.keyLabel ? ` · ${tab.keyLabel}` : ''}\n\n`
   return header + lines.join('\n') + '\n'
 }
 
@@ -345,7 +346,7 @@ export function normalizeUserTab(raw: unknown): UserTab | null {
       ? t.title
       : typeof t.tab.title === 'string' && t.tab.title.trim()
         ? t.tab.title
-        : 'Untitled tab'
+        : tx('Untitled tab')
   const tempoBpm =
     typeof t.tempoBpm === 'number' && Number.isFinite(t.tempoBpm) && t.tempoBpm > 0
       ? t.tempoBpm
@@ -431,9 +432,13 @@ export function userTabToLibraryItem(t: UserTab): LibraryItem {
     kind: 'song',
     skill: 'beginner',
     key: t.keyLabel,
-    genre: 'User convert',
+    genre: tx('User convert'),
     tags: t.tags,
-    description: `Saved ${t.sourceKind} convert · ${t.score?.notes?.length ?? 0} notes · ${new Date(t.createdAt).toLocaleString()}`,
+    description: tx('Saved {kind} convert · {count} notes · {when}', {
+      kind: t.sourceKind,
+      count: t.score?.notes?.length ?? 0,
+      when: new Date(t.createdAt).toLocaleString(),
+    }),
     tab: t.tab,
     openLicense: true,
   }

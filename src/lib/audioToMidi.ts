@@ -11,6 +11,7 @@
  *   ghost drop → chord-aware fretting (look-ahead) → MIDI.
  */
 
+import { tx } from '../i18n/runtime'
 import { buildSimpleMidi, parseMidi, type MidiNote, type MidiParseResult } from './midi'
 import { triggerBlobDownload } from './download'
 import {
@@ -1507,9 +1508,13 @@ export function pcmToMidi(
 ): AudioToMidiResult {
   const a4 = Number.isFinite(opts?.a4) && (opts!.a4 as number) > 0 ? (opts!.a4 as number) : 440
   const warnings: string[] = [
-    'Audio→MIDI is lead-biased multipitch assist (up to ~4 fretted voices) — not studio multi-track tabs.',
-    'Full-band path: stereo mid → HPSS stem race → melody band → guitar-register score → tempo snap → quantize.',
-    'Edit or Clean up the candidate tab before practicing or saving.',
+    tx(
+      'Audio→MIDI is lead-biased multipitch assist (up to ~4 fretted voices) — not studio multi-track tabs.',
+    ),
+    tx(
+      'Full-band path: stereo mid → HPSS stem race → melody band → guitar-register score → tempo snap → quantize.',
+    ),
+    tx('Edit or Clean up the candidate tab before practicing or saving.'),
   ]
   const onProgress = opts?.onProgress
 
@@ -1523,16 +1528,21 @@ export function pcmToMidi(
       ? trimSamples(opts.sidePcm, sampleRate, opts?.maxSec).samples
       : undefined
   if (opts?.maxSec && opts.maxSec > 0 && analyzedSec + 0.05 < fullDuration) {
-    warnings.push(`Analyzed first ${analyzedSec.toFixed(0)}s of ${fullDuration.toFixed(0)}s (trim).`)
+    warnings.push(
+      tx('Analyzed first {analyzed}s of {full}s (trim).', {
+        analyzed: analyzedSec.toFixed(0),
+        full: fullDuration.toFixed(0),
+      }),
+    )
   }
-  onProgress?.(6, 'Separating lead stem (HPSS)…')
+  onProgress?.(6, tx('Separating lead stem (HPSS)…'))
 
   const stemKind: StemKind = opts?.stem ?? 'auto'
   let stemPcm = work
   let chosenStemLabel = stemKind
 
   if (!opts?.skipHpss && stemKind === 'auto') {
-    onProgress?.(10, 'Comparing lead / harmonic / mix stems…')
+    onProgress?.(10, tx('Comparing lead / harmonic / mix stems…'))
     // Compete stems on a short window so full-band mixes stay interactive
     const probe = trimSamples(work, sampleRate, Math.min(12, analyzedSec || 12)).samples
     const sideProbe =
@@ -1543,29 +1553,42 @@ export function pcmToMidi(
     chosenStemLabel = best.stem
     stemPcm = selectStem(work, sampleRate, best.stem, { sidePcm: sideTrimmed, a4 })
     warnings.push(
-      `Full-band auto-stem picked “${best.stem}” (score ${best.score.toFixed(1)}) — HPSS lead / harmonic / mix${sideProbe ? ' / side' : ''}.`,
+      sideProbe
+        ? tx(
+            'Full-band auto-stem picked “{stem}” (score {score}) — HPSS lead / harmonic / mix / side.',
+            { stem: best.stem, score: best.score.toFixed(1) },
+          )
+        : tx('Full-band auto-stem picked “{stem}” (score {score}) — HPSS lead / harmonic / mix.', {
+            stem: best.stem,
+            score: best.score.toFixed(1),
+          }),
     )
   } else if (!opts?.skipHpss && stemKind !== 'mix') {
     stemPcm = selectStem(work, sampleRate, stemKind, { sidePcm: sideTrimmed, a4 })
     chosenStemLabel = stemKind
     warnings.push(
-      `Applied median HPSS → ${stemKind} stem to reduce drums/bass before pitch track.`,
+      tx('Applied median HPSS → {stem} stem to reduce drums/bass before pitch track.', {
+        stem: stemKind,
+      }),
     )
   } else {
     chosenStemLabel = 'mix'
   }
 
-  onProgress?.(18, 'Preparing melody band…')
+  onProgress?.(18, tx('Preparing melody band…'))
 
   const prepared = opts?.skipMelodyBand
     ? stemPcm
     : emphasizeMelodyBand(stemPcm, sampleRate, { leadMode: true })
   if (!opts?.skipMelodyBand) {
     warnings.push(
-      `Applied lead emphasis (harmonic envelope + melody-band filter) on “${chosenStemLabel}” stem.`,
+      tx(
+        'Applied lead emphasis (harmonic envelope + melody-band filter) on “{stem}” stem.',
+        { stem: chosenStemLabel },
+      ),
     )
   }
-  onProgress?.(26, 'Detecting tempo…')
+  onProgress?.(26, tx('Detecting tempo…'))
 
   const rawTempo = detectTempoBpm(prepared, sampleRate, {
     defaultBpm: 100,
@@ -1573,16 +1596,24 @@ export function pcmToMidi(
   const detectedTempo = snapTempoBpm(rawTempo, prepared, sampleRate)
   if (detectedTempo !== rawTempo) {
     warnings.push(
-      `Tempo snap ${rawTempo} → ${detectedTempo} BPM (½×/2× + onset grid check).`,
+      tx('Tempo snap {raw} → {bpm} BPM (½×/2× + onset grid check).', {
+        raw: rawTempo,
+        bpm: detectedTempo,
+      }),
     )
   }
   let tempoBpm = opts?.tempoBpm ?? detectedTempo
   if (opts?.tempoBpm == null) {
-    warnings.push(`Estimated tempo ≈ ${detectedTempo} BPM from onset energy.`)
+    warnings.push(tx('Estimated tempo ≈ {bpm} BPM from onset energy.', { bpm: detectedTempo }))
   } else {
-    warnings.push(`Using your tempo override: ${tempoBpm} BPM (detected ≈ ${detectedTempo}).`)
+    warnings.push(
+      tx('Using your tempo override: {bpm} BPM (detected ≈ {detected}).', {
+        bpm: tempoBpm,
+        detected: detectedTempo,
+      }),
+    )
   }
-  onProgress?.(40, 'Tracking pitch…')
+  onProgress?.(40, tx('Tracking pitch…'))
 
   // Full-band: slightly stricter confidence; pure mono melodies still pass
   const minConf = stemKind === 'mix' && opts?.skipHpss ? 0.3 : 0.36
@@ -1593,9 +1624,9 @@ export function pcmToMidi(
     a4,
   })
   if (a4 !== 440) {
-    warnings.push(`Using Profile A4 = ${a4} Hz for pitch → MIDI.`)
+    warnings.push(tx('Using Profile A4 = {hz} Hz for pitch → MIDI.', { hz: a4 }))
   }
-  onProgress?.(70, 'Building notes…')
+  onProgress?.(70, tx('Building notes…'))
   let notes = framesToNotes(frames, {
     tempoBpm,
     minDurationSec: 0.1,
@@ -1617,8 +1648,8 @@ export function pcmToMidi(
   if (notes.length !== beforeRefine) {
     warnings.push(
       hasMultipitchContent(notes)
-        ? 'Refined draft: multipitch keep + ghost drop + onset snap.'
-        : 'Refined draft: melody extract + ghost drop + onset snap + register keep.',
+        ? tx('Refined draft: multipitch keep + ghost drop + onset snap.')
+        : tx('Refined draft: melody extract + ghost drop + onset snap + register keep.'),
     )
   }
 
@@ -1638,21 +1669,28 @@ export function pcmToMidi(
       })
       notes = mergeAdjacentNotes(notes, { ticksPerQuarter: DEFAULT_TPQ })
       warnings.push(
-        `Tempo refined ${prev} → ${blended} BPM (energy onset × note spacing).`,
+        tx('Tempo refined {prev} → {bpm} BPM (energy onset × note spacing).', {
+          prev,
+          bpm: blended,
+        }),
       )
     }
   }
 
   if (notes.length === 0) {
-    warnings.push('No stable pitches found — check that the clip has a clear single-note melody.')
+    warnings.push(
+      tx('No stable pitches found — check that the clip has a clear single-note melody.'),
+    )
   }
 
   const noteCap = opts?.noteCap ?? DEFAULT_NOTE_CAP
   if (notes.length > noteCap) {
     notes = notes.slice(0, noteCap)
-    warnings.push(`Truncated to first ${noteCap} detected notes for performance.`)
+    warnings.push(
+      tx('Truncated to first {count} detected notes for performance.', { count: noteCap }),
+    )
   }
-  onProgress?.(90, 'Writing MIDI…')
+  onProgress?.(90, tx('Writing MIDI…'))
 
   // Embed detected/override tempo (+ 4/4 meter) so download + re-import stay truthful.
   // Audio path is monophonic assist — no real compound-meter detection yet.
@@ -1666,7 +1704,7 @@ export function pcmToMidi(
     { ticksPerQuarter: DEFAULT_TPQ, tempoBpm, timeSig: [4, 4] },
   )
   const midi = parseMidi(midiBytes)
-  onProgress?.(100, 'Audio → MIDI done')
+  onProgress?.(100, tx('Audio → MIDI done'))
 
   return {
     notes,
@@ -1690,7 +1728,7 @@ function getDecodeContext(): { ctx: AudioContext; close: boolean } {
         (globalThis as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext
       : undefined
   if (!AC) {
-    throw new Error('Web Audio API unavailable — cannot decode MP3 in this environment')
+    throw new Error(tx('Web Audio API unavailable — cannot decode MP3 in this environment'))
   }
   return { ctx: new AC(), close: true }
 }
@@ -1746,7 +1784,7 @@ export async function convertArrayBufferToMidi(
 ): Promise<AudioToMidiResult> {
   const { ctx, close } = getDecodeContext()
   try {
-    opts?.onProgress?.(2, 'Decoding audio…')
+    opts?.onProgress?.(2, tx('Decoding audio…'))
     const copy = arrayBuffer.slice(0)
     const audio = await ctx.decodeAudioData(copy)
     const { mid, side } = audioBufferToMidSide(audio)
@@ -1887,26 +1925,37 @@ export async function pcmToMidiAsync(
       ? trimSamples(opts.sidePcm, sampleRate, opts?.maxSec).samples
       : undefined
   const warnings: string[] = [
-    'Audio→MIDI is lead-biased multipitch assist (up to ~4 fretted voices) — not studio multi-track tabs.',
-    'Full-band path: stereo mid (+ side) → drum gate → HPSS stem race → engine race (Basic Pitch multipitch vs autocorr) → tempo snap → swing quantize.',
-    'Edit or Clean up the candidate tab before practicing or saving.',
+    tx(
+      'Audio→MIDI is lead-biased multipitch assist (up to ~4 fretted voices) — not studio multi-track tabs.',
+    ),
+    tx(
+      'Full-band path: stereo mid (+ side) → drum gate → HPSS stem race → engine race (Basic Pitch multipitch vs autocorr) → tempo snap → swing quantize.',
+    ),
+    tx('Edit or Clean up the candidate tab before practicing or saving.'),
   ]
   // Drum-transient gate before stem race (full-band default on)
   if (opts?.drumGate !== false && !opts?.skipHpss) {
     work = gateDrumTransients(work, sampleRate, { strength: 0.5 })
-    warnings.push('Applied drum-transient gate before stem race (softens kick/snare spikes).')
+    warnings.push(
+      tx('Applied drum-transient gate before stem race (softens kick/snare spikes).'),
+    )
   }
   if (opts?.maxSec && opts.maxSec > 0 && analyzedSec + 0.05 < fullDuration) {
-    warnings.push(`Analyzed first ${analyzedSec.toFixed(0)}s of ${fullDuration.toFixed(0)}s (trim).`)
+    warnings.push(
+      tx('Analyzed first {analyzed}s of {full}s (trim).', {
+        analyzed: analyzedSec.toFixed(0),
+        full: fullDuration.toFixed(0),
+      }),
+    )
   }
 
-  onProgress?.(6, 'Separating lead stem (HPSS)…')
+  onProgress?.(6, tx('Separating lead stem (HPSS)…'))
   const stemKind: StemKind = opts?.stem ?? 'auto'
   let stemPcm = work
   let chosenStemLabel: string = stemKind
 
   if (!opts?.skipHpss && stemKind === 'auto') {
-    onProgress?.(10, 'Comparing lead / harmonic / mix stems…')
+    onProgress?.(10, tx('Comparing lead / harmonic / mix stems…'))
     const probe = trimSamples(work, sampleRate, Math.min(12, analyzedSec || 12)).samples
     const sideProbe =
       sideTrimmed && sideTrimmed.length === work.length
@@ -1916,39 +1965,62 @@ export async function pcmToMidiAsync(
     chosenStemLabel = best.stem
     stemPcm = selectStem(work, sampleRate, best.stem, { sidePcm: sideTrimmed, a4 })
     warnings.push(
-      `Full-band auto-stem picked “${best.stem}” (score ${best.score.toFixed(1)}) — HPSS lead / harmonic / mix${sideProbe ? ' / side' : ''}.`,
+      sideProbe
+        ? tx(
+            'Full-band auto-stem picked “{stem}” (score {score}) — HPSS lead / harmonic / mix / side.',
+            { stem: best.stem, score: best.score.toFixed(1) },
+          )
+        : tx('Full-band auto-stem picked “{stem}” (score {score}) — HPSS lead / harmonic / mix.', {
+            stem: best.stem,
+            score: best.score.toFixed(1),
+          }),
     )
   } else if (!opts?.skipHpss && stemKind !== 'mix') {
     stemPcm = selectStem(work, sampleRate, stemKind, { sidePcm: sideTrimmed, a4 })
     chosenStemLabel = stemKind
     warnings.push(
-      `Applied median HPSS → ${stemKind} stem to reduce drums/bass before pitch track.`,
+      tx('Applied median HPSS → {stem} stem to reduce drums/bass before pitch track.', {
+        stem: stemKind,
+      }),
     )
   } else {
     chosenStemLabel = 'mix'
   }
 
-  onProgress?.(18, 'Preparing melody band…')
+  onProgress?.(18, tx('Preparing melody band…'))
   const prepared = opts?.skipMelodyBand
     ? stemPcm
     : emphasizeMelodyBand(stemPcm, sampleRate, { leadMode: true })
   if (!opts?.skipMelodyBand) {
     warnings.push(
-      `Applied lead emphasis (harmonic envelope + melody-band filter) on “${chosenStemLabel}” stem.`,
+      tx(
+        'Applied lead emphasis (harmonic envelope + melody-band filter) on “{stem}” stem.',
+        { stem: chosenStemLabel },
+      ),
     )
   }
 
-  onProgress?.(26, 'Detecting tempo…')
+  onProgress?.(26, tx('Detecting tempo…'))
   const rawTempo = detectTempoBpm(prepared, sampleRate, { defaultBpm: 100 })
   const detectedTempo = snapTempoBpm(rawTempo, prepared, sampleRate)
   if (detectedTempo !== rawTempo) {
-    warnings.push(`Tempo snap ${rawTempo} → ${detectedTempo} BPM (½×/2× + onset grid check).`)
+    warnings.push(
+      tx('Tempo snap {raw} → {bpm} BPM (½×/2× + onset grid check).', {
+        raw: rawTempo,
+        bpm: detectedTempo,
+      }),
+    )
   }
   let tempoBpm = opts?.tempoBpm ?? detectedTempo
   if (opts?.tempoBpm == null) {
-    warnings.push(`Estimated tempo ≈ ${detectedTempo} BPM from onset energy.`)
+    warnings.push(tx('Estimated tempo ≈ {bpm} BPM from onset energy.', { bpm: detectedTempo }))
   } else {
-    warnings.push(`Using your tempo override: ${tempoBpm} BPM (detected ≈ ${detectedTempo}).`)
+    warnings.push(
+      tx('Using your tempo override: {bpm} BPM (detected ≈ {detected}).', {
+        bpm: tempoBpm,
+        detected: detectedTempo,
+      }),
+    )
   }
 
   // --- Engine race: Basic Pitch (when available) vs autocorrelation ---
@@ -1956,7 +2028,10 @@ export async function pcmToMidiAsync(
   const racePool: RaceCand[] = []
 
   const runAutocorr = (): DetectedNote[] => {
-    onProgress?.(engine === 'basic-pitch' ? 70 : 42, 'Tracking pitch (autocorrelation)…')
+    onProgress?.(
+      engine === 'basic-pitch' ? 70 : 42,
+      tx('Tracking pitch (autocorrelation)…'),
+    )
     const classic = pcmToMidi(prepared, sampleRate, {
       tempoBpm,
       a4,
@@ -1974,35 +2049,41 @@ export async function pcmToMidiAsync(
 
   const tryBp = engine === 'basic-pitch' || engine === 'auto'
   if (tryBp) {
-    onProgress?.(32, 'Loading Basic Pitch model (free Apache-2.0)…')
+    onProgress?.(32, tx('Loading Basic Pitch model (free Apache-2.0)…'))
     const ok = await basicPitchAvailable()
     if (ok) {
       try {
-        onProgress?.(40, 'Running Basic Pitch multipitch assist…')
+        onProgress?.(40, tx('Running Basic Pitch multipitch assist…'))
         const at22k = resampleMono(prepared, sampleRate, 22050)
         const bpNotes = await notesFromBasicPitch(at22k, 22050, {
           tempoBpm,
           a4,
           onProgress: (pct) => {
             const mapped = 40 + Math.round(pct * 0.28)
-            onProgress?.(mapped, `Basic Pitch… ${pct}%`)
+            onProgress?.(mapped, tx('Basic Pitch… {pct}%', { pct }))
           },
         })
         if (preferBasicPitchNotes(bpNotes)) {
           racePool.push({ engine: 'basic-pitch', notes: bpNotes })
           if (a4 !== 440) {
-            warnings.push(`Using Profile A4 = ${a4} Hz for Basic Pitch pitch shift.`)
+            warnings.push(
+              tx('Using Profile A4 = {hz} Hz for Basic Pitch pitch shift.', { hz: a4 }),
+            )
           }
         } else {
-          warnings.push('Basic Pitch returned too few notes — not entered in engine race.')
+          warnings.push(
+            tx('Basic Pitch returned too few notes — not entered in engine race.'),
+          )
         }
       } catch (err) {
         const msg = err instanceof Error ? err.message : String(err)
-        warnings.push(`Basic Pitch failed (${msg}) — autocorrelation only.`)
+        warnings.push(tx('Basic Pitch failed ({detail}) — autocorrelation only.', { detail: msg }))
       }
     } else if (engine === 'basic-pitch') {
       warnings.push(
-        'Basic Pitch model unavailable (need public/models/basic-pitch/) — autocorrelation fallback.',
+        tx(
+          'Basic Pitch model unavailable (need public/models/basic-pitch/) — autocorrelation fallback.',
+        ),
       )
     }
   }
@@ -2020,19 +2101,27 @@ export async function pcmToMidiAsync(
   if (winner) {
     if (winner.engine === 'basic-pitch') {
       warnings.push(
-        `Pitch engine race winner: Basic Pitch (Apache-2.0 multipitch) · score ${winner.score.toFixed(1)} → playable fretting draft (up to 4 voices).`,
+        tx(
+          'Pitch engine race winner: Basic Pitch (Apache-2.0 multipitch) · score {score} → playable fretting draft (up to 4 voices).',
+          { score: winner.score.toFixed(1) },
+        ),
       )
     } else {
       warnings.push(
         racePool.some((c) => c.engine === 'basic-pitch')
-          ? `Pitch engine race winner: autocorrelation · score ${winner.score.toFixed(1)} (beat Basic Pitch on this clip).`
-          : `Pitch engine: autocorrelation · score ${winner.score.toFixed(1)}.`,
+          ? tx(
+              'Pitch engine race winner: autocorrelation · score {score} (beat Basic Pitch on this clip).',
+              { score: winner.score.toFixed(1) },
+            )
+          : tx('Pitch engine: autocorrelation · score {score}.', {
+              score: winner.score.toFixed(1),
+            }),
       )
     }
   }
 
   if (!notes.length) {
-    onProgress?.(40, 'Tracking pitch (autocorrelation)…')
+    onProgress?.(40, tx('Tracking pitch (autocorrelation)…'))
     const classic = pcmToMidi(prepared, sampleRate, {
       tempoBpm,
       a4,
@@ -2054,7 +2143,7 @@ export async function pcmToMidiAsync(
     }
   }
 
-  onProgress?.(78, 'Building notes…')
+  onProgress?.(78, tx('Building notes…'))
   const beforeRefine = notes.length
   // BP winners often carry multipitch; autocorr stays mono via auto mode
   // User voiceMode overrides: mono lock / multi force / auto
@@ -2075,21 +2164,23 @@ export async function pcmToMidiAsync(
   if (notes.length !== beforeRefine || hasMultipitchContent(notes)) {
     warnings.push(
       hasMultipitchContent(notes)
-        ? 'Refined draft: multipitch keep (≤4 voices) + ghost drop + onset snap + quantize.'
-        : 'Refined draft: melody extract + ghost drop + onset snap + register keep.',
+        ? tx('Refined draft: multipitch keep (≤4 voices) + ghost drop + onset snap + quantize.')
+        : tx('Refined draft: melody extract + ghost drop + onset snap + register keep.'),
     )
   }
   if (swing !== 'none') {
-    warnings.push(`Applied ${swing} 8th-note swing feel on the beat grid.`)
+    warnings.push(tx('Applied {swing} 8th-note swing feel on the beat grid.', { swing }))
   }
   if (voiceMode === 'mono') {
-    warnings.push('Lock lead (mono): forced single melody line.')
+    warnings.push(tx('Lock lead (mono): forced single melody line.'))
   } else if (voiceMode === 'multi') {
-    warnings.push('Multipitch mode: keeping playable chord voices when detected.')
+    warnings.push(tx('Multipitch mode: keeping playable chord voices when detected.'))
   }
   const artCount = notes.filter((n) => n.articulation && n.articulation !== 'none').length
   if (artCount > 0) {
-    warnings.push(`Marked ${artCount} bend/slide/hammer hints (assist — edit if wrong).`)
+    warnings.push(
+      tx('Marked {count} bend/slide/hammer hints (assist — edit if wrong).', { count: artCount }),
+    )
   }
 
   if (opts?.tempoBpm == null && notes.length >= 4) {
@@ -2107,21 +2198,30 @@ export async function pcmToMidiAsync(
         swing,
       })
       notes = mergeAdjacentNotes(notes, { ticksPerQuarter: DEFAULT_TPQ })
-      warnings.push(`Tempo refined ${prev} → ${blended} BPM (energy onset × note spacing).`)
+      warnings.push(
+        tx('Tempo refined {prev} → {bpm} BPM (energy onset × note spacing).', {
+          prev,
+          bpm: blended,
+        }),
+      )
     }
   }
 
   if (notes.length === 0) {
-    warnings.push('No stable pitches found — check that the clip has a clear single-note melody.')
+    warnings.push(
+      tx('No stable pitches found — check that the clip has a clear single-note melody.'),
+    )
   }
 
   const noteCap = opts?.noteCap ?? DEFAULT_NOTE_CAP
   if (notes.length > noteCap) {
     notes = notes.slice(0, noteCap)
-    warnings.push(`Truncated to first ${noteCap} detected notes for performance.`)
+    warnings.push(
+      tx('Truncated to first {count} detected notes for performance.', { count: noteCap }),
+    )
   }
 
-  onProgress?.(90, 'Writing MIDI…')
+  onProgress?.(90, tx('Writing MIDI…'))
   const midiBytes = buildSimpleMidi(
     notes.map((n) => ({
       pitch: n.pitch,
@@ -2132,7 +2232,7 @@ export async function pcmToMidiAsync(
     { ticksPerQuarter: DEFAULT_TPQ, tempoBpm, timeSig: [4, 4] },
   )
   const midi = parseMidi(midiBytes)
-  onProgress?.(100, 'Audio → MIDI done')
+  onProgress?.(100, tx('Audio → MIDI done'))
 
   return {
     notes,

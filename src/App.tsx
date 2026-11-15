@@ -1,4 +1,5 @@
 import { useEffect } from 'react'
+import { useI18n } from './i18n/useI18n'
 import { Navigate, Route, Routes } from 'react-router-dom'
 import { AppShell } from './components/AppShell'
 import { HomePage } from './pages/HomePage'
@@ -16,6 +17,8 @@ import { bindAudioUnlock, setPlaybackA4 } from './lib/audio'
 export default function App() {
   const onboarded = useAppStore((s) => s.onboarded)
   const a4 = useAppStore((s) => s.a4)
+  // Subscribe so a language change re-renders every page that calls tx().
+  useI18n()
 
   // WebView2 / desktop: resume AudioContext on first real user gesture.
   useEffect(() => {

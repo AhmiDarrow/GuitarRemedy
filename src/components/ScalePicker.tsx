@@ -5,15 +5,12 @@ import {
   resolveScaleId,
   type ScaleDefinition,
 } from '../lib/theory'
+import { displayPitchClass } from '../i18n/notes'
+import { presentScaleName } from '../i18n/present'
+import { useI18n } from '../i18n/useI18n'
+import { useAppStore } from '../store/appStore'
 
 const CATEGORY_ORDER = ['pentatonic', 'scale', 'mode', 'other'] as const
-
-const CATEGORY_LABEL: Record<(typeof CATEGORY_ORDER)[number], string> = {
-  pentatonic: 'Pentatonic',
-  scale: 'Diatonic',
-  mode: 'Modes',
-  other: 'Other',
-}
 
 type Props = {
   root: number
@@ -24,6 +21,20 @@ type Props = {
 }
 
 export function ScalePicker({ root, scaleId, onRoot, onScale, className }: Props) {
+  const noteSpelling = useAppStore((s) => s.noteSpelling)
+  const { tx } = useI18n()
+  const categoryLabel = (cat: (typeof CATEGORY_ORDER)[number]) => {
+    switch (cat) {
+      case 'pentatonic':
+        return tx('Pentatonic')
+      case 'scale':
+        return tx('Diatonic')
+      case 'mode':
+        return tx('Modes')
+      default:
+        return tx('Other')
+    }
+  }
   const resolved = resolveScaleId(scaleId) ?? scaleId
   const byCat = CATEGORY_ORDER.map((cat) => ({
     cat,
@@ -33,7 +44,7 @@ export function ScalePicker({ root, scaleId, onRoot, onScale, className }: Props
   return (
     <div className={clsx('space-y-4', className)}>
       <div>
-        <p className="section-title mb-2">Root</p>
+        <p className="section-title mb-2">{tx('Root')}</p>
         <div className="flex flex-wrap gap-1.5">
           {NOTE_NAMES.map((n, i) => (
             <button
@@ -47,29 +58,30 @@ export function ScalePicker({ root, scaleId, onRoot, onScale, className }: Props
                   : 'border-line/80 text-soft hover:border-mint/40 hover:text-bright bg-ink-2/60',
               )}
             >
-              {n}
+              {noteSpelling === 'letters' ? n : displayPitchClass(i, noteSpelling)}
             </button>
           ))}
         </div>
       </div>
 
       <div>
-        <p className="section-title mb-2">Scale / mode</p>
+        <p className="section-title mb-2">{tx('Scale / mode')}</p>
         <div className="space-y-3">
           {byCat.map(({ cat, scales }) => (
             <div key={cat}>
               <p className="text-[10px] uppercase tracking-widest text-mint/70 mb-1.5 font-semibold">
-                {CATEGORY_LABEL[cat]}
+                {categoryLabel(cat)}
               </p>
               <div className="flex flex-wrap gap-1.5">
                 {scales.map((s) => {
                   const active = resolved === s.id
+                  const name = presentScaleName(s.id, s.name)
                   return (
                     <button
                       key={s.id}
                       type="button"
                       onClick={() => onScale(s.id)}
-                      title={s.name}
+                      title={name}
                       className={clsx(
                         'px-2.5 py-1.5 rounded-lg text-xs font-medium border transition-colors',
                         active
@@ -77,7 +89,7 @@ export function ScalePicker({ root, scaleId, onRoot, onScale, className }: Props
                           : 'border-line/70 text-soft hover:border-mint/30 hover:text-bright bg-ink-2/40',
                       )}
                     >
-                      {s.name}
+                      {name}
                     </button>
                   )
                 })}

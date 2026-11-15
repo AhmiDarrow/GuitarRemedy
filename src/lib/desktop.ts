@@ -1,5 +1,7 @@
 /** Tauri 2 desktop helpers — safe no-ops in the browser. */
 
+import { tx } from '../i18n/runtime'
+
 const AUDIO_EXT = [
   'mp3',
   'wav',
@@ -52,14 +54,14 @@ export async function openMusicFileNative(): Promise<File | null> {
     const { readFile } = await import('@tauri-apps/plugin-fs')
     const selected = await open({
       multiple: false,
-      title: 'Open song or tab',
+      title: tx('Open song or tab'),
       filters: [
         {
-          name: 'Audio & tabs',
+          name: tx('Audio & tabs'),
           extensions: [...AUDIO_EXT, ...TAB_EXT],
         },
-        { name: 'Audio', extensions: [...AUDIO_EXT] },
-        { name: 'MIDI / MusicXML / GP', extensions: [...TAB_EXT] },
+        { name: tx('Audio'), extensions: [...AUDIO_EXT] },
+        { name: tx('MIDI / MusicXML / GP'), extensions: [...TAB_EXT] },
       ],
     })
     if (!selected || Array.isArray(selected)) return null

@@ -9,6 +9,9 @@ import {
   type ScaleDefinition,
 } from '../lib/theory'
 import { playNote } from '../lib/audio'
+import { displayPitchClass } from '../i18n/notes'
+import { presentScaleName } from '../i18n/present'
+import { useI18n } from '../i18n/useI18n'
 import { useAppStore } from '../store/appStore'
 
 const FRETS = 15
@@ -53,6 +56,14 @@ export function Fretboard({
   const customTuning = useAppStore((s) => s.customTuning)
   const getTuning = useAppStore((s) => s.getTuning)
   const a4 = useAppStore((s) => s.a4)
+  const noteSpelling = useAppStore((s) => s.noteSpelling)
+  const { tx } = useI18n()
+  const spellPc = (pc: number) => {
+    const letter = NOTE_NAMES[pc]
+    if (letter == null) return ''
+    return noteSpelling === 'letters' ? letter : displayPitchClass(pc, noteSpelling)
+  }
+  const scaleLabel = presentScaleName(scale.id, scale.name)
   const tuning = useMemo(
     () => getTuning(),
     [getTuning, tuningName, customTuning],
@@ -98,7 +109,10 @@ export function Fretboard({
         className,
       )}
       role="img"
-      aria-label={`${NOTE_NAMES[root] ?? ''} ${scale.name} fretboard`}
+      aria-label={tx('{note} {scale} fretboard', {
+        note: spellPc(root),
+        scale: scaleLabel,
+      })}
     >
       <div className="min-w-[720px] p-3 md:p-4">
         {/* Fret numbers */}
@@ -232,8 +246,16 @@ export function Fretboard({
                         )}
                         aria-label={
                           cell.inScale
-                            ? `${NOTE_NAMES[cell.pc]} fret ${fret}${isActive ? ' playing' : ''}`
-                            : `Empty fret ${fret}`
+                            ? isActive
+                              ? tx('{note} fret {n} playing', {
+                                  note: spellPc(cell.pc),
+                                  n: fret,
+                                })
+                              : tx('{note} fret {n}', {
+                                  note: spellPc(cell.pc),
+                                  n: fret,
+                                })
+                            : tx('Empty fret {n}', { n: fret })
                         }
                         aria-current={isActive ? 'true' : undefined}
                       >
@@ -260,7 +282,7 @@ export function Fretboard({
                           >
                             {showDegrees && deg != null
                               ? deg
-                              : NOTE_NAMES[cell.pc]}
+                              : spellPc(cell.pc)}
                           </span>
                         )}
                       </button>
@@ -273,9 +295,11 @@ export function Fretboard({
         </div>
 
         <p className="mt-2 text-[10px] text-center text-[var(--text-muted)]/80 font-mono">
-          {lefty ? 'Lefty · ' : ''}
-          frets 0–{FRETS}
-          {position != null ? ` · box ${position}–${position + 4}` : ''}
+          {lefty ? tx('Lefty · ') : ''}
+          {tx('frets 0–{n}', { n: FRETS })}
+          {position != null
+            ? tx(' · box {from}–{to}', { from: position, to: position + 4 })
+            : ''}
         </p>
       </div>
     </div>

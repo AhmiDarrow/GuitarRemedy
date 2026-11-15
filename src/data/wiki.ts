@@ -1,3 +1,5 @@
+import { txKey } from '../i18n/runtime'
+
 /**
  * GuitarRemedy offline wiki — free MIT encyclopedia for players.
  * Original teaching text (not scraped books). Canonical for in-app /wiki.
@@ -2285,7 +2287,8 @@ export function searchWiki(query: string): WikiArticle[] {
   const q = query.trim().toLowerCase()
   if (!q) return WIKI_ARTICLES
   return WIKI_ARTICLES.filter((a) => {
-    const hay = `${a.title} ${a.summary} ${a.tags.join(' ')} ${a.body}`.toLowerCase()
+    const localized = `${txKey(`wiki.${a.id}.title`, a.title)} ${txKey(`wiki.${a.id}.summary`, a.summary)} ${txKey(`wiki.${a.id}.body`, a.body)}`
+    const hay = `${a.title} ${a.summary} ${a.tags.join(' ')} ${a.body} ${localized}`.toLowerCase()
     return hay.includes(q)
   })
 }

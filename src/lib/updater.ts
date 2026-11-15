@@ -1,3 +1,4 @@
+import { tx } from '../i18n/runtime'
 import { isTauri } from './desktop'
 
 export type UpdateCheckResult =
@@ -8,7 +9,7 @@ export type UpdateCheckResult =
 
 /** Map raw plugin / network errors into something a player can act on. */
 export function friendlyUpdaterError(raw: string): string {
-  const msg = (raw || '').trim() || 'Update check failed.'
+  const msg = (raw || '').trim() || tx('Update check failed.')
   const lower = msg.toLowerCase()
   if (
     lower.includes('not valid') ||
@@ -21,17 +22,17 @@ export function friendlyUpdaterError(raw: string): string {
     lower.includes('not found') ||
     lower.includes('json')
   ) {
-    return (
+    return tx(
       'No published update feed yet (latest.json missing or draft release). ' +
-      'Publish a non-draft GitHub Release that includes latest.json, ' +
-      'or you are already on the only public build.'
+        'Publish a non-draft GitHub Release that includes latest.json, ' +
+        'or you are already on the only public build.',
     )
   }
   if (lower.includes('signature') || lower.includes('minisign')) {
-    return 'Update signature check failed. Re-download from the official GitHub Releases page.'
+    return tx('Update signature check failed. Re-download from the official GitHub Releases page.')
   }
   if (lower.includes('network') || lower.includes('timed out') || lower.includes('dns')) {
-    return 'Could not reach GitHub Releases. Check your network and try again.'
+    return tx('Could not reach GitHub Releases. Check your network and try again.')
   }
   return msg
 }
@@ -41,7 +42,7 @@ export async function checkForAppUpdate(): Promise<UpdateCheckResult> {
   if (!isTauri()) {
     return {
       kind: 'unsupported',
-      message: 'Auto-update runs in the Windows desktop build. Web/PWA refreshes on redeploy.',
+      message: tx('Auto-update runs in the Windows desktop build. Web/PWA refreshes on redeploy.'),
     }
   }
   try {
@@ -69,7 +70,7 @@ export async function downloadAndInstallUpdate(
   onProgress?: (pct: number | null) => void,
 ): Promise<boolean> {
   if (!isTauri()) {
-    throw new Error('Updates require the desktop app')
+    throw new Error(tx('Updates require the desktop app'))
   }
   const { check } = await import('@tauri-apps/plugin-updater')
   const { relaunch } = await import('@tauri-apps/plugin-process')

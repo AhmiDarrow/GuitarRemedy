@@ -5,6 +5,9 @@ import { STANDARD_TUNING, TUNINGS } from '../lib/theory'
 import { BPM_DEFAULT, clampPracticeBpm } from '../lib/tabScore'
 import { setPlaybackA4 } from '../lib/audio'
 import { localDate } from './lessonStore'
+import { isLocaleId, type LocaleId } from '../i18n/locales'
+import { isNoteSpelling, type NoteSpelling } from '../i18n/notes'
+import { initI18n } from '../i18n/runtime'
 
 export type Handedness = 'right' | 'left'
 
@@ -43,6 +46,10 @@ interface AppState {
   currentDay: number
   streak: number
   lastPracticeDate: string | null
+  /** UI language. Default English until boot reads a saved choice or the OS language. */
+  locale: LocaleId
+  /** Fretboard and tuner pitch names. Lessons and tabs stay in letter names. */
+  noteSpelling: NoteSpelling
   setDisplayName: (name: string) => void
   setLefty: (v: boolean) => void
   setHandedness: (h: Handedness) => void
@@ -63,6 +70,8 @@ interface AppState {
   completeLesson: (day: number) => void
   setCurrentDay: (day: number) => void
   recordPractice: () => void
+  setLocale: (id: LocaleId) => void
+  setNoteSpelling: (spelling: NoteSpelling) => void
   getTuning: () => number[]
 }
 
@@ -98,6 +107,8 @@ export const useAppStore = create<AppState>()(
       currentDay: 1,
       streak: 0,
       lastPracticeDate: null,
+      locale: 'en',
+      noteSpelling: 'letters',
 
       setDisplayName: (name) => set({ displayName: name || 'Player' }),
       setLefty: (v) => set({ lefty: v, handedness: v ? 'left' : 'right' }),
@@ -158,6 +169,16 @@ export const useAppStore = create<AppState>()(
 
       setCurrentDay: (day) => set({ currentDay: Math.max(1, Math.min(365, day)) }),
 
+      setLocale: (id) => {
+        if (!isLocaleId(id) || id === get().locale) return
+        set({ locale: id })
+        void initI18n(id)
+      },
+      setNoteSpelling: (spelling) => {
+        if (!isNoteSpelling(spelling)) return
+        set({ noteSpelling: spelling })
+      },
+
       recordPractice: () => {
         const today = todayISO()
         const { lastPracticeDate, streak } = get()
@@ -200,21 +221,30 @@ export const useAppStore = create<AppState>()(
         currentDay: s.currentDay,
         streak: s.streak,
         lastPracticeDate: s.lastPracticeDate,
+        locale: s.locale,
+        noteSpelling: s.noteSpelling,
       }),
       // Migrate older persists that used dual onboarding flags.
+      // Missing or invalid locale/noteSpelling keep the in-memory defaults so old saves stay intact.
       merge: (persisted, current) => {
         const p = (persisted ?? {}) as Record<string, unknown>
         const legacyDone = Boolean(p.onboardingDone)
         const onboarded = Boolean(p.onboarded || legacyDone || current.onboarded)
         const rawName = typeof p.displayName === 'string' ? p.displayName.trim() : ''
         const displayName = rawName || 'Player'
+        const locale = isLocaleId(p.locale) ? p.locale : current.locale
+        const noteSpelling = isNoteSpelling(p.noteSpelling) ? p.noteSpelling : current.noteSpelling
         const rest = { ...p }
         delete rest.onboardingDone
+        delete rest.locale
+        delete rest.noteSpelling
         return {
           ...current,
           ...rest,
           onboarded,
           displayName,
+          locale,
+          noteSpelling,
         } as AppState
       },
     },

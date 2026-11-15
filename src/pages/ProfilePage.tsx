@@ -12,23 +12,19 @@ import {
   ScrollText,
   Upload,
 } from 'lucide-react'
+import { LanguagePicker } from '../components/LanguagePicker'
+import { NoteSpellingPicker } from '../components/NoteSpellingPicker'
 import { NumberInput } from '../components/NumberInput'
 import { useAppStore } from '../store/appStore'
 import { useUserTabsStore } from '../store/userTabsStore'
 import { TUNINGS, type TuningName } from '../lib/theory'
 import { CURRICULUM, getLesson } from '../data/curriculum'
 import { ABOUT_HELLO, APP_NAME, APP_VERSION } from '../lib/brand'
-
-const PHASE_LABEL: Record<string, string> = {
-  basics: 'Basics',
-  chords: 'Chords',
-  scales: 'Scales',
-  rhythm: 'Rhythm',
-  lead: 'Lead',
-  repertoire: 'Repertoire',
-}
+import { phaseLabel, presentLesson, presentTuningName } from '../i18n/present'
+import { useI18n } from '../i18n/useI18n'
 
 export function ProfilePage() {
+  const { tx, tCount, formatDayStamp } = useI18n()
   const displayName = useAppStore((s) => s.displayName)
   const setDisplayName = useAppStore((s) => s.setDisplayName)
   const lefty = useAppStore((s) => s.lefty)
@@ -62,11 +58,9 @@ export function ProfilePage() {
     [currentDay],
   )
   const pct = Math.round((completed.length / CURRICULUM.length) * 100)
-  const tuningLabel =
-    tuningName === 'custom'
-      ? 'Custom'
-      : (TUNINGS[tuningName]?.name ?? tuningName)
-  const phaseLabel = PHASE_LABEL[lesson?.phase ?? ''] ?? lesson?.phase ?? 'Path'
+  const tuningLabel = presentTuningName(tuningName, TUNINGS[tuningName]?.name ?? tuningName)
+  const phaseText = lesson ? phaseLabel(lesson.phase) : tx('Path')
+  const shownLesson = lesson ? presentLesson(lesson) : null
 
   return (
     <div className="space-y-6 max-w-xl animate-fade-up">
@@ -80,15 +74,15 @@ export function ProfilePage() {
         />
         <div className="absolute inset-0 bg-gradient-to-r from-[#030705] via-[#030705]/92 to-transparent" />
         <div className="relative p-5 md:p-6">
-          <p className="text-xs uppercase tracking-widest text-mint/80 font-semibold">You</p>
+          <p className="text-xs uppercase tracking-widest text-mint/80 font-semibold">{tx('You')}</p>
           <h1 className="font-display text-3xl font-bold mt-1 tracking-tight">
-            {displayName?.trim() || 'Player'}
+            {displayName?.trim() || tx('Player')}
           </h1>
           <p className="text-sm text-[var(--text-muted)] mt-1 max-w-sm">
-            Progress, fretboard prefs, and shortcuts. Everything stays on this device.
+            {tx('Progress, fretboard prefs, and shortcuts. Everything stays on this device.')}
           </p>
           <p className="text-[11px] text-[var(--text-muted)] mt-3">
-            {APP_NAME} · v{APP_VERSION} · local-first
+            {tx('{name} · v{version} · local-first', { name: APP_NAME, version: APP_VERSION })}
           </p>
         </div>
       </div>
@@ -96,12 +90,12 @@ export function ProfilePage() {
       {/* Stats */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {[
-          { label: 'Streak', value: `${streak}d`, icon: Flame, tone: 'text-mint' },
-          { label: 'Day', value: String(currentDay), icon: BookOpen, tone: 'text-lime' },
-          { label: 'Done', value: String(completed.length), icon: Library, tone: 'text-teal' },
-          { label: 'Path', value: `${pct}%`, icon: Guitar, tone: 'text-soft' },
-        ].map(({ label, value, icon: Icon, tone }) => (
-          <div key={label} className="card p-4">
+          { id: 'streak', label: tx('Streak'), value: tx('{n}d', { n: streak }), icon: Flame, tone: 'text-mint' },
+          { id: 'day', label: tx('Day'), value: String(currentDay), icon: BookOpen, tone: 'text-lime' },
+          { id: 'done', label: tx('Done'), value: String(completed.length), icon: Library, tone: 'text-teal' },
+          { id: 'path', label: tx('Path'), value: tx('{n}%', { n: pct }), icon: Guitar, tone: 'text-soft' },
+        ].map(({ id, label, value, icon: Icon, tone }) => (
+          <div key={id} className="card p-4">
             <div className="flex items-center justify-between gap-2">
               <span className="text-[10px] uppercase tracking-wide text-[var(--text-muted)]">
                 {label}
@@ -117,14 +111,24 @@ export function ProfilePage() {
       <div className="card p-5 space-y-4">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
-            <h2 className="font-display font-semibold">365-day path</h2>
+            <h2 className="font-display font-semibold">{tx('365-day path')}</h2>
             <p className="text-xs text-[var(--text-muted)] mt-0.5">
-              {completed.length} of {CURRICULUM.length} lessons · {phaseLabel}
-              {lastPracticeDate ? ` · last practice ${lastPracticeDate}` : ''}
+              {lastPracticeDate
+                ? tx('{done} of {total} lessons · {phase} · last practice {date}', {
+                    done: completed.length,
+                    total: CURRICULUM.length,
+                    phase: phaseText,
+                    date: formatDayStamp(lastPracticeDate),
+                  })
+                : tx('{done} of {total} lessons · {phase}', {
+                    done: completed.length,
+                    total: CURRICULUM.length,
+                    phase: phaseText,
+                  })}
             </p>
           </div>
           <span className="text-sm font-display font-bold text-mint tabular-nums shrink-0">
-            {pct}%
+            {tx('{n}%', { n: pct })}
           </span>
         </div>
         <div
@@ -133,61 +137,62 @@ export function ProfilePage() {
           aria-valuenow={pct}
           aria-valuemin={0}
           aria-valuemax={100}
-          aria-label="Lesson path progress"
+          aria-label={tx('Lesson path progress')}
         >
           <div
             className="h-full rounded-full bg-gradient-to-r from-mint/80 to-lime/70 transition-[width] duration-500"
             style={{ width: `${Math.min(100, Math.max(0, pct))}%` }}
           />
         </div>
-        {lesson ? (
+        {shownLesson ? (
           <div className="rounded-xl border border-[var(--border)] bg-[var(--bg-elevated)]/60 px-4 py-3">
             <p className="text-[10px] uppercase tracking-widest text-mint/80 font-semibold">
-              Up next · Day {lesson.day}
+              {tx('Up next · Day {day}', { day: shownLesson.day })}
             </p>
-            <p className="text-sm font-medium mt-1 leading-snug">{lesson.title}</p>
-            <p className="text-xs text-[var(--text-muted)] mt-1 line-clamp-2">{lesson.theoryBite}</p>
+            <p className="text-sm font-medium mt-1 leading-snug">{shownLesson.title}</p>
+            <p className="text-xs text-[var(--text-muted)] mt-1 line-clamp-2">{shownLesson.theoryBite}</p>
             <Link
-              to={`/learn/${lesson.day}`}
+              to={`/learn/${shownLesson.day}`}
               className="btn-primary mt-3 inline-flex text-sm px-4 py-2 rounded-xl"
             >
-              Open lesson
+              {tx('Open lesson')}
             </Link>
           </div>
         ) : null}
         <div className="flex flex-wrap gap-2 text-xs text-[var(--text-muted)]">
           <span className="inline-flex items-center gap-1.5 rounded-full border border-[var(--border)] px-2.5 py-1">
             <Heart className="w-3 h-3 text-mint" />
-            {favorites.length} favorite{favorites.length === 1 ? '' : 's'}
+            {tCount('favorites', favorites.length)}
           </span>
           <Link
             to="/library?mine=1"
             className="inline-flex items-center gap-1.5 rounded-full border border-[var(--border)] px-2.5 py-1 hover:border-mint/40 hover:text-mint transition-colors"
           >
             <Library className="w-3 h-3 text-mint" />
-            {userTabs.length} saved tab{userTabs.length === 1 ? '' : 's'}
+            {tCount('savedTabs', userTabs.length)}
           </Link>
         </div>
       </div>
 
       {/* Quick tools */}
       <div className="card p-5 space-y-3">
-        <h2 className="font-display font-semibold">Shortcuts</h2>
+        <h2 className="font-display font-semibold">{tx('Shortcuts')}</h2>
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
           {(
             [
-              { to: '/practice', state: { tool: 'metronome' }, label: 'Metronome', icon: Gauge },
-              { to: '/practice', state: { tool: 'tuner' }, label: 'Tuner', icon: AudioLines },
-              { to: '/practice', state: { tool: 'fretboard' }, label: 'Fretboard', icon: Guitar },
-              { to: '/library', label: 'Library', icon: Library },
-              { to: '/upload', label: 'Upload', icon: Upload },
-              { to: '/wiki', label: 'Wiki', icon: ScrollText },
+              { to: '/practice', state: { tool: 'metronome' }, label: tx('Metronome'), icon: Gauge },
+              { to: '/practice', state: { tool: 'tuner' }, label: tx('Tuner'), icon: AudioLines },
+              { to: '/practice', state: { tool: 'fretboard' }, label: tx('Fretboard'), icon: Guitar },
+              { to: '/library', label: tx('Library'), icon: Library },
+              { to: '/upload', label: tx('Upload'), icon: Upload },
+              { to: '/wiki', label: tx('Wiki'), icon: ScrollText },
             ] as const
           ).map((item) => {
             const Icon = item.icon
+            const routeKey = 'state' in item ? `${item.to}:${item.state.tool}` : item.to
             return (
               <Link
-                key={item.label}
+                key={routeKey}
                 to={item.to}
                 state={'state' in item ? item.state : undefined}
                 className="flex items-center gap-2.5 rounded-xl border border-[var(--border)] bg-[var(--bg-elevated)]/50 px-3 py-2.5 text-sm hover:border-mint/40 hover:bg-mint/5 transition-colors"
@@ -195,7 +200,7 @@ export function ProfilePage() {
                 <span className="w-8 h-8 rounded-lg bg-mint/10 border border-mint/20 flex items-center justify-center shrink-0">
                   <Icon className="w-4 h-4 text-mint" />
                 </span>
-                <span className="font-medium truncate">{item.label}</span>
+                <span className="font-medium break-words">{item.label}</span>
               </Link>
             )
           })}
@@ -204,14 +209,16 @@ export function ProfilePage() {
 
       {/* Player */}
       <div className="card p-5 space-y-4">
-        <h2 className="font-display font-semibold">Player</h2>
+        <h2 className="font-display font-semibold">{tx('Player')}</h2>
+        <LanguagePicker id="profile-language" />
+        <NoteSpellingPicker id="profile-note-names" />
         <label className="block text-xs text-[var(--text-muted)]">
-          Display name
+          {tx('Display name')}
           <input
             className="input mt-1"
             value={displayName}
             onChange={(e) => setDisplayName(e.target.value)}
-            placeholder="Your name"
+            placeholder={tx('Your name')}
             autoComplete="nickname"
           />
         </label>
@@ -220,10 +227,11 @@ export function ProfilePage() {
       {/* Instrument — fretboard / play-along only */}
       <div className="card p-5 space-y-4">
         <div>
-          <h2 className="font-display font-semibold">Fretboard &amp; play-along</h2>
+          <h2 className="font-display font-semibold">{tx('Fretboard & play-along')}</h2>
           <p className="text-[11px] text-[var(--text-muted)] mt-1">
-            Scales, tabs, and Library tones. The chromatic tuner keeps its own A4 and open-string map
-            under Practice → Tuner.
+            {tx(
+              'Scales, tabs, and Library tones. The chromatic tuner keeps its own A4 and open-string map under Practice → Tuner.',
+            )}
           </p>
         </div>
 
@@ -234,11 +242,11 @@ export function ProfilePage() {
             onChange={(e) => setLefty(e.target.checked)}
             className="accent-mint"
           />
-          <span className="text-sm">Left-handed fretboard</span>
+          <span className="text-sm">{tx('Left-handed fretboard')}</span>
         </label>
 
         <label className="block text-xs text-[var(--text-muted)]">
-          Tuning
+          {tx('Tuning')}
           <select
             className="input mt-1"
             value={tuningName}
@@ -246,19 +254,19 @@ export function ProfilePage() {
           >
             {Object.entries(TUNINGS).map(([id, t]) => (
               <option key={id} value={id}>
-                {t.name}
+                {presentTuningName(id, t.name)}
               </option>
             ))}
           </select>
           <span className="block text-[10px] mt-1 text-[var(--text-muted)]">
-            Active: {tuningLabel}
+            {tx('Active: {tuning}', { tuning: tuningLabel })}
           </span>
         </label>
 
         {tuningName === 'custom' ? (
           <div className="space-y-2">
             <p className="text-[11px] text-[var(--text-muted)]">
-              Custom open-string MIDI (low E → high e). Fretboard and play-along only — not the tuner.
+              {tx('Custom open-string MIDI (low E → high e). Fretboard and play-along only — not the tuner.')}
             </p>
             <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
               {['E', 'A', 'D', 'G', 'B', 'e'].map((label, i) => (
@@ -283,7 +291,7 @@ export function ProfilePage() {
         ) : null}
 
         <label className="block text-xs text-[var(--text-muted)]">
-          Play-along A4 (Hz)
+          {tx('Play-along A4 (Hz)')}
           <NumberInput
             integer
             className="input mt-1"
@@ -293,7 +301,7 @@ export function ProfilePage() {
             onCommit={setA4}
           />
           <span className="block text-[10px] mt-1 text-[var(--text-muted)]">
-            Scales, tabs, and tones. Tuner A4 is set inside the tuner.
+            {tx('Scales, tabs, and tones. Tuner A4 is set inside the tuner.')}
           </span>
         </label>
 
@@ -304,11 +312,11 @@ export function ProfilePage() {
             onChange={(e) => setShowDegrees(e.target.checked)}
             className="accent-mint"
           />
-          <span className="text-sm">Show scale degrees on fretboard</span>
+          <span className="text-sm">{tx('Show scale degrees on fretboard')}</span>
         </label>
 
         <label className="block text-xs text-[var(--text-muted)]">
-          Default BPM
+          {tx('Default BPM')}
           <NumberInput
             integer
             className="input mt-1"
@@ -318,7 +326,7 @@ export function ProfilePage() {
             onCommit={setBpm}
           />
           <span className="block text-[10px] mt-1 text-[var(--text-muted)]">
-            Shared by metronome, scale play, and tab playback (30–300).
+            {tx('Shared by metronome, scale play, and tab playback (30–300).')}
           </span>
         </label>
 
@@ -328,35 +336,36 @@ export function ProfilePage() {
             state={{ tool: 'tuner' }}
             className="btn-secondary inline-flex text-center text-sm px-4 py-2 rounded-xl"
           >
-            Open tuner
+            {tx('Open tuner')}
           </Link>
           <Link
             to="/practice"
             state={{ tool: 'metronome' }}
             className="btn-secondary inline-flex text-center text-sm px-4 py-2 rounded-xl"
           >
-            Open metronome
+            {tx('Open metronome')}
           </Link>
         </div>
       </div>
 
       {/* Honest convert summary — short; full detail on About */}
       <div className="card p-5 text-sm text-[var(--text-muted)] leading-relaxed space-y-2">
-        <h2 className="font-display font-semibold text-[var(--text)]">Song → tabs</h2>
+        <h2 className="font-display font-semibold text-[var(--text)]">{tx('Song → tabs')}</h2>
         <p>
-          <strong className="text-[var(--text)]">MIDI / MusicXML</strong> land as solid tabs.
-          Audio is a lead-biased assist you always edit by ear. Guitar Pro is best-effort and never
-          auto-saves placeholders.
+          <strong className="text-[var(--text)]">{tx('MIDI / MusicXML')}</strong>{' '}
+          {tx(
+            'land as solid tabs. Audio is a lead-biased assist you always edit by ear. Guitar Pro is best-effort and never auto-saves placeholders.',
+          )}
         </p>
         <p className="text-xs">
-          Your tabs stay on this device — export .grtab.json, ASCII, or MIDI anytime.
+          {tx('Your tabs stay on this device — export .grtab.json, ASCII, or MIDI anytime.')}
         </p>
         <div className="flex flex-wrap gap-2 pt-1">
           <Link to="/upload" className="btn-secondary text-sm px-4 py-2 rounded-xl">
-            Upload a song
+            {tx('Upload a song')}
           </Link>
           <Link to="/library?mine=1" className="btn-secondary text-sm px-4 py-2 rounded-xl">
-            Your tabs
+            {tx('Your tabs')}
           </Link>
         </div>
       </div>
@@ -368,18 +377,18 @@ export function ProfilePage() {
             <Info className="w-5 h-5 text-mint" />
           </span>
           <div>
-            <h2 className="font-display font-semibold">About {APP_NAME}</h2>
+            <h2 className="font-display font-semibold">{tx('About {name}', { name: APP_NAME })}</h2>
             <p className="text-xs text-[var(--text-muted)] mt-1 leading-relaxed">
-              {ABOUT_HELLO} Version, links, wiki, and desktop updates live on the About page.
+              {ABOUT_HELLO} {tx('Version, links, wiki, and desktop updates live on the About page.')}
             </p>
           </div>
         </div>
         <div className="flex flex-wrap gap-2 shrink-0">
           <Link to="/wiki" className="btn-secondary text-center text-sm px-4 py-2 rounded-xl">
-            Wiki
+            {tx('Wiki')}
           </Link>
           <Link to="/about" className="btn-primary text-center text-sm px-4 py-2 rounded-xl">
-            About
+            {tx('About')}
           </Link>
         </div>
       </div>

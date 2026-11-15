@@ -13,6 +13,7 @@ import {
   User,
 } from 'lucide-react'
 import clsx from 'clsx'
+import { useI18n } from '../i18n/useI18n'
 
 type MenuItem = {
   to: string
@@ -28,61 +29,6 @@ type MenuGroup = {
   items: MenuItem[]
 }
 
-/** Logo menu — grouped in the order people actually practice. */
-const MENU_GROUPS: MenuGroup[] = [
-  {
-    id: 'practice',
-    label: 'Practice',
-    items: [
-      {
-        to: '/practice',
-        label: 'Fretboard',
-        hint: 'Scales lab · play along',
-        icon: Guitar,
-        state: { tool: 'fretboard' },
-      },
-      {
-        to: '/practice',
-        label: 'Metronome',
-        hint: 'BPM · subdivisions · tap',
-        icon: Gauge,
-        state: { tool: 'metronome' },
-      },
-      {
-        to: '/practice',
-        label: 'Tuner',
-        hint: 'Standalone · own A4 & tuning',
-        icon: AudioLines,
-        state: { tool: 'tuner' },
-      },
-    ],
-  },
-  {
-    id: 'learn',
-    label: 'Learn',
-    items: [
-      { to: '/learn', label: 'Lessons', hint: 'Day 1–365 path', icon: BookOpen },
-      { to: '/library', label: 'Library', hint: 'Scales, chords, free tabs', icon: Library },
-      { to: '/wiki', label: 'Wiki', hint: 'Theory & guitar craft', icon: ScrollText },
-    ],
-  },
-  {
-    id: 'create',
-    label: 'Create',
-    items: [
-      { to: '/upload', label: 'Song → tabs', hint: 'Audio, MIDI, MusicXML, GP', icon: Upload },
-    ],
-  },
-  {
-    id: 'you',
-    label: 'You',
-    items: [
-      { to: '/profile', label: 'You', hint: 'Progress · fretboard prefs', icon: User },
-      { to: '/about', label: 'About', hint: 'Ahmi · updates · license', icon: Info },
-    ],
-  },
-]
-
 type Props = {
   size?: 'sm' | 'md'
   className?: string
@@ -93,7 +39,43 @@ export function AppMenu({ size = 'md', className, showTitle = true }: Props) {
   const [open, setOpen] = useState(false)
   const rootRef = useRef<HTMLDivElement>(null)
   const navigate = useNavigate()
+  const { tx } = useI18n()
   const mark = size === 'sm' ? 'w-8 h-8 rounded-lg' : 'w-10 h-10 rounded-xl'
+  const menuGroups: MenuGroup[] = [
+    {
+      id: 'practice',
+      label: tx('Practice'),
+      items: [
+        { to: '/practice', label: tx('Fretboard'), hint: tx('Scales lab · play along'), icon: Guitar, state: { tool: 'fretboard' } },
+        { to: '/practice', label: tx('Metronome'), hint: tx('BPM · subdivisions · tap'), icon: Gauge, state: { tool: 'metronome' } },
+        { to: '/practice', label: tx('Tuner'), hint: tx('Standalone · own A4 & tuning'), icon: AudioLines, state: { tool: 'tuner' } },
+      ],
+    },
+    {
+      id: 'learn',
+      label: tx('Learn'),
+      items: [
+        { to: '/learn', label: tx('Lessons'), hint: tx('Day 1–365 path'), icon: BookOpen },
+        { to: '/library', label: tx('Library'), hint: tx('Scales, chords, free tabs'), icon: Library },
+        { to: '/wiki', label: tx('Wiki'), hint: tx('Theory & guitar craft'), icon: ScrollText },
+      ],
+    },
+    {
+      id: 'create',
+      label: tx('Create'),
+      items: [
+        { to: '/upload', label: tx('Song → tabs'), hint: tx('Audio, MIDI, MusicXML, GP'), icon: Upload },
+      ],
+    },
+    {
+      id: 'you',
+      label: tx('You'),
+      items: [
+        { to: '/profile', label: tx('You'), hint: tx('Progress · fretboard prefs'), icon: User },
+        { to: '/about', label: tx('About'), hint: tx('Ahmi · updates · license'), icon: Info },
+      ],
+    },
+  ]
 
   useEffect(() => {
     if (!open) return
@@ -123,7 +105,7 @@ export function AppMenu({ size = 'md', className, showTitle = true }: Props) {
         className="flex items-center gap-2.5 rounded-xl text-left hover:bg-white/5 transition-colors pr-1.5 -ml-1 pl-1 py-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-mint/50"
         aria-haspopup="menu"
         aria-expanded={open}
-        aria-label="Open app menu"
+        aria-label={tx('Open app menu')}
         onClick={() => setOpen((v) => !v)}
       >
         <img
@@ -143,7 +125,7 @@ export function AppMenu({ size = 'md', className, showTitle = true }: Props) {
               />
             </span>
             <span className="text-[11px] text-[var(--text-muted)] mt-0.5 block">
-              Menu · practice · learn
+              {tx('Menu · practice · learn')}
             </span>
           </span>
         ) : (
@@ -159,10 +141,10 @@ export function AppMenu({ size = 'md', className, showTitle = true }: Props) {
       {open ? (
         <div
           role="menu"
-          aria-label="App menu"
+          aria-label={tx('App menu')}
           className="absolute left-0 top-full mt-2 z-50 w-72 max-h-[min(70dvh,28rem)] overflow-y-auto rounded-2xl border border-[var(--border)] bg-[var(--bg-elevated)]/95 backdrop-blur-xl shadow-2xl shadow-black/40 p-1.5 animate-fade-up"
         >
-          {MENU_GROUPS.map((group, gi) => (
+          {menuGroups.map((group, gi) => (
             <div key={group.id}>
               {gi > 0 ? <div className="my-1 mx-2 border-t border-[var(--border)]" /> : null}
               <p className="px-3 pt-2 pb-1 text-[10px] uppercase tracking-widest text-[var(--text-muted)] font-semibold">
@@ -186,7 +168,7 @@ export function AppMenu({ size = 'md', className, showTitle = true }: Props) {
                         {item.label}
                       </span>
                       {item.hint ? (
-                        <span className="block text-[11px] text-[var(--text-muted)] truncate">
+                        <span className="block text-[11px] text-[var(--text-muted)] break-words">
                           {item.hint}
                         </span>
                       ) : null}
@@ -203,7 +185,7 @@ export function AppMenu({ size = 'md', className, showTitle = true }: Props) {
             className="flex items-center gap-2 px-3 py-2.5 text-xs text-[var(--text-muted)] hover:text-mint rounded-xl"
             onClick={() => setOpen(false)}
           >
-            Check for updates
+            {tx('Check for updates')}
           </Link>
         </div>
       ) : null}

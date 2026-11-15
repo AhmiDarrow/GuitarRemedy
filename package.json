@@ -18,7 +18,7 @@
     "dev": "vite",
     "build": "tsc -p tsconfig.app.json --noEmit && vite build",
     "preview": "vite preview",
-    "test": "tsc -p tsconfig.app.json --noEmit && vitest run",
+    "test": "node scripts/check-locales.mjs && tsc -p tsconfig.app.json --noEmit && vitest run",
     "test:watch": "vitest",
     "test:rust": "cargo test --manifest-path src-tauri/Cargo.toml",
     "test:all": "npm test && npm run test:rust",

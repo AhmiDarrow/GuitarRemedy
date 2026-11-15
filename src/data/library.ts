@@ -1,3 +1,4 @@
+import { txKey } from '../i18n/runtime'
 import { FREE_LICENSE_TABS } from './freeTabs'
 
 export type LibraryKind = 'scale' | 'chord' | 'riff' | 'song' | 'progression'
@@ -517,7 +518,13 @@ export function searchLibrary(query: string, filters?: {
     if (filters?.favoritesOnly && filters.favoriteIds && !filters.favoriteIds.includes(item.id))
       return false
     if (!q) return true
-    const hay = [item.title, item.description, item.key, item.genre, ...item.tags]
+    const tabTitle = item.tab?.title && item.tab.title !== item.title ? item.tab.title : ''
+    const localized = [
+      txKey(`lib.${item.id}.title`, item.title),
+      txKey(`lib.${item.id}.description`, item.description),
+      tabTitle ? txKey(`lib.${item.id}.tab`, tabTitle) : '',
+    ].join(' ')
+    const hay = [item.title, item.description, item.key, item.genre, ...item.tags, localized]
       .filter(Boolean)
       .join(' ')
       .toLowerCase()

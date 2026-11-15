@@ -26,6 +26,7 @@ import {
 } from '../lib/tabEdit'
 import { NumberInput } from './NumberInput'
 import { TabView } from './TabView'
+import { useI18n } from '../i18n/useI18n'
 import type { FretPositionPrefer } from '../lib/theory'
 
 type Props = {
@@ -64,6 +65,7 @@ export function TabEditor({
   className,
   sourceAudioUrl,
 }: Props) {
+  const { tx } = useI18n()
   const [draft, setDraft] = useState<TabScore>(() => ({
     ...initial,
     notes: initial.notes.map((n) => ({ ...n })),
@@ -112,10 +114,11 @@ export function TabEditor({
         <div className="flex flex-wrap items-center gap-2">
           <Pencil className="w-4 h-4 text-mint" />
           <h3 className="font-display font-semibold text-sm flex-1">
-            Edit tab{title ? ` · ${title}` : ''}
+            {tx('Edit tab')}
+            {title ? tx(' · {title}', { title }) : ''}
           </h3>
           <label className="text-xs text-[var(--text-muted)] flex items-center gap-2">
-            Tempo
+            {tx('Tempo')}
             <NumberInput
               integer
               min={30}
@@ -126,7 +129,7 @@ export function TabEditor({
             />
           </label>
           <label className="text-xs text-[var(--text-muted)] flex items-center gap-2">
-            Position
+            {tx('Position')}
             <select
               className="rounded-lg bg-[var(--bg-elevated)] border border-[var(--border)] px-2 py-1 text-[var(--text)]"
               value={preferPos}
@@ -136,9 +139,9 @@ export function TabEditor({
                 setDraft((s) => reFretScore(s, v))
               }}
             >
-              <option value="auto">Auto</option>
-              <option value="open">Open (0–5)</option>
-              <option value="mid">Mid (5–7)</option>
+              <option value="auto">{tx('Auto')}</option>
+              <option value="open">{tx('Open (0–5)')}</option>
+              <option value="mid">{tx('Mid (5–7)')}</option>
             </select>
           </label>
           <button
@@ -149,59 +152,59 @@ export function TabEditor({
               setSelected(draft.notes.length)
             }}
           >
-            <Plus className="w-3.5 h-3.5" /> Note
+            <Plus className="w-3.5 h-3.5" /> {tx('Note')}
           </button>
           <button
             type="button"
             className="btn-ghost !py-1.5 !px-2 text-xs"
-            title="Drop ghosts, quantize, merge, re-fret"
+            title={tx('Drop ghosts, quantize, merge, re-fret')}
             onClick={() => {
               setDraft((s) => cleanUpScore(s, { preferPosition: preferPos }))
               setSelected(0)
             }}
             disabled={noteCount === 0}
           >
-            <Sparkles className="w-3.5 h-3.5" /> Clean up
+            <Sparkles className="w-3.5 h-3.5" /> {tx('Clean up')}
           </button>
           <button
             type="button"
             className="btn-ghost !py-1.5 !px-2 text-xs"
-            title="Force single lead line (highest conf per onset)"
+            title={tx('Force single lead line (highest conf per onset)')}
             onClick={() => {
               setDraft((s) => lockLeadMono(s))
               setSelected(0)
             }}
             disabled={noteCount === 0}
           >
-            <Crosshair className="w-3.5 h-3.5" /> Lock lead
+            <Crosshair className="w-3.5 h-3.5" /> {tx('Lock lead')}
           </button>
           <button
             type="button"
             className="btn-ghost !py-1.5 !px-2 text-xs"
-            title="Drop low-confidence notes"
+            title={tx('Drop low-confidence notes')}
             onClick={() => {
               setDraft((s) => dropLowConfidenceNotes(s, 0.38))
               setSelected(0)
             }}
             disabled={noteCount === 0}
           >
-            <Filter className="w-3.5 h-3.5" /> Weak notes
+            <Filter className="w-3.5 h-3.5" /> {tx('Weak notes')}
           </button>
           <button
             type="button"
             className="btn-ghost !py-1.5 !px-2 text-xs"
-            title="Keep strongest 8 bars only"
+            title={tx('Keep strongest 8 bars only')}
             onClick={() => {
               setDraft((s) => keepStrongestBars(s, 8, 4))
               setSelected(0)
             }}
             disabled={noteCount === 0}
           >
-            <Music2 className="w-3.5 h-3.5" /> Best bars
+            <Music2 className="w-3.5 h-3.5" /> {tx('Best bars')}
           </button>
           {onCancel ? (
             <button type="button" className="btn-ghost !py-1.5 !px-2 text-xs" onClick={onCancel}>
-              <X className="w-3.5 h-3.5" /> Cancel
+              <X className="w-3.5 h-3.5" /> {tx('Cancel')}
             </button>
           ) : null}
           <button
@@ -210,34 +213,43 @@ export function TabEditor({
             onClick={() => onSave(draft)}
             disabled={noteCount === 0}
           >
-            <Save className="w-3.5 h-3.5" /> Save edits
+            <Save className="w-3.5 h-3.5" /> {tx('Save edits')}
           </button>
         </div>
 
         <p className="text-xs text-[var(--text-muted)] leading-relaxed">
-          Fix frets, strings, beat time, and duration after convert. Row color = pitch confidence
-          (mint strong · amber medium · red weak). Marks: <span className="font-mono">b</span> bend ·{' '}
-          <span className="font-mono">/</span> slide · <span className="font-mono">h</span> hammer ·{' '}
-          <span className="font-mono">p</span> pull. <strong className="text-mint font-medium">Lock lead</strong>{' '}
-          forces mono; <strong className="text-mint font-medium">Clean up</strong> snaps timing and re-frets.
+          {tx('Fix frets, strings, beat time, and duration after convert. Row color = pitch confidence (mint strong · amber medium · red weak). Marks: ')}
+          <span className="font-mono">b</span>
+          {tx(' bend · ')}
+          <span className="font-mono">/</span>
+          {tx(' slide · ')}
+          <span className="font-mono">h</span>
+          {tx(' hammer · ')}
+          <span className="font-mono">p</span>
+          {tx(' pull. ')}
+          <strong className="text-mint font-medium">{tx('Lock lead')}</strong>
+          {' '}
+          {tx('forces mono; ')}
+          <strong className="text-mint font-medium">{tx('Clean up')}</strong>
+          {tx(' snaps timing and re-frets.')}
         </p>
 
         {sourceAudioUrl ? (
           <div className="rounded-xl border border-[var(--border)] p-3 bg-[var(--bg-elevated)]/50 space-y-2">
             <div className="flex flex-wrap items-center gap-2 text-xs">
               <Headphones className="w-3.5 h-3.5 text-mint" />
-              <span className="font-medium text-[var(--text)]">A/B original audio</span>
+              <span className="font-medium text-[var(--text)]">{tx('A/B original audio')}</span>
               <button
                 type="button"
                 className="btn-ghost !py-1 !px-2 text-xs"
                 onClick={scrubToSelected}
                 disabled={!current}
-                title="Jump source audio to selected note beat"
+                title={tx('Jump source audio to selected note beat')}
               >
-                Scrub to note
+                {tx('Scrub to note')}
               </button>
               <span className="text-[var(--text-muted)]">
-                Play the recording under the tab — ear is the final check.
+                {tx('Play the recording under the tab — ear is the final check.')}
               </span>
             </div>
             <audio
@@ -250,7 +262,7 @@ export function TabEditor({
               onEnded={() => setAbPlaying(false)}
             />
             {abPlaying ? (
-              <p className="text-[10px] text-mint/80 font-mono">Source playing — compare with tab preview below.</p>
+              <p className="text-[10px] text-mint/80 font-mono">{tx('Source playing — compare with tab preview below.')}</p>
             ) : null}
           </div>
         ) : null}
@@ -260,14 +272,14 @@ export function TabEditor({
             <table className="w-full text-xs font-mono">
               <thead className="sticky top-0 bg-[var(--bg-elevated)] text-[var(--text-muted)]">
                 <tr>
-                  <th className="text-left p-2">#</th>
-                  <th className="text-left p-2">Str</th>
-                  <th className="text-left p-2">Fret</th>
-                  <th className="text-left p-2">Art</th>
-                  <th className="text-left p-2">Beat</th>
-                  <th className="text-left p-2">Dur</th>
-                  <th className="text-left p-2">MIDI</th>
-                  <th className="text-left p-2">Conf</th>
+                  <th className="text-left p-2">{tx('#')}</th>
+                  <th className="text-left p-2">{tx('Str')}</th>
+                  <th className="text-left p-2">{tx('Fret')}</th>
+                  <th className="text-left p-2">{tx('Art')}</th>
+                  <th className="text-left p-2">{tx('Beat')}</th>
+                  <th className="text-left p-2">{tx('Dur')}</th>
+                  <th className="text-left p-2">{tx('MIDI')}</th>
+                  <th className="text-left p-2">{tx('Conf')}</th>
                   <th className="p-2" />
                 </tr>
               </thead>
@@ -297,7 +309,7 @@ export function TabEditor({
                       <button
                         type="button"
                         className="btn-ghost !p-1"
-                        aria-label={`Delete note ${i + 1}`}
+                        aria-label={tx('Delete note {n}', { n: i + 1 })}
                         onClick={(e) => {
                           e.stopPropagation()
                           setDraft((s) => deleteScoreNote(s, i))
@@ -312,7 +324,7 @@ export function TabEditor({
                 {noteCount === 0 ? (
                   <tr>
                     <td colSpan={9} className="p-4 text-[var(--text-muted)]">
-                      No notes — add one to start editing.
+                      {tx('No notes — add one to start editing.')}
                     </td>
                   </tr>
                 ) : null}
@@ -321,11 +333,11 @@ export function TabEditor({
           </div>
 
           <div className="space-y-3 rounded-xl border border-[var(--border)] p-3 bg-[var(--bg-elevated)]/40">
-            <p className="section-title">Selected note</p>
+            <p className="section-title">{tx('Selected note')}</p>
             {current ? (
               <>
                 <label className="block text-xs text-[var(--text-muted)]">
-                  String
+                  {tx('String')}
                   <select
                     className="mt-1 w-full rounded-lg bg-[var(--bg)] border border-[var(--border)] px-2 py-1.5 text-[var(--text)]"
                     value={current.string}
@@ -333,13 +345,16 @@ export function TabEditor({
                   >
                     {STRING_LABELS.map((lab, i) => (
                       <option key={lab} value={i}>
-                        {lab} ({i === 0 ? 'high' : i === 5 ? 'low' : 'mid'})
+                        {lab}
+                        {tx(' ({role})', {
+                          role: i === 0 ? tx('high') : i === 5 ? tx('low') : tx('mid'),
+                        })}
                       </option>
                     ))}
                   </select>
                 </label>
                 <label className="block text-xs text-[var(--text-muted)]">
-                  Fret
+                  {tx('Fret')}
                   <NumberInput
                     integer
                     min={0}
@@ -350,7 +365,7 @@ export function TabEditor({
                   />
                 </label>
                 <label className="block text-xs text-[var(--text-muted)]">
-                  Start beat
+                  {tx('Start beat')}
                   <NumberInput
                     min={0}
                     step={0.25}
@@ -360,7 +375,7 @@ export function TabEditor({
                   />
                 </label>
                 <label className="block text-xs text-[var(--text-muted)]">
-                  Duration (beats)
+                  {tx('Duration (beats)')}
                   <NumberInput
                     min={0.05}
                     step={0.25}
@@ -370,7 +385,7 @@ export function TabEditor({
                   />
                 </label>
                 <label className="block text-xs text-[var(--text-muted)]">
-                  Articulation
+                  {tx('Articulation')}
                   <select
                     className="mt-1 w-full rounded-lg bg-[var(--bg)] border border-[var(--border)] px-2 py-1.5 text-[var(--text)]"
                     value={current.articulation ?? 'none'}
@@ -380,23 +395,23 @@ export function TabEditor({
                       })
                     }
                   >
-                    <option value="none">None</option>
-                    <option value="bend">Bend</option>
-                    <option value="slide">Slide</option>
-                    <option value="hammer">Hammer-on</option>
-                    <option value="pull">Pull-off</option>
+                    <option value="none">{tx('None')}</option>
+                    <option value="bend">{tx('Bend')}</option>
+                    <option value="slide">{tx('Slide')}</option>
+                    <option value="hammer">{tx('Hammer-on')}</option>
+                    <option value="pull">{tx('Pull-off')}</option>
                   </select>
                 </label>
               </>
             ) : (
-              <p className="text-xs text-[var(--text-muted)]">Select or add a note.</p>
+              <p className="text-xs text-[var(--text-muted)]">{tx('Select or add a note.')}</p>
             )}
           </div>
         </div>
       </div>
 
       <div className="mt-4">
-        <p className="section-title mb-2">Preview</p>
+        <p className="section-title mb-2">{tx('Preview')}</p>
         <TabView score={preview} title={title || draft.title} />
       </div>
     </div>

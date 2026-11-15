@@ -4,6 +4,7 @@
  * steel inharmonicity · noise-floor calibrate · phase/strobe.
  */
 
+import { tx } from '../i18n/runtime'
 import { hzToMidi, midiToHz } from './audioToMidi'
 import { NOTE_NAMES } from './theory'
 
@@ -688,25 +689,25 @@ export function formatMicPermissionError(err: unknown): string {
         : ''
 
   if (name === 'NotAllowedError' || name === 'PermissionDeniedError') {
-    return 'Microphone blocked for the tuner. On Android: App info → Permissions → Microphone → Allow, force-stop the app, reopen, then tap Listen again. If it is already Allowed, reinstall the latest APK (WebView mic bridge).'
+    return tx('Microphone blocked for the tuner. On Android: App info → Permissions → Microphone → Allow, force-stop the app, reopen, then tap Listen again. If it is already Allowed, reinstall the latest APK (WebView mic bridge).')
   }
   if (name === 'NotFoundError' || name === 'DevicesNotFoundError') {
-    return 'No microphone found. Plug one in or check device settings, then try again.'
+    return tx('No microphone found. Plug one in or check device settings, then try again.')
   }
   if (name === 'NotReadableError' || name === 'TrackStartError') {
-    return 'Microphone is busy or blocked by another app. Close other apps using the mic, then try again.'
+    return tx('Microphone is busy or blocked by another app. Close other apps using the mic, then try again.')
   }
   if (name === 'SecurityError') {
-    return 'Microphone blocked in this context. Use the installed app or HTTPS, allow mic access, then try again.'
+    return tx('Microphone blocked in this context. Use the installed app or HTTPS, allow mic access, then try again.')
   }
   if (name === 'OverconstrainedError') {
-    return 'Could not open the microphone with tuner settings. Check mic permissions and try again.'
+    return tx('Could not open the microphone with tuner settings. Check mic permissions and try again.')
   }
   if (/permission|not allowed|denied|secure/i.test(msg)) {
-    return 'Microphone permission needed. Allow mic access for GuitarRemedy (Android: App info → Permissions → Microphone), force-stop and reopen, then tap Listen again.'
+    return tx('Microphone permission needed. Allow mic access for GuitarRemedy (Android: App info → Permissions → Microphone), force-stop and reopen, then tap Listen again.')
   }
   if (msg.trim()) return msg
-  return 'Could not open the microphone. Allow mic access, then tap Listen again.'
+  return tx('Could not open the microphone. Allow mic access, then tap Listen again.')
 }
 
 function isConstraintFailure(err: unknown): boolean {
@@ -726,7 +727,7 @@ function isConstraintFailure(err: unknown): boolean {
 export async function requestTunerMicrophone(): Promise<MediaStream> {
   if (typeof navigator === 'undefined' || !navigator.mediaDevices?.getUserMedia) {
     throw new Error(
-      'Microphone not available here. Use the Android app, desktop app, or a browser that supports mic access.',
+      tx('Microphone not available here. Use the Android app, desktop app, or a browser that supports mic access.'),
     )
   }
   const gum = navigator.mediaDevices.getUserMedia.bind(navigator.mediaDevices)
@@ -818,8 +819,8 @@ export async function startLiveTuner(
     void graphCtx?.close().catch(() => {})
     throw new Error(
       err instanceof Error && err.message
-        ? `Could not start the tuner audio: ${err.message}`
-        : 'Could not start the tuner audio. Try again.',
+        ? tx('Could not start the tuner audio: {detail}', { detail: err.message })
+        : tx('Could not start the tuner audio. Try again.'),
     )
   }
   const ctx: AudioContext = graphCtx

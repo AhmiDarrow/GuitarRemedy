@@ -1,5 +1,7 @@
 /** Minimal MusicXML note extractor for song import */
 
+import { tx } from '../i18n/runtime'
+
 export interface MusicXmlNote {
   pitch: number | null // MIDI, null = rest
   /** Duration in divisions (MusicXML duration units). */
@@ -50,13 +52,13 @@ export function parseMusicXml(xml: string): MusicXmlParseResult {
   const doc = new DOMParser().parseFromString(cleaned, 'application/xml')
   const err = doc.querySelector('parsererror')
   if (err) {
-    throw new Error('Invalid MusicXML')
+    throw new Error(tx('Invalid MusicXML'))
   }
 
   const title =
     textContent(doc.documentElement, 'work-title') ||
     textContent(doc.documentElement, 'movement-title') ||
-    'Untitled'
+    tx('Untitled')
 
   const divisions = parseInt(textContent(doc.documentElement, 'divisions') || '1', 10) || 1
   const fifths = parseInt(textContent(doc.documentElement, 'fifths') || '0', 10) || 0
