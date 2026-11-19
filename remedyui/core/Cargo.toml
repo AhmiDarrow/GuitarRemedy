@@ -1,0 +1,18 @@
+[package]
+name = "guitar-remedy-core"
+version = "1.0.0"
+description = "GuitarRemedy's own logic: music theory, the tuner's pitch detection, tabs, song import (MIDI, MusicXML, Guitar Pro, audio), the curriculum, library and wiki"
+authors = ["AhmiDarrow"]
+license = "MIT"
+edition = "2024"
+publish = false
+
+[lib]
+name = "guitar_core"
+
+[dependencies]
+serde = { version = "1", features = ["derive"] }
+serde_json = { version = "1", features = ["float_roundtrip", "preserve_order"] }
+
+[dev-dependencies]
+flate2 = "1"

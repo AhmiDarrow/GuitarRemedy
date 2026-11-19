@@ -1,0 +1,34 @@
+[workspace]
+members = [".", "core"]
+resolver = "3"
+
+[package]
+name = "guitar-remedy"
+version = "1.0.0"
+description = "GuitarRemedy on RemedyUI: a local-first guitar school with guided lessons, tuner, metronome, tabs and song import"
+authors = ["AhmiDarrow"]
+license = "MIT"
+repository = "https://github.com/AhmiDarrow/GuitarRemedy"
+edition = "2024"
+publish = false
+
+[lib]
+name = "guitar_remedy"
+# The APK and the web page load the app as a library; the desktop links it into src/main.rs.
+crate-type = ["cdylib", "rlib"]
+
+[[bin]]
+name = "guitar-remedy"
+path = "src/main.rs"
+
+[dependencies]
+guitar-remedy-core = { path = "core" }
+serde = { version = "1", features = ["derive"] }
+serde_json = { version = "1", features = ["float_roundtrip", "preserve_order"] }
+
+[profile.release]
+lto = "fat"
+opt-level = 3
+codegen-units = 1
+strip = true
+panic = "abort"
