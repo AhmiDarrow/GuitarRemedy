@@ -53,6 +53,13 @@ GuitarRemedy is a local-first guitar school you can actually practice in — not
 2. **Audio:** decode → **HPSS lead stem** → **Basic Pitch** (Apache-2.0 multipitch assist, free model in `public/models/basic-pitch`) or autocorrelation fallback → tempo → MIDI → fretting → auto-clean  
 3. **Human loop:** Edit (pitch ±1, keep first N bars, Clean up) → save to **Your tabs** → `.grtab.json` / MIDI / ASCII  
 
+```mermaid
+flowchart LR
+  audio[MP3 · WAV · FLAC · …] --> stem[HPSS lead stem] --> pitch[Basic Pitch<br/>or autocorrelation] --> midi[tempo → MIDI]
+  file[MIDI · MusicXML · Guitar Pro] --> midi
+  midi --> fret[fretting + auto-clean] --> edit[Edit by ear] --> keep[(Your tabs<br/>.grtab.json · MIDI · ASCII)]
+```
+
 **Accepted audio:** MP3, WAV, M4A, OGG/Opus, FLAC, AAC/MP4, WebM, AIFF, CAF, WMA (when the runtime can decode).  
 **Accepted tabs:** MIDI, MusicXML/MXL, Guitar Pro (best-effort), `.grtab.json`.
 
@@ -119,11 +126,10 @@ src-tauri/      Tauri 2 · signed updater
 - Packaging notes: [`PACKAGING.md`](PACKAGING.md)
 
 ```bash
-# when you're ready to publish (not done until you say so)
-gh repo create AhmiDarrow/GuitarRemedy --private --source=. --remote=origin
-git push -u origin main
+# one-time: give CI the updater signing key
 gh secret set TAURI_SIGNING_PRIVATE_KEY < %USERPROFILE%\.tauri\guitarremedy.key
-git tag v0.1.0 && git push origin v0.1.0
+# each release: tag the version from package.json
+git tag v<version> && git push origin v<version>
 ```
 
 ---
